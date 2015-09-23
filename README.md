@@ -1,7 +1,7 @@
-# C++ Core Guidelines
+# C++ 핵심 가이드라인
 
->"Within C++ is a smaller, simpler, safer language struggling to get out." 
->-- <cite>Bjarne Stroustrup</cite>
+>"C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)" 
+>-- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
 
 The C++ Core Guidelines are a collaborative effort led by Bjarne Stroustrup, much like the C++ language itself. They are the result of many 
 person-years of discussion and design across a number of organizations. Their design encourages general applicability and broad adoption but 
