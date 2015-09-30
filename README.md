@@ -16,7 +16,8 @@
 - Ilgook Jo
 - Dongwoo Lee
 - Joowon Ryoo
-- Gun Son
+- Geon Son
+- Minseob Kwon
 
 >"C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)" 
 >-- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
