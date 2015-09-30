@@ -1,4 +1,20 @@
-# C++ 핵심 가이드라인
+# C++ 핵심 가이드라인 한글화 프로젝트
+
+- 본 프로젝트는 C++ 표준위원회에서 제작한 C++ 핵심 가이드라인을 한글화하는 프로젝트입니다.
+- 원본 문서가 수시로 변경됩니다. 한글로 번역하신 내용 밑에 영어 원문을 인용 문구로 남겨주시기 바랍니다.
+- 모든 문서는 Markdown 포맷을 기본으로 합니다.
+- 원문의 의도만 바뀌지 않는다면 재밌게 의역해도 상관없습니다. 
+- 참여를 원하시는 분께서는 Chris Ohk(utilForever)에게 연락주시기 바랍니다.
+
+## 번역을 도와주시는 분들
+
+- Chris Ohk
+- Seokjoon Yun
+- Giyeon Bang
+- Ilgook Jo
+- Dongwoo Lee
+- Joowon Ryoo
+- Gun Son
 
 >"C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)" 
 >-- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
