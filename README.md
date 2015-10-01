@@ -57,19 +57,28 @@ However, no topic that can help a programmer is out of bounds.
 We expect to have to introduce more exceptions to better accommodate real-world needs. We also need more rules.
 
 여러분은 기대와 다르거나 경험한 내용과 다른 규칙을 찾을 수 있을 것이다. 만약 여러분이 어떤 방법으로든 코딩 스타일을 바꾸도록 제안하지 않았다면, 우리는 실패한 것이다!
-그러니 규칙을 확인하거나 반증해보길 바란다! 
+그러니 규칙을 확인하거나 반증해보길 바란다! 특히, 성능 측정 또는 더 나은 예제로 뒷받침되는 규칙을 만들고 싶다.
 
 > You will find some of the rules contrary to your expectations or even contrary to your experience.
 If we haven't suggested you change your coding style in any way, we have failed! Please try to verify or disprove rules!
 In particular, we'd really like to have some of our rules backed up with measurements or better examples.
 
-You will find some of the rules obvious or even trivial. Please remember that one purpose of a guideline is to help someone who is less 
-experienced or coming from a different background or language to get up to speed.
+당신은 심지어 당연하거나 사소한 규칙도 찾을 수 있을 것이다. 하지만 가이드라인의 목적 중 하나는 경험이 적거나 다른 언어를 배운 사람이 모던 C++을 빠르게 배울 수 있도록 돕기 위함을 기억하길 바란다.
 
-The rules are designed to be supported by an analysis tool. Violations of rules will be flagged with references (or links) to the relevant rule. 
+> You will find some of the rules obvious or even trivial. Please remember that one purpose of a guideline is to help someone
+who is less experienced or coming from a different background or language to get up to speed.
+
+우리는 분석 도구를 통해 지원할 수 있도록 규칙을 설계했다. 규칙을 위반하게 되면 관련 규칙에 대한 참조(또는 링크)를 표시한다.
+우리는 여러분이 코드를 작성하기 전에 모든 규칙을 기억할 것이라고 기대하지 않는다.
+
+> The rules are designed to be supported by an analysis tool. Violations of rules will be flagged with references (or links) to the relevant rule. 
 We do not expect you to memorize all the rules before trying to write code.
 
-The rules are meant for gradual introduction into a code base. We plan to build tools for that and hope others will too.
+규칙은 코드 베이스로의 점진적인 도입을 의미한다. 우리는 이를 위해 도구를 만들 계획이다.
 
-Comments and suggestions for improvements are most welcome. We plan to modify and extend this document as our understanding improves and the 
-language and the set of available libraries improve.
+> The rules are meant for gradual introduction into a code base. We plan to build tools for that and hope others will too.
+
+개선을 위한 의견과 제안은 대부분 환영한다. 우리는 규칙에 대한 해석이 좀 더 나아지고 C++ 언어 및 라이브러리가 개선되는 대로 이 문서를 수정하고 확장할 계획이다.
+
+> Comments and suggestions for improvements are most welcome. We plan to modify and extend this document as our understanding improves
+and the language and the set of available libraries improve.
