@@ -1,3 +1,6 @@
+> "C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)" 
+> -- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
+
 # C++ 핵심 가이드라인 한글화 프로젝트
 
 - 본 프로젝트는 C++ 표준위원회에서 제작한 C++ 핵심 가이드라인을 한글화하는 프로젝트입니다.
@@ -17,9 +20,6 @@
 - Joowon Ryoo
 - Geon Son
 - Minseob Kwon
-
-> "C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)" 
-> -- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
 
 비야네 스트롭스트룹이 주도한 C++ 핵심 가이드라인은 많은 사람들이 공동으로 노력한 결과이며 C++ 언어 그 자체다.
 C++ 핵심 가이드라인은 수 년에 걸쳐 많은 조직에서 다양한 사람들의 토론과 디자인을 거친 결과다.
