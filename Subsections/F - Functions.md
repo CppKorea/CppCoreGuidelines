@@ -1,6 +1,8 @@
-# F: Functions
+# 함수
+># F: Functions
 
-A function specifies an action or a computation that takes the system from one consistent state to the next. It is the fundamental building block of programs.
+함수는 동작이나 계산을 명세하는데 이것들은 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 이것은 프로그램의 기초적인 설계 단위다.
+>A function specifies an action or a computation that takes the system from one consistent state to the next. It is the fundamental building block of programs.
 
 It should be possible to name a function meaningfully, to specify the requirements of its argument, and clearly state the relationship between the arguments and the result. An implementation is not a specification. Try to think about what a function does as well as about how it does it.
 Functions are the most critical part in most interfaces, so see the interface rules.
