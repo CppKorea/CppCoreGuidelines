@@ -1,14 +1,24 @@
-# CPL: C-style programming
+# CPL: C-style 프로그래밍
+> CPL: C-style programming
 
-C and C++ are closely related languages.
+C와 C++는 밀접하게 관계된 언어다.
+(그것들은) 둘 다 "Classic C", 1978에서 유래되어 이후 ISO위원회에서 발전해왔다.
+(그것들의) 호환성을 위해 많은 시도들이 있었으나, 어느 쪽도 다른 것의 하위 집합(subset)이 아니다.
+> C and C++ are closely related languages.
 They both originate in "Classic C" from 1978 and have evolved in ISO committees since then.
 Many attempts have been made to keep them compatible, but neither is a subset of the other.
 
-C rule summary:
+C 규칙 요약:
+> C rule summary:
 
-* [CPL.1: Prefer C++ to C](Rcpl-C)
-* [CPL.2: If you must use C, use the common subset of C and C++, and compile the C code as C++](#Rcpl-subset)
-* [CPL.3: If you must use C for interfaces, use C++ in the code using such interfaces](#Rcpl-interface)
+* [CPL.1: C보다 C++로 택하자](Rcpl-C)
+* [CPL.2: 만약 반드시 C를 써야한다면, C와 C++의 공통된 하위 집합을 쓰며, C++로 코드를 컴파일하자](#Rcpl-subset)
+* [CPL.3: 만약 인터페이스를 위해 C를 써야한다면, 인터페이스를 쓴 코드 안에 C++를 사용하자](#Rcpl-interface)
+
+>
+* [CPL.1: Prefer C++ to C]
+* [CPL.2: If you must use C, use the common subset of C and C++, and compile the C code as C++]
+* [CPL.3: If you must use C for interfaces, use C++ in the code using such interfaces]
 
 
 <a name="Rcpl-C"></a>
