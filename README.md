@@ -12,14 +12,56 @@
 
 ## 번역을 도와주시는 분들
 
-- Chris Ohk
-- Seokjoon Yun
-- Giyeon Bang
+- Chris Ohk (utilForever)
+- Seokjoon Yun 
+- Giyeon Bang (GiyeonBang-rhathd)
 - Ilgook Jo
 - Dongwoo Lee
-- Joowon Ryoo
+- Joowon Ryoo (HIPERCUBE)
 - Geon Son
 - Minseob Kwon
+- Yonghyun Kim (drvoss)
+- ByungWook Eric Ahn (bwahn)
+- Eundoo Song (sedman)
+- Inchul Kang (kangic)
+- Jongdeok Kim (jenix21)
+- Jihoon Song (jihoonsong)
+- Junsung Jang (naxxster)
+- Jonghee Yun (jongheeyun)
+- Changjun Lee (yiatom)
+- Minjang Kim (minjang)
+
+## 번역 진행 상황
+
+- Abstract
+- C++ Core Guildlines
+- A - Architectural Ideas
+- C - Classes and Class Hierarchies
+- Con - Constants and Immutability
+- CP - Concurrency and Parallelism
+- <B>CPL - C-Style programming : GiyeonBang-rhathd</B>
+- <B>E - Error Handling : HIPERCUBE</B>
+- Enum - Enumerations
+- ES - Expressions and Statements
+- F - Functions
+- GSL - Guideline support library
+- <B>I - Interfaces : bwahn</B>
+- In - Introduction
+- <B>N - Non-Rules and myths : GiyeonBang-rhathd</B>
+- <B>NL - Naming and layout rules : GiyeonBang-rhathd</B>
+- P - Philosophy
+- PER - Performance
+- PRO - Profiles
+- <B>R - Resource management : kangic</B>
+- RF - References
+- <B>SF - Source files : naxxster</B>
+- STL - The Standard Library
+- T - Templates and generic programming
+- To-do - Unclassified proto-rules
+- Appendix A - Libraries
+- Appendix B - Modernizing code
+- Appendix C - Discussion
+
 
 ## 개요
 
