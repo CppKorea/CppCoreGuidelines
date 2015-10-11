@@ -38,7 +38,7 @@
 - A - Architectural Ideas
 - C - Classes and Class Hierarchies
 - Con - Constants and Immutability
-- CP - Concurrency and Parallelism
+- <B>CP - Concurrency and Parallelism : minjang</B>
 - <B>CPL - C-Style programming : GiyeonBang-rhathd</B>
 - <B>E - Error Handling : HIPERCUBE</B>
 - Enum - Enumerations
@@ -56,7 +56,7 @@
 - RF - References
 - <B>SF - Source files : naxxster</B>
 - STL - The Standard Library
-- T - Templates and generic programming
+- <B>T - Templates and generic programming : minjang</B>
 - To-do - Unclassified proto-rules
 - Appendix A - Libraries
 - Appendix B - Modernizing code
