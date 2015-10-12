@@ -33,35 +33,34 @@
 
 ## 번역 진행 상황
 
-- Abstract
-- C++ Core Guildlines
-- A - Architectural Ideas
-- C - Classes and Class Hierarchies
-- Con - Constants and Immutability
-- <B>CP - Concurrency and Parallelism : minjang</B>
-- <B>CPL - C-Style programming : GiyeonBang-rhathd</B>
-- <B>E - Error Handling : HIPERCUBE</B>
-- Enum - Enumerations
-- ES - Expressions and Statements
-- F - Functions
-- GSL - Guideline support library
-- <B>I - Interfaces : bwahn</B>
-- In - Introduction
-- <B>N - Non-Rules and myths : GiyeonBang-rhathd</B>
-- <B>NL - Naming and layout rules : GiyeonBang-rhathd</B>
-- P - Philosophy
-- PER - Performance
-- PRO - Profiles
-- <B>R - Resource management : kangic</B>
-- RF - References
-- <B>SF - Source files : naxxster</B>
-- STL - The Standard Library
-- <B>T - Templates and generic programming : minjang</B>
-- To-do - Unclassified proto-rules
-- Appendix A - Libraries
-- Appendix B - Modernizing code
-- Appendix C - Discussion
-
+- <B>Abstract : utilForever (100%)</B>
+- C++ Core Guildlines (0%)
+- A - Architectural Ideas (0%)
+- C - Classes and Class Hierarchies (0%)
+- Con - Constants and Immutability (0%)
+- <B>CP - Concurrency and Parallelism : minjang (0%)</B>
+- <B>CPL - C-Style programming : GiyeonBang-rhathd (0%)</B>
+- <B>E - Error Handling : HIPERCUBE (0%)</B>
+- <B>Enum - Enumerations : sedman (0%)</B>
+- ES - Expressions and Statements (0%)
+- <B>F - Functions : jongheeyun (1%)</B>
+- GSL - Guideline support library (0%)
+- <B>I - Interfaces : bwahn (0%)</B>
+- In - Introduction (0%)
+- <B>N - Non-Rules and myths : GiyeonBang-rhathd (0%)</B>
+- <B>NL - Naming and layout rules : GiyeonBang-rhathd (0%)</B>
+- <B>P - Philosophy : drvoss (0%)</B>
+- <B>PER - Performance : sedman (0%)</B>
+- <B>PRO - Profiles : drvoss (0%)</B>
+- <B>R - Resource management : kangic (0%)</B>
+- RF - References (0%)
+- <B>SF - Source files : naxxster (0%)</B>
+- STL - The Standard Library (0%)
+- <B>T - Templates and generic programming : minjang (0%)</B>
+- To-do - Unclassified proto-rules (0%)
+- Appendix A - Libraries (0%)
+- Appendix B - Modernizing code (0%)
+- Appendix C - Discussion (0%)
 
 ## 개요
 
