@@ -12,7 +12,7 @@ C 규칙 요약:
 > C rule summary:
 
 * [CPL.1: C보다 C++로 택하자](Rcpl-C)
-* [CPL.2: 만약 반드시 C를 써야한다면, C와 C++의 공통된 하위 집합을 쓰며, C++로 코드를 컴파일하자](#Rcpl-subset)
+* [CPL.2: 만약 반드시 C를 써야한다면, C와 C++의 공용 하위 집합(subset)을 쓰며, C++로 코드를 컴파일하자](#Rcpl-subset)
 * [CPL.3: 만약 인터페이스를 위해 C를 써야한다면, 인터페이스를 쓴 코드 안에 C++를 사용하자](#Rcpl-interface)
 
 >
@@ -22,19 +22,24 @@ C 규칙 요약:
 
 
 <a name="Rcpl-C"></a>
-### CPL.1: Prefer C++ to C
+### CPL.1: C보다 C++로 택하자
+> ### CPL.1: Prefer C++ to C
 
-**Reason**: C++ provides better type checking and more notational support.
+**이유**: C++은 더 나은 형 검사(type checking)와 더 많은 표기법을 지원한다.
+이것은 더 나은 고수준의 프로그래밍과 자주 더 빠른 코드 생성을 제공한다.
+> **Reason**: C++ provides better type checking and more notational support.
 It provides better support for high-level programming and often generates faster code.
 
-**Example**:
+**예제**:
+> **Example**:
 
 	char ch = 7;
 	void* pv = &ch;
-	int* pi = pv;	// not C++
-	*pi = 999;		// overwrite sizeof(int) bytes near &ch
+	int* pi = pv;	// C++(의 표기)가 아님 // not C++
+	*pi = 999;		// &ch 근처의 sizeof(int) 바이트를 덮어씀 // overwrite sizeof(int) bytes near &ch
 
-**Enforcement**: Use a C++ compiler.
+**시행**: C++ 컴파일러를 사용하라. 
+> **Enforcement**: Use a C++ compiler.
 
 
 <a name="Rcpl-subset"></a>
