@@ -18,39 +18,51 @@
 
 수백만줄에 달하는 코드가 있는데, 이걸 단 한 번에 모두 바꿔버린다는 생각은 일반적으로 비현실적이다.
 >If we have a million lines of new code, the idea of "just changing it all at once" is typically unrealistic.
+
 그래서 단계적으로 코드 베이스를 현대화할 필요가 있다.
 >Thus, we need a way of gradually modernizing a code base.
 
 옛날 코드를 모던 스타일로 업그레이드하는 일은 좀 벅찬 일이다.
 >Upgrading older code to modern style can be a daunting task.
+
 보통 옛날 코드들은 이해하기 아주 어렵도록 지저분한데, (적어도 현재의 사용범위 안에서만큼은) 작동이 정확히 된다.
 >Often, the old code is both a mess (hard to understand) and working correctly (for the current range of uses).
+
 일반적으로 그 프로그램을 처음 짠 프로그래머는 주변에 없고, 테스트 케이스는 완전치 않다.
 >Typically, the original programmer is not around and test cases incomplete.
+
 코드가 지저분하면, 조그만 변화만 주려고 해도 엄청난 노력이 필요하고, 에러가 발생하는 확률도 급격히 증가한다.
 >The fact that the code is a mess dramatically increases to effort needed to make any change and the risk of introducing errors.
+
 대체로 지저분하고 오래된 코드들은 쓸데없이 느리게 도는데, 구식 컴파일러를 통해서만 컴파일되고 요즘 하드웨어의 혜택을 전혀 받지 못하기 때문이다.
 >Often messy, old code runs unnecessarily slowly because it requires outdated compilers and cannot take advantage of modern hardware.
+
 그래서 많은 경우에, 메이저 업그레이드를 하기 위해서는 여러 프로그램들의 도움이 필요하게 된다.
 >In many cases, programs support would be required for major upgrade efforts.
 
 코드를 현대화하는 이유는 다음과 같다. 새 기능을 추가하는 것을 쉽게 하기 위해서, 유지보수성을 향상시키기 위해서, 성능(처리량과 응답속도)을 향상시키 위해서, 요즘의 하드웨어를 충분히 활용하기 위해서.
 >The purpose of modernizing code is to simplify adding new functionality, to ease maintenance, and to increase performance (throughput or latency), and to better utilize modern hardware.
+
 코드를 "보기 예쁘게 만들기"라든가 "모던 스타일을 따르기"는 그 자체로 코드 개선의 이유가 될 수는 없다.
 >Making code "look pretty" or "follow modern style" are not by themselves reasons for change.
 
 구식 코드를 가지고 있다는 것은 (기회 비용을 포함한) 비용이 드는 일이지만, 코드에 변화를 주는 것은 또 그만큼의 리스크가 있는 일이다.
 >There are risks implied by every change and costs (including the cost of lost opportunities) implied by having an outdated code base.
+
 그래서, 코드 현대화를 통해 절감되는 비용이, 그에 따르는 리스크보다 훨씬 커야만 한다.
 >The cost reductions must outweigh the risks.
+
 
 그렇다면 어떻게 해야할까?
 >But how?
 
+
 코드 현대화에 단 하나의 정답이 있는 것은 아니다.
 >There is no one approach to modernizing code.
+
 코드에 따라, 업데이트에 대한 압박에 따라, 개발자의 배경에 따라, 사용가능한 툴에 따라 어떤 방법이 좋을지가 달라진다.
 >How best to do it depends on the code, the pressure for updates, the backgrounds of the developers, and the available tool.
+
 여기에서는 몇 가지 (아주 일반적인) 방법을 소개하고자 한다.
 >Here are some (very general) ideas:
 
@@ -73,10 +85,12 @@ This would be a set of changes across the whole code base, but would most likely
 
 어떤 방법을 선택하든, 코어 가이드라인을 충실히 따를 때 가장 큰 이득을 얻을 수 있다는 것을 유념하기 바란다.
 >Whichever way you choose, please note that the most advantages come with the highest conformance to the guidelines.
+
 이 가이드라인은 잘돌아가기를 기대하는 마음으로 아무거나 하나 골라서 적용해보는, 관계없는 규칙들의 마구잡이식 모음집이 아니다.
 >The guidelines are not a random set of unrelated rules where you can srandomly pick and choose with an expectation of success.
 
 여러분들의 경험과 코드 현대화를 위해 사용하는 툴들을 대한 이야기를 진심으로 듣고 싶다.
 >We would dearly love to hear about experience and about tools used.
+
 코드 현대화는 분석 툴, 코드 변환툴 따위의 도움을 받을 때 더 신속하고, 단순하고, 안전하게 이루어질 수 있다.
 >Modernization can be much faster, simpler, and safer when supported with analysis tools and even code transformation tools.
