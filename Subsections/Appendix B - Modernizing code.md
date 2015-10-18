@@ -3,16 +3,17 @@
 
 이상적으로,  우리는 모든 룰을 따라 코드를 짠다.
 >Ideally, we follow all rules in all code.
-하지만 현실적으로, 우리는 다음과 같은 수많은 옛날 코드를 다루어야 한다.
->Realistically, we have to deal with a lot of old code:
 
-*가이드라인이 형성되기 전이나, 알려지기 이전에 짜여진 어플리케이션 코드
+하지만 현실적으로, 우리는 다음과 같은 수많은 옛날 코드를 다루어야 한다.
+>Realistically, we have to deal with a lot of old code
+
+* 가이드라인이 형성되기 전이나, 알려지기 이전에 짜여진 어플리케이션 코드
 >* application code written before the guidelines were formuated or known
 
-*오래됐거나 상이한 표준에 맞추어 짜여진 라이브러리
+* 오래됐거나 상이한 표준에 맞추어 짜여진 라이브러리
 >* libraries written to older/different standards
 
-*미처 현대화할 생각을 못했던 코드들
+* 미처 현대화할 생각을 못했던 코드들
 >* code that we just haven't gotten around to modernizing
 
 수백만줄에 달하는 코드가 있는데, 이걸 단 한 번에 모두 바꿔버린다는 생각은 일반적으로 비현실적이다.
@@ -53,20 +54,20 @@
 여기에서는 몇 가지 (아주 일반적인) 방법을 소개하고자 한다.
 >Here are some (very general) ideas:
 
-*가장 좋은 방법은 "모든 코드를 업그레이드 하기"다. 총 투입시간 대비 이득이 가장 크다.
+* 가장 좋은 방법은 "모든 코드를 업그레이드 하기"다. 총 투입시간 대비 이득이 가장 크다.
 >* The ideal is "just upgrade everything." That gives the most benefits for the shortest total time.
 
 하지만 대부분의 상황에서는 불가능 할 것이다.
 >In most circumstances, it is also impossible.
 
-*모듈 하나씩 바꿔가는 식으로 코드를 컨버트할 수도 있다.하지만 인터페이스(특히 ABI)에 영향을 주는 룰들은 모듈 하나씩 바꿔가는 식으로 적용할 수가 없다. 예를 들어 [use 'array_view'](#S-GSL), 같은 룰이 그렇다.
+* 모듈 하나씩 바꿔가는 식으로 코드를 컨버트할 수도 있다.하지만 인터페이스(특히 ABI)에 영향을 주는 룰들은 모듈 하나씩 바꿔가는 식으로 적용할 수가 없다. 예를 들어 [use 'array_view'](#S-GSL), 같은 룰이 그렇다.
 >* We could convert a code base module for module, but any rules that affects interfaces (especially ABIs), such as [use `array_view`](#S-GSL), cannot be done on a per-module basis.
 
 
-*적용했을 때 가장 큰 이득을 얻을 수 있거나, 가장 적은 오류를 일으킬 것같은 룰부터 적용하여 코드를 컨버트하는 "상향식 접근법"도 있다.
+* 적용했을 때 가장 큰 이득을 얻을 수 있거나, 가장 적은 오류를 일으킬 것같은 룰부터 적용하여 코드를 컨버트하는 "상향식 접근법"도 있다.
 >* We could convert code "botton up" starting with the rules we estimate will give the greatest benefits and/or the least trouble in a given code base.
 
-*인터페이스에 초점을 맞추어 시작할 수도 있다. 예를 들어, 어떤 시스템 자원도 누수되지 않고 어떤 포인터도 오용되지 않는 것을 확실하게 하는 것이다. 이 방법을 적용하면 전체 코드 베이스를 관통하여 이곳 저곳에 변화를 주어야겠지만, 매우 큰 효용을 얻을 수 있다.
+* 인터페이스에 초점을 맞추어 시작할 수도 있다. 예를 들어, 어떤 시스템 자원도 누수되지 않고 어떤 포인터도 오용되지 않는 것을 확실하게 하는 것이다. 이 방법을 적용하면 전체 코드 베이스를 관통하여 이곳 저곳에 변화를 주어야겠지만, 매우 큰 효용을 얻을 수 있다.
 >* We could start by focusing on the interfaces, e.g., make sure that no resources are lost and no pointer is misused.
 This would be a set of changes across the whole code base, but would most likely have huge benefits.
 
