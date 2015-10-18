@@ -1,11 +1,8 @@
 # 부록 B: 코드 현대화하기
-># Appendix B: Modernizing code
 
-이상적으로,  우리는 모든 룰을 따라 코드를 짠다.
+이상적으로,  우리는 모든 룰을 따라 코드를 짠다. 하지만 현실적으로, 우리는 다음과 같은 수많은 옛날 코드를 다루어야 한다.
 >Ideally, we follow all rules in all code.
-
-하지만 현실적으로, 우리는 다음과 같은 수많은 옛날 코드를 다루어야 한다.
->Realistically, we have to deal with a lot of old code
+Realistically, we have to deal with a lot of old code
 
 * 가이드라인이 형성되기 전이나, 알려지기 이전에 짜여진 어플리케이션 코드
 >* application code written before the guidelines were formuated or known
