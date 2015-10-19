@@ -1,7 +1,10 @@
 # Appendix C: Discussion
 
-This section contains follow-up material on rules and sets of rules.
-In particular, here we present further rationale, longer examples, and discussions of alternatives.
+이 절은 규칙들과 규칙들의 집합에 대한 추가적인 내용을 담고 있다.
+특히, 여기서 우리는 더 많은 이유와 더 긴 예제들과 대안책들에 대한 토론을 표현하고자 한다.
+
+>This section contains follow-up material on rules and sets of rules.
+>In particular, here we present further rationale, longer examples, and discussions of alternatives.
 
 ### <a name="Sd order">Discussion: Define and initialize member variables in the order of member declaration</a>
 
