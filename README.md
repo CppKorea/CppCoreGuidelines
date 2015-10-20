@@ -37,7 +37,7 @@
 - <B>Abstract : utilForever (100%)</B>
 - C++ Core Guildlines (0%)
 - A - Architectural Ideas (0%)
-- C - Classes and Class Hierarchies (0%)
+- <B>C - Classes and Class Hierarchies (0%) : jenix21</B>
 - <B>Con - Constants and Immutability : jen6 (0%)</B>
 - <B>CP - Concurrency and Parallelism : minjang (0%)</B>
 - <B>CPL - C-Style programming : GiyeonBang-rhathd (0%)</B>
@@ -60,7 +60,7 @@
 - <B>T - Templates and generic programming : minjang (0%)</B>
 - To-do - Unclassified proto-rules (0%)
 - Appendix A - Libraries (0%)
-- <B>Appendix B - Modernizing code : yiatom (0%)</B>
+- <B>Appendix B - Modernizing code : yiatom (100%)</B>
 - <B>Appendix C - Discussion : jihoonsong (0%)</B>
 
 ## 개요
