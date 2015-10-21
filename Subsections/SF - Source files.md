@@ -9,29 +9,31 @@
 >Source file rule summary:
 
 * [SF.1: 코드 파일에 대해서 `.cpp` 확장자를 사용하고, 인터페이스 파일에 대해서는 `.h` 확장자를 사용하라](#Rs-suffix)
->* [SF.1: Use a `.cpp` suffix for code files and `.h` for interface files](#Rs-suffix)
 * [SF.2: `.h` 파일은 객체에 대한 정의나, 인라인이 아닌 함수에 대한 정의를 포함하지 않도록 한다](#Rs-inline)
->* [SF.2: A `.h` file may not contain object definitions or non-inline function definitions](#Rs-inline)
 * [SF.3: 복수의 소스 파일에서 사용되는 모든 선언은 `.h` 파일을 사용하라](#Rs-suffix)
->* [SF.3: Use `.h` files for all declarations used in multiple sourcefiles](#Rs-suffix)
 * [SF.4: `.h` 파일은 다른 선언들을 하기 이전에 포함하라](#Rs-include-order)
->* [SF.4: Include `.h` files before other declarations in a file](#Rs-include-order)
 * [SF.5: `.cpp` 파일은 자신의 인터페이스를 정의하고 있는 `.h` 파일들을 포함시켜야 한다](#Rs-consistency)
->* [SF.5: A `.cpp` file must include the `.h` file(s) that defines its interface](#Rs-consistency)
 * [SF.6: Use `using`-directives for transition, for foundation libraries (such as `std`), or within a local scope](#Rs-using)
->* [SF.6: Use `using`-directives for transition, for foundation libraries (such as `std`), or within a local scope](#Rs-using)
 * [SF.7: 헤더 파일에는 `using` 지시자를 사용하지 마라](#Rs-using-directive)
->* [SF.7: Don't put a `using`-directive in a header file](#Rs-using-directive)
 * [SF.8: 모든 `.h` 파일에 `#include` 보호 문구를 사용하라](#Rs-guards)
->* [SF.8: Use `#include` guards for all `.h` files](#Rs-guards)
 * [SF.9: 소스 파일들 사이에는 순환 의존 구조를 만들지 말라](#Rs-cycles)
->* [SF.9: Avoid cyclic dependencies among source files](#Rs-cycles)
 
 * [SF.20: 논리적 구조를 표현하기 위하여 `namespace`를 사용하라](#Rs-namespace)
->* [SF.20: Use `namespace`s to express logical structure](#Rs-namespace)
 * [SF.21: 헤더에는 이름없는(익명의) 네임스페이스를 사용하지 마라](#Rs-unnamed)
->* [SF.21: Don't use an unnamed (anonymous) namespace in a header](#Rs-unnamed)
 * [SF.22: 내부에서만 사용하는/외부에 노출하지 않는 모든 항목들에 대해서는 이름없는(익명의) 네임스페이를 사용하라](#Rs-unnamed2)
+
+>* [SF.1: Use a `.cpp` suffix for code files and `.h` for interface files](#Rs-suffix)
+>* [SF.2: A `.h` file may not contain object definitions or non-inline function definitions](#Rs-inline)
+>* [SF.3: Use `.h` files for all declarations used in multiple sourcefiles](#Rs-suffix)
+>* [SF.4: Include `.h` files before other declarations in a file](#Rs-include-order)
+>* [SF.5: A `.cpp` file must include the `.h` file(s) that defines its interface](#Rs-consistency)
+>* [SF.6: Use `using`-directives for transition, for foundation libraries (such as `std`), or within a local scope](#Rs-using)
+>* [SF.7: Don't put a `using`-directive in a header file](#Rs-using-directive)
+>* [SF.8: Use `#include` guards for all `.h` files](#Rs-guards)
+>* [SF.9: Avoid cyclic dependencies among source files](#Rs-cycles)
+>
+>* [SF.20: Use `namespace`s to express logical structure](#Rs-namespace)
+>* [SF.21: Don't use an unnamed (anonymous) namespace in a header](#Rs-unnamed)
 >* [SF.22: Use an unnamed (anonymous) namespace for all internal/nonexported entities](#Rs-unnamed2)
 
 
@@ -73,8 +75,8 @@
 **Enforcement**:
 
 * 컨벤션에 맞지 않는 파일 이름들 찾아내기
->* Flag non-conventional file names.
 * `.h` 와 `.cpp`` (혹은 동일한 의미의 파일들) 이 아래의 규칙을 따르는지 검토하기
+>* Flag non-conventional file names.
 >* Check that `.h` and `.cpp`` (and equivalents) follow the rules below.
 
 
@@ -92,24 +94,25 @@
 >**Alternative formulation**: A `.h` file must contain only:
 
 * 다른 `.h`파일에 대한 `#include` 구문 (인클루드 보호 장치와 함께)
->* `#include`s of other `.h` files (possibly with include guards
 * 템플릿
->* templates
 * 클래스 정의
->* class definitions
 * 함수 선언
->* function declarations
 * `extern` 선언
->* `extern` declarations
 * `inline` 함수 정의
->* `inline` function definitions
 * `constexpr` 정의
->* `constexpr` definitions
 * `const` 정의
->* `const` definitions
 * `using` 별칭 정의
->* `using` alias definitions
 * ???
+>* `#include`s of other `.h` files (possibly with include guards
+>* templates
+>* class definitions
+>* function declarations
+>* `extern` declarations
+>* `inline` function definitions
+>* `constexpr` definitions
+>* `const` definitions
+>* `using` alias definitions
+>* ???
 
 **Enforcement**: 위의 허용 목록을 검토한다.
 >**Enforcement**: Check the positive list above.
