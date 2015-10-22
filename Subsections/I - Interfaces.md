@@ -476,9 +476,11 @@ That is, it's value must be `delete`d or transferred to another owner, as is don
 
 
 <a name="Ri-nullptr"></a>
-### I.12: Declare a pointer that must not be null as `not_null`
+### I.12: 포인터가 NULL값이 될 수 없다면 `not_null`로 선언하라.
+>### I.12: Declare a pointer that must not be null as `not_null`
 
-**Reason**: To help avoid dereferencing `nullptr` errors. To improve performance by avoiding redundant checks for `nullptr`.
+**Reason**:  `nullptr` 역참조(Null Pointer Dereference)에러를 피하기 위해, `nullptr` 반복 체크를 줄여서 성능을 높이기 위해.
+>**Reason**: To help avoid dereferencing `nullptr` errors. To improve performance by avoiding redundant checks for `nullptr`.
 
 **Example**:
 
@@ -490,35 +492,47 @@ That is, it's value must be `delete`d or transferred to another owner, as is don
 
 	int length(const char* p);				// we must assume that p can be nullptr
 
-By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
+소스 안에 의도를 추가해 줌으로써 컴파일러와 툴의 분석 결과가 좋아진다. 정적(컴파일타임) 분석을 통해 클래스의 에러를 발견하는 것, 최적화 수행하기, 분기 줄이기, NULL 체크 말이다.
+>By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
 
-**Note**: The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
+**Note**: c 스타일의 스트링(NULL로 끝나는 문자열)에 대한 포인터를 char형이라고 여전히 가정하고 있으며 잠재적인 에러 원인이 된다. 'const char *' 대신에 'zstring'을 사용하라.
+>**Note**: The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
 
 	int length(not_null<zstring> p);		// we can assume that p cannot be nullptr
 									// we can assume that p points to a zero-terminated array of characters
 
-Note: `length()` is, of course, `std::strlen()` in disguise.
+Note: `length()`는 당연히 `std::strlen()`이다.
+>Note: `length()` is, of course, `std::strlen()` in disguise.
 
 **Enforcement**:
 
-* (Simple) ((Foundation)) If a function checks a pointer parameter against `nullptr` before access, on all control-flow paths, then warn it should be declared `not_null`.
+* (Simple) ((Foundation)) 함수내에서 값을 접근하기 전에 `nullptr` 체크를 한다면 `not_null`로 선언해야 한다고 경고하라.
+* (Complex) 포인터를 반환하는 함수가 `nullptr`가 아닌 값을 반환하고 있다면 반환값을 `not_null`로 선언해야 한다고 경고하라.
+
+>* (Simple) ((Foundation)) If a function checks a pointer parameter against `nullptr` before access, on all control-flow paths, then warn it should be declared `not_null`.
 * (Complex) If a function with pointer return value ensures it is not `nullptr` on all return paths, then warn the return type should be declared `not_null`.
 
 
 <a name="Ri-array"></a>
-### I.13: Do not pass an array as a single pointer
+### I.13: 포인터로 배열 인자를 넘기지 마라.
+>### I.13: Do not pass an array as a single pointer
 
-**Reason**: (pointer,size)-style interfaces are error-prone. Also, plain pointer (to array) must relies on some convention to allow the callee to determine the size.
+**Reason**: (포인터, 사이즈) 형태의 함수 인터페이스는 에러날 확률이 높다. 배열에 대한 포인터는 반드시 사이즈를 판단할 수 있는 방식이 필요하다.  
+>**Reason**: (pointer,size)-style interfaces are error-prone. Also, plain pointer (to array) must relies on some convention to allow the callee to determine the size.
 
 **Example**: Consider
 
 	void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
 
-What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
+'q'의 사이즈가 n보다 적다면 어떻게 될까? 관계없는 메모리에 쓰기를 시도할 것이다. 
+'p'의 사이즈가 n보다 작다면 관계없는 메모리로부터 읽기를 시도할 것이다.
+어느 쪽이나 의도치 않는 실행(수행,행동)을 하게 되고 잠재적인 고약한 버그가 생긴다.
+>What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
 What if there are fewer than `n` elements in the array pointed to by `p`? Then, we read some probably unrelated memory.
 Either is undefined behavior and a potentially very nasty bug.
 
-**Alternative**: Consider using explicit ranges,
+**Alternative**: 특정 범위를 사용하는 것을 생각해보자.
+>**Alternative**: Consider using explicit ranges,
 
 	void copy(array_view<const T> r, array_view<T> r2); // copy r to r2
 
@@ -529,9 +543,12 @@ Either is undefined behavior and a potentially very nasty bug.
 	// ...
 	draw(arr,10);
 
-Passing `10` as the `n` argument may be a mistake: the most common convention is to assume [`0`:`n`) but that is nowhere stated. Worse is that the call of `draw()` compiled at all: there was an implicit conversion from array to pointer (array decay) and then another implicit conversion from `Circle` to `Shape`. There is no way that `draw()` can safely iterate through that array: it has no way of knowing the size of the elements.
+10을 n에 인자로 넘기면 에러가 날 수 있다.: 보통 방법은 [0:n)로 가정하는 것이지만 어디에도 설명되지 않고 있다. 더 나쁜 부분은 'draw()' 호출이다. 배열을 포인터로 암시적으로 형변환했고 Circle을 Shape로 묵시적으로 형변환했다.
+'draw()'함수가 배열을 안전하게 순환할 수 있을지 잘 모르겠다. 배열 원소 사이즈를 알 방법이 없기 때문이다.
+>Passing `10` as the `n` argument may be a mistake: the most common convention is to assume [`0`:`n`) but that is nowhere stated. Worse is that the call of `draw()` compiled at all: there was an implicit conversion from array to pointer (array decay) and then another implicit conversion from `Circle` to `Shape`. There is no way that `draw()` can safely iterate through that array: it has no way of knowing the size of the elements.
 
-**Alternative**: Use a support class that ensures that the number of elements is correct and prevents dangerous implicit conversions. For example:
+**Alternative**: 배열 원소의 수가 정확하고 암시적인 형변환을 방어할 수 있는 지원 클래스를 사용하라. 예를 들면,
+>**Alternative**: Use a support class that ensures that the number of elements is correct and prevents dangerous implicit conversions. For example:
 
 	void draw2(array_view<Circle>);
 	Circle arr[10];
@@ -542,13 +559,18 @@ Passing `10` as the `n` argument may be a mistake: the most common convention is
 	void draw3(array_view<Shape>);
 	draw3(arr);	// error: cannot convert Circle[10] to array_view<Shape>
 
-This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
+'draw2()'는  'draw()'와 동일한 정보를 인자로 넘긴다. 그러나 사실은 명확하게 'Circle'의 범위라는 의도이다.
+>This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
 
-**Exception**: Use `zstring` and `czstring` to represent a C-style, zero-terminated strings. But see ???.
+**Exception**: C 스타일 NULL로 끝나는 스트링을 표시할 때는 `zstring`, `czstring`를 사용해라. But see ???.
+>**Exception**: Use `zstring` and `czstring` to represent a C-style, zero-terminated strings. But see ???.
 
 **Enforcement**:
 
-* (Simple) ((Bounds)) Warn for any expression that would rely on implicit conversion of an array type to a pointer type. Allow exception for zstring/czstring pointer types.
+* (Simple) ((Bounds)) 조용히 배열을 포인터로 형변환하려는 표현식에 대해서 경고하라. zstring/czstring은 제외.
+* (Simple) ((Bounds)) 주소값을 계산하기 위해 포인터에 대해서 연산하는 계산식에 대해서 경고하라.  
+
+>* (Simple) ((Bounds)) Warn for any expression that would rely on implicit conversion of an array type to a pointer type. Allow exception for zstring/czstring pointer types.
 * (Simple) ((Bounds)) Warn for any arithmetic operation on an expression of pointer type that results in a value of pointer type. Allow exception for zstring/czstring pointer types.
 
 
