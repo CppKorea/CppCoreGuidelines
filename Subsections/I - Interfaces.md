@@ -343,7 +343,7 @@ Postconditions related only to internal state belongs in the definition/implemen
 		Ensures(buffer[0]==0);
 	}
 
-**Note**: 주석문, `if`문, `assert()`문 등을 통해 선조건은 다양하게 언급되었다. 일반적인 코드와 구분이 어렵고 업데이트하기 어렵고 툴로 조작하기 어렵고 틀린 의미를 가지고 있을 수도 있다.
+**Note**: 선조건은 주석문, `if`문, `assert()`문 등으로 다양하게 언급되었다. 이런 여러 방식때문에 일반적인 코드와 구분이 어렵고 업데이트하기 어렵고 툴로 조작하기 어렵고 틀린 의미를 가지고 있을 수도 있다.
 >**Note**: preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics.
 
 **Alternative**: "이 자원은 반드시 해제되어야 한다" 형태의 후조건은 [RAII](#Rc-raii)에 잘 정의되어 있다.
@@ -427,7 +427,7 @@ consider using a style that returns a pair of values:
 **Note**: 성능이슈가 예외를 사용하지 않을 타당한 이유라고는 생각지 않는다.
 >**Note**: We don't consider "performance" a valid reason not to use exceptions.
 
-* 명확한 에러 체크와 관리가 예외처리만큼 시간과 공간을 허비하지는 않는다.
+* 명시적인 에러 체크와 관리가 예외처리만큼 시간과 공간을 허비하지는 않는다.
 * 간결한 코드는 예외처리를 포함해도 더 좋은 성능을 가진다. (프로그램 최적화를 통해 실행경로를 단순화시킨다).
 * 성능향상를 위한 좋은 방법은 핵심코드는 핵심부분 밖에서 체크하도록 옮기는 것이다. ([checking](#Rper-checking)).
 * 장기적으로 봤을 때 정규화된 코드가 최적화가 잘 된다.
@@ -513,7 +513,7 @@ That is, it's value must be `delete`d or transferred to another owner, as is don
 **Enforcement**:
 
 * (Simple) `owner`가 아닌 일반포인터의 `delete`에 대해서는 경고하라.
-* (Simple) 모든 실행경로 상에서 리셋이나 명확한 `owner` 포인터를 삭제하는데 실패하면 경고하라.
+* (Simple) 모든 실행경로 상에서 리셋이나 `owner` 포인터를 명시적으로 삭제할 때 실패하면 경고하라.
 * (Simple) `new`의 결과값 또는 함수호출로 반환되는 포인터가 일반포인터라면 경고하라.
 
 >* (Simple) Warn on `delete` of a raw pointer that is not an `owner`.
@@ -572,12 +572,12 @@ Note: `length()`는 당연히 `std::strlen()`이다.
 
 'q'의 사이즈가 n보다 적다면 어떻게 될까? 관계없는 메모리에 쓰기를 시도할 것이다.
 'p'의 사이즈가 n보다 작다면 관계없는 메모리로부터 읽기를 시도할 것이다.
-어느 쪽이나 의도치 않는 실행(수행,행동)을 하게 되고 잠재적인 고약한 버그가 생긴다.
+어느 쪽이나 미정의 동작을 하게 되고 잠재적인 고약한 버그가 생긴다.
 >What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
 What if there are fewer than `n` elements in the array pointed to by `p`? Then, we read some probably unrelated memory.
 Either is undefined behavior and a potentially very nasty bug.
 
-**Alternative**: 특정 범위를 사용하는 것을 생각해보자.
+**Alternative**: 명시적 범위를 사용하는 걸 고려해봐라.
 >**Alternative**: Consider using explicit ranges,
 
 	void copy(array_view<const T> r, array_view<T> r2); // copy r to r2
@@ -605,7 +605,7 @@ Either is undefined behavior and a potentially very nasty bug.
 	void draw3(array_view<Shape>);
 	draw3(arr);	// error: cannot convert Circle[10] to array_view<Shape>
 
-'draw2()'는  'draw()'와 동일한 정보를 인자로 넘긴다. 그러나 사실은 명확하게 'Circle'의 범위라는 의도이다.
+'draw2()'는  'draw()'와 동일한 정보를 인자로 넘긴다. 그러나 사실은 명시적으로 'Circle'의 범위라는 의도이다.
 >This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
 
 **Exception**: C 스타일 NULL로 끝나는 스트링을 표시할 때는 `zstring`, `czstring`를 사용해라. But see ???.
