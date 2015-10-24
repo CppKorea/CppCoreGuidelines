@@ -248,15 +248,21 @@ We don't need to mentioning it for each member function.
 
 
 <a name="Ri-post"></a>
-### I.7: State postconditions
+### I.7: 후행조건을 기술하라.
+>### I.7: State postconditions
 
-**Reason**: To detect misunderstandings about the result and possibly catch erroneous implementations.
+**Reason**: 결과에 대한 잘못된 이해를 찾기 위해, 잘못된 구현을 찾아내기 위해.
+>**Reason**: To detect misunderstandings about the result and possibly catch erroneous implementations.
 
-**Example; bad**: Consider
+**Example; bad**: 보면
+>**Example; bad**: Consider
 
 	int area(int height, int width) { return height*width; }	// bad
 
-Here, we (incautiously) left out the precondition specification, so it is not explicit that height and width must be positive.
+여기보면 부주의하게 선행조건 명세를 뻬먹었는데 높이와 폭이 양수가 된다는 조건이 빠져있다.
+역시 후행조건 명세를 뻬먹었는데 넓이를 구하는 알고리즘이 integer 범위를 벗어날 수 있다는 조건이 빠져 있다. 오버플로가 발생할 수 있다.
+이렇게 해보자:
+>Here, we (incautiously) left out the precondition specification, so it is not explicit that height and width must be positive.
 We also left out the postcondition specification, so it is not obvious that the algorithm (`height*width`) is wrong for areas larger than the largest integer.
 Overflow can happen.
 Consider using:
@@ -268,7 +274,8 @@ Consider using:
 		return res;
 	}
 
-**Example, bad**: Consider a famous security bug
+**Example, bad**: 악명높은 보안 버그를 보자
+>**Example, bad**: Consider a famous security bug
 
 	void f()	// problematic
 	{
@@ -277,7 +284,8 @@ Consider using:
 		memset(buffer,0,MAX);
 	}
 
-There was no postcondition stating that the buffer should be cleared and the optimizer eliminated the apparently redundant `memset()` call:
+버퍼가 초기화되고 중복 `memset()` 호출을 줄여서 최적화했다는 후행조건이 없다:
+>There was no postcondition stating that the buffer should be cleared and the optimizer eliminated the apparently redundant `memset()` call:
 
 	void f()	// better
 	{
@@ -287,11 +295,14 @@ There was no postcondition stating that the buffer should be cleared and the opt
 		Ensures(buffer[0]==0);
 	}
 
-**Note** postconditions are often informally stated in a comment that states the purpose of a function; `Ensures()` can be used to make this more systematic, visible, and checkable.
+**Note** 후행조건은 함수의 목적을 기술하는 주석문에서 대충 언급된다. `Ensures()`를 사용함으로써 시스템적으로 체크할 수 있도록 보일 것이다.
+>**Note** postconditions are often informally stated in a comment that states the purpose of a function; `Ensures()` can be used to make this more systematic, visible, and checkable.
 
-**Note**: Postconditions are especially important when they relate to something that is not directly reflected in a returned result, such as a state of a data structure used.
+**Note**: 구조체 상태처럼 반환된 결과값 속에 간접적으로 영향을 미치는 것에 대한 후행조건이 특히 중요하다.
+>**Note**: Postconditions are especially important when they relate to something that is not directly reflected in a returned result, such as a state of a data structure used.
 
-**Example**: Consider a function that manipulates a `Record`, using a `mutex` to avoid race conditions:
+**Example**: 경쟁상태을 피할 목적으로 `mutex`를 사용하는 `Record` 조작 함수를 생각해보자:
+>**Example**: Consider a function that manipulates a `Record`, using a `mutex` to avoid race conditions:
 
 	mutex m;
 
@@ -301,7 +312,9 @@ There was no postcondition stating that the buffer should be cleared and the opt
 		// ... no m.unlock() ...
 	}
 
-Here, we "forgot" to state that the `mutex` should be released, so we don't know if the failure to ensure release of the `mutex` was a bug or a feature. Stating the postcondition would have made it clear:
+여기서 `mutex`를 해제해야 한다는 언급을 잊어버렸는데, `mutex` 해제를 언급하지 않은 것이 단순 버그인지 의도인지 알 수가 없다.
+후행조건을 기술함으로써 코드를 분명하게 만든다:
+>Here, we "forgot" to state that the `mutex` should be released, so we don't know if the failure to ensure release of the `mutex` was a bug or a feature. Stating the postcondition would have made it clear:
 
 	void manipulate(Record& r)	// better: hold the mutex m while and only while manipulating r
 	{
@@ -309,9 +322,11 @@ Here, we "forgot" to state that the `mutex` should be released, so we don't know
 		// ... no m.unlock() ...
 	}
 
-The bug is now obvious.
+이제 버그가 분명하게 보인다.
+>The bug is now obvious.
 
-Better still, use [RAII](#Rc-raii) to ensure that the postcondition ("the lock must be released") is enforced in code:
+락 해제에 대한 후행조건을 기술하기보다는 [RAII](#Rc-raii)를 사용해라:
+>Better still, use [RAII](#Rc-raii) to ensure that the postcondition ("the lock must be released") is enforced in code:
 
 	void manipulate(Record& r)	// best
 	{
@@ -319,18 +334,21 @@ Better still, use [RAII](#Rc-raii) to ensure that the postcondition ("the lock m
 		// ...
 	}
 
-**Note**: Ideally, postconditions are stated in the interface/declaration so that users can easily see them.
+**Note**: 이상적으로, 인터페이스/선언부에 사용자들이 쉽게 볼 수 있도록 후행조건을 기술해야 한다.
+사용자들에게 언급되어야 하는 후행조건만 인터페이스에 언급하는데 그친다. 내부 상태에 대한 후행조건은 정의/구현부에만 포함된다.
+>**Note**: Ideally, postconditions are stated in the interface/declaration so that users can easily see them.
 Only postconditions related to the users can be stated in the interface.
 Postconditions related only to internal state belongs in the definition/implementation.
 
-**Enforcement**: (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
+**Enforcement**: (Not enforceable) 체크하기 어려운 개념적인 가이드라인이다.
+>**Enforcement**: (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
 
 
 <a name="Ri-ensures"></a>
-### I.8: 후조건을 표현할때 `Ensures()`를 사용해라.
+### I.8: 후행조건을 표현할때 `Ensures()`를 사용해라.
 >### I.8: Prefer `Ensures()` for expressing postconditions
 
-**Reason**: 후조건이라는 것을 분명히 하기 위해, 또 분석툴을 사용하기 위해.
+**Reason**: 후행조건이라는 것을 분명히 하기 위해, 또 분석툴을 사용하기 위해.
 >**Reason**: To make it clear that the condition is a postcondition and to enable tool use.
 
 **Example**:
@@ -343,16 +361,16 @@ Postconditions related only to internal state belongs in the definition/implemen
 		Ensures(buffer[0]==0);
 	}
 
-**Note**: 선조건은 주석문, `if`문, `assert()`문 등으로 다양하게 언급되었다. 이런 여러 방식때문에 일반적인 코드와 구분이 어렵고 업데이트하기 어렵고 툴로 조작하기 어렵고 틀린 의미를 가지고 있을 수도 있다.
+**Note**: 선행조건은 주석문, `if`문, `assert()`문 등으로 다양하게 언급되었다. 이런 여러 방식때문에 일반적인 코드와 구분이 어렵고 업데이트하기 어렵고 툴로 조작하기 어렵고 틀린 의미를 가지고 있을 수도 있다.
 >**Note**: preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics.
 
-**Alternative**: "이 자원은 반드시 해제되어야 한다" 형태의 후조건은 [RAII](#Rc-raii)에 잘 정의되어 있다.
+**Alternative**: "이 자원은 반드시 해제되어야 한다" 형태의 후행조건은 [RAII](#Rc-raii)에 잘 정의되어 있다.
 >**Alternative**: Postconditions of the form "this resource must be released" and best expressed by [RAII](#Rc-raii).
 
 이상적으로 `Ensured`는 인터페이스의 일부가 되어야 한다. 지금으로서는 함수 정의에 위치시킨다.(함수 내부)
 >Ideally, that `Ensured` should be part of the interface that's not easily done. For now, we place it in the definition (function body).
 
-**Enforcement**: (Not enforceable) 다양한 방식의 후조건은 가능하지 않다. 언어명세에 포함되지 않은 채로 대충 정의(assert())한 후조건에 대해서 경고하기는 거의 불가능하다.
+**Enforcement**: (Not enforceable) 다양한 방식의 후행조건은 가능하지 않다. 언어명세에 포함되지 않은 채로 대충 정의(assert())한 후행조건에 대해서 경고하기는 거의 불가능하다.
 >**Enforcement**: (Not enforceable) Finding the variety of ways postconditions can be asserted is not feasible. Warning about those that can be easily identfied (assert()) has questionable value in the absence of a language facility.
 
 
@@ -398,7 +416,7 @@ This is a major source of errors.
 	explicit thread(F&& f, Args&&... args);	// good: throw system_error if unable to start the new thread
 
 **Note**: 에러란 무엇인가?
-에러는 기능이 의도한 목적을 이룰 수 없는 것을 의미한다.(후조건을 만족시키면서)
+에러는 기능이 의도한 목적을 이룰 수 없는 것을 의미한다.(후행조건을 만족시키면서)
 에러를 무시하는 코드를 호출하면 정의되지 않는 시스템 상태나 잘못된 결과를 야기할 수 있다.
 예를 들어, 리모트 서버와 연결이 안된다면 에러는 아니다. 서버는 다양한 이유로 연결을 거부할 수 있다.
 호출하는 쪽에서 결과를 체크할 수 있도록 반환해 주는 것이 자연스럽다. 그러나 연결에 실패하는 것을 에러로 간주할 생각이라면 예외를 던져주어야 한다.
@@ -437,7 +455,7 @@ consider using a style that returns a pair of values:
 * A good rule for performance critical code is to move checking outside the critical part of the code ([checking](#Rper-checking)).
 * In the longer term, more regular code gets better optimized.
 
-**See also**:  선조건, 후조건 위반를 보고하기 위해 Rule I.??? and I.???.
+**See also**:  선행조건, 후행조건 위반를 보고하기 위해 Rule I.??? and I.???.
 >**See also**: Rule I.??? and I.??? for reporting precondition and postcondition violations.
 
 **Enforcement**:
