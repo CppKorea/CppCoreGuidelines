@@ -1,7 +1,7 @@
-# I: Interfaces
+# I: 인터페이스 (Interfaces)
 
-An interface is a contract between two parts of a program. Precisely stating what is expected of a supplier of a service and a user of that service is essential.
-Having good (easy-to-understand, encouraging efficient use, not error-prone, supporting testing, etc.) interfaces is probably the most important single aspect of code organization.
+인터페이스는
+> An interface is a contract between two parts of a program. Precisely stating what is expected of a supplier of a service and a user of that service is essential. Having good (easy-to-understand, encouraging efficient use, not error-prone, supporting testing, etc.) interfaces is probably the most important single aspect of code organization.
 
 Interface rule summary:
 
@@ -553,18 +553,23 @@ This `draw2()` passes the same amount of information to `draw()`, but makes the 
 
 
 <a name="Ri-nargs"></a>
-### I.14: Keep the number of function arguments low
+### I.14: 함수인자수를 최소로 유지하라.
+>### I.14: Keep the number of function arguments low
 
-**Reason**: Having many arguments opens opportunities for confusion. Passing lots of arguments is often costly compared to alternatives.
+**Reason**: 인자수가 많으면 혼란을 일으킨다. 많은 인자를 패싱하는 것은 종종 비용적으로 대안과 비교된다.
+>**Reason**: Having many arguments opens opportunities for confusion. Passing lots of arguments is often costly compared to alternatives.
 
-**Example**: The standard-library `merge()` is at the limit of what we can comfortably handle
+**Example**: 표준 라이브러리 `merge()` 편하게 다룰 수 있는 한계점 정도이다.
+>**Example**: The standard-library `merge()` is at the limit of what we can comfortably handle
 
 	template<class InputIterator1, class InputIterator2, class OutputIterator, class Compare>
 	OutputIterator merge(InputIterator1 first1, InputIterator1 last1,
 						InputIterator2 first2, InputIterator2 last2,
 						OutputIterator result, Compare comp);
 
-Here, we have three template arguments and five function arguments.
+여기보면 3개의 템플릿 인자와 5개의 함수인자를 가진다.
+많이 쓰는 방식으로 단순하게 생각해보면 비교 함수는 '보다 작다'가 기본값이므로 생략한다.
+>Here, we have three template arguments and five function arguments.
 To simplify the most frequent and simplest uses, the comparison argument can be defaulted to `<`:
 
 	template<class InputIterator1, class InputIterator2, class OutputIterator>
@@ -572,52 +577,70 @@ To simplify the most frequent and simplest uses, the comparison argument can be 
 						InputIterator2 first2, InputIterator2 last2,
 						OutputIterator result);
 
-This doesn't reduce the total complexity, but it reduces the surface complexity presented to many users.
+이렇게 한다고해서 전체 복잡성이 줄어 들지 않지만 사용자 입장에서 보기에는 복잡성이 줄어든 것처럼 보인다.
+실제로 인자수를 줄이기 위해서는 인자를 좀더 추상적으로 묶을 필요가 있다.
+>This doesn't reduce the total complexity, but it reduces the surface complexity presented to many users.
 To really reduce the number of arguments, we need to bundle the arguments into higher-level abstractions:
 
 	template<class InputRange2, class InputRange2, class OutputIterator>
 	OutputIterator merge(InputRange1 r1, InputRange2 r2, OutputIterator result);
 
-Grouping arguments into "bundles" is a general technique to reduce the number of arguments and to increase the opportunities for checking.
+인자를 묶어서 그룹핑하는 것이 인자수를 줄이는 일반적인 방법이고 체크(?)할 기회를 늘려준다.
+>Grouping arguments into "bundles" is a general technique to reduce the number of arguments and to increase the opportunities for checking.
 
-**Note**: How many arguments are too many? Four arguments is a lot.
-There are functions that are best expressed with four individual arguments, but not many.
+**Note**: 인자는 네개면 많다.
+>**Note**: How many arguments are too many? Four arguments is a lot.
 
-**Alternative**: Group arguments into meaningful objects and pass the objects (by value or by reference).
+4개 인자를 가진 잘 정의된 함수들이 있지만 많지 않다.
+>There are functions that are best expressed with four individual arguments, but not many.
 
-**Alternative**: Use default arguments or overloads to allow the most common forms of calls to be done with fewer arguments.
+**Alternative**: 인자를 의미있는 오브젝트로 그룹핑해서 패싱을 하라.(값으로 넘기던지, 참조로 넘기던지)
+>**Alternative**: Group arguments into meaningful objects and pass the objects (by value or by reference).
+
+**Alternative**: 인자의 기본값을 사용하여 적은 인자로 호출가능하도록 제일 공통적인 형태를 가지도록 함수를 재정의하라.(생략가능한 인자를 적극 활용하라는 의미임.)
+>**Alternative**: Use default arguments or overloads to allow the most common forms of calls to be done with fewer arguments.
 
 **Enforcement**:
-   - Warn when a functions declares two iterators (including pointers) of the same type instead of a range or a view.
+	- 범위 또는 뷰 이외에 동일 타입의 반복자(iterator)를 2개이상 선언하는 함수가 있다면 경고.
+	- (Not enforceable) 체크하기 어려운 철학적인 가이드라인이다.
+   >- Warn when a functions declares two iterators (including pointers) of the same type instead of a range or a view.
    - (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
 
 
 <a name="Ri-unrelated"></a>
-### I.15: Avoid adjacent unrelated parameters of the same type
+### I.15: 동일 타입이지만 관련없는 인접한 매개변수는 피하라.
+>### I.15: Avoid adjacent unrelated parameters of the same type
 
-**Reason**: Adjacent arguments of the same type are easily swapped by mistake.
+**Reason**: 동일 타입의 인접한 매개변수는 실수로 쉽게 바뀐다.
+>**Reason**: Adjacent arguments of the same type are easily swapped by mistake.
 
 **Example; bad**: Consider
 
 		void copy_n(T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
 
-This is a nasty variant of a K&R C-style interface. It is easy to reverse the "to" and "from" arguments.
+K&R C 스타일 인터페이스인데 "to"와 "from" 매개변수가 쉽게 뒤바뀐다.
+>This is a nasty variant of a K&R C-style interface. It is easy to reverse the "to" and "from" arguments.
 
-Use `const` for the "from" argument:
+"from" 인자에 `const`를 사용해라.
+>Use `const` for the "from" argument:
 
 		void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
 
-**Alternative**: Don't pass arrays as pointers, pass an object representing a rage (e.g., an `array_view`):
+**Alternative**: 포인터로 배열을 인자로 넘기지 말고 오브젝트로 인자를 넘겨라.(e.g., `array_view`):
+>**Alternative**: Don't pass arrays as pointers, pass an object representing a rage (e.g., an `array_view`):
 
 		void copy_n(array_view<const T> p, array_view<T> q); // copy from b to q
 
-**Enforcement**: (Simple) Warn if two consecutive parameters share the same type.
+**Enforcement**: (Simple) 연속된 2개 매개변수가 동일한 타입을 가진다면 경고하라.
+>**Enforcement**: (Simple) Warn if two consecutive parameters share the same type.
 
 
 <a name="Ri-abstract"></a>
-### I.16: Prefer abstract classes as interfaces to class hierarchies
+### I.16: 클래스 상속보다 인터페이스로 추상 클래스(abstract class)를 선호하라.
+>### I.16: Prefer abstract classes as interfaces to class hierarchies
 
-**Reason**: Abstract classes are more likely to be stable than base classes with state.
+**Reason**: 추상 클래스는 상태가 있는 부모클래스보다 더 안정적이다.
+>**Reason**: Abstract classes are more likely to be stable than base classes with state.
 
 **Example; bad**: You just knew that `Shape` would turn up somewhere :-)
 
@@ -633,7 +656,8 @@ Use `const` for the "from" argument:
 		Color col;
 	};
 
-This will force every derived class to compute a center -- even if that's non-trivial and the center is never used. Similarly, not every `Shape` has a `Color`, and many `Shape`s are best represented without an outline defined as a sequence of `Point`s. Abstract classes were invented to discourage users from writing such classes:
+이 클래스는 상속받는 모든 자식 클래스에 센터를 계속하도록 강요할 것이다. -- center를 사용하지도 않을 거고 non-trivial한데도 불구하고 말이다. 모든 'Shape'가 'Color'를 가지지 않는다. 게다가 많은 'Shape'는 포인트의 열로 정의된 외각선이 없이도 표현된다. 추상클래스는 그런류의 클래스를 사용할 수 있도록 개발되었다.
+>This will force every derived class to compute a center -- even if that's non-trivial and the center is never used. Similarly, not every `Shape` has a `Color`, and many `Shape`s are best represented without an outline defined as a sequence of `Point`s. Abstract classes were invented to discourage users from writing such classes:
 
 	class Shape {	// better: Shape is a pure interface
 	public:
@@ -644,18 +668,25 @@ This will force every derived class to compute a center -- even if that's non-tr
 		// ... no data members ...
 	};
 
-**Enforcement**: (Simple) Warn if a pointer to a class `C` is assigned to a pointer to a base of `C` and the base class contains data members.
+**Enforcement**: (Simple) 'C' 클래스 포인터가 부모클래스의 포인터를 가지고 있고 그 부모클래스가 데이터 멤버를 가진다면 경고하라.
+>**Enforcement**: (Simple) Warn if a pointer to a class `C` is assigned to a pointer to a base of `C` and the base class contains data members.
 
 
 <a name="Ri-abi"></a>
-### I.16: If you want a cross-compiler ABI, use a C-style subset
+### I.16: 컴파일러간 호환을 위한 바이너리 인터페이스(ABI: Application Binary Interface)을 원한다면 C 스타일을 사용하라.
+>### I.16: If you want a cross-compiler ABI, use a C-style subset
 
-**Reason**: Different compilers implement different binary layouts for classes, exception handling, function names, and other implementation details.
+**Reason**: 컴파일러는 제각각 클래스의 바이너리 레이아웃, 예외 처리, 함수명, 상세 실행방식이 다르게 구현되어 있다.
+>**Reason**: Different compilers implement different binary layouts for classes, exception handling, function names, and other implementation details.
 
-**Exception**: You can carefully craft an interface using a few carefully selected higher-level C++ types. See ???.
+**Exception**: 상위레벨 C++ 타입만 사용해서 신경써서 인터페이스를 만들어야 한다. See ???.
+>**Exception**: You can carefully craft an interface using a few carefully selected higher-level C++ types. See ???.
 
-**Exception**: Common ABIs are emerging on some platfoms freeing you from the more Draconian restrictions.
+**Exception**: ~~ 몇몇 플랫폼 상에서 공통 ABI가 나타나고 있다.
+>**Exception**: Common ABIs are emerging on some platfoms freeing you from the more Draconian restrictions.
 
-**Note**: if you use a single compiler, you can use full C++ in interfaces. That may require recompilation after an upgrade to a new compiler version.
+**Note**: 한종류만 사용한다면 C++ 기능을 풀로 사용할 수 있다는 것으로 새버전에 대해서도 재컴파일이 가능하는 의미이다.
+>**Note**: if you use a single compiler, you can use full C++ in interfaces. That may require recompilation after an upgrade to a new compiler version.
 
-**Enforcement**: (Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
+**Enforcement**: (Not enforceable) 어느 인터페이스가 ABI를 만족할지 신뢰할 정도로 구분해 낼 수 없다.
+>**Enforcement**: (Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
