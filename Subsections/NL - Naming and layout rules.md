@@ -185,11 +185,13 @@ Try to be consistent in your use of acronyms, lengths of identifiers:
 
 Would be possible except for the use of libraries with varying conventions.
 
-### <a name="Rl-all-caps"></a> NL 9: Use `ALL_CAPS` for macro names only
+### <a name="Rl-all-caps"></a> NL 9: 매크로 명칭에만 전체 대문자를 사용하라.
+>### <a name="Rl-all-caps"></a> NL 9: Use `ALL_CAPS` for macro names only
 
 ##### Reason
 
-To avoid confusing macros from names that obeys scope and type rules.
+범위와 타입 규칙을 지키는 이름에 대해서는 매크로와 혼돈하지 않도록 하기 위해.
+>To avoid confusing macros from names that obeys scope and type rules.
 
 ##### Example
 
@@ -201,32 +203,43 @@ To avoid confusing macros from names that obeys scope and type rules.
 
 ##### Note
 
-This rule applies to non-macro symbolic constants:
+이 규칙은 매크로가 아닌 상수에도 적용된다.
+>This rule applies to non-macro symbolic constants:
 
     enum bad { BAD, WORSE, HORRIBLE }; // BAD
 
 ##### Enforcement
 
-* Flag macros with lower-case letters
-* Flag `ALL_CAPS` non-macro names
+* 소문자로 된 매크로는 표시하라.
+* 매크로가 아닌데 대문자로 된 것은 표시하라.
 
-### <a name="Rl-camel"></a> NL.10: Avoid CamelCase
+>* Flag macros with lower-case letters
+>* Flag `ALL_CAPS` non-macro names
+
+### <a name="Rl-camel"></a> NL.10: 카멜케이스를 피하라.
+>### <a name="Rl-camel"></a> NL.10: Avoid CamelCase
 
 ##### Reason
 
-The use of underscores to separate parts of a name is the original C and C++ style and used in the C++ standard library.
+이름을 구분하기 위해 `_`를 사용하는 것은 원래 C/C++ 스타일이고 C++ 표준 라이브러리에도 사용하고 있다.
+카멜케이스를 좋아한다면 여러 종류 중에서 한 종류만 선택하라.
+>The use of underscores to separate parts of a name is the original C and C++ style and used in the C++ standard library.
 If you prefer CamelCase, you have to choose among different flavors of camelCase.
 
 ##### Note
 
-This rule is a default to use only if you have a choice.
+이 규칙은 일단 카멜케이스를 쓰겠다고 했을때 기본 규칙이다.
+카멜케이스를 안 쓴다면 [consistency](#Rl-name)에 정의된 스타일을 따라야 한다.
+일관성 유지는 개인적 기호보다 우선한다.
+>This rule is a default to use only if you have a choice.
 Often, you don't have a choice and must follow an established style for [consistency](#Rl-name).
 The need for consistency beats personal taste.
 
 ##### Example
 
 [Stroustrup](http://www.stroustrup.com/Programming/PPP-style.pdf):
-ISO Standard, but with upper case used for your own types and concepts:
+사용자 정의 타입, 개념에 대해 대문자를 사용하는 ISO 표준
+>ISO Standard, but with upper case used for your own types and concepts:
 
 * `int`
 * `vector`
@@ -234,13 +247,16 @@ ISO Standard, but with upper case used for your own types and concepts:
 
 ##### Enforcement
 
-Impossible.
+불가능하다.
+>Impossible.
 
-### <a name="Rl-space"></a> NL.15: Use spaces sparingly
+### <a name="Rl-space"></a> NL.15: 스페이스를 아껴서 사용하라.
+>### <a name="Rl-space"></a> NL.15: Use spaces sparingly
 
 ##### Reason
 
-Too much space makes the text larger and distracts.
+너무 많은 스페이스는 코드를 길고 산만하게 만들기 때문에.
+>Too much space makes the text larger and distracts.
 
 ##### Example, bad
 
@@ -262,28 +278,40 @@ Too much space makes the text larger and distracts.
 
 ##### Note
 
-Some IDEs have their own opinions and add distracting space.
+몇몇 IDE는 그들만의 확신에 따라 추가적인 스페이스를 사용한다.
+>Some IDEs have their own opinions and add distracting space.
 
 ##### Note
 
-We value well-placed whitespace as a significant help for readability. Just don't overdo it.
+잘 정리된 스페이스는 가독성 향상에 많은 도움이 된다. 과도하게 쓰지는 말자.
+>We value well-placed whitespace as a significant help for readability. Just don't overdo it.
 
-### <a name="Rl-order"></a> NL.16: Use a conventional class member declaration order
+### <a name="Rl-order"></a> NL.16: 일반적인 클래스 맴버 선언 순서를 지켜라.
+>### <a name="Rl-order"></a> NL.16: Use a conventional class member declaration order
 
 ##### Reason
 
-A conventional order of members improves readability.
+멤버 선언 순서는 가독성을 높여준다.
+>A conventional order of members improves readability.
 
-When declaring a class use the following order
+클래스 선언시 다음 순서를 사용하라.
+>When declaring a class use the following order
 
-* types: classes, enums, and aliases (`using`)
+* 타입: class, enum, alias (`using`구문)
+* 생성자, 복사 생성자, 해제자.
+* 함수
+* 데이터
+
+>* types: classes, enums, and aliases (`using`)
 * constructors, assignments, destructor
 * functions
 * data
 
-Use the `public` before `protected` before `private` order.
+`private`, `protected`, `public`순으로 선언하라.
+>Use the `public` before `protected` before `private` order.
 
-Private types and functions can be placed with private data.
+비공개 타입과 함수는 비공개 데이터 영역에 둔다.
+>Private types and functions can be placed with private data.
 
 ##### Example
 
@@ -291,15 +319,15 @@ Private types and functions can be placed with private data.
 
 ##### Enforcement
 
-Flag departures from the suggested order. There will be a lot of old code that doesn't follow this rule.
+제안된 순서와 다르면 표시를 해라. 이 규칙을 따르지 않는 예전 코드가 많이 있을꺼다.
+>Flag departures from the suggested order. There will be a lot of old code that doesn't follow this rule.
 
 ### <a name="Rl-knr"></a> NL.17: K&R 방식의 레이아웃을 사용하라.
 >### <a name="Rl-knr"></a> NL.17: Use K&R-derived layout
 
 ##### Reason
 
-이 방식이 원래 C/C++ 레이아웃이다. vertical space를 잘 보존한다.
-다른 언어 구성을 구별시킬 수 있다.(함수와 클래스를 잘.)
+이 방식이 원래 C/C++ 레이아웃이다. 수직적인 배치가 유지되고 함수나 클래스 같은 언어 요소를 구분하기가 쉽다.
 >This is the original C and C++ layout. It preserves vertical space well. It distinguishes different language constructs (such as functions and classes well).
 
 ##### Note
