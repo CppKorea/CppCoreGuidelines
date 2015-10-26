@@ -12,14 +12,56 @@
 
 ## 번역을 도와주시는 분들
 
-- Chris Ohk
-- Seokjoon Yun
-- Giyeon Bang
+- Chris Ohk (utilForever)
+- Seokjoon Yun 
+- Giyeon Bang (GiyeonBang-rhathd)
 - Ilgook Jo
 - Dongwoo Lee
-- Joowon Ryoo
-- Geon Son
+- Joowon Ryoo (HIPERCUBE)
+- Geon Son (jen6)
 - Minseob Kwon
+- Yonghyun Kim (drvoss)
+- Byungwook Eric Ahn (bwahn)
+- Eundoo Song (sedman)
+- Inchul Kang (kangic)
+- Jongdeok Kim (jenix21)
+- Jihoon Song (jihoonsong)
+- Junsung Jang (naxxster)
+- Jonghee Yun (jongheeyun)
+- Changjun Lee (yiatom)
+- Minjang Kim (minjang)
+- Hyungtae Kim (cavecafe)
+
+## 번역 진행 상황
+
+- <B>Abstract : utilForever (100%)</B>
+- C++ Core Guildlines (0%)
+- A - Architectural Ideas (0%)
+- <B>C - Classes and Class Hierarchies (0%) : jenix21</B>
+- <B>Con - Constants and Immutability : jen6 (0%)</B>
+- <B>CP - Concurrency and Parallelism : minjang (0%)</B>
+- <B>CPL - C-Style programming : GiyeonBang-rhathd (0%)</B>
+- <B>E - Error Handling : HIPERCUBE (0%)</B>
+- <B>Enum - Enumerations : sedman (0%)</B>
+- <B>ES - Expressions and Statements : yiatom (0%)</B>
+- <B>F - Functions : jongheeyun (1%)</B>
+- GSL - Guideline support library (0%)
+- <B>I - Interfaces : bwahn (0%)</B>
+- <B>In - Introduction : yiatom (0%)</B>
+- <B>N - Non-Rules and myths : GiyeonBang-rhathd (0%)</B>
+- <B>NL - Naming and layout rules : GiyeonBang-rhathd (0%)</B>
+- <B>P - Philosophy : drvoss (0%)</B>
+- <B>PER - Performance : sedman (0%)</B>
+- <B>PRO - Profiles : drvoss (0%)</B>
+- <B>R - Resource management : kangic (0%)</B>
+- RF - References (0%)
+- <B>SF - Source files : naxxster (0%)</B>
+- <B>STL - The Standard Library : cavecafe (0%)</B>
+- <B>T - Templates and generic programming : minjang (0%)</B>
+- To-do - Unclassified proto-rules (0%)
+- Appendix A - Libraries (0%)
+- <B>Appendix B - Modernizing code : yiatom (100%)</B>
+- <B>Appendix C - Discussion : jihoonsong (0%)</B>
 
 ## 개요
 
