@@ -89,9 +89,13 @@ Readability. Avoidance of "silly mistakes."
 
 Use a tool.
 
-### <a name="Rl-name-type"></a> NL.5 Don't encode type information in names
+### <a name="Rl-name-type"></a> NL.5 이름 안에 타입 정보를 포함하지 마라.
+>### <a name="Rl-name-type"></a> NL.5 Don't encode type information in names
 
-**Rationale**: If names reflects type rather than functionality, it becomes hard to change the types used to provide that functionality.
+**Rationale**: 이름을 기능보다는 타입을 반영한다면 기능을 다른 종류의 타입으로 변경시키기가 힘들 것이다.
+타입을 포함한 이름은 부차적이거나 약간 이해 못할 수도 있다.
+헝가리안 표기법은 최악이다.(적어도 정적 타입 언어에 있어서는)
+>**Rationale**: If names reflects type rather than functionality, it becomes hard to change the types used to provide that functionality.
 Names with types encoded are either verbose or cryptic.
 Hungarian notation is evil (at least in a strongly statically-typed language).
 
@@ -101,18 +105,21 @@ Hungarian notation is evil (at least in a strongly statically-typed language).
 
 ##### Note
 
-Some styles distinguishes members from local variable, and/or from global variable.
+어떤 스타일은 지역변수와 맴버변수를 구분하거나 전역변수를 구분하려고 한다.
+>Some styles distinguishes members from local variable, and/or from global variable.
 
     struct S {
         int m_;
         S(int m) :m_{abs(m)} { }
     };
 
-This is not evil.
+이건 그렇게 나쁘지는 않다.
+>This is not evil.
 
 ##### Note
 
-Some styles distinguishes types from non-types.
+또 어떤 스타일은 타입과 비타입을 구분하려고 한다.
+>Some styles distinguishes types from non-types.
 
     typename<typename T>
     class Hash_tbl {	// maps string to T
@@ -121,9 +128,11 @@ Some styles distinguishes types from non-types.
 
     Hash_tbl<int> index;
 
-This is not evil.
+이것도 그렇게 나쁘지는 않다.
+>This is not evil.
 
-### <a name="Rl-name-length"></a> NL.7: Make the length of a name roughly proportional to the length of its scope
+### <a name="Rl-name-length"></a> NL.7: 변수범위의 크기에 비례해서 이름의 길이를 맞춰라.
+>### <a name="Rl-name-length"></a> NL.7: Make the length of a name roughly proportional to the length of its scope
 
 **Rationale**: ???
 
@@ -135,29 +144,36 @@ This is not evil.
 
 ???
 
-### <a name="Rl-name"></a> NL.8: Use a consistent naming style
+### <a name="Rl-name"></a> NL.8: 일관적인 이름짓기 스타일을 사용하라.
+>### <a name="Rl-name"></a> NL.8: Use a consistent naming style
 
-**Rationale**: Consistence in naming and naming style increases readability.
+**Rationale**:  일관성 있게 이름을 정하면 가독성을 높여준다.
+>**Rationale**: Consistence in naming and naming style increases readability.
 
 ##### Note
 
-Where are many styles and when you use multiple libraries, you can't follow all their differences conventions.
+많은 스타일이 공존하고 복수개의 라이브러리를 사용할 때 모든 네이밍 방식을 따를 수는 없다.
+다양한 라이브러리가 가진 고유 스타일을 버리고 자기 스타일을 선택하라.
+>Where are many styles and when you use multiple libraries, you can't follow all their differences conventions.
 Choose a "house style", but leave "imported" libraries with their original style.
 
 ##### Example
 
-ISO Standard, use lower case only and digits, separate words with underscores:
+ISO 표준은 소문자, 숫자, `_`로 구분된 단어만 사용한다.
+>ISO Standard, use lower case only and digits, separate words with underscores:
 
 * `int`
 * `vector`
 * `my_map`
 
-Avoid double underscores `__`.
+두개 짜리 `__`를 사용하지 마라.
+>Avoid double underscores `__`.
 
 ##### Example
 
 [Stroustrup](http://www.stroustrup.com/Programming/PPP-style.pdf):
-ISO Standard, but with upper case used for your own types and concepts:
+대문자로 된 사용자 정의 타입과 컨셉을 지원하는 ISO 표준
+>ISO Standard, but with upper case used for your own types and concepts:
 
 * `int`
 * `vector`
@@ -165,25 +181,29 @@ ISO Standard, but with upper case used for your own types and concepts:
 
 ##### Example
 
-CamelCase: capitalize each word in a multi-word identifier:
+낙타표기법(CamelCase): 여러 단어로 구성된 식별자에서 단어의 첫글자를 대문자로 한다.
+>CamelCase: capitalize each word in a multi-word identifier:
 
 * `int`
 * `vector`
 * `MyMap`
 * `myMap`
 
-Some conventions capitalize the first letter, some don't.
+맨 첫글자를 소문자로 하는 경우도 있다.
+>Some conventions capitalize the first letter, some don't.
 
 ##### Note
 
-Try to be consistent in your use of acronyms, lengths of identifiers:
+약어나 식별자 길이도 일관성을 유지하도록 하라.
+>Try to be consistent in your use of acronyms, lengths of identifiers:
 
     int mtbf {12};
     int mean_time_between_failor {12};		// make up your mind
 
 ##### Enforcement
 
-Would be possible except for the use of libraries with varying conventions.
+스타일이 다른 라이브러리를 사용할 때를 뻬고는 시행이 가능할 것이다.
+>Would be possible except for the use of libraries with varying conventions.
 
 ### <a name="Rl-all-caps"></a> NL 9: 매크로 명칭에만 전체 대문자를 사용하라.
 >### <a name="Rl-all-caps"></a> NL 9: Use `ALL_CAPS` for macro names only
