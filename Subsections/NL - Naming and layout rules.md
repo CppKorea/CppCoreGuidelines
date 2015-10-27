@@ -1,12 +1,19 @@
-# <a name="S-naming"></a> NL: Naming and layout rules
+# <a name="S-naming"></a> NL: 이름짓기와 코드 배치 규칙
+># <a name="S-naming"></a> NL: Naming and layout rules
 
-Consistent naming and layout are helpful. If for no other reason because it minimizes "my style is better than your style" arguments.
+별다른 이유없이 "내 스타일이 당신 것보다 더 좋다"는 논란을 줄이기 위해서라면 일관성있는 이름짓기와 레이아웃은 도움이 된다.
+굉장히 많은 스타일이 존재하고 사람들은 그 스타일에 대해 열렬하게 찬반 의견을 보인다.
+게다가 실제 프로젝트는 아주 많은 소스코드를 가지고 있고 모든 코드에 대해 표준화된 스타일을 적용하는 것은 불가능하다.
+여기서 더 좋은 아이디어가 없다면 도입해도 무방한 규칙들을 소개하겠다. 그러나 규칙을 소개하는 진짜 목적은 특정한 규칙 그 자체가 아니라 일관성이다.
+IDE나 툴들이 이것을 도와줄 것이다. 어쩌면 방해할지도 모른다.
+>Consistent naming and layout are helpful. If for no other reason because it minimizes "my style is better than your style" arguments.
 However, there are many, many, different styles around and people are passionate about them (pro and con).
 Also, most real-world projects includes code from many sources, so standardizing on a single style for all code is often impossible.
 We present a set of rules that you might use if you have no better ideas, but the real aim is consistency, rather than any particular rule set.
 IDEs and tools can help (as well as hinder).
 
-Naming and layout rules:
+이름짓기와 코드 배치 규칙:
+>Naming and layout rules:
 
 * [NL 1: Don't say in comments what can be clearly stated in code](#Rl-comments)
 * [NL.2: State intent in comments](#Rl-comments-intent)
@@ -23,16 +30,21 @@ Naming and layout rules:
 * [NL.18: Use C++-style declarator layout](#Rl-ptr)
 * [NL.25: Don't use `void` as an argument type](#Rl-void)
 
-Most of these rules are aesthetic and programmers hold strong opinions.
+규칙들 대부분이 심미적이고 개발자들은 자기 의견을 강하게 표현한다.
+IDE 역시 기본값 외에 몇가지 대안을 가지고 있는 상황이다. 특별한 이유가 없다면 이 규칙들을 기본으로 사용할 것을 제안한다.
+>Most of these rules are aesthetic and programmers hold strong opinions.
 IDEs also tend to have defaults and a range of alternatives.These rules are suggested defaults to follow unless you have reasons not to.
 
-More specific and detailed rules are easier to enforce.
+더 자세한 내용들이 적용하기 쉬울 것이다.
+>More specific and detailed rules are easier to enforce.
 
-### <a name="Rl-comments"></a> NL.1: Don't say in comments what can be clearly stated in code
+### <a name="Rl-comments"></a> NL.1: 코드에서 말할 수 있는 내용을 주석문에 넣지 마라.
+>### <a name="Rl-comments"></a> NL.1: Don't say in comments what can be clearly stated in code
 
 ##### Reason
 
-Compilers do not read comments.
+컴파일러는 주석문을 읽지 않는다. 주석문은 코드보다 정확하지 않다. 주석문은 코드보다 일관성있게 업데이트되지 않는다.
+>Compilers do not read comments.
 Comments are less precise than code.
 Comments are not updated as consistently as code.
 
@@ -42,13 +54,16 @@ Comments are not updated as consistently as code.
 
 ##### Enforcement
 
-Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
+구어체 문장을 번역하는 인공지능 프로그램을 만들어라. 그리고는 C++로 잘 표현할 수 있는지 살펴봐라.
+>Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
 
-### <a name="Rl-comments-intent"></a> NL.2: State intent in comments
+### <a name="Rl-comments-intent"></a> NL.2: 주석문에 목적을 기술하라.
+>### <a name="Rl-comments-intent"></a> NL.2: State intent in comments
 
 ##### Reason
 
-Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
+코드는 무엇을 할지가 아니라 무엇을 했는지를 말한다. 주석은 구현된 내용보다 목적이나 의도를 간결하고 명쾌하게 기술할 수 있다.
+>Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
 
 ##### Example
 
@@ -60,23 +75,29 @@ Code says what is done, not what is supposed to be done. Often intent can be sta
 
 ##### Note
 
-If the comment and the code disagrees, both are likely to be wrong.
+주석과 코드가 다르다면 둘다 틀렸을거다.
+>If the comment and the code disagrees, both are likely to be wrong.
 
-### <a name="Rl-comments-crisp"></a> NL.3: Keep comments crisp
+### <a name="Rl-comments-crisp"></a> NL.3: 주석을 간략하게 유지하라.
+>### <a name="Rl-comments-crisp"></a> NL.3: Keep comments crisp
 
 ##### Reason
 
-Verbosity slows down understanding and makes the code harder to read by spreading it around in the source file.
+말이 많으면 이해도가 떨어지고 소스파일에 퍼져 보여서 코드를 읽기 어렵게 만든다.
+>Verbosity slows down understanding and makes the code harder to read by spreading it around in the source file.
 
 ##### Enforcement
 
-not possible.
+불가능하다.
+>not possible.
 
-### <a name="Rl-indent"></a> NL.4: Maintain a consistent indentation style
+### <a name="Rl-indent"></a> NL.4: 일관적인 들여쓰기 스타일을 유지하라.
+>### <a name="Rl-indent"></a> NL.4: Maintain a consistent indentation style
 
 ##### Reason
 
-Readability. Avoidance of "silly mistakes."
+가독성 향상. 멍청한 실수를 피하기 위해.
+>Readability. Avoidance of "silly mistakes."
 
 ##### Example, bad
 
@@ -87,7 +108,8 @@ Readability. Avoidance of "silly mistakes."
 
 ##### Enforcement
 
-Use a tool.
+툴을 사용하라.
+>Use a tool.
 
 ### <a name="Rl-name-type"></a> NL.5 이름 안에 타입 정보를 포함하지 마라.
 >### <a name="Rl-name-type"></a> NL.5 Don't encode type information in names
