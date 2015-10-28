@@ -1752,27 +1752,33 @@ Unsigned types support bit manipulation without surprises from sign bits.
 
 ???
 
-### <a name="Res-signed"></a> ES.102: Used signed types for arithmetic
+### <a name="Res-signed"></a> ES.102: 산술연산을 위해서는 부호있는 타입을 사용하라.
+>### <a name="Res-signed"></a> ES.102: Used signed types for arithmetic
 
 ##### Reason
 
-Unsigned types support bit manipulation without surprises from sign bits.
+부호없는 타입은 부호비트부터 비트 연산을 해버리기 때문이다. (?)
+>Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Example
 
     ???
 
-**Exception**: Use unsigned types if you really want modulo arithmetic.
+**Exception**: 모듈러 연산을 사용한다면 부호없는 타입을 사용하라.
+>**Exception**: Use unsigned types if you really want modulo arithmetic.
 
 ##### Enforcement
 
 ???
 
-### <a name="Res-overflow"></a> ES.103: Don't overflow
+### <a name="Res-overflow"></a> ES.103: 오버플로우를 내지마라.
+>### <a name="Res-overflow"></a> ES.103: Don't overflow
 
 ##### Reason
 
-Overflow usually makes your numeric algorithm meaningless.
+오버플로우는 수식 알고리즘을 의미없게 만들어 버린다.
+최대값 이상으로 증가시킨다면 메모리값이 망가지고 비정상적으로 작동한다.
+>Overflow usually makes your numeric algorithm meaningless.
 Incrementing a value beyond a maximum value can lead to memory corruption and undefined behavior.
 
 ##### Example, bad
@@ -1795,19 +1801,23 @@ Incrementing a value beyond a maximum value can lead to memory corruption and un
 
     auto a = area(10'000'000, 100'000'000);	// bad
 
-**Exception**: Use unsigned types if you really want modulo arithmetic.
+**Exception**: 모듈러 연산을 사용한다면 부호없는 타입을 사용하라.
+>**Exception**: Use unsigned types if you really want modulo arithmetic.
 
-**Alternative**: For critical applications that can afford some overhead, use a range-checked integer and/or floating-point type.
+**Alternative**: 어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 정수 범위 체크나 부동소수점 타입을 사용하라.
+>**Alternative**: For critical applications that can afford some overhead, use a range-checked integer and/or floating-point type.
 
 ##### Enforcement
 
 ???
 
-### <a name="Res-underflow"></a> ES.104: Don't underflow
+### <a name="Res-underflow"></a> ES.104: 언더플로우를 내지 마라.
+>### <a name="Res-underflow"></a> ES.104: Don't underflow
 
 ##### Reason
 
-Decrementing a value beyond a minimum value can lead to memory corruption and undefined behavior.
+최소값 이하로 값이 내려가면 메모리값이 망가지고 비정상적으로 작동한다.
+>Decrementing a value beyond a minimum value can lead to memory corruption and undefined behavior.
 
 ##### Example, bad
 
@@ -1818,27 +1828,32 @@ Decrementing a value beyond a minimum value can lead to memory corruption and un
     while (n--)
         a[n - 1] = 9; // bad (twice)
 
-**Exception**: Use unsigned types if you really want modulo arithmetic.
+**Exception**: 모듈러 연산을 사용한다면 부호없는 타입을 사용하라.
+>**Exception**: Use unsigned types if you really want modulo arithmetic.
 
 ##### Enforcement
 
 ???
 
-### <a name="Res-zero"></a> ES.105: Don't divide by zero
+### <a name="Res-zero"></a> ES.105: 0으로 나누지 마라.
+>### <a name="Res-zero"></a> ES.105: Don't divide by zero
 
 ##### Reason
 
-The result is undefined and probably a crash.
+결과는 예측할 수 없고 코어덤프가 날 것이다.
+>The result is undefined and probably a crash.
 
 ##### Note
 
-this also applies to `%`.
+`%` 모듈라도 같이 적용된다.
+>this also applies to `%`.
 
 ##### Example
 
     ???
 
-**Alternative**: For critical applications that can afford some overhead, use a range-checked integer and/or floating-point type.
+**Alternative**: 어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 정수 범위 체크나 부동소수점 타입을 사용하라.
+>**Alternative**: For critical applications that can afford some overhead, use a range-checked integer and/or floating-point type.
 
 ##### Enforcement
 
