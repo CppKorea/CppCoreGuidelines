@@ -54,11 +54,11 @@ The use of a non-local control is potentially confusing, but controls only imple
 **Example, bad**: Reporting through non-local variables (e.g., `errno`) is easily ignored. For example:
 
 	fprintf(connection,"logging: %d %d %d\n",x,y,s); // don't: no test of printf's return value
-	
+
 What if the connection goes down so than no logging output is produced? See Rule I.??.
 
 **Alternative**: Throw an exception. An exception cannot be ignored.
-  
+
 **Alternative formulation**: Avoid passing information across an interface through non-local state.
 Note that non-`const` member functions pass information to other member functions thorough their object's state.
 
@@ -116,14 +116,14 @@ Every pointer or reference to mutable data is a potential data race.
 **Reason**: Singletons are basically complicated global objects in disguise.
 
 **Example**:
-	
+
 	class Singleton {
 		// ... lots of stuff to ensure that only one Singleton object is created, that it is initialized properly, etc.
 	};
 
 There are many variants of the singleton idea.
 That's part of the problem.
-	
+
 **Note**: If you don't want a global object to change, declare it `const` or `constexpr`.
 
 **Exception**: You can use the simplest "singleton" (so simple that it is often not considered a singleton) to get initialization on first use, if any:
@@ -140,7 +140,7 @@ In a multi-threaded environment the initialization of the static object does not
 
 If you, as many do, define a singleton as a class for which only one object is created, functions like `myX` are not singletons,
 and this useful technique is not an exception to the no-singleton rule.
-	
+
 **Enforcement**: Very hard in general
 
 * Look for classes with name that includes `singleton`
@@ -166,7 +166,7 @@ Consider using a variant or a pointer to base instead. (Future note: Consider a 
 **Example; bad**: Consider
 
 	void draw_rect(int,int,int,int);	// great opportunities for mistakes
-	
+
 	draw_rect(p.x,p.y,10,20);			// what does 10,20 mean?
 
 An `int` can carry arbitrary forms of information, so we must guess about the meaning of the four `int`s.
@@ -175,13 +175,13 @@ Comments and parameter names can help, but we could be explicit:
 
 	void draw_rectange(Point top_left, Point bottom_right);
 	void draw_rectange(Point top_left, Size height_width);
-	
+
 	draw_rectangle(p,Point{10,20});	// two corners
 	draw_rectangle(p,Size{10,20});	// one corner and a (height,width) pair
 
 Obviously, we cannot catch all errors through the static type system
 (e.g., the fact that a first argument is supposed to be a top-left point is left to convention (naming and comments)).
-	
+
 
 **Example**: ??? units: time duration ???
 
@@ -248,15 +248,21 @@ We don't need to mentioning it for each member function.
 
 
 <a name="Ri-post"></a>
-### I.7: State postconditions
+### I.7: 후행조건을 기술하라.
+>### I.7: State postconditions
 
-**Reason**: To detect misunderstandings about the result and possibly catch erroneous implementations.
+**Reason**: 결과에 대한 잘못된 이해를 찾기 위해, 잘못된 구현을 찾아내기 위해.
+>**Reason**: To detect misunderstandings about the result and possibly catch erroneous implementations.
 
-**Example; bad**: Consider
+**Example; bad**: 보면
+>**Example; bad**: Consider
 
 	int area(int height, int width) { return height*width; }	// bad
 
-Here, we (incautiously) left out the precondition specification, so it is not explicit that height and width must be positive.
+여기보면 부주의하게 선행조건 명세를 뻬먹었는데 높이와 폭이 양수가 된다는 조건이 빠져있다.
+역시 후행조건 명세를 뻬먹었는데 넓이를 구하는 알고리즘이 integer 범위를 벗어날 수 있다는 조건이 빠져 있다. 오버플로가 발생할 수 있다.
+이렇게 해보자:
+>Here, we (incautiously) left out the precondition specification, so it is not explicit that height and width must be positive.
 We also left out the postcondition specification, so it is not obvious that the algorithm (`height*width`) is wrong for areas larger than the largest integer.
 Overflow can happen.
 Consider using:
@@ -268,7 +274,8 @@ Consider using:
 		return res;
 	}
 
-**Example, bad**: Consider a famous security bug
+**Example, bad**: 악명높은 보안 버그를 보자
+>**Example, bad**: Consider a famous security bug
 
 	void f()	// problematic
 	{
@@ -277,7 +284,8 @@ Consider using:
 		memset(buffer,0,MAX);
 	}
 
-There was no postcondition stating that the buffer should be cleared and the optimizer eliminated the apparently redundant `memset()` call:
+버퍼가 초기화되고 중복 `memset()` 호출을 줄여서 최적화했다는 후행조건이 없다:
+>There was no postcondition stating that the buffer should be cleared and the optimizer eliminated the apparently redundant `memset()` call:
 
 	void f()	// better
 	{
@@ -287,11 +295,14 @@ There was no postcondition stating that the buffer should be cleared and the opt
 		Ensures(buffer[0]==0);
 	}
 
-**Note** postconditions are often informally stated in a comment that states the purpose of a function; `Ensures()` can be used to make this more systematic, visible, and checkable.
+**Note** 후행조건은 함수의 목적을 기술하는 주석문에서 대충 언급된다. `Ensures()`를 사용함으로써 시스템적으로 체크할 수 있도록 보일 것이다.
+>**Note** postconditions are often informally stated in a comment that states the purpose of a function; `Ensures()` can be used to make this more systematic, visible, and checkable.
 
-**Note**: Postconditions are especially important when they relate to something that is not directly reflected in a returned result, such as a state of a data structure used.
+**Note**: 구조체 상태처럼 반환된 결과값 속에 간접적으로 영향을 미치는 것에 대한 후행조건이 특히 중요하다.
+>**Note**: Postconditions are especially important when they relate to something that is not directly reflected in a returned result, such as a state of a data structure used.
 
-**Example**: Consider a function that manipulates a `Record`, using a `mutex` to avoid race conditions:
+**Example**: 경쟁상태을 피할 목적으로 `mutex`를 사용하는 `Record` 조작 함수를 생각해보자:
+>**Example**: Consider a function that manipulates a `Record`, using a `mutex` to avoid race conditions:
 
 	mutex m;
 
@@ -301,7 +312,9 @@ There was no postcondition stating that the buffer should be cleared and the opt
 		// ... no m.unlock() ...
 	}
 
-Here, we "forgot" to state that the `mutex` should be released, so we don't know if the failure to ensure release of the `mutex` was a bug or a feature. Stating the postcondition would have made it clear:
+여기서 `mutex`를 해제해야 한다는 언급을 잊어버렸는데, `mutex` 해제를 언급하지 않은 것이 단순 버그인지 의도인지 알 수가 없다.
+후행조건을 기술함으로써 코드를 분명하게 만든다:
+>Here, we "forgot" to state that the `mutex` should be released, so we don't know if the failure to ensure release of the `mutex` was a bug or a feature. Stating the postcondition would have made it clear:
 
 	void manipulate(Record& r)	// better: hold the mutex m while and only while manipulating r
 	{
@@ -309,27 +322,34 @@ Here, we "forgot" to state that the `mutex` should be released, so we don't know
 		// ... no m.unlock() ...
 	}
 
-The bug is now obvious.
+이제 버그가 분명하게 보인다.
+>The bug is now obvious.
 
-Better still, use [RAII](#Rc-raii) to ensure that the postcondition ("the lock must be released") is enforced in code:
+락 해제에 대한 후행조건을 기술하기보다는 [RAII](#Rc-raii)를 사용해라:
+>Better still, use [RAII](#Rc-raii) to ensure that the postcondition ("the lock must be released") is enforced in code:
 
 	void manipulate(Record& r)	// best
 	{
 		lock_guard _ {m};
 		// ...
 	}
-	
-**Note**: Ideally, postconditions are stated in the interface/declaration so that users can easily see them.
+
+**Note**: 이상적으로, 인터페이스/선언부에 사용자들이 쉽게 볼 수 있도록 후행조건을 기술해야 한다.
+사용자들에게 언급되어야 하는 후행조건만 인터페이스에 언급하는데 그친다. 내부 상태에 대한 후행조건은 정의/구현부에만 포함된다.
+>**Note**: Ideally, postconditions are stated in the interface/declaration so that users can easily see them.
 Only postconditions related to the users can be stated in the interface.
 Postconditions related only to internal state belongs in the definition/implementation.
 
-**Enforcement**: (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
+**Enforcement**: (Not enforceable) 체크하기 어려운 개념적인 가이드라인이다.
+>**Enforcement**: (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
 
 
 <a name="Ri-ensures"></a>
-### I.8: Prefer `Ensures()` for expressing postconditions
+### I.8: 후행조건을 표현할때 `Ensures()`를 사용해라.
+>### I.8: Prefer `Ensures()` for expressing postconditions
 
-**Reason**: To make it clear that the condition is a postcondition and to enable tool use.
+**Reason**: 후행조건이라는 것을 분명히 하기 위해, 또 분석툴을 사용하기 위해.
+>**Reason**: To make it clear that the condition is a postcondition and to enable tool use.
 
 **Example**:
 
@@ -341,21 +361,28 @@ Postconditions related only to internal state belongs in the definition/implemen
 		Ensures(buffer[0]==0);
 	}
 
-**Note**: preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics.
+**Note**: 선행조건은 주석문, `if`문, `assert()`문 등으로 다양하게 언급되었다. 이런 여러 방식때문에 일반적인 코드와 구분이 어렵고 업데이트하기 어렵고 툴로 조작하기 어렵고 틀린 의미를 가지고 있을 수도 있다.
+>**Note**: preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics.
 
-**Alternative**: Postconditions of the form "this resource must be released" and best expressed by [RAII](#Rc-raii).
+**Alternative**: "이 자원은 반드시 해제되어야 한다" 형태의 후행조건은 [RAII](#Rc-raii)에 잘 정의되어 있다.
+>**Alternative**: Postconditions of the form "this resource must be released" and best expressed by [RAII](#Rc-raii).
 
-Ideally, that `Ensured` should be part of the interface that's not easily done. For now, we place it in the definition (function body).
+이상적으로 `Ensured`는 인터페이스의 일부가 되어야 한다. 지금으로서는 함수 정의에 위치시킨다.(함수 내부)
+>Ideally, that `Ensured` should be part of the interface that's not easily done. For now, we place it in the definition (function body).
 
-**Enforcement**: (Not enforceable) Finding the variety of ways postconditions can be asserted is not feasible. Warning about those that can be easily identfied (assert()) has questionable value in the absence of a language facility.
+**Enforcement**: (Not enforceable) 다양한 방식의 후행조건은 가능하지 않다. 언어명세에 포함되지 않은 채로 대충 정의(assert())한 후행조건에 대해서 경고하기는 거의 불가능하다.
+>**Enforcement**: (Not enforceable) Finding the variety of ways postconditions can be asserted is not feasible. Warning about those that can be easily identfied (assert()) has questionable value in the absence of a language facility.
 
 
 <a name="Ri-concepts"></a>
-### I.9: If an interface is a template, document its parameters using concepts
+### I.9: 인터페이스가 템플릿이라면 concept을 사용해서 매개변수를 문서화해라.
+>### I.9: If an interface is a template, document its parameters using concepts
 
-**Reason**: Make the interface precisely specified and compile-time checkable in the (not so distant) future.
+**Reason**: 가까운 미래에 컴파일 타임 체크를 할 수 있도록 인터페이스를 정확하게 정의해라.
+>**Reason**: Make the interface precisely specified and compile-time checkable in the (not so distant) future.
 
-**Example**: Use the ISO Concepts TS style of requirements specification. For example:
+**Example**: TS 스타일 요구사항 명세에 ISO concept를 사용하라. 예제:
+>**Example**: Use the ISO Concepts TS style of requirements specification. For example:
 
 	template<typename Iter, typename Val>
 	//	requires InputIterator<Iter> && EqualityComparable<ValueType<Iter>>,Val>
@@ -364,17 +391,21 @@ Ideally, that `Ensured` should be part of the interface that's not easily done. 
 		// ...
 	}
 
-**Note**: Soon (maybe in 2016), most compilers will be able to check `requires` clauses once the `//` is removed.
+**Note**: 곧(2016년에) 대부분의 컴파일러가 `//`가 제거된 `requires` 구문을 체크할 수 있을 예정이다.
+>**Note**: Soon (maybe in 2016), most compilers will be able to check `requires` clauses once the `//` is removed.
 
 **See also**: See [generic programming](???) and [???](???)
 
-**Enforcement**: (Not enforceable yet) A language facility is under specification. When the language facility is available, warn if any non-variadic template parameter is not constrained by a concept (in its declaration or mentioned in a `requires` clause.
+**Enforcement**: (Not enforceable yet) 언어명세를 작성중이다. 언어명세가 정의된다면, 비가변 템플릿 매개변수가 concept으로 제한되지 않는다면 경고하라. (선언이나 `requires` 구문에 언급되지 않은)
+>**Enforcement**: (Not enforceable yet) A language facility is under specification. When the language facility is available, warn if any non-variadic template parameter is not constrained by a concept (in its declaration or mentioned in a `requires` clause.
 
 
 <a name="Ri-except"></a>
-### I.10: Use exceptions to signal a failure to perform an required task
+### I.10: 테스크 실행 실패를 알리려면 예외를 사용하라.
+>### I.10: Use exceptions to signal a failure to perform an required task
 
-**Reason**: It should not be possible to ignore an error because that could leave the system or a computation in an undefined (or unexpected) state.
+**Reason**: 시스템이나 계산결과를 예측불가능한 상태로 둘 수 없으므로 에러를 무시해서는 안된다. 이것이 에러의 주요 발생지가 된다.
+>**Reason**: It should not be possible to ignore an error because that could leave the system or a computation in an undefined (or unexpected) state.
 This is a major source of errors.
 
 **Example**:
@@ -384,17 +415,23 @@ This is a major source of errors.
 	template <class F, class ...Args>
 	explicit thread(F&& f, Args&&... args);	// good: throw system_error if unable to start the new thread
 
-	
-**Note**: What is an error?
+**Note**: 에러란 무엇인가?
+에러는 기능이 의도한 목적을 이룰 수 없는 것을 의미한다.(후행조건을 만족시키면서)
+에러를 무시하는 코드를 호출하면 정의되지 않는 시스템 상태나 잘못된 결과를 야기할 수 있다.
+예를 들어, 리모트 서버와 연결이 안된다면 에러는 아니다. 서버는 다양한 이유로 연결을 거부할 수 있다.
+호출하는 쪽에서 결과를 체크할 수 있도록 반환해 주는 것이 자연스럽다. 그러나 연결에 실패하는 것을 에러로 간주할 생각이라면 예외를 던져주어야 한다.
+>**Note**: What is an error?
 An error means that the function cannot achieve its advertised purpose (including establishing postconditions).
 Calling code that ignores the error could lead to wrong results or undefined systems state.
 For example, not being able to connect to a remote server is not by itself an error:
 the server can refuse a connection for all kinds of reasons, so the natural thing is to return a result that the caller always has to check.
 However, if failing to make a connection is considerd an error, then a failure should throw an exception.
 
-**Exception**: Many traditional interface functions (e.g., UNIX signal handlers) use error codes (e.g., `errno`) to report what are really status codes, rather than errors. You don't have good alternative to using such, so calling these does not violate the rule.
+**Exception**: 많은 예전 인터페이스 함수는 실제로는 상태값인 에러코드를 사용한다(예를 들면 `errno`). 별다른 대안이 없으므로 이 규칙에 위배되지는 않는다.
+>**Exception**: Many traditional interface functions (e.g., UNIX signal handlers) use error codes (e.g., `errno`) to report what are really status codes, rather than errors. You don't have good alternative to using such, so calling these does not violate the rule.
 
-**Alternative**: If you can't use exceptions (e.g. because your code is full of old-style raw-pointer use or because there are hard-real-time constraints),
+**Alternative**: 예외를 사용할 수 없다면(코드가 예전 스타일의 포인터로 가득하던지, 실시간 제약이 심각하서), 벨류쌍를 반환하는 스타일을 사용하는 것을 생각해 보라.
+>**Alternative**: If you can't use exceptions (e.g. because your code is full of old-style raw-pointer use or because there are hard-real-time constraints),
 consider using a style that returns a pair of values:
 
 	int val;
@@ -405,25 +442,37 @@ consider using a style that returns a pair of values:
 	}
 	// ... use val ...
 
-**Note**: We don't consider "performance" a valid reason not to use exceptions.
+**Note**: 성능이슈가 예외를 사용하지 않을 타당한 이유라고는 생각지 않는다.
+>**Note**: We don't consider "performance" a valid reason not to use exceptions.
 
-* Often, explicit error checking and handling consume as much time and space as exception handling.
+* 명시적인 에러 체크와 관리가 예외처리만큼 시간과 공간을 허비하지는 않는다.
+* 간결한 코드는 예외처리를 포함해도 더 좋은 성능을 가진다. (프로그램 최적화를 통해 실행경로를 단순화시킨다).
+* 성능향상를 위한 좋은 방법은 핵심코드는 핵심부분 밖에서 체크하도록 옮기는 것이다. ([checking](#Rper-checking)).
+* 장기적으로 봤을 때 정규화된 코드가 최적화가 잘 된다.
+
+>* Often, explicit error checking and handling consume as much time and space as exception handling.
 * Often, cleaner code yield better performance with exceptions (simplifying the tracing of paths through the program and their optimization).
 * A good rule for performance critical code is to move checking outside the critical part of the code ([checking](#Rper-checking)).
 * In the longer term, more regular code gets better optimized.
 
-**See also**: Rule I.??? and I.??? for reporting precondition and postcondition violations.
+**See also**:  선행조건, 후행조건 위반를 보고하기 위해 Rule I.??? and I.???.
+>**See also**: Rule I.??? and I.??? for reporting precondition and postcondition violations.
 
 **Enforcement**:
 
-* (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
+* (Not enforceable) 체크하기 힘든 철학적인 가이드라인이다.
+* `errno`를 살펴봐라.
+
+>* (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
 * look for `errno`.
 
 
 <a name="Ri-raw"></a>
-### I.11: Never transfer ownership by a raw pointer (`T*`)
+### I.11: 일반포인터로 소유권을 넘기지 마라.
+>### I.11: Never transfer ownership by a raw pointer (`T*`)
 
-**Reason**: if there is any doubt whether the caller or the callee owns an object, leaks or premature destruction will occur.
+**Reason**: 호출하는 쪽이나 받는 쪽이 객체를 누가 소유할지 모른다면 메모리 누수나 불충분한 소멸이 일어나기 때문이다.
+>**Reason**: if there is any doubt whether the caller or the callee owns an object, leaks or premature destruction will occur.
 
 **Example**: Consider
 
@@ -434,7 +483,9 @@ consider using a style that returns a pair of values:
 		return res;
 	}
 
-Who deletes the returned `X`? The problem would be harder to spot if compute returned a reference.
+반환된 X를 누가 삭제해야 하나? 만약에 참조를 반환한다면 문제는 더 어려워질 것이다.
+값으로 반환된 결과를 살펴보자.(결과 사이즈가 크다면 이동 개념을 사용하라.)
+>Who deletes the returned `X`? The problem would be harder to spot if compute returned a reference.
 Consider returning the result by value (use move semantics if the result is large):
 
 	vector<double> compute(args)	// good
@@ -444,10 +495,14 @@ Consider returning the result by value (use move semantics if the result is larg
 		return res;
 	}
 
-**Alternative**: Pass ownership using a "smart pointer", such as `unique_ptr` (for exclusive ownership) and `shared_ptr` (for shared ownership).
+**Alternative**: 'smart pointer'를 사용해서 소유권을 넘겨라. `unique_ptr`(독점적인 소유를 위해) 또는 `shared_ptr`(소유권 공유를 위해)
+그러나 참조 개념이 필요하지 않다면 효과는 제한적이고 우아히자는 않을 것이다.
+>**Alternative**: Pass ownership using a "smart pointer", such as `unique_ptr` (for exclusive ownership) and `shared_ptr` (for shared ownership).
 However that is less elegant and less efficient unless reference semantics are needed.
 
-**Alternative**: Sometimes older code can't be modified because of ABI compatibility requirements or lack of resources.
+**Alternative**: ABI 호환 요구 또는 자원 부족때문에 예전 코드를 수정할 수 없는 상황이 있다.
+그 경우에 `owner`를 사용해서 포인터의 소유권을 표시해둬라.
+>**Alternative**: Sometimes older code can't be modified because of ABI compatibility requirements or lack of resources.
 In that case, mark owning pointers using `owner` :
 
 	owner<X*> compute(args)		// It is now clear that ownership is transferred
@@ -457,28 +512,39 @@ In that case, mark owning pointers using `owner` :
 		return res;
 	}
 
-This tells analysis tools that `res` is an owner.
+이것은 분석툴에게 `res`가 오너라고 알려준다.
+즉, `return`하는 것처럼 그 값에 대해서 삭제하거나 다른 오너로 넘겨주어야 한다.
+>This tells analysis tools that `res` is an owner.
 That is, it's value must be `delete`d or transferred to another owner, as is done here by the `return`.
 
-`owner` is used similarly in the implementation of resource handles.
+`owner`는 자원 관리하는 구현과 비슷하게 사용된다.
+>`owner` is used similarly in the implementation of resource handles.
 
-`owner` is defined in the [Guideline Support Library](#S-GSL).
+`owner`는 [Guideline Support Library](#S-GSL)에 정의했다.
+> `owner` is defined in the [Guideline Support Library](#S-GSL).
 
-**Note**: Every object passed as a raw pointer (or iterator) is assumed to be owned by the caller, so that its lifetime is handled by the caller.
+**Note**: 일반포인터(또는 순환자)로 넘긴 객체는 호출하는 쪽에서 소유해야 한다고 가정한다. 객체 생존시간은 호출하는 쪽에서 관리할 수 있도록 말이다.
+>**Note**: Every object passed as a raw pointer (or iterator) is assumed to be owned by the caller, so that its lifetime is handled by the caller.
 
 **See also**: [Argument passing](#Rf-conventional) and [value return](#Rf-T-return).
 
 **Enforcement**:
 
-* (Simple) Warn on `delete` of a raw pointer that is not an `owner`.
+* (Simple) `owner`가 아닌 일반포인터의 `delete`에 대해서는 경고하라.
+* (Simple) 모든 실행경로 상에서 리셋이나 `owner` 포인터를 명시적으로 삭제할 때 실패하면 경고하라.
+* (Simple) `new`의 결과값 또는 함수호출로 반환되는 포인터가 일반포인터라면 경고하라.
+
+>* (Simple) Warn on `delete` of a raw pointer that is not an `owner`.
 * (Simple) Warn on failure to either `reset` or explicitly `delete` an `owner` pointer on every code path.
 * (Simple) Warn if the return value of `new` or a function call with return value of pointer type is assigned to a raw pointer.
 
 
 <a name="Ri-nullptr"></a>
-### I.12: Declare a pointer that must not be null as `not_null`
+### I.12: 포인터가 NULL값이 될 수 없다면 `not_null`로 선언하라.
+>### I.12: Declare a pointer that must not be null as `not_null`
 
-**Reason**: To help avoid dereferencing `nullptr` errors. To improve performance by avoiding redundant checks for `nullptr`.
+**Reason**:  `nullptr` 역참조(Null Pointer Dereference)에러를 피하기 위해, `nullptr` 반복 체크를 줄여서 성능을 높이기 위해.
+>**Reason**: To help avoid dereferencing `nullptr` errors. To improve performance by avoiding redundant checks for `nullptr`.
 
 **Example**:
 
@@ -490,35 +556,47 @@ That is, it's value must be `delete`d or transferred to another owner, as is don
 
 	int length(const char* p);				// we must assume that p can be nullptr
 
-By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
+소스 안에 의도를 추가해 줌으로써 컴파일러와 툴의 분석 결과가 좋아진다. 정적(컴파일타임) 분석을 통해 클래스의 에러를 발견하는 것, 최적화 수행하기, 분기 줄이기, NULL 체크 말이다.
+>By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
 
-**Note**: The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
+**Note**: c 스타일의 스트링(NULL로 끝나는 문자열)에 대한 포인터를 char형이라고 여전히 가정하고 있으며 잠재적인 에러 원인이 된다. `const char *` 대신에 `zstring`을 사용하라.
+>**Note**: The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
 
 	int length(not_null<zstring> p);		// we can assume that p cannot be nullptr
 									// we can assume that p points to a zero-terminated array of characters
 
-Note: `length()` is, of course, `std::strlen()` in disguise.
+Note: `length()`는 당연히 `std::strlen()`이다.
+>Note: `length()` is, of course, `std::strlen()` in disguise.
 
 **Enforcement**:
 
-* (Simple) ((Foundation)) If a function checks a pointer parameter against `nullptr` before access, on all control-flow paths, then warn it should be declared `not_null`.
+* (Simple) ((Foundation)) 함수내에서 값을 접근하기 전에 `nullptr` 체크를 한다면 `not_null`로 선언해야 한다고 경고하라.
+* (Complex) 포인터를 반환하는 함수가 `nullptr`가 아닌 값을 반환하고 있다면 반환값을 `not_null`로 선언해야 한다고 경고하라.
+
+>* (Simple) ((Foundation)) If a function checks a pointer parameter against `nullptr` before access, on all control-flow paths, then warn it should be declared `not_null`.
 * (Complex) If a function with pointer return value ensures it is not `nullptr` on all return paths, then warn the return type should be declared `not_null`.
 
 
 <a name="Ri-array"></a>
-### I.13: Do not pass an array as a single pointer
+### I.13: 포인터로 배열 인자를 넘기지 마라.
+>### I.13: Do not pass an array as a single pointer
 
-**Reason**: (pointer,size)-style interfaces are error-prone. Also, plain pointer (to array) must relies on some convention to allow the callee to determine the size.
+**Reason**: (포인터, 사이즈) 형태의 함수 인터페이스는 에러날 확률이 높다. 배열에 대한 포인터는 반드시 사이즈를 판단할 수 있는 방식이 필요하다.  
+>**Reason**: (pointer,size)-style interfaces are error-prone. Also, plain pointer (to array) must relies on some convention to allow the callee to determine the size.
 
 **Example**: Consider
 
 	void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
 
-What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
+'q'의 사이즈가 n보다 적다면 어떻게 될까? 관계없는 메모리에 쓰기를 시도할 것이다.
+'p'의 사이즈가 n보다 작다면 관계없는 메모리로부터 읽기를 시도할 것이다.
+어느 쪽이나 미정의 동작을 하게 되고 잠재적인 고약한 버그가 생긴다.
+>What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
 What if there are fewer than `n` elements in the array pointed to by `p`? Then, we read some probably unrelated memory.
 Either is undefined behavior and a potentially very nasty bug.
 
-**Alternative**: Consider using explicit ranges,
+**Alternative**: 명시적 범위를 사용하는 걸 고려해봐라.
+>**Alternative**: Consider using explicit ranges,
 
 	void copy(array_view<const T> r, array_view<T> r2); // copy r to r2
 
@@ -529,9 +607,12 @@ Either is undefined behavior and a potentially very nasty bug.
 	// ...
 	draw(arr,10);
 
-Passing `10` as the `n` argument may be a mistake: the most common convention is to assume [`0`:`n`) but that is nowhere stated. Worse is that the call of `draw()` compiled at all: there was an implicit conversion from array to pointer (array decay) and then another implicit conversion from `Circle` to `Shape`. There is no way that `draw()` can safely iterate through that array: it has no way of knowing the size of the elements.
+10을 n에 인자로 넘기면 에러가 날 수 있다.: 보통 방법은 [0:n)로 가정하는 것이지만 어디에도 설명되지 않고 있다. 더 나쁜 부분은 'draw()' 호출이다. 배열을 포인터로 암시적으로 형변환했고 Circle을 Shape로 묵시적으로 형변환했다.
+'draw()'함수가 배열을 안전하게 순환할 수 있을지 잘 모르겠다. 배열 원소 사이즈를 알 방법이 없기 때문이다.
+>Passing `10` as the `n` argument may be a mistake: the most common convention is to assume [`0`:`n`) but that is nowhere stated. Worse is that the call of `draw()` compiled at all: there was an implicit conversion from array to pointer (array decay) and then another implicit conversion from `Circle` to `Shape`. There is no way that `draw()` can safely iterate through that array: it has no way of knowing the size of the elements.
 
-**Alternative**: Use a support class that ensures that the number of elements is correct and prevents dangerous implicit conversions. For example:
+**Alternative**: 배열 원소의 수가 정확하고 암시적인 형변환을 방어할 수 있는 지원 클래스를 사용하라. 예를 들면,
+>**Alternative**: Use a support class that ensures that the number of elements is correct and prevents dangerous implicit conversions. For example:
 
 	void draw2(array_view<Circle>);
 	Circle arr[10];
@@ -542,13 +623,18 @@ Passing `10` as the `n` argument may be a mistake: the most common convention is
 	void draw3(array_view<Shape>);
 	draw3(arr);	// error: cannot convert Circle[10] to array_view<Shape>
 
-This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
+'draw2()'는  'draw()'와 동일한 정보를 인자로 넘긴다. 그러나 사실은 명시적으로 'Circle'의 범위라는 의도이다.
+>This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
 
-**Exception**: Use `zstring` and `czstring` to represent a C-style, zero-terminated strings. But see ???.
+**Exception**: C 스타일 NULL로 끝나는 스트링을 표시할 때는 `zstring`, `czstring`를 사용해라. But see ???.
+>**Exception**: Use `zstring` and `czstring` to represent a C-style, zero-terminated strings. But see ???.
 
 **Enforcement**:
 
-* (Simple) ((Bounds)) Warn for any expression that would rely on implicit conversion of an array type to a pointer type. Allow exception for zstring/czstring pointer types.
+* (Simple) ((Bounds)) 조용히 배열을 포인터로 형변환하려는 표현식에 대해서 경고하라. zstring/czstring은 제외.
+* (Simple) ((Bounds)) 주소값을 계산하기 위해 포인터에 대해서 연산하는 계산식에 대해서 경고하라.  
+
+>* (Simple) ((Bounds)) Warn for any expression that would rely on implicit conversion of an array type to a pointer type. Allow exception for zstring/czstring pointer types.
 * (Simple) ((Bounds)) Warn for any arithmetic operation on an expression of pointer type that results in a value of pointer type. Allow exception for zstring/czstring pointer types.
 
 
