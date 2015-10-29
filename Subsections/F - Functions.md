@@ -37,33 +37,33 @@ Functions are the most critical part in most interfaces, so see the interface ru
 인자 전달 규칙:
 >Argument passing rules:
 
-* [F.15: 정보를 전달 할 때 단순하고 전통적인 방식을 선호해라](#Rf-conventional)
-* [F.16: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
-* [F.17: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
-* [F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence](#Rf-range)
-* [F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-string)
-* [F.20: Use a `const T&` parameter for a large object](#Rf-const-T-ref)
-* [F.21: Use a `T` parameter for a small object](#Rf-T)
-* [F.22: Use `T&` for an in-out-parameter](#Rf-T-re)
-* [F.23: Use `T&` for an out-parameter that is expensive to move (only)](#Rf-T-return-out)
+* [F.15: 정보를 전달 할 때 단순하고 전통적인 방식을 선호하라](#Rf-conventional)
+* [F.16: 객체 하나를 지정 할 때는 `T*` 나 `owner<T*>` 또는 스마트 포인터를 사용하라](#Rf-ptr)
+* [F.17: "null"이 유효하지 않는 값을 의미할 때는 `not_null<T>`를 사용하라](#Rf-nullptr)
+* [F.18: 반 개방 범위를 나타날 때는 `array_view<T>` 또는 `array_view_p<T>`를 사용하라](#Rf-range)
+* [F.19: C언어 형 문자열을 지정 할 때는 `zstring` 또는 `not_null<zstring>`을 사용하라](#Rf-string)
+* [F.20: 크기가 큰 객체를 매개변수로 사용 할 때는 `const T&`를 사용하라](#Rf-const-T-ref)
+* [F.21: 크기가 작은 객체를 매개변수로 사용 할 때는 `T`를 사용하라](#Rf-T)
+* [F.22: 입출력 매개변수는 `T&`를 사용하라](#Rf-T-re)
+* [F.23: 값을 이동하는데 비용이 많이 드는 출력 매개변수는 `T&`를 사용하라 (only)](#Rf-T-return-out)
 * [F.24: Use a `TP&&` parameter when forwarding (only)](#Rf-pass-ref-ref)
 * [F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities](#Rf-pass-ref-move)
-* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
-* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
+* [F.26: 포인터가 필요한 곳에서 소유권을 이동 시킬 때는 `unique_ptr<T>`를 사용하라](#Rf-unique_ptr)
+* [F.27: 소유권을 공유 할 때는 `shared_ptr<T>`을 사용하라](#Rf-shared_ptr)
 
 >* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
-* [F.16: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
-* [F.17: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
-* [F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence](#Rf-range)
-* [F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-string)
-* [F.20: Use a `const T&` parameter for a large object](#Rf-const-T-ref)
-* [F.21: Use a `T` parameter for a small object](#Rf-T)
-* [F.22: Use `T&` for an in-out-parameter](#Rf-T-re)
-* [F.23: Use `T&` for an out-parameter that is expensive to move (only)](#Rf-T-return-out)
-* [F.24: Use a `TP&&` parameter when forwarding (only)](#Rf-pass-ref-ref)
-* [F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities](#Rf-pass-ref-move)
-* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
-* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
+>* [F.16: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
+>* [F.17: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
+>* [F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence](#Rf-range)
+>* [F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-string)
+>* [F.20: Use a `const T&` parameter for a large object](#Rf-const-T-ref)
+>* [F.21: Use a `T` parameter for a small object](#Rf-T)
+>* [F.22: Use `T&` for an in-out-parameter](#Rf-T-re)
+>* [F.23: Use `T&` for an out-parameter that is expensive to move (only)](#Rf-T-return-out)
+>* [F.24: Use a `TP&&` parameter when forwarding (only)](#Rf-pass-ref-ref)
+>* [F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities](#Rf-pass-ref-move)
+>* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
+>* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
 
 값 전달 규칙:
 >Value return rules:
@@ -115,11 +115,15 @@ If something is a well-specified action, separate it out from its  surrounding c
 		else
 			cerr << "no int on input\n";
 	}
-	
-Almost everything is wrong with `read_and_print`.
-It reads, it writes (to a fixed `ostream`), it write error messages (to a fixed `ostream`), it handles only `int`s.
-There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
-For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled
+
+`read_and_print`는 거의 모든것이 잘못 되어 있다.	
+>Almost everything is wrong with `read_and_print`.
+함수는 읽고, 함수는 (고정된 `ostream`에) 쓴다. 함수는 에러 메시지를 (고정된 `ostream`에) 쓴다. 함수는 `int`형만을 다룬다.
+>It reads, it writes (to a fixed `ostream`), it write error messages (to a fixed `ostream`), it handles only `int`s.
+재사용도 없고, 논리적으로 구분 될 수 있는 동작들은 뒤섞여 있고 지역변수는 사용이 끝난 후에도 논리적 범위에 남아 있습니다.
+>There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
+작은 예를 들어보면, 이것은 문제가 없어 보입니다. 하지만 입력을 처리하고 출력을 처리하고, 에러를 처리해야 한다면 더 복잡해 집니다.
+>For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
 
 **Note**: If you write a non-trivial lambda that potentially can be used in more than one place,
