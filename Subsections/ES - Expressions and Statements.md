@@ -1667,11 +1667,13 @@ There can be code in the `...` part that causes the `delete` never to happen.
 
 Flag naked `new`s and naked `delete`s.
 
-### <a name="Res-del"></a> ES.61: delete arrays using `delete[]` and non-arrays using `delete`
+### <a name="Res-del"></a> ES.61: `delete[]`를 사용해서 배열 메모리를 해제하라. `delete`는 배열이 아닌 메모리를 해제하라.
+>### <a name="Res-del"></a> ES.61: delete arrays using `delete[]` and non-arrays using `delete`
 
 ##### Reason
 
-That's what the language requires and mistakes can lead to resource release errors and/or memory corruption.
+C++의 요구조건이고 잘못 사용하면 리소스 해제 에러가 나면서 메모리값이 엉망이 될 것이다.
+>That's what the language requires and mistakes can lead to resource release errors and/or memory corruption.
 
 ##### Example, bad
 
@@ -1684,18 +1686,24 @@ That's what the language requires and mistakes can lead to resource release erro
 
 ##### Note
 
-This example not only violates the [no naked `new` rule](#Res-new) as in the previous example, it has many more problems.
+이 예제는 [no naked `new` rule](#Res-new)를 위반할 뿐만 아니라 많은 다른 문제를 야기한다.
+>This example not only violates the [no naked `new` rule](#Res-new) as in the previous example, it has many more problems.
 
 ##### Enforcement
 
-* if the `new` and the `delete` is in the same scope, mistakes can be flagged.
+* `new`, `delete`가 같은 영역범위에 있다면 오류여부를 표시해 줄 수 있다.
+* `new`, `delete`가 생성자/소멸자 안에 있다면 오류여부를 표시해 줄 수 있다.
+
+>* if the `new` and the `delete` is in the same scope, mistakes can be flagged.
 * if the `new` and the `delete` are in a constructor/destructor pair, mistakes can be flagged.
 
-### <a name="Res-arr2"></a> ES.62: Don't compare pointers into different arrays
+### <a name="Res-arr2"></a> ES.62: 다른 배열과 포인터를 비교하지 마라.
+>### <a name="Res-arr2"></a> ES.62: Don't compare pointers into different arrays
 
 ##### Reason
 
-The result of doing so is undefined.
+결과는 예측불가하다.
+>The result of doing so is undefined.
 
 ##### Example, bad
 
@@ -1709,17 +1717,21 @@ The result of doing so is undefined.
 
 ##### Note
 
-This example has many more problems.
+더 많은 문제가 내포되어 있다.
+>This example has many more problems.
 
 ##### Enforcement
 
-## <a name="SS-numbers"></a> Arithmetic
+## <a name="SS-numbers"></a> 연산
+>## <a name="SS-numbers"></a> Arithmetic
 
-### <a name="Res-mix"></a> ES.100: Don't mix signed and unsigned arithmetic
+### <a name="Res-mix"></a> ES.100: 부호 있는 연산과 없는 연산을 섞지 마라.
+>### <a name="Res-mix"></a> ES.100: Don't mix signed and unsigned arithmetic
 
 ##### Reason
 
-Avoid wrong results.
+결과가 잘못될 수 있기 때문에.
+>Avoid wrong results.
 
 ##### Example
 
@@ -1729,24 +1741,30 @@ Avoid wrong results.
 
 ##### Note
 
-Unfortunately, C++ uses signed integers for array subscripts and the standard library uses unsigned integers for container subscripts.
+불행히도 C++은 배열인자에 대해서 부호있는 정수를 사용하고 표준 라이브러리는 컨테이너 인자에 부호없는 정수형을 사용한다.
+일관성을 방해한다.
+>Unfortunately, C++ uses signed integers for array subscripts and the standard library uses unsigned integers for container subscripts.
 This precludes consistency.
 
 ##### Enforcement
 
-Compilers already know and sometimes warn.
+컴파일러가 이미 알고 있는 상황이고 경고를 날려 줄 것이다.
+>Compilers already know and sometimes warn.
 
-### <a name="Res-unsigned"></a> ES.101: use unsigned types for bit manipulation
+### <a name="Res-unsigned"></a> ES.101: 비트연산 시에는 부호없는 타입을 사용하라.
+>### <a name="Res-unsigned"></a> ES.101: use unsigned types for bit manipulation
 
 ##### Reason
 
-Unsigned types support bit manipulation without surprises from sign bits.
+부호없는 타입은 부호비트까지 포함해서 비트 연산할 수 있도록 지원하기 때문에.
+>Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Example
 
     ???
 
-**Exception**: Use unsigned types if you really want modulo arithmetic.
+**Exception**: 모듈러 연산을 하려면 부호없는 타입을 사용하라.
+>**Exception**: Use unsigned types if you really want modulo arithmetic.
 
 ##### Enforcement
 
@@ -1757,7 +1775,7 @@ Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Reason
 
-부호없는 타입은 부호비트부터 비트 연산을 해버리기 때문이다. (?)
+부호없는 타입은 부호비트까지 포함해서 비트 연산할 수 있도록 지원하기 때문에.
 >Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Example
@@ -1845,7 +1863,7 @@ Incrementing a value beyond a maximum value can lead to memory corruption and un
 
 ##### Note
 
-`%` 모듈라도 같이 적용된다.
+`%` 모듈러 연산도 같이 적용된다.
 >this also applies to `%`.
 
 ##### Example
