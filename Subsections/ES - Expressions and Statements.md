@@ -1573,14 +1573,20 @@ If you feel the need for a lot of casts, there may be a fundamental design probl
 * Warn against named casts
 * Warn if there are many functional style casts (there is an obvious problem in quantifying 'many').
 
-### <a name="Res-casts-named"></a> ES.49: If you must use a cast, use a named cast
+### <a name="Res-casts-named"></a> ES.49: 형변환을 써야 한다면 네임드 형변환을 사용하라.
+>### <a name="Res-casts-named"></a> ES.49: If you must use a cast, use a named cast
 
 ##### Reason
 
-Readability. Error avoidance.
+가독성, 에러 줄이기.
+네임드 형변환은 C스타일이나 함수형 형변환보다 더 구체적이다. 컴파일러에게 에러를 알려주는 역할도 한다.
+C스타일 형변환: (int) a
+함수형 형변환: int(a)
+>Readability. Error avoidance.
 Named casts are more specific than a C-style or functional cast, allowing the compiler to catch some errors.
 
-The named casts are:
+네임드 형변환:
+>The named casts are:
 
 * `static_cast`
 * `const_cast`
@@ -1601,17 +1607,23 @@ The named casts are:
 
 ##### Enforcement
 
-Flag C-style and functional casts.
+C스타일, 함수형 형변환이 있다면 표시한다.
+>Flag C-style and functional casts.
 
-## <a name="Res-casts-const"></a> ES.50: Don't cast away `const`
+### <a name="Res-casts-const"></a> ES.50: `const`를 없애지 마라.
+>## <a name="Res-casts-const"></a> ES.50: Don't cast away `const`
 
 ##### Reason
 
-It makes a lie out of `const`.
+`const`로부터 거짓말한다. (?)
+>It makes a lie out of `const`.
 
 ##### Note
 
-Usually the reason to "cast away `const`" is to allow the updating of some transient information of an otherwise immutable object.
+보통 `const`를 없애버리는 이유는 변경할 수 없는 객체 속에 있는 일시적인 정보를 변경하기 위해서이다.
+예를 들면 캐시, 임시 계산값, 미리 계산한 값 등이다.
+이런 값은 `const_cast`를 쓰는 것보다 `mutable`이나 간접적인 방법을 사용하면 더 쉽게 처리할 수 있다.
+>Usually the reason to "cast away `const`" is to allow the updating of some transient information of an otherwise immutable object.
 Examples are cashing, memorization, and precomputation.
 Such examples are often handled as well or better using `mutable` or an indirection than with a `const_cast`.
 
@@ -1621,13 +1633,16 @@ Such examples are often handled as well or better using `mutable` or an indirect
 
 ##### Enforcement
 
-Flag `const_cast`s.
+`const_cast`이 있다면 표시한다.
+>Flag `const_cast`s.
 
-### <a name="Res-range-checking"></a> ES.55: Avoid the need for range checking
+### <a name="Res-range-checking"></a> ES.55: 범위를 체크할 필요성을 없애라.
+>### <a name="Res-range-checking"></a> ES.55: Avoid the need for range checking
 
 ##### Reason
 
-Constructs that cannot overflow, don't, and usually runs faster:
+범위를 벗어날 수 없는 구조라면 오히려 더 빠르게 실행될 수 있다.
+>Constructs that cannot overflow, don't, and usually runs faster:
 
 ##### Example
 
@@ -1638,17 +1653,22 @@ Constructs that cannot overflow, don't, and usually runs faster:
 
 ##### Enforcement
 
-Look for explicit range checks and heuristically suggest alternatives.
+명시적인 범위체크를 찾아라. 적절한 대안을 제안한다. (?)
+>Look for explicit range checks and heuristically suggest alternatives.
 
-### <a name="Res-new"></a> ES.60: Avoid `new` and `delete[]` outside resource management functions
+### <a name="Res-new"></a> ES.60: 리소스 함수 외부에서는 `new`, `delete[]`를 쓰지 마라.
+>### <a name="Res-new"></a> ES.60: Avoid `new` and `delete[]` outside resource management functions
 
 ##### Reason
 
-Direct resource management in application code is error-prone and tedious.
+프로그램 코드 내에서 직접적인 리소스 관리는 에러를 발생시키기 쉬우며 지루(?)하다.
+>Direct resource management in application code is error-prone and tedious.
 
 ##### Note
 
-also known as "No naked `new`!"
+"no naked `new`""로 알려짐. (C스타일 포인터 `T *`, C++은 std::shared_ptr<T>, std::weak_ptr<T>, std::unique_ptr<T>)
+C스타일 포인터를 생짜 포인터(naked pointer 또는 raw pointer)라고 함.
+>also known as "No naked `new`!"
 
 ##### Example, bad
 
@@ -1659,15 +1679,17 @@ also known as "No naked `new`!"
         delete[] p;
     }
 
-There can be code in the `...` part that causes the `delete` never to happen.
+`...`는 `delete`를 호출할 필요가 전혀 없는 코드라고 가정한다.
+>There can be code in the `...` part that causes the `delete` never to happen.
 
 **See also**: [R: Resource management](#S-resource).
 
 ##### Enforcement
 
-Flag naked `new`s and naked `delete`s.
+생짜 `new`, `delete`이 있다면 표시한다.
+>Flag naked `new`s and naked `delete`s.
 
-### <a name="Res-del"></a> ES.61: `delete[]`를 사용해서 배열 메모리를 해제하라. `delete`는 배열이 아닌 메모리를 해제하라.
+### <a name="Res-del"></a> ES.61: `delete[]`로 배열 포인터를 해제하라. `delete`로 배열이 아닌 포인터를 해제하라.
 >### <a name="Res-del"></a> ES.61: delete arrays using `delete[]` and non-arrays using `delete`
 
 ##### Reason
@@ -1697,7 +1719,7 @@ C++의 요구조건이고 잘못 사용하면 리소스 해제 에러가 나면�
 >* if the `new` and the `delete` is in the same scope, mistakes can be flagged.
 * if the `new` and the `delete` are in a constructor/destructor pair, mistakes can be flagged.
 
-### <a name="Res-arr2"></a> ES.62: 다른 배열과 포인터를 비교하지 마라.
+### <a name="Res-arr2"></a> ES.62: 다른 배열간에 포인터를 비교하지 마라.
 >### <a name="Res-arr2"></a> ES.62: Don't compare pointers into different arrays
 
 ##### Reason
