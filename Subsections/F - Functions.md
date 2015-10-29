@@ -116,15 +116,20 @@ If something is a well-specified action, separate it out from its  surrounding c
 			cerr << "no int on input\n";
 	}
 
+
 `read_and_print`는 거의 모든것이 잘못 되어 있다.	
 >Almost everything is wrong with `read_and_print`.
+
 함수는 읽고, 함수는 (고정된 `ostream`에) 쓴다. 함수는 에러 메시지를 (고정된 `ostream`에) 쓴다. 함수는 `int`형만을 다룬다.
 >It reads, it writes (to a fixed `ostream`), it write error messages (to a fixed `ostream`), it handles only `int`s.
+
 재사용도 없고, 논리적으로 구분 될 수 있는 동작들은 뒤섞여 있고 지역변수는 사용이 끝난 후에도 논리적 범위에 남아 있습니다.
 >There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
+
 작은 예를 들어보면, 이것은 문제가 없어 보입니다. 하지만 입력을 처리하고 출력을 처리하고, 에러를 처리해야 한다면 더 복잡해 집니다.
 >For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
+
 
 **Note**: If you write a non-trivial lambda that potentially can be used in more than one place,
 give it a name by assigning it to a (usually non-local) variable.
