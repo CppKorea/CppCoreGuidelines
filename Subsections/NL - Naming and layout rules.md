@@ -1,18 +1,18 @@
 # <a name="S-naming"></a> NL: 이름짓기와 코드 배치 규칙
 ># <a name="S-naming"></a> NL: Naming and layout rules
 
-별다른 이유없이 "내 스타일이 당신 것보다 더 좋다"는 논란을 줄이기 위해서라면 일관성있는 이름짓기와 레이아웃은 도움이 된다.
-굉장히 많은 스타일이 존재하고 사람들은 그 스타일에 대해 열렬하게 찬반 의견을 보인다.
-게다가 실제 프로젝트는 아주 많은 소스코드를 가지고 있고 모든 코드에 대해 표준화된 스타일을 적용하는 것은 불가능하다.
-여기서 더 좋은 아이디어가 없다면 도입해도 무방한 규칙들을 소개하겠다. 그러나 규칙을 소개하는 진짜 목적은 특정한 규칙 그 자체가 아니라 일관성이다.
-IDE나 툴들이 이것을 도와줄 것이다. 어쩌면 방해할지도 모른다.
+만약 다른 이유가 없다면 일관된 이름짓기와 배치는 도움이 된다. 이는 "내 스타일이 당신의 것보다 더 좋다"라는 논의를 최소화할 수 있기 때문이다.
+그러나 여기저기 매우 다양한 스타일들이 있어 사람들은 그것들에 대해 (찬반으로) 열렬하다.
+게다가 대부분의 실제 프로젝트들은 많은 원점(sources)으로부터 코드를 포함하여, 모든 코드를 단일 스타일로 표준화하는 것은 흔히 불가능하다.
+여기서 더 좋은 아이디어가 없다면 사용할 일련의 규칙들 소개하며, 진짜 목표는 특정 규칙 집합이 아닌 일관성이다.
+IDE들과 툴들이 도와줄 수 있다. (게다가 방해도 할 것이다.)
 >Consistent naming and layout are helpful. If for no other reason because it minimizes "my style is better than your style" arguments.
 However, there are many, many, different styles around and people are passionate about them (pro and con).
 Also, most real-world projects includes code from many sources, so standardizing on a single style for all code is often impossible.
 We present a set of rules that you might use if you have no better ideas, but the real aim is consistency, rather than any particular rule set.
 IDEs and tools can help (as well as hinder).
 
-이름짓기와 코드 배치 규칙:
+이름짓기와 배치 규칙:
 >Naming and layout rules:
 
 * [NL 1: Don't say in comments what can be clearly stated in code](#Rl-comments)
@@ -30,12 +30,12 @@ IDEs and tools can help (as well as hinder).
 * [NL.18: Use C++-style declarator layout](#Rl-ptr)
 * [NL.25: Don't use `void` as an argument type](#Rl-void)
 
-규칙들 대부분이 심미적이고 개발자들은 자기 의견을 강하게 표현한다.
-IDE 역시 기본값 외에 몇가지 대안을 가지고 있는 상황이다. 특별한 이유가 없다면 이 규칙들을 기본으로 사용할 것을 제안한다.
+대부분의 규칙들은 미학적이고 개발자들은 강한 의견을 유지한다.
+IDE 역시 기본값 외에 다양한 대안을 가지고 있는 경향이다. 이 규칙들은 이유가 되지 않는다면 기본으로 따르도록 제안된다.
 >Most of these rules are aesthetic and programmers hold strong opinions.
-IDEs also tend to have defaults and a range of alternatives.These rules are suggested defaults to follow unless you have reasons not to.
+IDEs also tend to have defaults and a range of alternatives. These rules are suggested defaults to follow unless you have reasons not to.
 
-더 자세한 내용들이 적용하기 쉬울 것이다.
+더 구체적이고 세부적인 규칙들이 시행하기 쉬울 것이다.
 >More specific and detailed rules are easier to enforce.
 
 ### <a name="Rl-comments"></a> NL.1: 코드에서 말할 수 있는 내용을 주석문에 넣지 마라.
