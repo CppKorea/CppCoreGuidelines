@@ -99,12 +99,12 @@ Functions are the most critical part in most interfaces, so see the interface ru
 ### F.1: "패키지" 
 >### F.1: "Package" meaningful operations as carefully named functions
 
-**근거**: 공용코드를 분해해 보면 코드를 더 읽기 쉽게 만들고 재사용률을 높이고 복잡한 코드에서 에러를 줄일 수 있다.
-만약 어떤 동작이 잘 정의되어 있다면 그것을 코드로 분리하고 이름을 지어 주자.  
+**근거**: 공용코드를 분해해 보면 코드를 더 읽기 쉽게 만들고 재사용률을 높이고 복잡한 코드에서 에러를 줄일 수 있습니다.
+만약 어떤 동작이 잘 정의되어 있다면 그것을 코드로 분리하고 이름을 지어주세요.
 >**Reason**: Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
 If something is a well-specified action, separate it out from its  surrounding code and give it a name.
 
-**예제, 하지 말 것**:
+**예, 하지 말 것**:
 >**Example, don't**:
 
 	void read_and_print(istream& is)	// read and print and int
@@ -117,8 +117,8 @@ If something is a well-specified action, separate it out from its  surrounding c
 	}
 
 
-`read_and_print`는 거의 모든것이 잘못 되어 있다.
-함수는 읽고, 함수는 (고정된 `ostream`에) 쓴다. 함수는 에러 메시지를 (고정된 `ostream`에) 쓴다. 함수는 `int`형만을 다룬다.
+`read_and_print`는 거의 모든것이 잘못 되어 있습니다.
+이 함수는 읽고, (고정된 `ostream`에) 씁니다. 이 함수는 에러 메시지를 (고정된 `ostream`에) 쓰고 `int`형만을 다룹니다.
 재사용도 없고, 논리적으로 구분 될 수 있는 동작들은 뒤섞여 있고 지역변수는 사용이 끝난 후에도 논리적 범위에 남아 있습니다.
 작은 예를 들어보면, 이것은 문제가 없어 보입니다. 하지만 입력을 처리하고 출력을 처리하고, 에러를 처리해야 한다면 더 복잡해 집니다.
 >Almost everything is wrong with `read_and_print`.
@@ -127,31 +127,41 @@ If something is a well-specified action, separate it out from its  surrounding c
 >For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
 
-**Note**: If you write a non-trivial lambda that potentially can be used in more than one place,
-give it a name by assigning it to a (usually non-local) variable.
+**주의**: 한군데 이상에서 사용되는 사소하지 않은 람다를 작성한다면 함수에 이름을 짓고 (대부분 로컬이 아닌)변수에 할당하세요.
+>**Note**: If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
 
-**Example**:
+**예**:
+>**Example**:
 
 	sort(a, b, [](T x, T y) { return x.valid() && y.valid() && x.value()<y.value(); });
 
-Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
+람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠하게 해줍니다.
+>Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
 
 	auto lessT = [](T x, T y) { return x.valid() && y.valid() && x.value()<y.value(); };
 	
 	sort(a, b, lessT);
 	find_if(a,b, lessT);
 
-The shortest code is not always the best for performance or maintainability.
+유지보수나 성능을 고려하다면 짧은 코드가 항상 좋은것은 아닙니다.
+>The shortest code is not always the best for performance or maintainability.
 
-**Exception**: Loop bodies, including lambdas used as loop bodies, rarely needs to be named.
-However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
-The rule [Keep functions short](#Rf-single) implies "Keep loop bodies short."
-Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be re-usable.
+**예외**: 반복문, 람다를 반복문으로 사용하는 경우는 거의 이름을 지어줄 필요가 없습니다.
+그러나 수십줄에서 수십페이지가 되는 큰 반복문에는 문제가 있습니다.
+[함수를 간결하게 유지하라](#Rf-single)는 규칙은 "반복문을 간결하게 유지하라"를 의미합니다.
+비슷한 경우로, 콜백함수 인자로 사용되는 람다가 중요한 경우도 있습니다. 물론 재사용 될지는 알 수 없습니다.
+>**Exception**: Loop bodies, including lambdas used as loop bodies, rarely needs to be named.
+>However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
+>The rule [Keep functions short](#Rf-single) implies "Keep loop bodies short."
+>Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be re-usable.
 
-**Enforcement**:
+**시행하기**:
+>**Enforcement**:
 
-* See [Keep functions short](#Rf-single)
-* Flag identical and very similar lambdas used in different places.
+[Keep functions short](#Rf-single)를 참조하세요.
+여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두세요.
+>* See [Keep functions short](#Rf-single)
+>* Flag identical and very similar lambdas used in different places.
 
 
 <a name="Rf-logical"></a>
@@ -1141,3 +1151,4 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	}
 
 **Enforcement**: ???
+
