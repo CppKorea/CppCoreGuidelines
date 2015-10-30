@@ -1,42 +1,72 @@
 # 함수
 ># F: Functions
 
-함수는 동작이나 계산을 명세하는데 이것들은 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 이것은 프로그램의 기초적인 설계 단위다.
+함수는 동작이나 계산을 명세하는데 이것들은 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템입니다. 이것은 프로그램의 기초적인 설계 단위입니다.
 >A function specifies an action or a computation that takes the system from one consistent state to the next. It is the fundamental building block of programs.
 
-It should be possible to name a function meaningfully, to specify the requirements of its argument, and clearly state the relationship between the arguments and the result. An implementation is not a specification. Try to think about what a function does as well as about how it does it.
+함수의 이름은 의미있게 작성이 되어야 합니다. 그래야 인자의 요구사항, 인자간의 관계와 결과를 명확하게 기술할 수 있습니다. 함수의 구현은 사양서가 아닙니다. 함수가 무엇을 해야하는지, 어떻게 동작하는지를 생각해 보세요.
+함수는 모든 인터페이스에서 가장 중요한 부분입니다. 인터페이스 규칙을 참고 하세요.
+>It should be possible to name a function meaningfully, to specify the requirements of its argument, and clearly state the relationship between the arguments and the result. An implementation is not a specification. Try to think about what a function does as well as about how it does it.
 Functions are the most critical part in most interfaces, so see the interface rules.
 
-Function rule summary:
+함수 규칙 정리:
+>Function rule summary:
 
-Function definition rules:
+함수 정의 규칙:
+>Function definition rules:
 
-* [F.1: "Package" meaningful operations as carefully named functions](#Rf-package)
-* [F.2: A function should perform a single logical operation](#Rf-logical)
-* [F.3: Keep functions short and simple](#Rf-single)
-* [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
-* [F.5: If a function is very small and time critical, declare it inline](#Rf-inline)
-* [F.6: If your function may not throw, declare it `noexcept`](#Rf-noexcept)
-* [F.7: For general use, take `T*` arguments rather than a smart pointers](#Rf-smart)
+* [F.1: "패키지" meaningful operations as carefully named functions](#Rf-package)
+* [F.2: 함수는 하나의 동작만 수행해야 한다](#Rf-logical)
+* [F.3: 함수를 간결하고 단순하게 유지시켜야 한다](#Rf-single)
+* [F.4: 만약 함수가 컴파일 시간에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
+* [F.5: 만약 함수가 매우 작고 성능이 중요하다면 인라인으로 선언하라](#Rf-inline)
+* [F.6: 만약 함수가 예외를 발생시키지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
+* [F.7: 일반적으로 사용되는 함수라면 스마트 포인터 보다는 `T*`를 인자로 받아라](#Rf-smart)
 * [F.8: Prefer pure functions](#Rf-pure)
 
-Argument passing rules:
+>* [F.1: "Package" meaningful operations as carefully named functions](#Rf-package)
+>* [F.2: A function should perform a single logical operation](#Rf-logical)
+>* [F.2: A function should perform a single logical operation](#Rf-logical)
+>* [F.3: Keep functions short and simple](#Rf-single)
+>* [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
+>* [F.5: If a function is very small and time critical, declare it inline](#Rf-inline)
+>* [F.6: If your function may not throw, declare it `noexcept`](#Rf-noexcept)
+>* [F.7: For general use, take `T*` arguments rather than a smart pointers](#Rf-smart)
+>* [F.8: Prefer pure functions](#Rf-pure)
 
-* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
-* [F.16: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
-* [F.17: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
-* [F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence](#Rf-range)
-* [F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-string)
-* [F.20: Use a `const T&` parameter for a large object](#Rf-const-T-ref)
-* [F.21: Use a `T` parameter for a small object](#Rf-T)
-* [F.22: Use `T&` for an in-out-parameter](#Rf-T-re)
-* [F.23: Use `T&` for an out-parameter that is expensive to move (only)](#Rf-T-return-out)
+인자 전달 규칙:
+>Argument passing rules:
+
+* [F.15: 정보를 전달 할 때 단순하고 전통적인 방식을 선호하라](#Rf-conventional)
+* [F.16: 객체 하나를 지정 할 때는 `T*` 나 `owner<T*>` 또는 스마트 포인터를 사용하라](#Rf-ptr)
+* [F.17: "null"이 유효하지 않는 값을 의미할 때는 `not_null<T>`를 사용하라](#Rf-nullptr)
+* [F.18: 반 개방 범위를 나타날 때는 `array_view<T>` 또는 `array_view_p<T>`를 사용하라](#Rf-range)
+* [F.19: C언어 형 문자열을 지정 할 때는 `zstring` 또는 `not_null<zstring>`을 사용하라](#Rf-string)
+* [F.20: 크기가 큰 객체를 매개변수로 사용 할 때는 `const T&`를 사용하라](#Rf-const-T-ref)
+* [F.21: 크기가 작은 객체를 매개변수로 사용 할 때는 `T`를 사용하라](#Rf-T)
+* [F.22: 입출력 매개변수는 `T&`를 사용하라](#Rf-T-re)
+* [F.23: 값을 이동하는데 비용이 많이 드는 출력 매개변수는 `T&`를 사용하라 (only)](#Rf-T-return-out)
 * [F.24: Use a `TP&&` parameter when forwarding (only)](#Rf-pass-ref-ref)
 * [F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities](#Rf-pass-ref-move)
-* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
-* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
+* [F.26: 포인터가 필요한 곳에서 소유권을 이동 시킬 때는 `unique_ptr<T>`를 사용하라](#Rf-unique_ptr)
+* [F.27: 소유권을 공유 할 때는 `shared_ptr<T>`을 사용하라](#Rf-shared_ptr)
 
-Value return rules:
+>* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
+>* [F.16: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
+>* [F.17: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
+>* [F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence](#Rf-range)
+>* [F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-string)
+>* [F.20: Use a `const T&` parameter for a large object](#Rf-const-T-ref)
+>* [F.21: Use a `T` parameter for a small object](#Rf-T)
+>* [F.22: Use `T&` for an in-out-parameter](#Rf-T-re)
+>* [F.23: Use `T&` for an out-parameter that is expensive to move (only)](#Rf-T-return-out)
+>* [F.24: Use a `TP&&` parameter when forwarding (only)](#Rf-pass-ref-ref)
+>* [F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities](#Rf-pass-ref-move)
+>* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
+>* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
+
+값 전달 규칙:
+>Value return rules:
 
 * [F.40: Prefer return values to out-parameters](#Rf-T-return)
 * [F.41: Prefer to return tuples to multiple out-parameters](#Rf-T-multi)
@@ -45,29 +75,37 @@ Value return rules:
 * [F.44: Return a `T&` when "returning no object" isn't an option](#Rf-return-ref)
 * [F.45: Don't return a `T&&`](#Rf-return-ref-ref)
 
-Other function rules:
+기타 규칙:
+>Other function rules:
 
 * [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
 * [F.51: Prefer overloading over default arguments for virtual functions](#Rf-default-arg)
 * [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
 * [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
 
-Functions have strong similarities to lambdas and function objects so see also Section ???.
+함수는 람다와 함수 객체와 매우 비슷합니다. 다음 섹션을 참조 하세요.
+>Functions have strong similarities to lambdas and function objects so see also Section ???.
 
 
 <a name="SS-fct-def"></a>
-## F.def: Function definitions
+## 함수 정의
+>## F.def: Function definitions
 
-A function definition is a function declaration that also specifies the function's implementation, the function body.
+함수 정의란 함수의 선언과 함수의 몸체인 구현을 말합니다.
+>A function definition is a function declaration that also specifies the function's implementation, the function body.
 
 
 <a name="Rf-package"></a>
-### F.1: "Package" meaningful operations as carefully named functions
+### F.1: "패키지" 
+>### F.1: "Package" meaningful operations as carefully named functions
 
-**Reason**: Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
+**근거**: 공용코드를 분해해 보면 코드를 더 읽기 쉽게 만들고 재사용률을 높이고 복잡한 코드에서 에러를 줄일 수 있다.
+만약 어떤 동작이 잘 정의되어 있다면 그것을 코드로 분리하고 이름을 지어 주자.  
+>**Reason**: Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
 If something is a well-specified action, separate it out from its  surrounding code and give it a name.
 
-**Example, don't**:
+**예제, 하지 말 것**:
+>**Example, don't**:
 
 	void read_and_print(istream& is)	// read and print and int
 	{
@@ -77,11 +115,16 @@ If something is a well-specified action, separate it out from its  surrounding c
 		else
 			cerr << "no int on input\n";
 	}
-	
-Almost everything is wrong with `read_and_print`.
-It reads, it writes (to a fixed `ostream`), it write error messages (to a fixed `ostream`), it handles only `int`s.
-There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
-For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled
+
+
+`read_and_print`는 거의 모든것이 잘못 되어 있다.
+함수는 읽고, 함수는 (고정된 `ostream`에) 쓴다. 함수는 에러 메시지를 (고정된 `ostream`에) 쓴다. 함수는 `int`형만을 다룬다.
+재사용도 없고, 논리적으로 구분 될 수 있는 동작들은 뒤섞여 있고 지역변수는 사용이 끝난 후에도 논리적 범위에 남아 있습니다.
+작은 예를 들어보면, 이것은 문제가 없어 보입니다. 하지만 입력을 처리하고 출력을 처리하고, 에러를 처리해야 한다면 더 복잡해 집니다.
+>Almost everything is wrong with `read_and_print`.
+>It reads, it writes (to a fixed `ostream`), it write error messages (to a fixed `ostream`), it handles only `int`s.
+>There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
+>For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
 
 **Note**: If you write a non-trivial lambda that potentially can be used in more than one place,
