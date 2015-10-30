@@ -158,7 +158,7 @@ mess could become hard to understand.
 **시행하기**:
 >**Enforcement**:
 
-* [Keep functions short](#Rf-single)를 참조하세요.
+* [함수를 간결하게 유지하라](#Rf-single)를 참조하세요.
 * 여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두세요.
 
 >* See [Keep functions short](#Rf-single)
