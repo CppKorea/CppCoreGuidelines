@@ -166,27 +166,31 @@ mess could become hard to understand.
 
 
 <a name="Rf-logical"></a>
-### F.2: A function should perform a single logical operation
+### F.2: 함수는 하나의 논리적 수행만 행해야 한다
+>### F.2: A function should perform a single logical operation
 
-**Reason**: A function that performs a single operation is simpler to understand, test, and reuse.
+**근거**: 하나의 논리적 수행만 행하는 함수는 이해하기 쉽고, 테스트하기가 쉽고, 재사용이 쉽습니다. 
+>**Reason**: A function that performs a single operation is simpler to understand, test, and reuse.
 
-**Example**: Consider
+**예**: 다음을 주목 하세요.
+>**Example**: Consider
 
 	void read_and_print()	// bad
 	{
 		int x;
 		cin >> x;
-		// check for errors
+		// 에러를 검사한다.
 		cout << x << "\n";
 	}
 
-This is a monolith that is tied to a specific input and will never find a another (different) use. Instead, break functions up into suitable logical parts and parameterize:
+이 함수는 특정한 입력에 속박되어 있고 다른 쓰임세는 찾아 볼 수 없습니다. 대신에 함수를 의미있는 논리적 부분들로 나누고 매개변수화 하세요: 
+>This is a monolith that is tied to a specific input and will never find a another (different) use. Instead, break functions up into suitable logical parts and parameterize:
 
 	int read(istream& is)	// better
 	{
 		int x;
 		is >> x;
-		// check for errors
+		// 에러를 검사한다.
 		return x;
 	}
 
@@ -195,7 +199,8 @@ This is a monolith that is tied to a specific input and will never find a anothe
 		os << x << "\n";
 	}
 
-These can now be combined where needed:
+필요한 곳에서 두 함수를 결합할 수 있습니다:
+>These can now be combined where needed:
 
 	void read_and_print()
 	{
@@ -203,12 +208,13 @@ These can now be combined where needed:
 		print(cout, x);
 	}
 
-If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, etc. Example:
+만약 요청이 있었다면, `read()`와 `print()`에서 사용하는 데이터형과 입력 메커니즘 등을 템플릿화 할 수 있다. 예:  
+>If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, etc. Example:
 
-	auto read = [](auto& input, auto& value)	// better
+	auto read = [](auto& input, auto& value)	// 더 나은 방법
 	{
 		input >> value;
-		// check for errors
+		// 에러를 검사한다.
 	}
 
 	auto print(auto& output, const auto& value)
@@ -216,11 +222,15 @@ If there was a need, we could further templatize `read()` and `print()` on the d
 		output << value << "\n";
 	}
 
-**Enforcement**:
+**시행하기**
+>**Enforcement**:
 
-* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
-* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
-* Consider functions with 7 or more parameters suspicious.
+* 함수가 두개 이상의 출력 매개변수를 가진다면 의심하세요. 여러개의 반환값을 저장 할 수 있는 `tuple`과 같은 것을 반환값으로 사용하세요. 
+* 편집기의 한 화면에 다 나오지 않을 만큼 큰 함수는 의심하세요. 이런 함수는 이름을 잘 지어주고 더 작은 세부동작으로 나누세요.
+* 
+>* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
+>* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
+>* Consider functions with 7 or more parameters suspicious.
 
 
 <a name="Rf-single"></a>
