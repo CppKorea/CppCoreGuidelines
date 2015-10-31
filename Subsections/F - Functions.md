@@ -235,12 +235,15 @@ mess could become hard to understand.
 
 
 <a name="Rf-single"></a>
-### F.3: Keep functions short and simple
+### F.3: 함수를 단순하고 간결하게 유지하라
+>### F.3: Keep functions short and simple
 
-**Reason**: Large functions are hard to read, more likely to contain complex code, and more likely to have variables in larger than minimal scopes.
+**근거**: 긴 함수는 읽기 어렵고 복잡하고, 변수는 최소범위를 넘어서서 사용되고 있을지 모른다. 복잡한 제어구조를 가진 함수는 더 길고 논리적 오류가 숨겨져 있을지도 모른다. 
+>**Reason**: Large functions are hard to read, more likely to contain complex code, and more likely to have variables in larger than minimal scopes.
 Functions with complex control stryuctures are more likely to be long and more likely to hide logical errors
 
-**Example**: Consider
+**예**:
+>**Example**: Consider
 
 	double simpleFunc(double val, int flag1, int flag2)
 		// simpleFunc: takes a value and calculates the expected ASIC output, given the two mode flags.
@@ -268,11 +271,15 @@ Functions with complex control stryuctures are more likely to be long and more l
   		return finalize(intermediate, 0.);
 	}
 
-This is too complex (and also pretty long).
+이 함수는 너무 복잡하다 (그리고 너무 길다).
+어떻게 모든 경우가 올바르게 처리되는지 알 수 있을까요?
+게다가 이 함수는 다른 규칙들도 어기고 있습니다.
+>This is too complex (and also pretty long).
 How would you know if all possible alternatives have been correctly handled?
 Yes, it break other rules also.
 
-We can refactor:
+이렇게 바꿔 볼 수 있습니다:
+>We can refactor:
 
 	double func1_muon(double val, int flag)
 	{
@@ -294,17 +301,27 @@ We can refactor:
   		return 0.;
 	}
 
-**Note**: "It doesn't fit on a screen" is often a good practical definition of "far too large."
+**주의**: "한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이 되기도 합니다.
+왠만하면 최대 다섯줄짜리 함수로 구현 할 수 있을지 고민해 봐야 합니다.
+>**Note**: "It doesn't fit on a screen" is often a good practical definition of "far too large."
 One-to-five-line functions should be considered normal.
 
-**Note**: Break large functions up into smaller cohesive and named functions.
+**주의**: 긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누세요. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 내제화되어 사용될 수 있습니다. 
+>**Note**: Break large functions up into smaller cohesive and named functions.
 Small simple functions are easily inlined where the cost of a function call is significant.
 
-**Enforcement**:
+**시행하기**:
+>**Enforcement**:
 
-* Flag functions that do not "fit on a screen."
+* "한 화면에 맞지 않는" 함수는 표시해 두세요.
+한 화면은 얼마나 클까요? 한 줄에 140자, 총 60줄에 맞추도록 노력하세요. 이 정도면 대략 책 한 페이지정도 되는데 보기 좋은 분량이 됩니다.
+* 유달리 복잡해보이는 함수는 표시해 두세요. 얼마나 복잡해야 너무 복잡한 걸까요?
+복잡성 지표를 사용하세요. Try "more that 10 logical path through."
+Count a simple switch as one path. 
+
+>* Flag functions that do not "fit on a screen."
 How big is a screen? Try 60 lines by 140 characters; that's roughly the maximum that's comfortable for a book page.
-* Flag functions that are too complex. How complex is too complex?
+>* Flag functions that are too complex. How complex is too complex?
 You could use cyclomatic complexity. Try "more that 10 logical path through." Count a simple switch as one path.
 
 
