@@ -227,7 +227,8 @@ mess could become hard to understand.
 
 * 함수가 두개 이상의 출력 매개변수를 가진다면 의심하세요. 여러개의 반환값을 저장 할 수 있는 `tuple`과 같은 것을 반환값으로 사용하세요. 
 * 편집기의 한 화면에 다 나오지 않을 만큼 큰 함수는 의심하세요. 이런 함수는 이름을 잘 지어주고 더 작은 세부동작으로 나누세요.
-* 
+* 7개 이상의 매개변수를 가진 함수는 의심하세요.
+
 >* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
 >* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
 >* Consider functions with 7 or more parameters suspicious.
