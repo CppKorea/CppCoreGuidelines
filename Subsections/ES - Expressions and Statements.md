@@ -771,11 +771,13 @@ If `leak == true` the object pointed to by `p2` is leaked and the object pointed
 
 Look for raw pointers that are targets of `new`, `malloc()`, or functions that may return such pointers.
 
-### <a name="Res-const"></a> ES.25: Declare an objects `const` or `constexpr` unless you want to modify its value later on
+### <a name="Res-const"></a> ES.25: 값을 바꾸고 싶지 않다면 `const`, `constexpr`로 객체를 선언하라.
+>### <a name="Res-const"></a> ES.25: Declare an objects `const` or `constexpr` unless you want to modify its value later on
 
 ##### Reason
 
-That way you can't change the value by mistake. That way may offer the compiler optimization opportunities.
+실수로 값을 바꾸는 걸 막을 수 있는 방법이다. 컴파일러에게 최적화를 위한 기회를 줄 수도 있다.
+>That way you can't change the value by mistake. That way may offer the compiler optimization opportunities.
 
 ##### Example
 
@@ -788,13 +790,17 @@ That way you can't change the value by mistake. That way may offer the compiler 
 
 ##### Enforcement
 
-Look to see if a variable is actually mutated, and flag it if not. Unfortunately, it may be impossible to detect when a non-`const` was not intended to vary.
+변수가 실제로 값이 바뀌는지 안 바뀌는지 보고 바뀐다면 표시한다.
+`const`가 아닌 객체가 값을 바꾸려 하는지 찾아 내는 건 불가능하다.
+>Look to see if a variable is actually mutated, and flag it if not. Unfortunately, it may be impossible to detect when a non-`const` was not intended to vary.
 
-### <a name="Res-recycle"></a> ES.26: Don't use a variable for two unrelated purposes
+### <a name="Res-recycle"></a> ES.26: 두개 이상의 다른 목적을 위해 한 변수를 사용하지 마라.
+>### <a name="Res-recycle"></a> ES.26: Don't use a variable for two unrelated purposes
 
 ##### Reason
 
-Readability.
+가독성.
+>Readability.
 
 ##### Example, bad
 
@@ -807,13 +813,17 @@ Readability.
 
 ##### Enforcement
 
-Flag recycled variables.
+재활용되는 변수가 있다면 표시한다.
+>Flag recycled variables.
 
-### <a name="Res-stack"></a> ES.27: Use `std::array` or `stack_array` for arrays on the stack
+### <a name="Res-stack"></a> ES.27: 지역변수 배열은 `std::array`, `stack_array`를 사용하라.
+>### <a name="Res-stack"></a> ES.27: Use `std::array` or `stack_array` for arrays on the stack
 
 ##### Reason
 
-They are readable and don't implicitly convert to pointers.
+가독성이 높아지고, 모르게 포인터로 바뀌지 않는다.
+언어가 지원하는 배열과 비표준적인 확장과 헷갈리지 않는다.
+>They are readable and don't implicitly convert to pointers.
 They are not confused with non-standard extensions of built-in arrays.
 
 ##### Example, bad
@@ -830,7 +840,10 @@ They are not confused with non-standard extensions of built-in arrays.
 
 ##### Note
 
-The definition of `a1` is legal C++ and has always been.
+`a1` 변수선언은 C++에서는 적법하다. 그런 류의 코드가 많이 있다.
+다만 배열크기가 전역값일 때는 에러가 나기 쉽고 버퍼 오버플로우, 배열을 포인터로 변환(?) 등의 유명한 에러가 나기 쉽다.
+`a2` 변수선언은 C방식으로 C++에서는 쓰지 않으며 보안상 문제가 있는 것으로 간주한다.
+>The definition of `a1` is legal C++ and has always been.
 There is a lot of such code.
 It is error-prone, though, especially when the bound is non-local.
 Also, it is a "popular" source of errors (buffer overflow, pointers from array decay, etc.).
@@ -850,14 +863,21 @@ The definition of `a2` is C but not C++ and is considered a security risk
 
 ##### Enforcement
 
-* Flag arrays with non-constant bounds (C-style VLAs)
-* Flag arrays with non-local constant bounds
+* 상수 크기를 가지지 않는 배열이라면 표시한다. (C스타일의 가변길이배열)
+* 지역상수 크기를 가지지 않는 배열이라면 표시한다.
 
-### <a name="Res-lambda-init"></a> ES.28: Use lambdas for complex initialization, especially of `const` variables
+>* Flag arrays with non-constant bounds (C-style VLAs)
+>* Flag arrays with non-local constant bounds
+
+### <a name="Res-lambda-init"></a> ES.28: 특히 `const` 변수같은 복잡한 초기화를 위해 람다를 사용하라.
+>### <a name="Res-lambda-init"></a> ES.28: Use lambdas for complex initialization, especially of `const` variables
 
 ##### Reason
 
-It nicely encapsulates local initialization, including cleaning up scratch variables needed only for the initialization, without needing to create a needless nonlocal yet nonreusable function. It also works for variables that should be `const` but only after some initialization work.
+멋지게 지역 초기화를 숨길 수 있다.
+초기화 작업을 위해서만 필요한 변수를 포함해서 재사용할 것 같지 않은 전역함수를 생성할 필요도 없다.
+`const`여야만 하는 변수에도 작동하고 초기화 작업 후에도 잘 작동한다.
+>It nicely encapsulates local initialization, including cleaning up scratch variables needed only for the initialization, without needing to create a needless nonlocal yet nonreusable function. It also works for variables that should be `const` but only after some initialization work.
 
 ##### Example, bad
 
@@ -887,7 +907,8 @@ It nicely encapsulates local initialization, including cleaning up scratch varia
         return s;
     }(); // note ()
 
-If at all possible, reduce the conditions to a simple set of alternatives (e.g., an `enum`) and don't mix up selection and initialization.
+가능하다면 `enum`같은 쉬운 방법으로 조건을 줄여라. 값선정과 초기화를 섞지 마라.
+>If at all possible, reduce the conditions to a simple set of alternatives (e.g., an `enum`) and don't mix up selection and initialization.
 
 ##### Example
 
@@ -900,13 +921,19 @@ If at all possible, reduce the conditions to a simple set of alternatives (e.g.,
 
 ##### Enforcement
 
-Hard. At best a heuristic. Look for an uninitialized variable followed by a loop assigning to it.
+어렵다. 잘해야 휴리스틱. 루프문으로 값을 설정하는 초기화 안된 변수을 찾아라.
+>Hard. At best a heuristic. Look for an uninitialized variable followed by a loop assigning to it.
 
-### <a name="Res-macros"></a> ES.30: Don't use macros for program text manipulation
+### <a name="Res-macros"></a> ES.30: 프로그램 텍스트를 변경하기 위해서 매크로를 사용하지 마라.
+>### <a name="Res-macros"></a> ES.30: Don't use macros for program text manipulation
 
 ##### Reason
 
-Macros are a major source of bugs.
+매크로는 주요 버그 소스이다.
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.
+매크로는 매개변수 넘기는 것에 대한 일반적인 규칙을 따르지 않는다.
+매크로는 사람이 보는 것과 컴파일러가 보는 것이 다르다는 점을 보장한다. (??)
+>Macros are a major source of bugs.
 Macros don't obey the usual scope and type rules.
 Macros ensure that the human reader see something different from whet the compiler sees.
 Macros complicates tool building.
@@ -915,21 +942,30 @@ Macros complicates tool building.
 
     #define Case break; case	/* BAD */
 
-This innocuous-looking macro makes a single lower case `c` instead of a `C` into a bad flow-control bug.
+이 무해한 매크로는 소문자를 대문자로만 바꿨는데 나쁜 흐름제어 버그를 만든다.
+>This innocuous-looking macro makes a single lower case `c` instead of a `C` into a bad flow-control bug.
 
 ##### Note
 
-This rule does not ban the use of macros for "configuration control" use in `#ifdef`s, etc.
+이 규칙은 `#ifdef`문에서 설정제어를 위해 매크로를 사용하는 것은 금하지 않는다.
+>This rule does not ban the use of macros for "configuration control" use in `#ifdef`s, etc.
 
 ##### Enforcement
 
-Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
+소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리질러.
+>Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
 
-### <a name="Res-macros2"></a> ES.31: Don't use macros for constants or "functions"
+### <a name="Res-macros2"></a> ES.31: 상수나 함수에 대해서는 매크로를 사용하지 마라.
+>### <a name="Res-macros2"></a> ES.31: Don't use macros for constants or "functions"
 
 ##### Reason
 
-Macros are a major source of bugs.
+매크로는 주요 버그 소스이다.
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.
+매크로는 매개변수 넘기는 것에 대한 일반적인 규칙을 따르지 않는다.
+매크로는 사람이 보는 것과 컴파일러가 보는 것이 다르다는 점을 보장한다. (??)
+매크로는 툴 빌딩을 복잡하게 한다.
+>Macros are a major source of bugs.
 Macros don't obey the usual scope and type rules.
 Macros don't obey the usual rules for argument passing.
 Macros ensure that the human reader see something different from whet the compiler sees.
@@ -940,62 +976,81 @@ Macros complicates tool building.
     #define PI 3.14
     #define SQUARE(a, b) (a*b)
 
-Even if we hadn't left a well-know bug in `SQUARE` there are much better behaved alternatives; for example:
+`SQUARE`에 잘 알려진 버그가 없다고 하더라도 더 잘 동작하는 대안이 있다.
+예를 들면:
+>Even if we hadn't left a well-know bug in `SQUARE` there are much better behaved alternatives; for example:
 
     constexpr double pi = 3.14;
     template<typename T> T square(T a, T b) { return a*b; }
 
 ##### Enforcement
 
-Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
+소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리질러.
+>Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
 
-### <a name="Res-CAPS!"></a> ES.32: Use `ALL_CAPS` for all macro names
+### <a name="Res-CAPS!"></a> ES.32: 매크로 이름에 대문자만 사용하라.
+>### <a name="Res-CAPS!"></a> ES.32: Use `ALL_CAPS` for all macro names
 
 ##### Reason
 
-Convention. Readability. Distinguishing macros.
+관습. 가독성. 매크로 구별.
+>Convention. Readability. Distinguishing macros.
 
 ##### Example
 
+```
     #define forever for(;;)		/* very BAD */
 
     #define FOREVER for(;;)		/* Still evil, but at least visible to humans */
+```
 
 ##### Enforcement
 
-Scream when you see a lower case macro.
+소문자로 된 매크로를 보면 소리질러.
+>Scream when you see a lower case macro.
 
-### <a name="Res-ellipses"></a> ES.40: Don't define a (C-style) variadic function
+### <a name="Res-ellipses"></a> ES.40: C스타일 가변인자 함수를 정의하지 마라.
+>### <a name="Res-ellipses"></a> ES.40: Don't define a (C-style) variadic function
 
 ##### Reason
 
-Not type safe. Requires messy cast-and-macro-laden code to get working right.
+타입이 안전하지 않기 때문에. 복잡한 형변환과 매크로가 잘 작동하는 코드를 요구한다.
+>Not type safe. Requires messy cast-and-macro-laden code to get working right.
 
 ##### Example
 
     ??? <vararg>
 
-**Alternative**: Overloading. Templates. Variadic templates.
+**Alternative**: 오버로딩, 템플릿, 가변인자 템플릿.
+>**Alternative**: Overloading. Templates. Variadic templates.
 
 ##### Note
 
-There are rare used of variadic functions in SFINAE code, but those don't actually run and don't need the `<vararg>` implementation mess.
+`<vararg>`
+>There are rare used of variadic functions in SFINAE code, but those don't actually run and don't need the `<vararg>` implementation mess.
 
 ##### Enforcement
 
-Flag definitions of C-style variadic functions.
+C스타일의 가변인자 함수를 정의한다면 표시한다.
+>Flag definitions of C-style variadic functions.
 
 ## ES.stmt: Statements
 
-Statements control the flow of control (except for function calls and exception throws, which are expressions).
+문장은 제어흐름을 통제한다.(연산식인 함수 호출, 예외 호출을 제외하고)
+>Statements control the flow of control (except for function calls and exception throws, which are expressions).
 
-### <a name="Res-switch-if"></a> ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice
+### <a name="Res-switch-if"></a> ES.70: 선택할 수 있다면 `if`문보다 `switch`문을 선호하라.
+>### <a name="Res-switch-if"></a> ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice
 
 ##### Reason
 
-* Readability.
-* Efficiency: A `switch` compares against constants and is usually better optimized than a series of tests in an `if`-`then`-`else` chain.
-* a `switch` is enables some heuristic consistency checking. For example, has all values of an `enum` been covered? If not, is there a `default`?
+* 가독성.
+* 효율성: 상수값에 대해서 `if`-`then`-`else`문의 연속보다 `switch`문이 더 잘 최적화될 수 있다.
+* `switch` 문은 휴리스틱하게 일관성 체크를 할 수 있다. 예를 들어 `enum` 모든 값을 커버할 수 있는가? 없으면 `default`는 있는가?
+
+>* Readability.
+>* Efficiency: A `switch` compares against constants and is usually better optimized than a series of tests in an `if`-`then`-`else` chain.
+>* a `switch` is enables some heuristic consistency checking. For example, has all values of an `enum` been covered? If not, is there a `default`?
 
 ##### Example
 
@@ -1007,7 +1062,8 @@ Statements control the flow of control (except for function calls and exception 
         }
     }
 
-rather than:
+위 예제가 더 좋다:
+>rather than:
 
     void use2(int n)
     {
@@ -1019,7 +1075,8 @@ rather than:
 
 ##### Enforcement
 
-Flag if-then-else chains that check against constants (only).
+상수값에 대해서 체크하는 if-then-else 연속이라면 표시한다.
+>Flag if-then-else chains that check against constants (only).
 
 ### <a name="Res-for-range"></a> ES.71: 선택할 수 있다면 범위형 `for`문을 선호하라.
 >### <a name="Res-for-range"></a> ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice
@@ -1031,7 +1088,6 @@ Flag if-then-else chains that check against constants (only).
 
 ##### Example
 
-```
     for (int i = 0; i < v.size(); ++i)	// bad
             cout << v[i] << '\n';
 
@@ -1053,7 +1109,6 @@ Flag if-then-else chains that check against constants (only).
         else
             cout << v[i] << '\n';
     }
-```
 
 프로그래머나 정적 분석기는 `f(&v[i])`에서 `v`에 대해서 값변경이 일어나지 않는다고 판단할지도 모른다.
 루프를 최적화하기 위해서다.
