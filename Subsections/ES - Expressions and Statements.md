@@ -1,15 +1,42 @@
-# <a name="S-expr"></a> ES: Expressions and Statements
+# <a name="S-expr"></a> ES: 식과 문
 
+식과 문은 가장 낮은 레벨에서 가장 직접적으로 행동과 연산을 표현하는 방식이다. 로컬 스코프에서 선언하는 것을 '문(statements)이라고 한다.
 Expressions and statements are the lowest and most direct way of expressing actions and computation. Declarations in local scopes are statements.
 
+네이밍과 주석달기, 들여쓰기 룰에 대해서는,[NL: Naming and layout](#S-naming)을 참고하길 바란다.
 For naming, commenting, and indentation rules, see [NL: Naming and layout](#S-naming).
 
+일반적인 규칙:
 General rules:
 
+* [ES.1: 다른 라이브러리나 "직접 짠 코드" 대신 표준 라이브러리를 쓰자](#Res-lib)
+* [ES.2: 언어의 기능을 직접적으로 사용하기 보다는 적절한 추상화를 하자](#Res-abstr)
 * [ES.1: Prefer the standard library to other libraries and to "handcrafted code"](#Res-lib)
 * [ES.2: Prefer suitable abstractions to direct use of language features](#Res-abstr)
 
+선언 규칙:
 Declaration rules:
+
+* [ES.5: 스코프를 작게 유지하자](#Res-scope)
+* [ES.6: for-구문 초기화나 조건 설정에 사용한 이름은 스코프 안으로 한정하자](#Res-cond)
+* [ES.7: 자주 쓰거나 지역변수는 이름을 짧게, 그렇지 않은 경우는 길게](#Res-name-length)
+* [ES.8: 비슷해보이는 네이밍은 피하자](#Res-name-similar)
+* [ES.9: `ALL_CAPS` 네이밍은 피하자](#Res-!CAPS)
+* [ES.10: 한 선언당 (단) 하나의 이름만 선언하자 ](#Res-name-one)
+* [ES.11: 타입명을 풍부하게 재사용할 수 있도록 'auto'를 쓰자](#Res-auto)
+* [ES.20: 객체를 언제나 초기화하자](#Res-always)
+* [ES.21: 변수(혹은 상수)를 필요하기도 전에 선언하지 말자](#Res-introduce)
+* [ES.22: 초기화할 값도 없는데 변수부터 선언하지 말자](#Res-init)
+* [ES.23: '{}' 초기화 구문을 쓰자](#Res-list)
+* [ES.24: Use a `unique_ptr<T>` to hold pointers in code that may throw](#Res-unique)
+* [ES.25: 나중에 값을 바꿀 게 아니라면 'const'나 constexpr'로 객체를 선언하자](#Res-const)
+* [ES.26: 변수 하나를 연관 없는 두 목적을 위해 쓰지 말자](#Res-recycle)
+* [ES.27: 배열과 스택을 만들 때는 'std::array' 나 'stack_array'를 쓰자](#Res-stack)
+* [ES.28: 복잡한 초기화를 위해서는 람다식을 쓰자. 특히나 'const' 상수에 대해서는.](#Res-lambda-init)
+* [ES.30: 프로그램 텍스트 변조를 할때 매크로를 사용하지말자](#Res-macros)
+* [ES.31: 상수나 "함수"를 매크로로 정의하지 말자](#Res-macros2)
+* [ES.32: 매크로는 `ALL_CAPS`네이밍을 하자](#Res-CAPS!)
+* [ES.40: C 스타일의 variadic 함수를 정의하지 말자](#Res-ellipses)
 
 * [ES.5: Keep scopes small](#Res-scope)
 * [ES.6: Declare names in for-statement initializers and conditions to limit scope](#Res-cond)
@@ -32,7 +59,23 @@ Declaration rules:
 * [ES.32: Use `ALL_CAPS` for all macro names](#Res-CAPS!)
 * [ES.40: Don't define a (C-style) variadic function](#Res-ellipses)
 
+식의 규칙 :
 Expression rules:
+* [ES.40: 복잡한 식은 피하자](#Res-complicated)
+* [ES.41: 연산자 우선순위가 햇갈릴 때는 괄호를 쓰자](#Res-parens)
+* [ES.42: 포인터는 단순하고 직관적으로 사용하자](#Res-ptr)
+* [ES.43: 값을 구하는 순서가 정의되지 않은 식은 피하자](#Res-order)
+* [ES.44: 함수 아규먼트의 연산 순서에 의지하지 말자](#Res-order-fct)
+* [ES.45: 컨버전을 좁히는 것을 피하자](#Res-narrowing)
+* [ES.46: "만능 상수"를 피하자. 상징적인 상수를 사용하자](#Res-magic)
+* [ES.47: '0'이나 'NULL' 대신 `nullptr`을 쓰자](#Res-nullptr)
+* [ES.48: 캐스팅을 피하자](#Res-casts)
+* [ES.49: 캐스팅을 해야할 때는 명시된 캐스팅을 하자](#Res-casts-named)
+* [ES.50: `const`를 내버려두지 말자](#Res-casts-const)
+* [ES.55: 범위 체크를 불필요하게 하자](#Res-range-checking)
+* [ES.60: 자원 관리 함수 바깥에서 `new` 와 `delete[]` 를 쓰는 것을 피하자](#Res-new)
+* [ES.61: 배열은 `delete[]`로 배열이 아닌 것은 `delete`로 삭제하자](#Res-del)
+* [ES.62: 상이한 배열로 포인터를 비교하지 말자](#Res-arr2)
 
 * [ES.40: Avoid complicated expressions](#Res-complicated)
 * [ES.41: If in doubt about operator precedence, parenthesize](#Res-parens)
@@ -50,7 +93,20 @@ Expression rules:
 * [ES.61: delete arrays using `delete[]` and non-arrays using `delete`](#Res-del)
 * [ES.62: Don't compare pointers into different arrays](#Res-arr2)
 
+구문 규칙:
 Statement rules:
+
+* [ES.70: 선택을 할때는 'if' 문대신 'switch' 문을 사용하자](#Res-switch-if)
+* [ES.71: 선택을 할때는 그냥 'for'  대신 range-`for`를 사용하자](#Res-for-range)
+* [ES.72: 확실한 반복 변수가 있을 때는 'while'보다는 'for' 문을 사용하자](#Res-for-while)
+* [ES.73: 확실한 반복 변수가 없을 때는 'for'문보다 'while'문을 사용하자](#Res-while-for)
+* [ES.74: 'for'문의 초기화 부분에서 반복 변수를 선언하자](#Res-for-init)
+* [ES.75: `do`문 사용을 피하자](#Res-do)
+* [ES.76: `goto`문 사용을 피하자](#Res-goto)
+* [ES.77: ??? `continue`](#Res-continue)
+* [ES.78: 내용이 있는 `case` 문은 `break`로 끝내자](#Res-break)
+* [ES.79: ??? `default`](#Res-default)
+* [ES.85: 빈 구문을 보이게 만들자](#Res-empty)
 
 * [ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice](#Res-switch-if)
 * [ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice](#Res-for-range)
@@ -64,7 +120,15 @@ Statement rules:
 * [ES.79: ??? `default`](#Res-default)
 * [ES.85: Make empty statements visible](#Res-empty)
 
+연산 규칙:
 Arithmetic rules:
+
+* [ES.100: 부호가 있는 연산과 없는 연산을 섞지 말자](#Res-mix)
+* [ES.101: 비트 조작을 할때는 unsigned호타입을 사용하자](#Res-unsigned)
+* [ES.102: 연산할때는 signed 타입을 사용하자](#Res-signed)
+* [ES.103: 오버플로우 금지](#Res-overflow)
+* [ES.104: 언더플로우 금지](#Res-underflow)
+* [ES.105: 0으로 나누기 금지](#Res-zero)
 
 * [ES.100: Don't mix signed and unsigned arithmetic](#Res-mix)
 * [ES.101: use unsigned types for bit manipulation](#Res-unsigned)
