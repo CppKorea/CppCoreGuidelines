@@ -1,57 +1,99 @@
 # <a name="S-errors"></a> E: Error handling
 
-Error handling involves:
+에러처리는 다음과 관련이 있다:
+>Error handling involves:
 
-* Detecting an error
-* Transmitting information about an error to some handler code
-* Preserve the state of a program in a valid state
-* Avoid resource leaks
+* 에러 찾아내기
+* 에러에 대한 정보를 처리코드로 전송하기
+* 프로그램을 올바른 상태로 유지시키기
+* 리소스 누수를 피하기
 
-It is not possible to recover from all errors. If recovery from an error is not possible, it is important to quickly "get out" in a well-defined way. A strategy for error handling must be simple, or it becomes a source of even worse errors.
+>* Detecting an error
+>* Transmitting information about an error to some handler code
+>* Preserve the state of a program in a valid state
+>* Avoid resource leaks
 
-The rules are designed to help avoid several kinds of errors:
+모든 에러를 복구하기란 불가능하다. 에러 복구가 여의치 않다면 정의된 방식으로 빨리 "빠져나가는" 것이 중요하다.
+에러 처리 방법은 간단해야 한다. 그렇지 않으면 훨씬 더 안좋은 에러의 시작이 될 것이다.
+>It is not possible to recover from all errors. If recovery from an error is not possible, it is important to quickly "get out" in a well-defined way. A strategy for error handling must be simple, or it becomes a source of even worse errors.
 
-* Type violations (e.g., misuse of `union`s and casts)
-* Resource leaks (including memory leaks)
-* Bounds errors
-* Lifetime errors (e.g., accessing an object after is has been `delete`d)
-* Complexity errors (logical errors make likely by overly complex expression of ideas)
-* Interface errors (e.g., an unexpected value is passed through an interface)
+규칙들은 여러 종류의 에러를 피하기 위해 만들어졌다:
+>The rules are designed to help avoid several kinds of errors:
 
-Error-handling rule summary:
+* 타입 위반 (`union`의 오용과 형변환)
+* 리소스 누수 (메모리 누수도 포함)
+* 범위를 벗어나는 에러
+* 변수 수명 에러 (`delete`된 객체 접근하기)
+* 복잡성 에러 (아이디어를 복잡한 표현으로 만드는 논리적 에러)
+* 인터페이스 에러 (기대하지 않은 값이 인터페이스로 넘어온다.)
 
-* [E.1: Develop an error-handling strategy early in a design](#Re-design)
-* [E.2: Throw an exception to signal that a function can't perform its assigned task](#Re-throw)
-* [E.3: Use exceptions for error handling only](#Re-errors)
-* [E.4: Design your error-handling strategy around invariants](#Re-design-invariants)
-* [E.5: Let a constructor establish an invariant, and throw if it cannot](#Re-invariant)
-* [E.6: Use RAII to prevent leaks](#Re-raii)
-* [E.7: State your preconditions](#Re-precondition)
-* [E.8: State your postconditions](#Re-postcondition)
+>* Type violations (e.g., misuse of `union`s and casts)
+>* Resource leaks (including memory leaks)
+>* Bounds errors
+>* Lifetime errors (e.g., accessing an object after is has been `delete`d)
+>* Complexity errors (logical errors make likely by overly complex expression of ideas)
+>* Interface errors (e.g., an unexpected value is passed through an interface)
 
-* [E.12: Use `noexcept` when exiting a function because of a `throw` is impossible or unacceptable](#Re-noexcept)
-* [E.13: Never throw while being the direct owner of an object](#Re-never-throw)
-* [E.14: Use purpose-designed user-defined types as exceptions (not built-in types)](#Re-exception-types)
-* [E.15: Catch exceptions from a hierarchy by reference](#Re-exception-ref)
-* [E.16: Destructors, deallocation, and `swap` must never fail](#Re-never-fail)
-* [E.17: Don't try to catch every exception in every function](#Re-not-always)
-* [E.18: Minimize the use of explicit `try`/`catch`](#Re-catch)
-* [E.19: Use a `final_action` object to express cleanup if no suitable resource handle is available](#Re-finally)
+에러 처리 규칙 요약:
+>Error-handling rule summary:
 
-* [E.25: ??? What to do in programs where exceptions cannot be thrown](#Re-no-throw)
+* [E.1: 디자인 초기에 에러처리 전략을 수립하라.](#Re-design)
+* [E.2: 함수가 맡은 작업을 처리할 수 없다는 것을 알리기 위해 예외를 발생시켜라.](#Re-throw)
+* [E.3: 에러처리를 위해서만 예외를 사용하라.](#Re-errors)
+* [E.4: 객체조건에 대한 에러처리 방법을 디자인하라.](#Re-design-invariants)
+* [E.5: 생성자가 객체조건을 구성하게 하라. 할 수 없으면 에러를 발생시켜라.](#Re-invariant)
+* [E.6: 메모리 누수를 막으려면 RAII를 사용하라.](#Re-raii)
+* [E.7: 선행조건을 기술하라.](#Re-precondition)
+* [E.8: 후행조건을 기술하라.](#Re-postcondition)
+
+* [E.12: `throw`를 허용 안하거나 불가능할 때 `noexcept`문을 사용하라.](#Re-noexcept)
+* [E.13: 객체의 직접 주인인 동안에는 예외를 발생시키지 마라.](#Re-never-throw)
+* [E.14: 목적에 맞는 사용자 정의 타입을 예외로 사용하라. (내장 타입은 안됨.)](#Re-exception-types)
+* [E.15: 참조형을 사용해서 상속받은 예외를 처리하라.](#Re-exception-ref)
+* [E.16: 소멸자, 할당해제, 스왑은 절대 실패해선 안된다.](#Re-never-fail)
+* [E.17: 모든 함수에서 발생하는 모든 예외를 처리하려고 하지 마라.](#Re-not-always)
+* [E.18: 명시적인 `try`/`catch`문의 사용을 최소화하라.](#Re-catch)
+* [E.19: 적당한 리소스 핸들을 사용할 수 없다면 처리방법을 나타낼 `final_action` 객체를 사용하라.](#Re-finally)
+
+* [E.25: ??? 예외를 던질 수 없는 프로그램에서는 무엇을 할 것인가.](#Re-no-throw)
 * ???
 
-### <a name="Re-design"></a> E.1: Develop an error-handling strategy early in a design
+>* [E.1: Develop an error-handling strategy early in a design](#Re-design)
+>* [E.2: Throw an exception to signal that a function can't perform its assigned task](#Re-throw)
+>* [E.3: Use exceptions for error handling only](#Re-errors)
+>* [E.4: Design your error-handling strategy around invariants](#Re-design-invariants)
+>* [E.5: Let a constructor establish an invariant, and throw if it cannot](#Re-invariant)
+>* [E.6: Use RAII to prevent leaks](#Re-raii)
+>* [E.7: State your preconditions](#Re-precondition)
+>* [E.8: State your postconditions](#Re-postcondition)
+
+>* [E.12: Use `noexcept` when exiting a function because of a `throw` is impossible or unacceptable](#Re-noexcept)
+>* [E.13: Never throw while being the direct owner of an object](#Re-never-throw)
+>* [E.14: Use purpose-designed user-defined types as exceptions (not built-in types)](#Re-exception-types)
+>* [E.15: Catch exceptions from a hierarchy by reference](#Re-exception-ref)
+>* [E.16: Destructors, deallocation, and `swap` must never fail](#Re-never-fail)
+>* [E.17: Don't try to catch every exception in every function](#Re-not-always)
+>* [E.18: Minimize the use of explicit `try`/`catch`](#Re-catch)
+>* [E.19: Use a `final_action` object to express cleanup if no suitable resource handle is available](#Re-finally)
+
+>* [E.25: ??? What to do in programs where exceptions cannot be thrown](#Re-no-throw)
+>* ???
+
+### <a name="Re-design"></a> E.1: 디자인 초기에 에러처리 전략을 수립하라.
+>### <a name="Re-design"></a> E.1: Develop an error-handling strategy early in a design
 
 ##### Reason
 
-A consistent and complete strategy for handling errors and resource leaks is hard to retrofit into a system.
+에러와 리소스 누수를 처리하기 위한 일관성있고 완벽한 전략은 기존 시스템에 새로 추가해 넣기가 아주 어렵다.
+>A consistent and complete strategy for handling errors and resource leaks is hard to retrofit into a system.
 
-### <a name="Re-throw"></a> E.2: Throw an exception to signal that a function can't perform its assigned task
+### <a name="Re-throw"></a> E.2: 함수가 맡은 작업을 처리할 수 없다는 것을 알리기 위해 예외를 발생시켜라.
+>### <a name="Re-throw"></a> E.2: Throw an exception to signal that a function can't perform its assigned task
 
 ##### Reason
 
-To make error handling systematic, robust, and non-repetitive.
+에러 처리를 시스템적으로, 튼튼하게, 비반복적으로 하기 위해서.
+>To make error handling systematic, robust, and non-repetitive.
 
 ##### Example
 
@@ -67,13 +109,19 @@ To make error handling systematic, robust, and non-repetitive.
         // ...
     }
 
-Here, `vector` and `string`s constructors may not be able to allocate sufficient memory for their elements, `vector`s constructor may not be able copy the `Thing`s in its initializer list, and `File_handle` may not be able to open the required file.
+여기 `vector`, `string`의 생성자는 충분한 메모리를 할당받을 수 없을지도 모른다. `vector`의 생성자는 `Thing`을 초기화 리스트에 복사할 수 없을지도 모른다.
+`File_handle`은 파일을 오픈하지 못할지도 모른다.
+이런 경우에 `use()`의 호출자가 처리할 수 있도록 예외를 발생시킨다. `use()`가 직접 `bar` 생성 실패를 처리하려고 하면 `try`/`catch`를 사용하면 된다.
+이런 에러일 때 `Foo`를 생성하려고 시도한 것들에 제어권을 넘기기 전에, 이미 생성된 맴버에 대해서 `Foo` 생성자가 알아서 잘 소멸시킨다. (?? - 어렵다)
+에러 코드를 포함하는 반환값이 없다는데 주목하라.
+>Here, `vector` and `string`s constructors may not be able to allocate sufficient memory for their elements, `vector`s constructor may not be able copy the `Thing`s in its initializer list, and `File_handle` may not be able to open the required file.
 In each case, they throw an exception for `use()`'s caller to handle.
 If `use()` could handle the failure to construct `bar` it can take control using `try`/`catch`.
 In either case, `Foo`'s constructor correctly destroys constructed members before passing control to whatever tried to create a `Foo`.
 Note that there is no return value that could contain an error code.
 
-The `File_handle` constructor might defined like this:
+`File_handle` 생성자를 아래처럼 정의했을 것이다:
+>The `File_handle` constructor might defined like this:
 
     File_handle::File_handle(const string& name, const string& mode)
         :f{fopen(name.c_str(), mode.c_str())}
@@ -84,23 +132,36 @@ The `File_handle` constructor might defined like this:
 
 ##### Note
 
-It is often said that exceptions are meant to signal exceptional events and failures.
+예외는 예외적인 이벤트나 실패를 알려주려는 의도라고들 한다.
+그러나 무엇이 예외적이냐는 것 때문에 다소 순환적인 의미를 가진다.
+예를 들면:
+>It is often said that exceptions are meant to signal exceptional events and failures.
 However, that's a bit circular because "what is exceptional?"
 Examples:
 
-* A precondition that cannot be met
-* A constructor that cannot construct an object (failure to establish its class's [invariant](#Rc-struct))
-* An out-of-range error (e.g., `v[v.size()] =7`)
-* Inability to acquire a resource (e.g., the network is down)
+* 만날 수 없는 선행조건
+* 객체를 생성할 수 없는 생성자 (클래스의 [invariant](#Rc-struct)를 구성하는데 실패)
+* 범위를 벗어나는 에러 (`v[v.size()] =7`)
+* 리소스 획득에 실패 (네트웍 다운)
 
-In contrast, termination of an ordinary loop is not exceptional.
+>* A precondition that cannot be met
+>* A constructor that cannot construct an object (failure to establish its class's [invariant](#Rc-struct))
+>* An out-of-range error (e.g., `v[v.size()] =7`)
+>* Inability to acquire a resource (e.g., the network is down)
+
+반대로 일반적인 루프의 종료는 예외적이 아니다.
+루프가 무한하지 않다면 루프의 종료는 일반적이고 당연히 그래야 한다.
+>In contrast, termination of an ordinary loop is not exceptional.
 Unless the loop was meant to be infinite, termination is normal and expected.
 
 ##### Note
 
-Don't use a `throw` as simply an alternative way of returning a value from a function.
+함수에서 값을 반환하는 또다른 방법으로 `throw`를 사용하지 마라.
+>Don't use a `throw` as simply an alternative way of returning a value from a function.
 
-**Exception**: Some systems, such as hard-real time systems require a guarantee that an action is taken in a (typically short) constant maximum time known before execution starts. Such systems can use exceptions only if there is tool support for accurately predicting the maximum time to recover from a `throw`.
+**Exception**: 진짜 실시간 시스템은 실행 전에 이미 정해진 상수최대시간(일반적으로 짧은 시간)내에 작업이 완료됨을 보장해야 한다.
+그런류의 시스템은 `throw`로부터 복구하기 위한 최대시간을 정확히 예측할 수 있는 툴이 있는 경우에만 예외를 사용할 수 있다.
+>**Exception**: Some systems, such as hard-real time systems require a guarantee that an action is taken in a (typically short) constant maximum time known before execution starts. Such systems can use exceptions only if there is tool support for accurately predicting the maximum time to recover from a `throw`.
 
 **See also**: [RAII](#Re-raii)
 
@@ -283,7 +344,7 @@ One strategy is to add a `valid()` operation to every resource handle:
         // ...
     } // destructors clean up as usual
 
-딱보면 코드 길이가 늘어나고 `exceptions`을 암시적으로 전파하는 것을 허용하지 않는다.
+딱 보면 코드 길이가 늘어나고 `exceptions`을 암시적으로 전파하는 것을 허용하지 않는다.
 그리고 `valid()` 체크를 까먹을 수도 있다.
 예외를 써라.
 >Obviously, this increases the size of the code, doesn't allow for implicit propagation of "exceptions" (`valid()` checks), and `valid()` checks can be forgotten.
@@ -544,7 +605,7 @@ Prefer to use exceptions.
 
 **See also**: [discussion](#Sd-never-fail)
 
-### <a name="Re-not-always"></a> E.17: 모든 함수에서 발생하는 모든 예외를 잡아서 처리하려고 하지 마라.
+### <a name="Re-not-always"></a> E.17: 모든 함수에서 발생하는 모든 예외를 처리하려고 하지 마라.
 >### <a name="Re-not-always"></a> E.17: Don't try to catch every exception in every function
 
 ##### Reason
