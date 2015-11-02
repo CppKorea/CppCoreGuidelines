@@ -13,6 +13,13 @@
 ## 번역을 도와주시는 분들
 
 - Chris Ohk (utilForever)
+- Seokjoon Yun (icysword)
+- Giyeon Bang (GiyeonBang-rhathd)
+- Ilgook Jo	(Ilgook)
+- Dongwoo Lee	(aichaku)
+- Joowon Ryoo (HIPERCUBE)		
+- Geon Son (jen6)		
+- Minseob Kwon (kmu9842)
 - Giyeon Bang (GiyeonBang-rhathd)
 - Yonghyun Kim (drvoss)
 - Byungwook Eric Ahn (bwahn)
