@@ -13,13 +13,7 @@
 ## 번역을 도와주시는 분들
 
 - Chris Ohk (utilForever)
-- Seokjoon Yun 
 - Giyeon Bang (GiyeonBang-rhathd)
-- Ilgook Jo
-- Dongwoo Lee
-- Joowon Ryoo (HIPERCUBE)
-- Geon Son (jen6)
-- Minseob Kwon
 - Yonghyun Kim (drvoss)
 - Byungwook Eric Ahn (bwahn)
 - Eundoo Song (sedman)
@@ -31,6 +25,7 @@
 - Changjun Lee (yiatom)
 - Minjang Kim (minjang)
 - Hyungtae Kim (cavecafe)
+- Sangbae Kang (typeon)
 
 ## 번역 진행 상황
 
