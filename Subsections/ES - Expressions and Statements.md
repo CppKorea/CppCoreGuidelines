@@ -1617,15 +1617,18 @@ Even if it does something sensible for you, it may do something different on ano
 코드에 문자가 있다면 표시한다. `0`, `1`, `nullptr`, `\n`, `""`, 다른 문자들에도 패스를 줘라. (?)
 >Flag literals in code. Give a pass to `0`, `1`, `nullptr`, `\n`, `""`, and others on a positive list.
 
-### <a name="Res-narrowing"></a> ES.46: Avoid lossy (narrowing, truncating) arithmetic conversions
+### <a name="Res-narrowing"></a> ES.46: 협소한, 값 자르기, 손실 있는 산술 변환을 피하라.
+>### <a name="Res-narrowing"></a> ES.46: Avoid lossy (narrowing, truncating) arithmetic conversions
 
 ##### Reason
 
-A narrowing conversion destroys information, often unexpectedly so.
+좁은 변환은 정보를 파괴하고 전혀 기대하지 않는 값을 가지게 한다.
+>A narrowing conversion destroys information, often unexpectedly so.
 
 ##### Example
 
-A key example is basic narrowing:
+다음 예제는 기본적인 협소 변환이다:
+>A key example is basic narrowing:
 
     double d = 7.9;
     int i = d;		// bad: narrowing: i becomes 7
@@ -1640,12 +1643,14 @@ A key example is basic narrowing:
 
 ##### Note
 
-The guideline support library offers a `narrow` operation for specifying that narrowing is acceptable and a `narrow` ("narrow if") that throws an exception if a narrowing would throw away information:
+gsl은  narrowing을 허용하고 값이 바뀔려고 하면 예외를 던지도록 정의한 `narrow` 연산을 제공한다.
+>The guideline support library offers a `narrow` operation for specifying that narrowing is acceptable and a `narrow` ("narrow if") that throws an exception if a narrowing would throw away information:
 
     i = narrow_cast<int>(d);		// OK (you asked for it): narrowing: i becomes 7
     i = narrow<int>(d);				// OK: throws narrowing_error
 
-We also include lossy arithmetic casts, such as from a negative floating point type to an unsigned integral type:
+손실있는 연산 형변환까지도 포함한다. 음의 실수 타입을 양의 정수타입으로 변환.
+>We also include lossy arithmetic casts, such as from a negative floating point type to an unsigned integral type:
 
     double d = -7.9;
     unsigned u = 0;
@@ -1656,21 +1661,27 @@ We also include lossy arithmetic casts, such as from a negative floating point t
 
 ##### Enforcement
 
-A good analyzer can detect all narrowing conversions. However, flagging all narrowing conversions will lead to a lot of false positives. Suggestions:
+좋은 분석기는 모든 협의 변환을 찾아낼 수 있다. 그러나 모든 협의 변환을 표시하면 수많은 false positive를 야기하므로. 제안하면:
+>A good analyzer can detect all narrowing conversions. However, flagging all narrowing conversions will lead to a lot of false positives. Suggestions:
 
-* flag all floating-point to integer conversions (maybe only float->char and double->int. Here be dragons! we need data)
-* flag all long->char (I suspect int->char is very common. Here be dragons! we need data)
-* consider narrowing conversions for function arguments especially suspect
+*
 
-### <a name="Res-nullptr"></a> ES.47: Use `nullptr` rather than `0` or `NULL`
+>* flag all floating-point to integer conversions (maybe only float->char and double->int. Here be dragons! we need data)
+>* flag all long->char (I suspect int->char is very common. Here be dragons! we need data)
+>* consider narrowing conversions for function arguments especially suspect
+
+### <a name="Res-nullptr"></a> ES.47: 0`, `NULL`보다 `nullptr`을 사용하라.
+>### <a name="Res-nullptr"></a> ES.47: Use `nullptr` rather than `0` or `NULL`
 
 ##### Reason
 
-Readability. Minimize surprises: `nullptr` cannot be confused with an `int`.
+가독성: `nullptr`가 `int`와 혼돈될 수 있으니 주의해라.
+>Readability. Minimize surprises: `nullptr` cannot be confused with an `int`.
 
 ##### Example
 
-Consider:
+다음을 보자:
+>Consider:
 
     void f(int);
     void f(char*);
@@ -1679,13 +1690,16 @@ Consider:
 
 ##### Enforcement
 
-Flag uses of `0` and `NULL` for pointers. The transformation may be helped by simple program transformation.
+포인터에 `0`, `NULL`을 사용한다면 표시한다. 간단하게 프로그램으로 변환할 수 있으면 도움이 될거다.
+>Flag uses of `0` and `NULL` for pointers. The transformation may be helped by simple program transformation.
 
-### <a name="Res-casts"></a> ES.48: Avoid casts
+### <a name="Res-casts"></a> ES.48: 형변환을 줄여라.
+>### <a name="Res-casts"></a> ES.48: Avoid casts
 
 ##### Reason
 
-Casts are a well-known source of errors. Makes some optimizations unreliable.
+형변환은 잘 알려진대로 에러의 원천이다. 최적화를 신뢰할 수 없게 만들어 버린다.
+>Casts are a well-known source of errors. Makes some optimizations unreliable.
 
 ##### Example
 
@@ -1693,26 +1707,37 @@ Casts are a well-known source of errors. Makes some optimizations unreliable.
 
 ##### Note
 
-Programmer who write casts typically assumes that they know what they are doing.
+형변환을 쓰는 개발자는 자신들이 무엇을 하는지 잘 안다고 생각한다.
+그러나 실제로는 값 사용에 대한 일반적인 규칙을 무력화시키고 있다.
+오버로드 함수 선정과 템플릿 인스턴스화는 맞아떨어지는 함수가 있어야만 하지만, 없다면 형변환을 적용하게 된다.
+>Programmer who write casts typically assumes that they know what they are doing.
 In fact, they often disable the general rules for using values.
 Overload resolution and template instantiation usually pick the right function if there is a right function to pick.
 If there is not, maybe there ought to be, rather than applying a local fix (cast).
 
 ##### Note
 
-Casts are necessary in a systems programming language.
+형변환은 시스템용 프로그래밍 언어에 꼭 필요하다.
+예를 들어, 디바이스 레지스터의 주소를 포인터로 얻어 올 때이다.
+그러나 너무 남용하는 바람에 많은 에러가 발생하는 것도 사실이다.
+>Casts are necessary in a systems programming language.
 For example, how else would we get the address of a device register into a pointer.
 However, casts are seriously overused as well as a major source of errors.
 
 ##### Note
 
-If you feel the need for a lot of casts, there may be a fundamental design problem.
+형변환을 너무 많이 쓴다고 생각된다면 디자인적으로 문제가 있을지도 모른다.
+>If you feel the need for a lot of casts, there may be a fundamental design problem.
 
 ##### Enforcement
 
-* Force the elimination of C-style casts
-* Warn against named casts
-* Warn if there are many functional style casts (there is an obvious problem in quantifying 'many').
+* C스타일 형변환을 없애라.
+* 네임드 형변환 이외에는 경고하라.
+* 함수형 형변환이 많다면 경고하라.(많다는 게 문제의 소지다.)
+
+>* Force the elimination of C-style casts
+>* Warn against named casts
+>* Warn if there are many functional style casts (there is an obvious problem in quantifying 'many').
 
 ### <a name="Res-casts-named"></a> ES.49: 형변환을 써야 한다면 네임드 형변환을 사용하라.
 >### <a name="Res-casts-named"></a> ES.49: If you must use a cast, use a named cast
@@ -1756,13 +1781,13 @@ C스타일, 함수형 형변환이 있다면 표시한다.
 
 ##### Reason
 
-`const`로부터 거짓말한다. (?)
+`const`가 아닌 것처럼 속이지 않기 위해.
 >It makes a lie out of `const`.
 
 ##### Note
 
 보통 `const`를 없애버리는 이유는 변경할 수 없는 객체 속에 있는 일시적인 정보를 변경하기 위해서이다.
-예를 들면 캐시, 임시 계산값, 미리 계산한 값 등이다.
+예를 들면 캐싱값, 임시계산값, 선계산값 등이다.
 이런 값은 `const_cast`를 쓰는 것보다 `mutable`이나 간접적인 방법을 사용하면 더 쉽게 처리할 수 있다.
 >Usually the reason to "cast away `const`" is to allow the updating of some transient information of an otherwise immutable object.
 Examples are cashing, memorization, and precomputation.
