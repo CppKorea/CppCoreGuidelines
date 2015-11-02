@@ -1,4 +1,4 @@
-> "C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)" 
+> "C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)"
 > -- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
 
 # C++ 핵심 가이드라인 한글화 프로젝트
@@ -6,7 +6,7 @@
 - 본 프로젝트는 C++ 표준위원회에서 제작한 C++ 핵심 가이드라인을 한글화하는 프로젝트입니다.
 - 번역을 시작하기 전에 번역하는 부분이 겹치지 않도록 Issue에 어떤 부분을 번역하는지 알려주시기 바랍니다. 또한 원본 문서가 수시로 변경되므로, 한글로 번역하신 내용 밑에 영어 원문을 인용 문구로 남겨주시기 바랍니다.
 - 모든 문서는 Markdown 포맷을 기본으로 합니다.
-- 원문의 의도만 바뀌지 않는다면 재밌게 의역해도 상관없습니다. 
+- 원문의 의도만 바뀌지 않는다면 재밌게 의역해도 상관없습니다.
 - 번역이 완료된 이후에는 편집자분을 통해 편집 과정을 거치게 됩니다.
 - 참여를 원하시는 분께서는 Chris Ohk(utilForever)에게 연락주시기 바랍니다.
 
@@ -42,18 +42,18 @@
 - C - Classes and Class Hierarchies (0%)
 - Con - Constants and Immutability (0%)
 - CP - Concurrency and Parallelism (0%)
-- CPL - C-Style programming (0%)
-- E - Error Handling (0%)
-- Enum - Enumerations (0%)
-- ES - Expressions and Statements (0%)
+- CPL - C-Style programming (100%)
+- E - Error Handling (100%)
+- Enum - Enumerations (100%)
+- ES - Expressions and Statements (70%)
 - F - Functions (1%)
 - GSL - Guideline support library (0%)
-- I - Interfaces (0%)
+- I - Interfaces (60%)
 - In - Introduction (0%)
 - N - Non-Rules and myths (0%)
-- NL - Naming and layout rules (0%)
+- NL - Naming and layout rules (100%)
 - P - Philosophy (0%)
-- PER - Performance (0%)
+- PER - Performance (50%)
 - PRO - Profiles (0%)
 - R - Resource management (0%)
 - RF - References (0%)
