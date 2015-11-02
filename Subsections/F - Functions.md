@@ -99,12 +99,12 @@ Functions are the most critical part in most interfaces, so see the interface ru
 ### F.1: "패키지" 
 >### F.1: "Package" meaningful operations as carefully named functions
 
-**근거**: 공용코드를 분해해 보면 코드를 더 읽기 쉽게 만들고 재사용률을 높이고 복잡한 코드에서 에러를 줄일 수 있다.
-만약 어떤 동작이 잘 정의되어 있다면 그것을 코드로 분리하고 이름을 지어 주자.  
+**근거**: 공용코드를 분해해 보면 코드를 더 읽기 쉽게 만들고 재사용률을 높이고 복잡한 코드에서 에러를 줄일 수 있습니다.
+만약 어떤 동작이 잘 정의되어 있다면 그것을 코드로 분리하고 이름을 지어주세요.
 >**Reason**: Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
 If something is a well-specified action, separate it out from its  surrounding code and give it a name.
 
-**예제, 하지 말 것**:
+**예, 하지 말 것**:
 >**Example, don't**:
 
 	void read_and_print(istream& is)	// read and print and int
@@ -117,8 +117,8 @@ If something is a well-specified action, separate it out from its  surrounding c
 	}
 
 
-`read_and_print`는 거의 모든것이 잘못 되어 있다.
-함수는 읽고, 함수는 (고정된 `ostream`에) 쓴다. 함수는 에러 메시지를 (고정된 `ostream`에) 쓴다. 함수는 `int`형만을 다룬다.
+`read_and_print`는 거의 모든것이 잘못 되어 있습니다.
+이 함수는 읽고, (고정된 `ostream`에) 씁니다. 이 함수는 에러 메시지를 (고정된 `ostream`에) 쓰고 `int`형만을 다룹니다.
 재사용도 없고, 논리적으로 구분 될 수 있는 동작들은 뒤섞여 있고 지역변수는 사용이 끝난 후에도 논리적 범위에 남아 있습니다.
 작은 예를 들어보면, 이것은 문제가 없어 보입니다. 하지만 입력을 처리하고 출력을 처리하고, 에러를 처리해야 한다면 더 복잡해 집니다.
 >Almost everything is wrong with `read_and_print`.
@@ -127,55 +127,70 @@ If something is a well-specified action, separate it out from its  surrounding c
 >For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
 
-**Note**: If you write a non-trivial lambda that potentially can be used in more than one place,
-give it a name by assigning it to a (usually non-local) variable.
+**주의**: 한군데 이상에서 사용되는 사소하지 않은 람다를 작성한다면 함수에 이름을 짓고 (대부분 로컬이 아닌)변수에 할당하세요.
+>**Note**: If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
 
-**Example**:
+**예**:
+>**Example**:
 
 	sort(a, b, [](T x, T y) { return x.valid() && y.valid() && x.value()<y.value(); });
 
-Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
+람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠하게 해줍니다.
+>Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
 
 	auto lessT = [](T x, T y) { return x.valid() && y.valid() && x.value()<y.value(); };
 	
 	sort(a, b, lessT);
 	find_if(a,b, lessT);
 
-The shortest code is not always the best for performance or maintainability.
+유지보수나 성능을 고려하다면 짧은 코드가 항상 좋은것은 아닙니다.
+>The shortest code is not always the best for performance or maintainability.
 
-**Exception**: Loop bodies, including lambdas used as loop bodies, rarely needs to be named.
-However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
-The rule [Keep functions short](#Rf-single) implies "Keep loop bodies short."
-Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be re-usable.
+**예외**: 반복문, 람다를 반복문으로 사용하는 경우는 거의 이름을 지어줄 필요가 없습니다.
+그러나 수십줄에서 수십페이지가 되는 큰 반복문에는 문제가 있습니다.
+[함수를 간결하게 유지하라](#Rf-single)는 규칙은 "반복문을 간결하게 유지하라"를 의미합니다.
+비슷한 경우로, 콜백함수 인자로 사용되는 람다가 중요한 경우도 있습니다. 물론 재사용 될지는 알 수 없습니다.
+>**Exception**: Loop bodies, including lambdas used as loop bodies, rarely needs to be named.
+>However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
+>The rule [Keep functions short](#Rf-single) implies "Keep loop bodies short."
+>Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be re-usable.
 
-**Enforcement**:
+**시행하기**:
+>**Enforcement**:
 
-* See [Keep functions short](#Rf-single)
-* Flag identical and very similar lambdas used in different places.
+* [함수를 간결하게 유지하라](#Rf-single)를 참조하세요.
+* 여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두세요.
+
+>* See [Keep functions short](#Rf-single)
+>* Flag identical and very similar lambdas used in different places.
 
 
 <a name="Rf-logical"></a>
-### F.2: A function should perform a single logical operation
+### F.2: 함수는 하나의 논리적 수행만 행해야 한다
+>### F.2: A function should perform a single logical operation
 
-**Reason**: A function that performs a single operation is simpler to understand, test, and reuse.
+**근거**: 하나의 논리적 수행만 행하는 함수는 이해하기 쉽고, 테스트하기가 쉽고, 재사용이 쉽습니다. 
+>**Reason**: A function that performs a single operation is simpler to understand, test, and reuse.
 
-**Example**: Consider
+**예**: 다음을 주목 하세요.
+>**Example**: Consider
 
 	void read_and_print()	// bad
 	{
 		int x;
 		cin >> x;
-		// check for errors
+		// 에러를 검사한다.
 		cout << x << "\n";
 	}
 
-This is a monolith that is tied to a specific input and will never find a another (different) use. Instead, break functions up into suitable logical parts and parameterize:
+이 함수는 특정한 입력에 속박되어 있고 다른 쓰임세는 찾아 볼 수 없습니다. 대신에 함수를 의미있는 논리적 부분들로 나누고 매개변수화 하세요: 
+>This is a monolith that is tied to a specific input and will never find a another (different) use. Instead, break functions up into suitable logical parts and parameterize:
 
 	int read(istream& is)	// better
 	{
 		int x;
 		is >> x;
-		// check for errors
+		// 에러를 검사한다.
 		return x;
 	}
 
@@ -184,7 +199,8 @@ This is a monolith that is tied to a specific input and will never find a anothe
 		os << x << "\n";
 	}
 
-These can now be combined where needed:
+필요한 곳에서 두 함수를 결합할 수 있습니다:
+>These can now be combined where needed:
 
 	void read_and_print()
 	{
@@ -192,12 +208,13 @@ These can now be combined where needed:
 		print(cout, x);
 	}
 
-If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, etc. Example:
+만약 요청이 있었다면, `read()`와 `print()`에서 사용하는 데이터형과 입력 메커니즘 등을 템플릿화 할 수 있다. 예:  
+>If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, etc. Example:
 
-	auto read = [](auto& input, auto& value)	// better
+	auto read = [](auto& input, auto& value)	// 더 나은 방법
 	{
 		input >> value;
-		// check for errors
+		// 에러를 검사한다.
 	}
 
 	auto print(auto& output, const auto& value)
@@ -205,20 +222,28 @@ If there was a need, we could further templatize `read()` and `print()` on the d
 		output << value << "\n";
 	}
 
-**Enforcement**:
+**시행하기**
+>**Enforcement**:
 
-* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
-* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
-* Consider functions with 7 or more parameters suspicious.
+* 함수가 두개 이상의 출력 매개변수를 가진다면 의심하세요. 여러개의 반환값을 저장 할 수 있는 `tuple`과 같은 것을 반환값으로 사용하세요. 
+* 편집기의 한 화면에 다 나오지 않을 만큼 큰 함수는 의심하세요. 이런 함수는 이름을 잘 지어주고 더 작은 세부동작으로 나누세요.
+* 7개 이상의 매개변수를 가진 함수는 의심하세요.
+
+>* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
+>* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
+>* Consider functions with 7 or more parameters suspicious.
 
 
 <a name="Rf-single"></a>
-### F.3: Keep functions short and simple
+### F.3: 함수를 단순하고 간결하게 유지하라
+>### F.3: Keep functions short and simple
 
-**Reason**: Large functions are hard to read, more likely to contain complex code, and more likely to have variables in larger than minimal scopes.
+**근거**: 긴 함수는 읽기 어렵고 복잡하고, 변수는 최소범위를 넘어서서 사용되고 있을지 모른다. 복잡한 제어구조를 가진 함수는 더 길고 논리적 오류가 숨겨져 있을지도 모른다. 
+>**Reason**: Large functions are hard to read, more likely to contain complex code, and more likely to have variables in larger than minimal scopes.
 Functions with complex control stryuctures are more likely to be long and more likely to hide logical errors
 
-**Example**: Consider
+**예**:
+>**Example**: Consider
 
 	double simpleFunc(double val, int flag1, int flag2)
 		// simpleFunc: takes a value and calculates the expected ASIC output, given the two mode flags.
@@ -246,11 +271,15 @@ Functions with complex control stryuctures are more likely to be long and more l
   		return finalize(intermediate, 0.);
 	}
 
-This is too complex (and also pretty long).
+이 함수는 너무 복잡하다 (그리고 너무 길다).
+어떻게 모든 경우가 올바르게 처리되는지 알 수 있을까요?
+게다가 이 함수는 다른 규칙들도 어기고 있습니다.
+>This is too complex (and also pretty long).
 How would you know if all possible alternatives have been correctly handled?
 Yes, it break other rules also.
 
-We can refactor:
+이렇게 바꿔 볼 수 있습니다:
+>We can refactor:
 
 	double func1_muon(double val, int flag)
 	{
@@ -272,17 +301,27 @@ We can refactor:
   		return 0.;
 	}
 
-**Note**: "It doesn't fit on a screen" is often a good practical definition of "far too large."
+**주의**: "한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이 되기도 합니다.
+왠만하면 최대 다섯줄짜리 함수로 구현 할 수 있을지 고민해 봐야 합니다.
+>**Note**: "It doesn't fit on a screen" is often a good practical definition of "far too large."
 One-to-five-line functions should be considered normal.
 
-**Note**: Break large functions up into smaller cohesive and named functions.
+**주의**: 긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누세요. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 내제화되어 사용될 수 있습니다. 
+>**Note**: Break large functions up into smaller cohesive and named functions.
 Small simple functions are easily inlined where the cost of a function call is significant.
 
-**Enforcement**:
+**시행하기**:
+>**Enforcement**:
 
-* Flag functions that do not "fit on a screen."
+* "한 화면에 맞지 않는" 함수는 표시해 두세요.
+한 화면은 얼마나 클까요? 한 줄에 140자, 총 60줄에 맞추도록 노력하세요. 이 정도면 대략 책 한 페이지정도 되는데 보기 좋은 분량이 됩니다.
+* 유달리 복잡해보이는 함수는 표시해 두세요. 얼마나 복잡해야 너무 복잡한 걸까요?
+복잡성 지표를 사용하세요. Try "more that 10 logical path through."
+Count a simple switch as one path. 
+
+>* Flag functions that do not "fit on a screen."
 How big is a screen? Try 60 lines by 140 characters; that's roughly the maximum that's comfortable for a book page.
-* Flag functions that are too complex. How complex is too complex?
+>* Flag functions that are too complex. How complex is too complex?
 You could use cyclomatic complexity. Try "more that 10 logical path through." Count a simple switch as one path.
 
 
@@ -1141,3 +1180,4 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	}
 
 **Enforcement**: ???
+

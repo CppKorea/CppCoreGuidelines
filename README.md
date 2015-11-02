@@ -13,13 +13,14 @@
 ## 번역을 도와주시는 분들
 
 - Chris Ohk (utilForever)
-- Seokjoon Yun 
+- Seokjoon Yun (icysword)
 - Giyeon Bang (GiyeonBang-rhathd)
-- Ilgook Jo
-- Dongwoo Lee
-- Joowon Ryoo (HIPERCUBE)
-- Geon Son (jen6)
-- Minseob Kwon
+- Ilgook Jo	(Ilgook)
+- Dongwoo Lee	(aichaku)
+- Joowon Ryoo (HIPERCUBE)		
+- Geon Son (jen6)		
+- Minseob Kwon (kmu9842)
+- Giyeon Bang (GiyeonBang-rhathd)
 - Yonghyun Kim (drvoss)
 - Byungwook Eric Ahn (bwahn)
 - Eundoo Song (sedman)
@@ -31,37 +32,38 @@
 - Changjun Lee (yiatom)
 - Minjang Kim (minjang)
 - Hyungtae Kim (cavecafe)
+- Sangbae Kang (typeon)
 
 ## 번역 진행 상황
 
-- <B>Abstract : utilForever (100%)</B>
+- <B>Abstract (100%)</B>
 - C++ Core Guildlines (0%)
 - A - Architectural Ideas (0%)
-- <B>C - Classes and Class Hierarchies (0%) : jenix21</B>
-- <B>Con - Constants and Immutability : jen6 (0%)</B>
-- <B>CP - Concurrency and Parallelism : minjang (0%)</B>
-- <B>CPL - C-Style programming : GiyeonBang-rhathd (0%)</B>
-- <B>E - Error Handling : HIPERCUBE (0%)</B>
-- <B>Enum - Enumerations : sedman (0%)</B>
-- <B>ES - Expressions and Statements : yiatom (0%)</B>
-- <B>F - Functions : jongheeyun (1%)</B>
+- C - Classes and Class Hierarchies (0%)
+- Con - Constants and Immutability (0%)
+- CP - Concurrency and Parallelism (0%)
+- CPL - C-Style programming (0%)
+- E - Error Handling (0%)
+- Enum - Enumerations (0%)
+- ES - Expressions and Statements (0%)
+- F - Functions (1%)
 - GSL - Guideline support library (0%)
-- <B>I - Interfaces : bwahn (0%)</B>
-- <B>In - Introduction : yiatom (0%)</B>
-- <B>N - Non-Rules and myths : GiyeonBang-rhathd (0%)</B>
-- <B>NL - Naming and layout rules : GiyeonBang-rhathd (0%)</B>
-- <B>P - Philosophy : drvoss (0%)</B>
-- <B>PER - Performance : sedman (0%)</B>
-- <B>PRO - Profiles : drvoss (0%)</B>
-- <B>R - Resource management : kangic (0%)</B>
+- I - Interfaces (0%)
+- In - Introduction (0%)
+- N - Non-Rules and myths (0%)
+- NL - Naming and layout rules (0%)
+- P - Philosophy (0%)
+- PER - Performance (0%)
+- PRO - Profiles (0%)
+- R - Resource management (0%)
 - RF - References (0%)
-- <B>SF - Source files : naxxster (0%)</B>
-- <B>STL - The Standard Library : cavecafe (0%)</B>
-- <B>T - Templates and generic programming : minjang (0%)</B>
+- SF - Source files (0%)
+- STL - The Standard Library (0%)
+- T - Templates and generic programming (0%)
 - To-do - Unclassified proto-rules (0%)
 - Appendix A - Libraries (0%)
-- <B>Appendix B - Modernizing code : yiatom (100%)</B>
-- <B>Appendix C - Discussion : jihoonsong (0%)</B>
+- Appendix B - Modernizing code (100%)
+- Appendix C - Discussion (0%)
 
 ## 개요
 
