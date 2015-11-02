@@ -835,11 +835,13 @@ If `leak == true` the object pointed to by `p2` is leaked and the object pointed
 
 Look for raw pointers that are targets of `new`, `malloc()`, or functions that may return such pointers.
 
-### <a name="Res-const"></a> ES.25: Declare an objects `const` or `constexpr` unless you want to modify its value later on
+### <a name="Res-const"></a> ES.25: 값을 바꾸고 싶지 않다면 `const`, `constexpr`로 객체를 선언하라.
+>### <a name="Res-const"></a> ES.25: Declare an objects `const` or `constexpr` unless you want to modify its value later on
 
 ##### Reason
 
-That way you can't change the value by mistake. That way may offer the compiler optimization opportunities.
+실수로 값을 바꾸는 걸 막을 수 있는 방법이다. 컴파일러에게 최적화를 위한 기회를 줄 수도 있다.
+>That way you can't change the value by mistake. That way may offer the compiler optimization opportunities.
 
 ##### Example
 
@@ -852,13 +854,17 @@ That way you can't change the value by mistake. That way may offer the compiler 
 
 ##### Enforcement
 
-Look to see if a variable is actually mutated, and flag it if not. Unfortunately, it may be impossible to detect when a non-`const` was not intended to vary.
+변수가 실제로 값이 바뀌는지 안 바뀌는지 보고 바뀐다면 표시한다.
+`const`가 아닌 객체가 값을 바꾸려 하는지 찾아 내는 건 불가능하다.
+>Look to see if a variable is actually mutated, and flag it if not. Unfortunately, it may be impossible to detect when a non-`const` was not intended to vary.
 
-### <a name="Res-recycle"></a> ES.26: Don't use a variable for two unrelated purposes
+### <a name="Res-recycle"></a> ES.26: 두개 이상의 다른 목적을 위해 한 변수를 사용하지 마라.
+>### <a name="Res-recycle"></a> ES.26: Don't use a variable for two unrelated purposes
 
 ##### Reason
 
-Readability.
+가독성.
+>Readability.
 
 ##### Example, bad
 
@@ -871,13 +877,17 @@ Readability.
 
 ##### Enforcement
 
-Flag recycled variables.
+재활용되는 변수가 있다면 표시한다.
+>Flag recycled variables.
 
-### <a name="Res-stack"></a> ES.27: Use `std::array` or `stack_array` for arrays on the stack
+### <a name="Res-stack"></a> ES.27: 지역변수 배열은 `std::array`, `stack_array`를 사용하라.
+>### <a name="Res-stack"></a> ES.27: Use `std::array` or `stack_array` for arrays on the stack
 
 ##### Reason
 
-They are readable and don't implicitly convert to pointers.
+가독성이 높아지고, 모르게 포인터로 바뀌지 않는다.
+언어가 지원하는 배열과 비표준적인 확장과 헷갈리지 않는다.
+>They are readable and don't implicitly convert to pointers.
 They are not confused with non-standard extensions of built-in arrays.
 
 ##### Example, bad
@@ -894,7 +904,10 @@ They are not confused with non-standard extensions of built-in arrays.
 
 ##### Note
 
-The definition of `a1` is legal C++ and has always been.
+`a1` 변수선언은 C++에서는 적법하다. 그런 류의 코드가 많이 있다.
+다만 배열크기가 전역값일 때는 에러가 나기 쉽고 버퍼 오버플로우, 배열을 포인터로 변환(?) 등의 유명한 에러가 나기 쉽다.
+`a2` 변수선언은 C방식으로 C++에서는 쓰지 않으며 보안상 문제가 있는 것으로 간주한다.
+>The definition of `a1` is legal C++ and has always been.
 There is a lot of such code.
 It is error-prone, though, especially when the bound is non-local.
 Also, it is a "popular" source of errors (buffer overflow, pointers from array decay, etc.).
@@ -914,14 +927,21 @@ The definition of `a2` is C but not C++ and is considered a security risk
 
 ##### Enforcement
 
-* Flag arrays with non-constant bounds (C-style VLAs)
-* Flag arrays with non-local constant bounds
+* 상수 크기를 가지지 않는 배열이라면 표시한다. (C스타일의 가변길이배열)
+* 지역상수 크기를 가지지 않는 배열이라면 표시한다.
 
-### <a name="Res-lambda-init"></a> ES.28: Use lambdas for complex initialization, especially of `const` variables
+>* Flag arrays with non-constant bounds (C-style VLAs)
+>* Flag arrays with non-local constant bounds
+
+### <a name="Res-lambda-init"></a> ES.28: 특히 `const` 변수같은 복잡한 초기화를 위해 람다를 사용하라.
+>### <a name="Res-lambda-init"></a> ES.28: Use lambdas for complex initialization, especially of `const` variables
 
 ##### Reason
 
-It nicely encapsulates local initialization, including cleaning up scratch variables needed only for the initialization, without needing to create a needless nonlocal yet nonreusable function. It also works for variables that should be `const` but only after some initialization work.
+멋지게 지역 초기화를 숨길 수 있다.
+초기화 작업을 위해서만 필요한 변수를 포함해서 재사용할 것 같지 않은 전역함수를 생성할 필요도 없다.
+`const`여야만 하는 변수에도 작동하고 초기화 작업 후에도 잘 작동한다.
+>It nicely encapsulates local initialization, including cleaning up scratch variables needed only for the initialization, without needing to create a needless nonlocal yet nonreusable function. It also works for variables that should be `const` but only after some initialization work.
 
 ##### Example, bad
 
@@ -951,7 +971,8 @@ It nicely encapsulates local initialization, including cleaning up scratch varia
         return s;
     }(); // note ()
 
-If at all possible, reduce the conditions to a simple set of alternatives (e.g., an `enum`) and don't mix up selection and initialization.
+가능하다면 `enum`같은 쉬운 방법으로 조건을 줄여라. 값선정과 초기화를 섞지 마라.
+>If at all possible, reduce the conditions to a simple set of alternatives (e.g., an `enum`) and don't mix up selection and initialization.
 
 ##### Example
 
@@ -964,13 +985,19 @@ If at all possible, reduce the conditions to a simple set of alternatives (e.g.,
 
 ##### Enforcement
 
-Hard. At best a heuristic. Look for an uninitialized variable followed by a loop assigning to it.
+어렵다. 잘해야 휴리스틱. 루프문으로 값을 설정하는 초기화 안된 변수을 찾아라.
+>Hard. At best a heuristic. Look for an uninitialized variable followed by a loop assigning to it.
 
-### <a name="Res-macros"></a> ES.30: Don't use macros for program text manipulation
+### <a name="Res-macros"></a> ES.30: 프로그램 텍스트를 변경하기 위해서 매크로를 사용하지 마라.
+>### <a name="Res-macros"></a> ES.30: Don't use macros for program text manipulation
 
 ##### Reason
 
-Macros are a major source of bugs.
+매크로는 주요 버그 소스이다.
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.
+매크로는 매개변수 넘기는 것에 대한 일반적인 규칙을 따르지 않는다.
+매크로는 사람이 보는 것과 컴파일러가 보는 것이 다르다는 점을 보장한다. (??)
+>Macros are a major source of bugs.
 Macros don't obey the usual scope and type rules.
 Macros ensure that the human reader see something different from whet the compiler sees.
 Macros complicates tool building.
@@ -979,21 +1006,30 @@ Macros complicates tool building.
 
     #define Case break; case	/* BAD */
 
-This innocuous-looking macro makes a single lower case `c` instead of a `C` into a bad flow-control bug.
+이 무해한 매크로는 소문자를 대문자로만 바꿨는데 나쁜 흐름제어 버그를 만든다.
+>This innocuous-looking macro makes a single lower case `c` instead of a `C` into a bad flow-control bug.
 
 ##### Note
 
-This rule does not ban the use of macros for "configuration control" use in `#ifdef`s, etc.
+이 규칙은 `#ifdef`문에서 설정제어를 위해 매크로를 사용하는 것은 금하지 않는다.
+>This rule does not ban the use of macros for "configuration control" use in `#ifdef`s, etc.
 
 ##### Enforcement
 
-Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
+소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리질러.
+>Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
 
-### <a name="Res-macros2"></a> ES.31: Don't use macros for constants or "functions"
+### <a name="Res-macros2"></a> ES.31: 상수나 함수에 대해서는 매크로를 사용하지 마라.
+>### <a name="Res-macros2"></a> ES.31: Don't use macros for constants or "functions"
 
 ##### Reason
 
-Macros are a major source of bugs.
+매크로는 주요 버그 소스이다.
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.
+매크로는 매개변수 넘기는 것에 대한 일반적인 규칙을 따르지 않는다.
+매크로는 사람이 보는 것과 컴파일러가 보는 것이 다르다는 점을 보장한다. (??)
+매크로는 툴 빌딩을 복잡하게 한다.
+>Macros are a major source of bugs.
 Macros don't obey the usual scope and type rules.
 Macros don't obey the usual rules for argument passing.
 Macros ensure that the human reader see something different from whet the compiler sees.
@@ -1004,62 +1040,81 @@ Macros complicates tool building.
     #define PI 3.14
     #define SQUARE(a, b) (a*b)
 
-Even if we hadn't left a well-know bug in `SQUARE` there are much better behaved alternatives; for example:
+`SQUARE`에 잘 알려진 버그가 없다고 하더라도 더 잘 동작하는 대안이 있다.
+예를 들면:
+>Even if we hadn't left a well-know bug in `SQUARE` there are much better behaved alternatives; for example:
 
     constexpr double pi = 3.14;
     template<typename T> T square(T a, T b) { return a*b; }
 
 ##### Enforcement
 
-Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
+소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리질러.
+>Scream when you see a macro that isn't just use for source control (e.g., `#ifdef`)
 
-### <a name="Res-CAPS!"></a> ES.32: Use `ALL_CAPS` for all macro names
+### <a name="Res-CAPS!"></a> ES.32: 매크로 이름에 대문자만 사용하라.
+>### <a name="Res-CAPS!"></a> ES.32: Use `ALL_CAPS` for all macro names
 
 ##### Reason
 
-Convention. Readability. Distinguishing macros.
+관습. 가독성. 매크로 구별.
+>Convention. Readability. Distinguishing macros.
 
 ##### Example
 
+```
     #define forever for(;;)		/* very BAD */
 
     #define FOREVER for(;;)		/* Still evil, but at least visible to humans */
+```
 
 ##### Enforcement
 
-Scream when you see a lower case macro.
+소문자로 된 매크로를 보면 소리질러.
+>Scream when you see a lower case macro.
 
-### <a name="Res-ellipses"></a> ES.40: Don't define a (C-style) variadic function
+### <a name="Res-ellipses"></a> ES.40: C스타일 가변인자 함수를 정의하지 마라.
+>### <a name="Res-ellipses"></a> ES.40: Don't define a (C-style) variadic function
 
 ##### Reason
 
-Not type safe. Requires messy cast-and-macro-laden code to get working right.
+타입이 안전하지 않기 때문에. 복잡한 형변환과 매크로가 잘 작동하는 코드를 요구한다.
+>Not type safe. Requires messy cast-and-macro-laden code to get working right.
 
 ##### Example
 
     ??? <vararg>
 
-**Alternative**: Overloading. Templates. Variadic templates.
+**Alternative**: 오버로딩, 템플릿, 가변인자 템플릿.
+>**Alternative**: Overloading. Templates. Variadic templates.
 
 ##### Note
 
-There are rare used of variadic functions in SFINAE code, but those don't actually run and don't need the `<vararg>` implementation mess.
+`<vararg>`
+>There are rare used of variadic functions in SFINAE code, but those don't actually run and don't need the `<vararg>` implementation mess.
 
 ##### Enforcement
 
-Flag definitions of C-style variadic functions.
+C스타일의 가변인자 함수를 정의한다면 표시한다.
+>Flag definitions of C-style variadic functions.
 
 ## ES.stmt: Statements
 
-Statements control the flow of control (except for function calls and exception throws, which are expressions).
+문장은 제어흐름을 통제한다.(연산식인 함수 호출, 예외 호출을 제외하고)
+>Statements control the flow of control (except for function calls and exception throws, which are expressions).
 
-### <a name="Res-switch-if"></a> ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice
+### <a name="Res-switch-if"></a> ES.70: 선택할 수 있다면 `if`문보다 `switch`문을 선호하라.
+>### <a name="Res-switch-if"></a> ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice
 
 ##### Reason
 
-* Readability.
-* Efficiency: A `switch` compares against constants and is usually better optimized than a series of tests in an `if`-`then`-`else` chain.
-* a `switch` is enables some heuristic consistency checking. For example, has all values of an `enum` been covered? If not, is there a `default`?
+* 가독성.
+* 효율성: 상수값에 대해서 `if`-`then`-`else`문의 연속보다 `switch`문이 더 잘 최적화될 수 있다.
+* `switch` 문은 휴리스틱하게 일관성 체크를 할 수 있다. 예를 들어 `enum` 모든 값을 커버할 수 있는가? 없으면 `default`는 있는가?
+
+>* Readability.
+>* Efficiency: A `switch` compares against constants and is usually better optimized than a series of tests in an `if`-`then`-`else` chain.
+>* a `switch` is enables some heuristic consistency checking. For example, has all values of an `enum` been covered? If not, is there a `default`?
 
 ##### Example
 
@@ -1071,7 +1126,8 @@ Statements control the flow of control (except for function calls and exception 
         }
     }
 
-rather than:
+위 예제가 더 좋다:
+>rather than:
 
     void use2(int n)
     {
@@ -1083,13 +1139,16 @@ rather than:
 
 ##### Enforcement
 
-Flag if-then-else chains that check against constants (only).
+상수값에 대해서 체크하는 if-then-else 연속이라면 표시한다.
+>Flag if-then-else chains that check against constants (only).
 
-### <a name="Res-for-range"></a> ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice
+### <a name="Res-for-range"></a> ES.71: 선택할 수 있다면 범위형 `for`문을 선호하라.
+>### <a name="Res-for-range"></a> ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice
 
 ##### Reason
 
-Readability. Error prevention. Efficiency.
+가독성. 에러 방지. 효율성.
+>Readability. Error prevention. Efficiency.
 
 ##### Example
 
@@ -1115,29 +1174,37 @@ Readability. Error prevention. Efficiency.
             cout << v[i] << '\n';
     }
 
-A human or a good static analyzer may determine that there really isn't a side effect on `v` in `f(&v[i])` so that the loop can be rewritten.
+프로그래머나 정적 분석기는 `f(&v[i])`에서 `v`에 대해서 값변경이 일어나지 않는다고 판단할지도 모른다.
+루프를 최적화하기 위해서다.
+>A human or a good static analyzer may determine that there really isn't a side effect on `v` in `f(&v[i])` so that the loop can be rewritten.
 
-"Messing with the loop variable" in the body of a loop is typically best avoided.
+루프문 내에서 루프변수와 관련되서 엮인 부분이 있다면 제일 먼저 없애도록 한다.
+>"Messing with the loop variable" in the body of a loop is typically best avoided.
 
 ##### Note
 
-Don't use expensive copies of the loop variable of a range-`for` loop:
+범위형 `for`문에 루프변수를 복사하여 사용하지 마라:
+>Don't use expensive copies of the loop variable of a range-`for` loop:
 
     for (string s : vs) // ...
 
-This will copy each elements of `vs` into `s`. Better
+위는 `vs` 요소를 `s`로 복사한다. 개선하면
+>This will copy each elements of `vs` into `s`. Better
 
     for (string& s : vs) // ...
 
 ##### Enforcement
 
-Look at loops, if a traditional loop just looks at each element of a sequence, and there are no side-effects on what it does with the elements, rewrite the loop to a for loop.
+루프를 보고 개별 요소들을 일렬로 참조하고 있고 부작용이 없어 보이면 `for`문으로 재작성하라.
+>Look at loops, if a traditional loop just looks at each element of a sequence, and there are no side-effects on what it does with the elements, rewrite the loop to a for loop.
 
-### <a name="Res-for-while"></a> ES.72: Prefer a `for`-statement to a `while`-statement when there is an obvious loop variable
+### <a name="Res-for-while"></a> ES.72:  루프 변수가 있다면 `while`문보다 `for`문을 선호하라.
+>### <a name="Res-for-while"></a> ES.72: Prefer a `for`-statement to a `while`-statement when there is an obvious loop variable
 
 ##### Reason
 
-Readability: the complete logic of the loop is visible "up front". The scope of the loop variable can be limited.
+가독성: 루프에 대한 전체 로직을 첫구문에서 볼 수 있다. 루프변수의 범위가 제한되는 점도 좋다.
+>Readability: the complete logic of the loop is visible "up front". The scope of the loop variable can be limited.
 
 ##### Example
 
@@ -1157,7 +1224,8 @@ Readability: the complete logic of the loop is visible "up front". The scope of 
 
 ???
 
-### <a name="Res-while-for"></a> ES.73: Prefer a `while`-statement to a `for`-statement when there is no obvious loop variable
+### <a name="Res-while-for"></a> ES.73: 루프 변수가 없다면 `for`문보다 `while`문을 선호하라.
+>### <a name="Res-while-for"></a> ES.73: Prefer a `while`-statement to a `for`-statement when there is no obvious loop variable
 
 ##### Reason
 
@@ -1171,11 +1239,14 @@ Readability: the complete logic of the loop is visible "up front". The scope of 
 
 ???
 
-### <a name="Res-for-init"></a> ES.74: Prefer to declare a loop variable in the initializer part of as `for`-statement
+### <a name="Res-for-init"></a> ES.74: `for`문 초기화 부분에 루프 변수를 선언하라.
+>### <a name="Res-for-init"></a> ES.74: Prefer to declare a loop variable in the initializer part of as `for`-statement
 
 ##### Reason
 
-Limit the loop variable visibility to the scope of the loop.
+루프 변수의 가시범위를 루프 범위 내로 제한하라.
+루프문 뒤에서 다른 목적으로 루프 변수를 사용하지 못하게 하라.
+>Limit the loop variable visibility to the scope of the loop.
 Avoid using the loop variable for other purposes after the loop.
 
 ##### Example
@@ -1196,16 +1267,24 @@ Avoid using the loop variable for other purposes after the loop.
 
 ##### Enforcement
 
-Warn when a variable modified inside the `for`-statement is declared outside the loop and not being used outside the loop.
+`for`문 안에서만 변하는 변수가 루프 밖에 선언되어 있지만 루프 밖에서 사용되지 않고 있다면 경고하라.
+(`for`문 안에서만 사용해야 하는 변수는 루프구문 안에 선언하라.)
+>Warn when a variable modified inside the `for`-statement is declared outside the loop and not being used outside the loop.
 
-**Discussion**: Scoping the loop variable to the loop body also helps code optimizers greatly. Recognizing that the induction variable
+**Discussion**: 루프변수를 루프구문내로 범위로 정하면 코드 최적화에 많은 도움이 된다.
+유도 변수는 루프구문 안에서만 접근가능함을 파악하면 최적화시킬 수 있다.
+위치이동시키기(hoisting), 강도줄이기(strength reduction), 루프내 불변코드 이동(loop-invariant code motion) 등이다.
+>**Discussion**: Scoping the loop variable to the loop body also helps code optimizers greatly. Recognizing that the induction variable
 is only accessible in the loop body unblocks optimizations such as hoisting, strength reduction, loop-invariant code motion, etc.
 
-### <a name="Res-do"></a> ES.75: Avoid `do`-statements
+### <a name="Res-do"></a> ES.75: `do`문을 피하라.
+>### <a name="Res-do"></a> ES.75: Avoid `do`-statements
 
 ##### Reason
 
-Readability, avoidance of errors.
+가독성. 에러 회피.
+종료 조건이 끝에 위치해 있고(못 보고 넘어가기 쉬운 위치.) 첫 루프에서 체크를 하지 않는다.
+>Readability, avoidance of errors.
 The termination conditions is at the end (where it can be overlooked) and the condition is not checked the first time through. ???
 
 ##### Example
@@ -1220,15 +1299,18 @@ The termination conditions is at the end (where it can be overlooked) and the co
 
 ???
 
-### <a name="Res-goto"></a> ES.76: Avoid `goto`
+### <a name="Res-goto"></a> ES.76: `goto`를 피하라.
+>### <a name="Res-goto"></a> ES.76: Avoid `goto`
 
 ##### Reason
 
-Readability, avoidance of errors. There are better control structures for humans; `goto` is for machine generated code.
+가독성. 에러 회피. 더 좋은 컨트롤 구조가 있다. `goto`는 생성코드에 좋은 구조이다.
+>Readability, avoidance of errors. There are better control structures for humans; `goto` is for machine generated code.
 
 ##### Exception
 
-Breaking out of a nested loop. In that case, always jump forwards.
+중첩된 루프에서 빠져나오기. 그런 경우라면 항상 전방으로 점프한다.
+>Breaking out of a nested loop. In that case, always jump forwards.
 
 ##### Example
 
@@ -1236,7 +1318,8 @@ Breaking out of a nested loop. In that case, always jump forwards.
 
 ##### Example
 
-There is a fair amount of use of the C goto-exit idiom:
+C에서 goto-exit를 상당히 많이 사용한다.:
+>There is a fair amount of use of the C goto-exit idiom:
 
     void f()
     {
@@ -1249,11 +1332,14 @@ There is a fair amount of use of the C goto-exit idiom:
         ... common cleanup code ...
     }
 
-This is an ad-hoc simulation of destructors. Declare your resources with handles with destructors that clean up.
+이건 소멸자를 즉흥적으로 시뮬레이션한 것이다. 리소스를 해제할 수 있는 소멸자를 가진 핸들로 선언하라.
+>This is an ad-hoc simulation of destructors. Declare your resources with handles with destructors that clean up.
 
 ##### Enforcement
 
-* Flag `goto`. Better still flag all `goto`s that do not jump from a nested loop to the statement immediately after a nest of loops.
+* `goto`가 보이면 표시한다. 루프 다음문으로 점프하지 않는 중첩 루프 내의 `goto`는 모두 표시하면 더 좋다.
+
+>* Flag `goto`. Better still flag all `goto`s that do not jump from a nested loop to the statement immediately after a nest of loops.
 
 ### <a name="Res-continue"></a> ES.77: ??? `continue`
 
@@ -1269,11 +1355,14 @@ This is an ad-hoc simulation of destructors. Declare your resources with handles
 
 ???
 
-### <a name="Res-break"></a> ES.78: Always end a non-empty `case` with a `break`
+### <a name="Res-break"></a> ES.78: 빈 `case`가 아니라면 `break`로 끝내라.
+>### <a name="Res-break"></a> ES.78: Always end a non-empty `case` with a `break`
 
 ##### Reason
 
- Accidentally leaving out a `break` is a fairly common bug.
+실수로 `break`없이 나가기는 꽤 많이 범하는 버그다.
+고의적으로 `break`를 없애기는 유지보수의 위험요소이다.
+ >Accidentally leaving out a `break` is a fairly common bug.
  A deliberate fallthrough is a maintenance hazard.
 
 ##### Example
@@ -1290,7 +1379,8 @@ This is an ad-hoc simulation of destructors. Declare your resources with handles
         break;
     }
 
-It is easy to overlook the fallthrough. Be explicit:
+`break`로 안 끝나는 사항은 간과하기 쉽다. 명확하게 해보자:
+>It is easy to overlook the fallthrough. Be explicit:
 
     switch(eventType)
     {
@@ -1305,11 +1395,13 @@ It is easy to overlook the fallthrough. Be explicit:
         break;
     }
 
-There is a proposal for a `[[fallthrough]]` annotation.
+`[[fallthrough]]`에 대한 제안도 있다.
+>There is a proposal for a `[[fallthrough]]` annotation.
 
 ##### Note
 
-Multiple case labels of a single statement is OK:
+단일문으로 된 여러개의 케이스 조건은 오케이:
+>Multiple case labels of a single statement is OK:
 
     switch (x) {
     case 'a':
@@ -1321,7 +1413,8 @@ Multiple case labels of a single statement is OK:
 
 ##### Enforcement
 
-Flag all fall throughs from non-empty `case`s.
+빈 `case`문이 아닌데 break로 끝나지 않는다면 표시한다.
+>Flag all fall throughs from non-empty `case`s.
 
 ### <a name="Res-default"></a> ES.79: ??? `default`
 
@@ -1337,11 +1430,13 @@ Flag all fall throughs from non-empty `case`s.
 
 ???
 
-### <a name="Res-empty"></a> ES.85: Make empty statements visible
+### <a name="Res-empty"></a> ES.85: 빈 문장을 보이게 만들어라.
+>### <a name="Res-empty"></a> ES.85: Make empty statements visible
 
 ##### Reason
 
-Readability.
+가독성.
+>Readability.
 
 ##### Example
 
@@ -1354,17 +1449,21 @@ Readability.
 
 ##### Enforcement
 
-Flag empty statements that are not blocks and doesn't "contain" comments.
+블록이 아니면서 주석문을 포함하지 않는 빈 문장이 있다면 표시한다.
+>Flag empty statements that are not blocks and doesn't "contain" comments.
 
 ## ES.expr: Expressions
 
-Expressions manipulate values.
+연산식은 값을 조작한다.
+>Expressions manipulate values.
 
-### <a name="Res-complicated"></a> ES.40: Avoid complicated expressions
+### <a name="Res-complicated"></a> ES.40: 복잡한 연산식은 피하라.
+>### <a name="Res-complicated"></a> ES.40: Avoid complicated expressions
 
 ##### Reason
 
-Complicated expressions are error-prone.
+복잡한 연산식은 에러가 쉽게 발생하기 때문이다.
+>Complicated expressions are error-prone.
 
 ##### Example
 
@@ -1384,11 +1483,14 @@ Complicated expressions are error-prone.
 
     x = x++ + x++ + ++x;		// bad: undefined behavior
 
-Some of these expressions are unconditionally bad (e.g., they rely on undefined behavior). Others are simply so complicated and/or unusual that even good programmers could misunderstand them or overlook a problem when in a hurry.
+위의 연산식 중 몇은 의심할 여지없이 나쁘다. (정의되지 않은 행동을 야기한다.)
+나머지는 꽤 복잡하거나 특이한 편이고, 심지어 능력있는 프로그래머도 잘못 이해하거나 문제를 간과해 버릴 만한 것도 있다.
+>Some of these expressions are unconditionally bad (e.g., they rely on undefined behavior). Others are simply so complicated and/or unusual that even good programmers could misunderstand them or overlook a problem when in a hurry.
 
 ##### Note
 
-A programmer should know and use the basic rules for expressions.
+프로그래머는 연산식에 대해서 기본적인 규칙은 알고 사용했으면 한다.
+>A programmer should know and use the basic rules for expressions.
 
 ##### Example
 
@@ -1405,21 +1507,33 @@ A programmer should know and use the basic rules for expressions.
 
 ##### Enforcement
 
-Tricky. How complicated must an expression be to be considered complicated? Writing computations as statements with one operation each is also confusing. Things to consider:
+트릭을 쓰자면(?). 연산식의 복잡성은 어떻게 고려할 것인가? 계산식을 하나의 연산으로만 구성된 문장들로 구성하기는 힘들다.
+고려해볼 것:
+>Tricky. How complicated must an expression be to be considered complicated? Writing computations as statements with one operation each is also confusing. Things to consider:
 
-* side effects: side effects on multiple non-local variables (for some definition of non-local) can be suspect, especially if the side effects are in separate subexpressions
-* writes to aliased variables
-* more than N operators (and what should N be?)
-* reliance of subtle precedence rules
-* uses undefined behavior (can we catch all undefined behavior?)
-* implementation defined behavior?
+* 부작용: 다수의 비지역 변수에 대한 부작용을 의심할 수 있다. 특히 별도의 하위 연산식에 있다면.
+* 가명(alias) 변수에 쓰기.
+* N개 이상의 연산자.
+* 비슷한 우선순위에 의존하기.
+* 정의되지 않은 행동을 사용하기. (모든 정의되지 않은 행동을 찾아낼 수 있는가?)
+* 정의된 실행 구현.
 * ???
 
-### <a name="Res-parens"></a> ES.41: If in doubt about operator precedence, parenthesize
+>* side effects: side effects on multiple non-local variables (for some definition of non-local) can be suspect, especially if the side effects are in separate subexpressions
+>* writes to aliased variables
+>* more than N operators (and what should N be?)
+>* reliance of subtle precedence rules
+>* uses undefined behavior (can we catch all undefined behavior?)
+>* implementation defined behavior?
+>* ???
+
+### <a name="Res-parens"></a> ES.41: 연산자 우선순위에 의심이 든다면 괄호를 사용하라.
+>### <a name="Res-parens"></a> ES.41: If in doubt about operator precedence, parenthesize
 
 ##### Reason
 
-Avoid errors. Readability. Not everyone has the operator table memorized.
+에러를 피하라. 가독성. 모든 사람들이 연산자 우선순위 테이블을 기억하지 않는다.
+>Avoid errors. Readability. Not everyone has the operator table memorized.
 
 ##### Example
 
@@ -1428,13 +1542,15 @@ Avoid errors. Readability. Not everyone has the operator table memorized.
 
     if (a & flag != 0)  // bad: means a&(flag != 0)
 
-Note: We recommend that programmers know their precedence table for the arithmetic operations, the logical operations, but consider mixing bitwise logical operations with other operators in need of parentheses.
+Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 테이블을 알고 있고, 다른 연산과 비트 연산을 섞어 사용할 때는 괄호를 고려해야 한다.
+>Note: We recommend that programmers know their precedence table for the arithmetic operations, the logical operations, but consider mixing bitwise logical operations with other operators in need of parentheses.
 
     if ((a & flag) != 0)  // OK: works as intended
 
 ##### Note
 
-You should know enough not to need parentheses for:
+아래에 대해서는 괄호가 필요없다는 정도는 알고 있을 것이다:
+>You should know enough not to need parentheses for:
 
     if (a<0 || a<=max) {
         // ...
@@ -1442,19 +1558,27 @@ You should know enough not to need parentheses for:
 
 ##### Enforcement
 
-* Flag combinations of bitwise-logical operators and other operators.
-* Flag assignment operators not as the leftmost operator.
+* 비트 논리 연산자와 다른 연산자가 섞여 있다면 표시한다.
+* 제일 왼쪽에 있는 연산자가 할당 연산자가 아니라면 표시한다.
 * ???
 
-### <a name="Res-ptr"></a> ES.42: Keep use of pointers simple and straightforward
+>* Flag combinations of bitwise-logical operators and other operators.
+>* Flag assignment operators not as the leftmost operator.
+>* ???
+
+### <a name="Res-ptr"></a> ES.42: 포인터를 단순하게 쉽게 사용하라.
+>### <a name="Res-ptr"></a> ES.42: Keep use of pointers simple and straightforward
 
 ##### Reason
 
-Complicated pointer manipulation is a major source of errors.
+복잡한 포인터 계산은 주요한 에러 원인이 된다.
+>Complicated pointer manipulation is a major source of errors.
 
-* Do all pointer arithmetic on an `array_view` (exception ++p in simple loop???)
-* Avoid pointers to pointers
-* ???
+* 모든 포인터 연산을 `array_view`로 해라.
+* 포인터에 대한 포인터를 피하라.
+>* Do all pointer arithmetic on an `array_view` (exception ++p in simple loop???)
+>* Avoid pointers to pointers
+>* ???
 
 ##### Example
 
@@ -1462,20 +1586,25 @@ Complicated pointer manipulation is a major source of errors.
 
 ##### Enforcement
 
-We need a heuristic limiting the complexity of pointer arithmetic statement.
+포인터 연산문의 복잡성 한도 제한을 줄일 필요가 있다.
+>We need a heuristic limiting the complexity of pointer arithmetic statement.
 
-### <a name="Res-order"></a> ES.43: Avoid expressions with undefined order of evaluation
+### <a name="Res-order"></a> ES.43: 계산 순서가 정의되지 않는 표현식은 피하라.
+>### <a name="Res-order"></a> ES.43: Avoid expressions with undefined order of evaluation
 
 ##### Reason
 
-You have no idea what such code does. Portability.
+그런 코드가 어떻게 동작할지는 알 수가 없다. 이식성.
+당신에게는 맞을지는 몰라도, 다른 옵티마이저 세팅이나 다른 컴파일러라면 다르게 동작할지도 모른다.
+>You have no idea what such code does. Portability.
 Even if it does something sensible for you, it may do something different on another compiler (e.g., the next release of your compiler) or with a different optimizer setting.
 
 ##### Example
 
     v[i] = ++i;	//  the result is undefined
 
-A good rule of thumb is that you should not read a value twice in an expression where you write to it.
+좋은 방법은 값을 쓰려고 할때 두번 이상 읽지 않는 것이다.
+>A good rule of thumb is that you should not read a value twice in an expression where you write to it.
 
 ##### Example
 
@@ -1483,72 +1612,87 @@ A good rule of thumb is that you should not read a value twice in an expression 
 
 ##### Note
 
-What is safe?
+안전하게?
+>What is safe?
 
 ##### Enforcement
 
-Can be detected by a good analyzer.
+좋은 분석기는 찾을 수 있다.
+>Can be detected by a good analyzer.
 
-### <a name="Res-order-fct"></a> ES.44: Don't depend on order of evaluation of function arguments
+### <a name="Res-order-fct"></a> ES.44: 함수인자의 계산순서에 의존하지 마라.
+>### <a name="Res-order-fct"></a> ES.44: Don't depend on order of evaluation of function arguments
 
 ##### Reason
 
-Because that order is unspecified.
+순서는 정의되지 않았기 때문에.
+>Because that order is unspecified.
 
 ##### Example
 
     int i = 0;
     f(++i, ++i);
 
-The call will most likely be `f(0, 1)` or `f(1, 0)`, but you don't know which. Technically, the behavior is undefined.
+위의 호출은 `f(0, 1)`이거나 `f(1, 0)`이 될지도 모른다. 기술적으로 정의되지 않은 동작이다.
+>The call will most likely be `f(0, 1)` or `f(1, 0)`, but you don't know which. Technically, the behavior is undefined.
 
 ##### Example
 
-??? overloaded operators can lead to order of evaluation problems (shouldn't :-()
+??? 오버로드된 연산자는 계산 순서 문제를 야기한다.
+>??? overloaded operators can lead to order of evaluation problems (shouldn't :-()
 
     f1()->m(f2());	// m(f1(), f2())
     cout << f1() << f2();	// operator<<(operator<<(cout, f1()), f2())
 
 ##### Enforcement
 
-Can be detected by a good analyzer.
+좋은 분석기는 찾을 수 있다.
+>Can be detected by a good analyzer.
 
-### <a name="Res-magic"></a> ES.45: Avoid "magic constants"; use symbolic constants
+### <a name="Res-magic"></a> ES.45: "매직 상수"를 피하라; 심볼 상수를 사용하라.
+>### <a name="Res-magic"></a> ES.45: Avoid "magic constants"; use symbolic constants
 
 ##### Reason
 
-Unnamed constants embedded in expressions are easily overlooked and often hard to understand:
+표현식에 포함된 이름없는 상수는 쉽게 간과되고 있고 이해하기 어렵기 때문이다:
+>Unnamed constants embedded in expressions are easily overlooked and often hard to understand:
 
 ##### Example
 
     for (int m = 1; m <= 12; ++m)	// don't: magic constant 12
         cout << month[m] << '\n';
 
-No, we don't all know that there are 12 months, numbered 1..12, in a year. Better:
+1년에 12달이 숫자로만 되어 있다면 이해가 잘 안될 것이다. 더 좋게 고치면:
+>No, we don't all know that there are 12 months, numbered 1..12, in a year. Better:
 
     constexpr int last_month = 12;	// months are numbered 1..12
 
     for (int m = first_month; m <= last_month; ++m)	// better
         cout << month[m] << '\n';
 
-Better still, don't expose constants:
+더 개선한다면, 상수를 없애면 된다:
+>Better still, don't expose constants:
 
     for (auto m : month)
         cout << m << '\n';
 
 ##### Enforcement
 
-Flag literals in code. Give a pass to `0`, `1`, `nullptr`, `\n`, `""`, and others on a positive list.
+코드에 문자가 있다면 표시한다. `0`, `1`, `nullptr`, `\n`, `""`, 다른 문자들에도 패스를 줘라. (?)
+>Flag literals in code. Give a pass to `0`, `1`, `nullptr`, `\n`, `""`, and others on a positive list.
 
-### <a name="Res-narrowing"></a> ES.46: Avoid lossy (narrowing, truncating) arithmetic conversions
+### <a name="Res-narrowing"></a> ES.46: 협소한, 값 자르기, 손실 있는 산술 변환을 피하라.
+>### <a name="Res-narrowing"></a> ES.46: Avoid lossy (narrowing, truncating) arithmetic conversions
 
 ##### Reason
 
-A narrowing conversion destroys information, often unexpectedly so.
+좁은 변환은 정보를 파괴하고 전혀 기대하지 않는 값을 가지게 한다.
+>A narrowing conversion destroys information, often unexpectedly so.
 
 ##### Example
 
-A key example is basic narrowing:
+다음 예제는 기본적인 협소 변환이다:
+>A key example is basic narrowing:
 
     double d = 7.9;
     int i = d;		// bad: narrowing: i becomes 7
@@ -1563,12 +1707,14 @@ A key example is basic narrowing:
 
 ##### Note
 
-The guideline support library offers a `narrow` operation for specifying that narrowing is acceptable and a `narrow` ("narrow if") that throws an exception if a narrowing would throw away information:
+gsl은  narrowing을 허용하고 값이 바뀔려고 하면 예외를 던지도록 정의한 `narrow` 연산을 제공한다.
+>The guideline support library offers a `narrow` operation for specifying that narrowing is acceptable and a `narrow` ("narrow if") that throws an exception if a narrowing would throw away information:
 
     i = narrow_cast<int>(d);		// OK (you asked for it): narrowing: i becomes 7
     i = narrow<int>(d);				// OK: throws narrowing_error
 
-We also include lossy arithmetic casts, such as from a negative floating point type to an unsigned integral type:
+손실있는 연산 형변환까지도 포함한다. 음의 실수 타입을 양의 정수타입으로 변환.
+>We also include lossy arithmetic casts, such as from a negative floating point type to an unsigned integral type:
 
     double d = -7.9;
     unsigned u = 0;
@@ -1579,21 +1725,27 @@ We also include lossy arithmetic casts, such as from a negative floating point t
 
 ##### Enforcement
 
-A good analyzer can detect all narrowing conversions. However, flagging all narrowing conversions will lead to a lot of false positives. Suggestions:
+좋은 분석기는 모든 협의 변환을 찾아낼 수 있다. 그러나 모든 협의 변환을 표시하면 수많은 false positive를 야기하므로. 제안하면:
+>A good analyzer can detect all narrowing conversions. However, flagging all narrowing conversions will lead to a lot of false positives. Suggestions:
 
-* flag all floating-point to integer conversions (maybe only float->char and double->int. Here be dragons! we need data)
-* flag all long->char (I suspect int->char is very common. Here be dragons! we need data)
-* consider narrowing conversions for function arguments especially suspect
+*
 
-### <a name="Res-nullptr"></a> ES.47: Use `nullptr` rather than `0` or `NULL`
+>* flag all floating-point to integer conversions (maybe only float->char and double->int. Here be dragons! we need data)
+>* flag all long->char (I suspect int->char is very common. Here be dragons! we need data)
+>* consider narrowing conversions for function arguments especially suspect
+
+### <a name="Res-nullptr"></a> ES.47: 0`, `NULL`보다 `nullptr`을 사용하라.
+>### <a name="Res-nullptr"></a> ES.47: Use `nullptr` rather than `0` or `NULL`
 
 ##### Reason
 
-Readability. Minimize surprises: `nullptr` cannot be confused with an `int`.
+가독성: `nullptr`가 `int`와 혼돈될 수 있으니 주의해라.
+>Readability. Minimize surprises: `nullptr` cannot be confused with an `int`.
 
 ##### Example
 
-Consider:
+다음을 보자:
+>Consider:
 
     void f(int);
     void f(char*);
@@ -1602,13 +1754,16 @@ Consider:
 
 ##### Enforcement
 
-Flag uses of `0` and `NULL` for pointers. The transformation may be helped by simple program transformation.
+포인터에 `0`, `NULL`을 사용한다면 표시한다. 간단하게 프로그램으로 변환할 수 있으면 도움이 될거다.
+>Flag uses of `0` and `NULL` for pointers. The transformation may be helped by simple program transformation.
 
-### <a name="Res-casts"></a> ES.48: Avoid casts
+### <a name="Res-casts"></a> ES.48: 형변환을 줄여라.
+>### <a name="Res-casts"></a> ES.48: Avoid casts
 
 ##### Reason
 
-Casts are a well-known source of errors. Makes some optimizations unreliable.
+형변환은 잘 알려진대로 에러의 원천이다. 최적화를 신뢰할 수 없게 만들어 버린다.
+>Casts are a well-known source of errors. Makes some optimizations unreliable.
 
 ##### Example
 
@@ -1616,35 +1771,52 @@ Casts are a well-known source of errors. Makes some optimizations unreliable.
 
 ##### Note
 
-Programmer who write casts typically assumes that they know what they are doing.
+형변환을 쓰는 개발자는 자신들이 무엇을 하는지 잘 안다고 생각한다.
+그러나 실제로는 값 사용에 대한 일반적인 규칙을 무력화시키고 있다.
+오버로드 함수 선정과 템플릿 인스턴스화는 맞아떨어지는 함수가 있어야만 하지만, 없다면 형변환을 적용하게 된다.
+>Programmer who write casts typically assumes that they know what they are doing.
 In fact, they often disable the general rules for using values.
 Overload resolution and template instantiation usually pick the right function if there is a right function to pick.
 If there is not, maybe there ought to be, rather than applying a local fix (cast).
 
 ##### Note
 
-Casts are necessary in a systems programming language.
+형변환은 시스템용 프로그래밍 언어에 꼭 필요하다.
+예를 들어, 디바이스 레지스터의 주소를 포인터로 얻어 올 때이다.
+그러나 너무 남용하는 바람에 많은 에러가 발생하는 것도 사실이다.
+>Casts are necessary in a systems programming language.
 For example, how else would we get the address of a device register into a pointer.
 However, casts are seriously overused as well as a major source of errors.
 
 ##### Note
 
-If you feel the need for a lot of casts, there may be a fundamental design problem.
+형변환을 너무 많이 쓴다고 생각된다면 디자인적으로 문제가 있을지도 모른다.
+>If you feel the need for a lot of casts, there may be a fundamental design problem.
 
 ##### Enforcement
 
-* Force the elimination of C-style casts
-* Warn against named casts
-* Warn if there are many functional style casts (there is an obvious problem in quantifying 'many').
+* C스타일 형변환을 없애라.
+* 네임드 형변환 이외에는 경고하라.
+* 함수형 형변환이 많다면 경고하라.(많다는 게 문제의 소지다.)
 
-### <a name="Res-casts-named"></a> ES.49: If you must use a cast, use a named cast
+>* Force the elimination of C-style casts
+>* Warn against named casts
+>* Warn if there are many functional style casts (there is an obvious problem in quantifying 'many').
+
+### <a name="Res-casts-named"></a> ES.49: 형변환을 써야 한다면 네임드 형변환을 사용하라.
+>### <a name="Res-casts-named"></a> ES.49: If you must use a cast, use a named cast
 
 ##### Reason
 
-Readability. Error avoidance.
+가독성, 에러 줄이기.
+네임드 형변환은 C스타일이나 함수형 형변환보다 더 구체적이다. 컴파일러에게 에러를 알려주는 역할도 한다.
+C스타일 형변환: (int) a
+함수형 형변환: int(a)
+>Readability. Error avoidance.
 Named casts are more specific than a C-style or functional cast, allowing the compiler to catch some errors.
 
-The named casts are:
+네임드 형변환:
+>The named casts are:
 
 * `static_cast`
 * `const_cast`
@@ -1665,17 +1837,23 @@ The named casts are:
 
 ##### Enforcement
 
-Flag C-style and functional casts.
+C스타일, 함수형 형변환이 있다면 표시한다.
+>Flag C-style and functional casts.
 
-## <a name="Res-casts-const"></a> ES.50: Don't cast away `const`
+### <a name="Res-casts-const"></a> ES.50: `const`를 없애지 마라.
+>## <a name="Res-casts-const"></a> ES.50: Don't cast away `const`
 
 ##### Reason
 
-It makes a lie out of `const`.
+`const`가 아닌 것처럼 속이지 않기 위해.
+>It makes a lie out of `const`.
 
 ##### Note
 
-Usually the reason to "cast away `const`" is to allow the updating of some transient information of an otherwise immutable object.
+보통 `const`를 없애버리는 이유는 변경할 수 없는 객체 속에 있는 일시적인 정보를 변경하기 위해서이다.
+예를 들면 캐싱값, 임시계산값, 선계산값 등이다.
+이런 값은 `const_cast`를 쓰는 것보다 `mutable`이나 간접적인 방법을 사용하면 더 쉽게 처리할 수 있다.
+>Usually the reason to "cast away `const`" is to allow the updating of some transient information of an otherwise immutable object.
 Examples are cashing, memorization, and precomputation.
 Such examples are often handled as well or better using `mutable` or an indirection than with a `const_cast`.
 
@@ -1685,13 +1863,16 @@ Such examples are often handled as well or better using `mutable` or an indirect
 
 ##### Enforcement
 
-Flag `const_cast`s.
+`const_cast`이 있다면 표시한다.
+>Flag `const_cast`s.
 
-### <a name="Res-range-checking"></a> ES.55: Avoid the need for range checking
+### <a name="Res-range-checking"></a> ES.55: 범위를 체크할 필요성을 없애라.
+>### <a name="Res-range-checking"></a> ES.55: Avoid the need for range checking
 
 ##### Reason
 
-Constructs that cannot overflow, don't, and usually runs faster:
+범위를 벗어날 수 없는 구조라면 오히려 더 빠르게 실행될 수 있다.
+>Constructs that cannot overflow, don't, and usually runs faster:
 
 ##### Example
 
@@ -1702,17 +1883,22 @@ Constructs that cannot overflow, don't, and usually runs faster:
 
 ##### Enforcement
 
-Look for explicit range checks and heuristically suggest alternatives.
+명시적인 범위체크를 찾아라. 적절한 대안을 제안한다. (?)
+>Look for explicit range checks and heuristically suggest alternatives.
 
-### <a name="Res-new"></a> ES.60: Avoid `new` and `delete[]` outside resource management functions
+### <a name="Res-new"></a> ES.60: 리소스 함수 외부에서는 `new`, `delete[]`를 쓰지 마라.
+>### <a name="Res-new"></a> ES.60: Avoid `new` and `delete[]` outside resource management functions
 
 ##### Reason
 
-Direct resource management in application code is error-prone and tedious.
+프로그램 코드 내에서 직접적인 리소스 관리는 에러를 발생시키기 쉬우며 지루(?)하다.
+>Direct resource management in application code is error-prone and tedious.
 
 ##### Note
 
-also known as "No naked `new`!"
+"no naked `new`""로 알려짐. (C스타일 포인터 `T *`, C++은 std::shared_ptr<T>, std::weak_ptr<T>, std::unique_ptr<T>)
+C스타일 포인터를 생짜 포인터(naked pointer 또는 raw pointer)라고 함.
+>also known as "No naked `new`!"
 
 ##### Example, bad
 
@@ -1723,19 +1909,23 @@ also known as "No naked `new`!"
         delete[] p;
     }
 
-There can be code in the `...` part that causes the `delete` never to happen.
+`...`는 `delete`를 호출할 필요가 전혀 없는 코드라고 가정한다.
+>There can be code in the `...` part that causes the `delete` never to happen.
 
 **See also**: [R: Resource management](#S-resource).
 
 ##### Enforcement
 
-Flag naked `new`s and naked `delete`s.
+생짜 `new`, `delete`이 있다면 표시한다.
+>Flag naked `new`s and naked `delete`s.
 
-### <a name="Res-del"></a> ES.61: delete arrays using `delete[]` and non-arrays using `delete`
+### <a name="Res-del"></a> ES.61: `delete[]`로 배열 포인터를 해제하라. `delete`로 배열이 아닌 포인터를 해제하라.
+>### <a name="Res-del"></a> ES.61: delete arrays using `delete[]` and non-arrays using `delete`
 
 ##### Reason
 
-That's what the language requires and mistakes can lead to resource release errors and/or memory corruption.
+C++의 요구조건이고 잘못 사용하면 리소스 해제 에러가 나면서 메모리값이 엉망이 될 것이다.
+>That's what the language requires and mistakes can lead to resource release errors and/or memory corruption.
 
 ##### Example, bad
 
@@ -1748,18 +1938,24 @@ That's what the language requires and mistakes can lead to resource release erro
 
 ##### Note
 
-This example not only violates the [no naked `new` rule](#Res-new) as in the previous example, it has many more problems.
+이 예제는 [no naked `new` rule](#Res-new)를 위반할 뿐만 아니라 많은 다른 문제를 야기한다.
+>This example not only violates the [no naked `new` rule](#Res-new) as in the previous example, it has many more problems.
 
 ##### Enforcement
 
-* if the `new` and the `delete` is in the same scope, mistakes can be flagged.
+* `new`, `delete`가 같은 영역범위에 있다면 오류여부를 표시해 줄 수 있다.
+* `new`, `delete`가 생성자/소멸자 안에 있다면 오류여부를 표시해 줄 수 있다.
+
+>* if the `new` and the `delete` is in the same scope, mistakes can be flagged.
 * if the `new` and the `delete` are in a constructor/destructor pair, mistakes can be flagged.
 
-### <a name="Res-arr2"></a> ES.62: Don't compare pointers into different arrays
+### <a name="Res-arr2"></a> ES.62: 다른 배열간에 포인터를 비교하지 마라.
+>### <a name="Res-arr2"></a> ES.62: Don't compare pointers into different arrays
 
 ##### Reason
 
-The result of doing so is undefined.
+결과는 예측불가하다.
+>The result of doing so is undefined.
 
 ##### Example, bad
 
@@ -1773,17 +1969,21 @@ The result of doing so is undefined.
 
 ##### Note
 
-This example has many more problems.
+더 많은 문제가 내포되어 있다.
+>This example has many more problems.
 
 ##### Enforcement
 
-## <a name="SS-numbers"></a> Arithmetic
+## <a name="SS-numbers"></a> 연산
+>## <a name="SS-numbers"></a> Arithmetic
 
-### <a name="Res-mix"></a> ES.100: Don't mix signed and unsigned arithmetic
+### <a name="Res-mix"></a> ES.100: 부호 있는 연산과 없는 연산을 섞지 마라.
+>### <a name="Res-mix"></a> ES.100: Don't mix signed and unsigned arithmetic
 
 ##### Reason
 
-Avoid wrong results.
+결과가 잘못될 수 있기 때문에.
+>Avoid wrong results.
 
 ##### Example
 
@@ -1793,24 +1993,30 @@ Avoid wrong results.
 
 ##### Note
 
-Unfortunately, C++ uses signed integers for array subscripts and the standard library uses unsigned integers for container subscripts.
+불행히도 C++은 배열인자에 대해서 부호있는 정수를 사용하고 표준 라이브러리는 컨테이너 인자에 부호없는 정수형을 사용한다.
+일관성을 방해한다.
+>Unfortunately, C++ uses signed integers for array subscripts and the standard library uses unsigned integers for container subscripts.
 This precludes consistency.
 
 ##### Enforcement
 
-Compilers already know and sometimes warn.
+컴파일러가 이미 알고 있는 상황이고 경고를 날려 줄 것이다.
+>Compilers already know and sometimes warn.
 
-### <a name="Res-unsigned"></a> ES.101: use unsigned types for bit manipulation
+### <a name="Res-unsigned"></a> ES.101: 비트연산 시에는 부호없는 타입을 사용하라.
+>### <a name="Res-unsigned"></a> ES.101: use unsigned types for bit manipulation
 
 ##### Reason
 
-Unsigned types support bit manipulation without surprises from sign bits.
+부호없는 타입은 부호비트까지 포함해서 비트 연산할 수 있도록 지원하기 때문에.
+>Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Example
 
     ???
 
-**Exception**: Use unsigned types if you really want modulo arithmetic.
+**Exception**: 모듈러 연산을 하려면 부호없는 타입을 사용하라.
+>**Exception**: Use unsigned types if you really want modulo arithmetic.
 
 ##### Enforcement
 
@@ -1821,7 +2027,7 @@ Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Reason
 
-부호없는 타입은 부호비트부터 비트 연산을 해버리기 때문이다. (?)
+부호없는 타입은 부호비트까지 포함해서 비트 연산할 수 있도록 지원하기 때문에.
 >Unsigned types support bit manipulation without surprises from sign bits.
 
 ##### Example
@@ -1909,7 +2115,7 @@ Incrementing a value beyond a maximum value can lead to memory corruption and un
 
 ##### Note
 
-`%` 모듈라도 같이 적용된다.
+`%` 모듈러 연산도 같이 적용된다.
 >this also applies to `%`.
 
 ##### Example
