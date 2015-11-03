@@ -25,8 +25,9 @@
 		, email(first + "." + last + "@acme.com")  // BAD: first and last not yet constructed
 	{}
 
+이 예제에서, `email`은 맨 처음에 선언되었기 때문에 `first` 와 `last` 이전에 생성될 것이다. 그 말은 `email`의 생성자가 `first` 와 `last`를 너무 이른 시점에 사용하려 한다는 뜻이다. -- `first` 와 `last`가 바람직한 값으로 지정되기 전일 뿐만 아니라 그들이 생성되기도 전에 말이다.
 
-In this example, `email` will be constructed before `first` and `last` because it is declared first. That means its constructor will attempt to use `first` and `last` too soon -- not just before they are set to the desired values, but before they are constructed at all.
+>In this example, `email` will be constructed before `first` and `last` because it is declared first. That means >its constructor will attempt to use `first` and `last` too soon -- not just before they are set to the desired >values, but before they are constructed at all.
 
 If the class definition and the constructor body are in separate files, the long-distance influence that the order of member variable declarations has over the constructor's correctness will be even harder to spot.
 
