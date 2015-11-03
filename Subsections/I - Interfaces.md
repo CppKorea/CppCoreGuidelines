@@ -122,11 +122,13 @@ You cannot have a race condition on immutable data.
 
 (Simple) Report all non-`const` variables declared at namespace scope.
 
-### <a name="Ri-singleton"></a> I.3: Avoid singletons
+### <a name="Ri-singleton"></a> I.3: 싱글턴 패턴을 피하라.
+>### <a name="Ri-singleton"></a> I.3: Avoid singletons
 
 ##### Reason
 
-Singletons are basically complicated global objects in disguise.
+싱글턴은 위장하고 있지만 기본적으로는 복잡한 전역 객체이다.
+>Singletons are basically complicated global objects in disguise.
 
 ##### Example
 
@@ -135,16 +137,19 @@ Singletons are basically complicated global objects in disguise.
         // that it is initialized properly, etc.
     };
 
-There are many variants of the singleton idea.
+싱글턴에 대한 아이디어는 다양하다. 그것이 문제의 한 부분이다.
+>There are many variants of the singleton idea.
 That's part of the problem.
 
 ##### Note
 
-If you don't want a global object to change, declare it `const` or `constexpr`.
+전역객체를 변경시키고 싶지 않다면 `const`, `constexpr`로 선언하라.
+>If you don't want a global object to change, declare it `const` or `constexpr`.
 
 ##### Exception
 
-You can use the simplest "singleton" (so simple that it is often not considered a singleton) to get initialization on first use, if any:
+사용되자마자 최기화가 이뤄지는 제일 단순한 "싱글턴"을 사용할 수 있다:
+>You can use the simplest "singleton" (so simple that it is often not considered a singleton) to get initialization on first use, if any:
 
     X& myX()
     {
@@ -152,47 +157,67 @@ You can use the simplest "singleton" (so simple that it is often not considered 
         return my_x;
     }
 
-This is one of the most effective solutions to problems related to initialization order.
+이 방식이 초기화 순서와 관련한 문제를 처리하기에 가장 효과적인 해결책이다.
+다중쓰레드 환경에서도 정적객체의 초기화는 경쟁상황을 일으키지는 않는다.
+(부주의하게 생성자내에서 공유된 객체를 접근하지 않는다면 말이다.)
+>This is one of the most effective solutions to problems related to initialization order.
 In a multi-threaded environment the initialization of the static object does not introduce a race condition
 (unless you carelessly access a shared object from within its constructor).
 
-If you, as many do, define a singleton as a class for which only one object is created, functions like `myX` are not singletons, and this useful technique is not an exception to the no-singleton rule.
+한 객체만 생성해야 하는 클래스로 싱글턴을 정의한다면 `myX`같은 함수는 싱글턴이 아니다.
+그리고 이 유용한 기술은 비싱글턴 규칙에 예외적이지 않다.
+>If you, as many do, define a singleton as a class for which only one object is created, functions like `myX` are not singletons, and this useful technique is not an exception to the no-singleton rule.
 
 ##### Enforcement
 
-Very hard in general.
+실제로 엄청 어렵다.
+>Very hard in general.
 
-* Look for classes with names that include `singleton`.
-* Look for classes for which only a single object is created (by counting objects or by examining constructors).
+* `singleton`을 포함하는 이름을 가진 클래스를 찾아본다.
+* 객체를 헤아리거나 생성자를 조사해 보면서 한개의 객체가 생성되는 클래스를 찾아본다.
+>* Look for classes with names that include `singleton`.
+>* Look for classes for which only a single object is created (by counting objects or by examining constructors).
 
-### <a name="Ri-typed"></a> I.4: Make interfaces precisely and strongly typed
+### <a name="Ri-typed"></a> I.4: 인터페이스를 정확하게 그리고 강하게 타입화해라.
+>### <a name="Ri-typed"></a> I.4: Make interfaces precisely and strongly typed
 
 ##### Reason
 
-Types are the simplest and best documentation, have well-defined meaning, and are guaranteed to be checked at compile time.
+타입은 가장 단순하지만 최고의 문서이다. 잘 정의된 의미를 가지고 있고, 컴파일 타임에 체크할 수 있도록 보장한다.
+또한 정확하게 타입된 코드는 더 잘 최적화 된다.
+>Types are the simplest and best documentation, have well-defined meaning, and are guaranteed to be checked at compile time.
 Also, precisely typed code is often optimized better.
 
 ##### Example, don't
 
-Consider:
+보자:
+>Consider:
 
     void pass(void* data);    // void* is suspicious
 
-Now the callee has to cast the data pointer (back) to a correct type to use it. That is error-prone and often verbose.
+지금 호출받은 함수는 올바른 타입으로 사용하기 위해서 데이터 포인터를 형변환해야 한다.
+그건 에러가 발생하기 쉽고, 길어져서 구질구질하다. 인터페이스에서 `void*`를 피하라.
+대신에 베이스클래스에 대한 포인터나 다형타입 사용을 고려해라. (?)
+>Now the callee has to cast the data pointer (back) to a correct type to use it. That is error-prone and often verbose.
 Avoid `void*` in interfaces.
 Consider using a variant or a pointer to base instead. (Future note: Consider a pointer to concept.)
 
-**Alternative**: Often, a template parameter can eliminate the `void*` turning it into a `T*` or something like that.
+**Alternative**: 종종 템플릿 매개변수는 `void*`를 제거하고 `T*`나 비슷한 것으로 변환시켜 버린다.
+>**Alternative**: Often, a template parameter can eliminate the `void*` turning it into a `T*` or something like that.
 
 ##### Example, bad
 
-Consider:
+보자:
+>Consider:
 
     void draw_rect(int, int, int, int);   // great opportunities for mistakes
 
     draw_rect(p.x, p.y, 10, 20);          // what does 10, 20 mean?
 
-An `int` can carry arbitrary forms of information, so we must guess about the meaning of the four `int`s.
+`int`는 정보를 임의대로 제공해서, 4개의 `int`가 어떤 의미인지를 유추해야만 한다.
+아마도 첫 2개는 `x`, `y` 좌표일 것같지만, 나머지 두개는 머지?
+주석이나 매개변수 이름이 도움을 주기도 하지만 명확히 한다면:
+>An `int` can carry arbitrary forms of information, so we must guess about the meaning of the four `int`s.
 Most likely, the first two are an `x`,`y` coordinate pair, but what are the last two?
 Comments and parameter names can help, but we could be explicit:
 
@@ -202,12 +227,15 @@ Comments and parameter names can help, but we could be explicit:
     draw_rectangle(p, Point{10, 20});  // two corners
     draw_rectangle(p, Size{10, 20});   // one corner and a (height, width) pair
 
-Obviously, we cannot catch all errors through the static type system
+분명히 정적타입시스템 상에서도 모든 에러를 잡아낼 수는 없다.
+(첫번째 인자가 좌-상단점이라는 사실은 이름이나 주석 등으로 컨벤션되었다.)
+>Obviously, we cannot catch all errors through the static type system
 (e.g., the fact that a first argument is supposed to be a top-left point is left to convention (naming and comments)).
 
 ##### Example, bad
 
-In the following example, it is not clear from the interface what `time_to_blink` means: Seconds? Milliseconds?
+다음 예제, `time_to_blink`이 무슨 의미일지 인터페이스를 보고는 모르겠다. 초, 밀리초?
+>In the following example, it is not clear from the interface what `time_to_blink` means: Seconds? Milliseconds?
 
     void blink_led(int time_to_blink) // bad - the unit is ambiguous
     {
@@ -223,7 +251,8 @@ In the following example, it is not clear from the interface what `time_to_blink
 
 ##### Example, good
 
-`std::chrono::duration` types introduced in C++11 helps making the unit of time duration explicit.
+`std::chrono::duration` 타입은 C++11에서 도입되었는데 지속시간의 단위를 분명하게 만드는데 도움이 된다.
+>`std::chrono::duration` types introduced in C++11 helps making the unit of time duration explicit.
 
     void blink_led(milliseconds time_to_blink) // good - the unit is explicit
     {
@@ -237,7 +266,8 @@ In the following example, it is not clear from the interface what `time_to_blink
         blink_led(1500ms);
     }
 
-The function can also be written in such a way that it will accept any time duration unit.
+함수는 어떤 종류의 경과시간 단위도 허용하도록 아래와 같이 교체 쓸 수도 있다.
+>The function can also be written in such a way that it will accept any time duration unit.
 
     template<class rep, class period>
     void blink_led(duration<rep, period> time_to_blink) // good - accepts any unit
@@ -257,41 +287,58 @@ The function can also be written in such a way that it will accept any time dura
 
 ##### Enforcement
 
-* (Simple) Report the use of `void*` as a parameter or return type.
-* (Hard to do well) Look for member functions with many built-in type arguments.
+* (Simple) `void*`를 반환타입이나 매개변수로 사용한다면 보고한다.
+* (Hard to do well) 다수의 내장 타입 인자를 가진 맴버함수를 찾는다.
 
-### <a name="Ri-pre"></a> I.5: State preconditions (if any)
+>* (Simple) Report the use of `void*` as a parameter or return type.
+>* (Hard to do well) Look for member functions with many built-in type arguments.
+
+### <a name="Ri-pre"></a> I.5: 있다면 선행조건을 기술하라.
+>### <a name="Ri-pre"></a> I.5: State preconditions (if any)
 
 ##### Reason
 
-Arguments have meaning that may constrain their proper use in the callee.
+인자는 호출받는 함수 내에서 적절하게 사용하게 만드는 의도를 가진다.
+>Arguments have meaning that may constrain their proper use in the callee.
 
 ##### Example
 
-Consider:
+보자:
+>Consider:
 
     double sqrt(double x);
 
-Here `x` must be nonnegative. The type system cannot (easily and naturally) express that, so we must use other means. For example:
+여기서 `x`는 반드시 양수여야 한다. 타입 시스템으로는 표현할 수 없고, 그래서 다른 수단을 사용해야 한다.
+예를 들면:
+>Here `x` must be nonnegative. The type system cannot (easily and naturally) express that, so we must use other means. For example:
 
     double sqrt(double x); // x must be nonnegative
 
-Some preconditions can be expressed as assertions. For example:
+선행조건은 assertion(?)으로 표현하기도 한다. 예를 들면:
+>Some preconditions can be expressed as assertions. For example:
 
     double sqrt(double x) { Expects(x >= 0); /* ... */ }
 
-Ideally, that `Expects(x >= 0)` should be part of the interface of `sqrt()` but that's not easily done. For now, we place it in the definition (function body).
+`Expects(x >= 0)` 조건이 `sqrt()`의 인터페이스에 포함되는 것이 가장 이상적이다. 그렇게 하기는 쉽지 않으니 당분간 함수 정의부 내에 위치시킨다.
+>Ideally, that `Expects(x >= 0)` should be part of the interface of `sqrt()` but that's not easily done. For now, we place it in the definition (function body).
 
-**Reference**: `Expects()` is described in [GSL](#S-gsl).
+**Reference**: `Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
+>**Reference**: `Expects()` is described in [GSL](#S-gsl).
 
 ##### Note
 
-Prefer a formal specification of requirements, such as `Expects(p != nullptr);`. If that is infeasible, use English text in comments, such as
+요구사항의 공식적인 스팩을 선호하라. `Excepts(p != nullptr);`.
+infeasible하다면, 주석문에 작성하라. 다음과 같이.
+`// the sequence [p:q) is ordered using <`.
+>Prefer a formal specification of requirements, such as `Expects(p != nullptr);`. If that is infeasible, use English text in comments, such as
 `// the sequence [p:q) is ordered using <`.
 
 ##### Note
 
-Most member functions have as a precondition that some class invariant holds.
+대부분의 맴버 함수는 클래스 불변조건(?)에 해당하는 선행조건을 갖고 있다.
+그 불변조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 맴버 함수에 의해 재구성되어야 한다.
+그래서 함수마다 개별적으로 언급할 필요는 없다.
+>Most member functions have as a precondition that some class invariant holds.
 That invariant is established by a constructor and must be reestablished upon exit by every member function called from outside the class.
 We don't need to mention it for each member function.
 
@@ -299,13 +346,16 @@ We don't need to mention it for each member function.
 
 (Not enforceable)
 
-**See also**: The rules for passing pointers. ???
+**See also**: 포인터 인자전달 규칙을 참조해라. ???
+>**See also**: The rules for passing pointers. ???
 
-### <a name="Ri-expects"></a> I.6: Prefer `Expects()` for expressing preconditions
+### <a name="Ri-expects"></a> I.6: 선행조건을 표현하고 싶다면 `Expects()`를 선호하라.
+>### <a name="Ri-expects"></a> I.6: Prefer `Expects()` for expressing preconditions
 
 ##### Reason
 
-To make it clear that the condition is a precondition and to enable tool use.
+선행조건임을 표시하고 툴 사용을 쉽고 명확하게 만들기 위해.
+>To make it clear that the condition is a precondition and to enable tool use.
 
 ##### Example
 
@@ -318,19 +368,26 @@ To make it clear that the condition is a precondition and to enable tool use.
 
 ##### Note
 
-Preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics (do you always want to abort in debug mode and check nothing in productions runs?).
+선행조건은 `if`문, `assert()`문, 주석문 등으로 기술할 수 있다.
+이런 구문은 일반 코드와 구분하기 어렵고, 업데이트하기 어렵고, 툴로 조작하기 어렵고, 잘못된 의미를 가질 수도 있다.
+(디버그 모드일 때는 중단시키고, 제품 모드일때는 체크하고 싶은가?)
+>Preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics (do you always want to abort in debug mode and check nothing in productions runs?).
 
 ##### Note
 
-Preconditions should be part of the interface rather than part of the implementation, but we don't yet have the language facilities to do that.
+선행조건은 구현부보다는 인터페이스부에 포함시켜야 한다. 아직은 그렇게 할 수 있는 언어기능이 없다.
+>Preconditions should be part of the interface rather than part of the implementation, but we don't yet have the language facilities to do that.
 
 ##### Note
 
-`Expects()` can also be used to check a condition in the middle of an algorithm.
+`Expects()`은 알고리즘 중간에 조건체크에도 사용할 수 있다.
+>`Expects()` can also be used to check a condition in the middle of an algorithm.
 
 ##### Enforcement
 
-(Not enforceable) Finding the variety of ways preconditions can be asserted is not feasible. Warning about those that can be easily identified (`assert()`) has questionable value in the absence of a language facility.
+(Not enforceable) 선행조건이 잘못될 다양한 조건을 찾는 것은 feasible하지 않다.
+`assert()`로 쉽게 구별될 수 있을 때라도 경고한다면, 언어에 그 기능이 없다 하더라도 가치가 있을지 의심스럽다.
+>(Not enforceable) Finding the variety of ways preconditions can be asserted is not feasible. Warning about those that can be easily identified (`assert()`) has questionable value in the absence of a language facility.
 
 ### <a name="Ri-post"></a> I.7: 후행조건을 기술하라.
 >### <a name="Ri-post"></a> I.7: State postconditions
@@ -670,40 +727,8 @@ That is, it's value must be `delete`d or transferred to another owner, as is don
 * (Simple) `new`의 결과값 또는 함수호출로 반환되는 포인터가 일반포인터라면 경고하라.
 
 >* (Simple) Warn on `delete` of a raw pointer that is not an `owner`.
-* (Simple) Warn on failure to either `reset` or explicitly `delete` an `owner` pointer on every code path.
-* (Simple) Warn if the return value of `new` or a function call with return value of pointer type is assigned to a raw pointer.
-
-### <a name="Ri-nullptr"></a> I.12: Declare a pointer that must not be null as `not_null`
-
-##### Reason
-
-To help avoid dereferencing `nullptr` errors. To improve performance by avoiding redundant checks for `nullptr`.
-
-##### Example
-
-    int length(const char* p);            // it is not clear whether length(nullptr) is valid
-
-    length(nullptr);                      // OK?
-
-    int length(not_null<const char*> p);  // better: we can assume that p cannot be nullptr
-
-    int length(const char* p);            // we must assume that p can be nullptr
-
-By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
-
-##### Note
-
-The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
-
-    int length(not_null<zstring> p);   // we can assume that p cannot be nullptr
-                                       // we can assume that p points to a zero-terminated array of characters
-
-Note: `length()` is, of course, `std::strlen()` in disguise.
-
-##### Enforcement
-
-* (Simple) ((Foundation)) If a function checks a pointer parameter against `nullptr` before access, on all control-flow paths, then warn it should be declared `not_null`.
-* (Complex) If a function with pointer return value ensures it is not `nullptr` on all return paths, then warn the return type should be declared `not_null`.
+>* (Simple) Warn on failure to either `reset` or explicitly `delete` an `owner` pointer on every code path.
+>* (Simple) Warn if the return value of `new` or a function call with return value of pointer type is assigned to a raw pointer.
 
 ### <a name="Ri-nullptr"></a> I.12: 포인터가 NULL값이 될 수 없다면 `not_null`로 선언하라.
 >### <a name="Ri-nullptr"></a> I.12: Declare a pointer that must not be null as `not_null`
@@ -731,8 +756,8 @@ Note: `length()` is, of course, `std::strlen()` in disguise.
 c 스타일의 스트링(NULL로 끝나는 문자열)에 대한 포인터를 char형이라고 여전히 가정하고 있으며 잠재적인 에러 원인이 된다. `const char *` 대신에 `zstring`을 사용하라.
 >The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
 
-	int length(not_null<zstring> p);		// we can assume that p cannot be nullptr
-									// we can assume that p points to a zero-terminated array of characters
+    int length(not_null<zstring> p);   // we can assume that p cannot be nullptr
+                                       // we can assume that p points to a zero-terminated array of characters
 
 Note: `length()`는 당연히 `std::strlen()`이다.
 >Note: `length()` is, of course, `std::strlen()` in disguise.
