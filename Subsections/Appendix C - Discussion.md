@@ -6,9 +6,11 @@
 >This section contains follow-up material on rules and sets of rules.
 >In particular, here we present further rationale, longer examples, and discussions of alternatives.
 
-### <a name="Sd order">Discussion: Define and initialize member variables in the order of member declaration</a>
+### <a name="Sd order">토론: 멤버 변수들을 멤버 선언 순서에 따라 정의하고 초기화하라</a>
 
-Member variables are always initialized in the order they are declared in the class definition, so write them in that order in the constructor initialization list. Writing them in a different order just makes the code confusing because it won't run in the order you see, and that can make it hard to see order-dependent bugs.
+멤버 변수들은 항상 클래스의 정의부에서 선언된 순서에 따라 초기화되므로, 생성자의 초기화 리스트에 그 순서대로 적어라. 다른 순서로 적는 것은 멤버 변수들이 눈에 보이는 순서대로 작동하지 않아 순서에 종속적인 버그를 찾기 어렵게 만들기 때문에 코드를 헷갈리게 만들 뿐이다.
+
+>Member variables are always initialized in the order they are declared in the class definition, so write them in >that order in the constructor initialization list. Writing them in a different order just makes the code >confusing because it won't run in the order you see, and that can make it hard to see order-dependent bugs.
 
 	class Employee {
 	    string email, first, last;
