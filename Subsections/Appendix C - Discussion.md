@@ -29,7 +29,9 @@
 
 >In this example, `email` will be constructed before `first` and `last` because it is declared first. That means >its constructor will attempt to use `first` and `last` too soon -- not just before they are set to the desired >values, but before they are constructed at all.
 
-If the class definition and the constructor body are in separate files, the long-distance influence that the order of member variable declarations has over the constructor's correctness will be even harder to spot.
+만약 클래스의 정의부와 생성자가 서로 다른 파일에 있다면, 멤버 변수의 선언 순서가 생성자의 정확함에 미치는 장거리 영향은 더욱 더 발견하기 힘들 것이다.
+
+>If the class definition and the constructor body are in separate files, the long-distance influence that the >order of member variable declarations has over the constructor's correctness will be even harder to spot.
 
 **References**
 
