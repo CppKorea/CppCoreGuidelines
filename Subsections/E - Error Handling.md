@@ -112,7 +112,7 @@
 여기 `vector`, `string`의 생성자는 충분한 메모리를 할당받을 수 없을지도 모른다. `vector`의 생성자는 `Thing`을 초기화 리스트에 복사할 수 없을지도 모른다.
 `File_handle`은 파일을 오픈하지 못할지도 모른다.
 이런 경우에 `use()`의 호출자가 처리할 수 있도록 예외를 발생시킨다. `use()`가 직접 `bar` 생성 실패를 처리하려고 하면 `try`/`catch`를 사용하면 된다.
-이런 에러일 때 `Foo`를 생성하려고 시도한 것들에 제어권을 넘기기 전에, 이미 생성된 맴버에 대해서 `Foo` 생성자가 알아서 잘 소멸시킨다. (?? - 어렵다)
+이런 에러일 때 `Foo`를 생성하려고 시도한 것들에 제어권을 넘기기 전에, 이미 생성된 멤버에 대해서 `Foo` 생성자가 알아서 잘 소멸시킨다. (?? - 어렵다)
 에러 코드를 포함하는 반환값이 없다는데 주목하라.
 >Here, `vector` and `string`s constructors may not be able to allocate sufficient memory for their elements, `vector`s constructor may not be able copy the `Thing`s in its initializer list, and `File_handle` may not be able to open the required file.
 In each case, they throw an exception for `use()`'s caller to handle.
@@ -206,7 +206,7 @@ There is nothing exceptional about finding a value in a `vector`.
 
 ##### Note
 
-[invariant](#Rc-struct)는 객체 맴버를 위한 논리적 조건이다. 생성자는 공용 맴버함수가 작동하도록 객체를 구성해야 한다.
+[invariant](#Rc-struct)는 객체 멤버를 위한 논리적 조건이다. 생성자는 공용 멤버함수가 작동하도록 객체를 구성해야 한다.
 (?? - 이것도 넘 어렵다.)
 >An [invariant](#Rc-struct) is logical condition for the members of an object that a constructor must establish for the public member functions to assume.
 

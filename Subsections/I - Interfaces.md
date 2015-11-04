@@ -288,7 +288,7 @@ Comments and parameter names can help, but we could be explicit:
 ##### Enforcement
 
 * (Simple) `void*`를 반환타입이나 매개변수로 사용한다면 보고한다.
-* (Hard to do well) 다수의 내장 타입 인자를 가진 맴버함수를 찾는다.
+* (Hard to do well) 다수의 내장 타입 인자를 가진 멤버함수를 찾는다.
 
 >* (Simple) Report the use of `void*` as a parameter or return type.
 >* (Hard to do well) Look for member functions with many built-in type arguments.
@@ -335,8 +335,8 @@ infeasible하다면, 주석문에 작성하라. 다음과 같이.
 
 ##### Note
 
-대부분의 맴버 함수는 클래스 불변조건(?)에 해당하는 선행조건을 갖고 있다.
-그 불변조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 맴버 함수에 의해 재구성되어야 한다.
+대부분의 멤버 함수는 클래스 불변조건(?)에 해당하는 선행조건을 갖고 있다.
+그 불변조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 멤버 함수에 의해 재구성되어야 한다.
 그래서 함수마다 개별적으로 언급할 필요는 없다.
 >Most member functions have as a precondition that some class invariant holds.
 That invariant is established by a constructor and must be reestablished upon exit by every member function called from outside the class.
