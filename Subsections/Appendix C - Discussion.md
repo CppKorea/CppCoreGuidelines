@@ -1,11 +1,16 @@
 # Appendix C: Discussion
 
-This section contains follow-up material on rules and sets of rules.
-In particular, here we present further rationale, longer examples, and discussions of alternatives.
+이 절은 규칙들과 규칙들의 집합에 대한 추가적인 내용을 담고 있다.
+특히, 여기서 우리는 더 많은 이유와 더 긴 예제들과 대안책들에 대한 토론들을 표현하고자 한다.
 
-### <a name="Sd order">Discussion: Define and initialize member variables in the order of member declaration</a>
+>This section contains follow-up material on rules and sets of rules.
+>In particular, here we present further rationale, longer examples, and discussions of alternatives.
 
-Member variables are always initialized in the order they are declared in the class definition, so write them in that order in the constructor initialization list. Writing them in a different order just makes the code confusing because it won't run in the order you see, and that can make it hard to see order-dependent bugs.
+### <a name="Sd order">토론: 멤버 변수들을 멤버 선언 순서에 따라 정의하고 초기화하라</a>
+
+멤버 변수들은 항상 클래스의 정의부에서 선언된 순서에 따라 초기화되므로, 생성자의 초기화 리스트에 그 순서대로 적어라. 다른 순서로 적는 것은 멤버 변수들이 눈에 보이는 순서대로 작동하지 않아 순서에 종속적인 버그를 찾기 어렵게 만들기 때문에 코드를 헷갈리게 만들 뿐이다.
+
+>Member variables are always initialized in the order they are declared in the class definition, so write them in >that order in the constructor initialization list. Writing them in a different order just makes the code >confusing because it won't run in the order you see, and that can make it hard to see order-dependent bugs.
 
 	class Employee {
 	    string email, first, last;
@@ -20,10 +25,13 @@ Member variables are always initialized in the order they are declared in the cl
 		, email(first + "." + last + "@acme.com")  // BAD: first and last not yet constructed
 	{}
 
+이 예제에서, `email`은 맨 처음에 선언되었기 때문에 `first` 와 `last` 이전에 생성될 것이다. 그 말은 `email`의 생성자가 `first` 와 `last`를 너무 이른 시점에 사용하려 한다는 뜻이다. -- `first` 와 `last`가 바람직한 값으로 지정되기 전일 뿐만 아니라 그들이 생성되기도 전에 말이다.
 
-In this example, `email` will be constructed before `first` and `last` because it is declared first. That means its constructor will attempt to use `first` and `last` too soon -- not just before they are set to the desired values, but before they are constructed at all.
+>In this example, `email` will be constructed before `first` and `last` because it is declared first. That means >its constructor will attempt to use `first` and `last` too soon -- not just before they are set to the desired >values, but before they are constructed at all.
 
-If the class definition and the constructor body are in separate files, the long-distance influence that the order of member variable declarations has over the constructor's correctness will be even harder to spot.
+만약 클래스의 정의부와 생성자가 서로 다른 파일에 있다면, 멤버 변수의 선언 순서가 생성자의 정확함에 미치는 장거리 영향은 더욱 더 발견하기 힘들 것이다.
+
+>If the class definition and the constructor body are in separate files, the long-distance influence that the >order of member variable declarations has over the constructor's correctness will be even harder to spot.
 
 **References**
 
