@@ -1,27 +1,31 @@
 # <a name="S-interfaces"></a> I: Interfaces
 
-An interface is a contract between two parts of a program. Precisely stating what is expected of a supplier of a service and a user of that service is essential.
+인터페이스는 프로그램 두 부분간의 계약이다.
+서비스의 공급자와 서비스의 사용자가 기대하는 바를 정확하게 기술하는 것이 핵심이다.
+좋은 인터페이스는 아마도 코드 구성 중에서 가장 중요한 한 요소이다.
+>An interface is a contract between two parts of a program. Precisely stating what is expected of a supplier of a service and a user of that service is essential.
 Having good (easy-to-understand, encouraging efficient use, not error-prone, supporting testing, etc.) interfaces is probably the most important single aspect of code organization.
 
-Interface rule summary:
+인터페이스 규칙 요약:
+>Interface rule summary:
 
-* [I.1: Make interfaces explicit](#Ri-explicit)
-* [I.2: Avoid global variables](#Ri-global)
-* [I.3: Avoid singletons](#Ri-singleton)
-* [I.4: Make interfaces precisely and strongly typed](#Ri-typed)
-* [I.5: State preconditions (if any)](#Ri-pre)
-* [I.6: Prefer `Expects()` for expressing preconditions](#Ri-expects)
-* [I.7: State postconditions](#Ri-post)
-* [I.8: Prefer `Ensures()` for expressing postconditions](#Ri-ensures)
-* [I.9: If an interface is a template, document its parameters using concepts](#Ri-concepts)
-* [I.10: Use exceptions to signal a failure to perform a required tasks](#Ri-except)
-* [I.11: Never transfer ownership by a raw pointer (`T*`)](#Ri-raw)
-* [I.12: Declare a pointer that must not be null as `not_null`](#Ri-nullptr)
-* [I.13: Do not pass an array as a single pointer](#Ri-array)
-* [I.23: Keep the number of function arguments low](#Ri-nargs)
-* [I.24: Avoid adjacent unrelated parameters of the same type](#Ri-unrelated)
-* [I.25: Prefer abstract classes as interfaces to class hierarchies](#Ri-abstract)
-* [I.26: If you want a cross-compiler ABI, use a C-style subset](#Ri-abi)
+* [I.1: 인터페이스를 명확하게 만들어라.](#Ri-explicit)
+* [I.2: 전역변수를 피하라.](#Ri-global)
+* [I.3: 싱글턴 패턴을 피하라.](#Ri-singleton)
+* [I.4: 인터페이스를 정확하게 그리고 강하게 타입화해라.](#Ri-typed)
+* [I.5: 있다면 선행조건을 기술하라.](#Ri-pre)
+* [I.6: 선행조건을 표현하고 싶다면 `Expects()`를 선호하라.](#Ri-expects)
+* [I.7: 후행조건을 기술하라.](#Ri-post)
+* [I.8: 후행조건을 표현할때 `Ensures()`를 사용해라.](#Ri-ensures)
+* [I.9: 인터페이스가 템플릿이라면 concept을 사용해서 매개변수를 문서화해라.](#Ri-concepts)
+* [I.10: 테스크 실행 실패를 알리려면 예외를 사용하라.](#Ri-except)
+* [I.11: 일반포인터로 소유권을 넘기지 마라.(`T*`)](#Ri-raw)
+* [I.12: 포인터가 NULL값이 될 수 없다면 `not_null`로 선언하라.](#Ri-nullptr)
+* [I.13: 포인터로 배열 인자를 넘기지 마라.](#Ri-array)
+* [I.23: 함수인자수를 최소로 유지하라.](#Ri-nargs)
+* [I.24: 동일 타입이지만 관련없는 인접한 매개변수는 피하라.](#Ri-unrelated)
+* [I.25: 클래스 상속보다 인터페이스로 추상 클래스(abstract class)를 선호하라.](#Ri-abstract)
+* [I.26: 컴파일러간 호환을 위한 바이너리 인터페이스(ABI)을 원한다면 C 스타일을 사용하라.](#Ri-abi)
 
 See also
 
@@ -33,52 +37,70 @@ See also
 * [E: Error handling](#S-errors)
 * [T: Templates and generic programming](#S-templates)
 
-### <a name="Ri-explicit"></a> I.1: Make interfaces explicit
+### <a name="Ri-explicit"></a> I.1: 인터페이스를 명확하게 만들어라.
+>### <a name="Ri-explicit"></a> I.1: Make interfaces explicit
 
 ##### Reason
 
-Correctness. Assumptions not stated in an interface are easily overlooked and hard to test.
+정확성. 인터페이스에 언급되지 않은 가정은 간과되기 쉽고 테스트하기 어렵다.
+>Correctness. Assumptions not stated in an interface are easily overlooked and hard to test.
 
 ##### Example, bad
 
-Controlling the behavior of a function through a global (namespace scope) variable (a call mode) is implicit and potentially confusing. For example:
+전역변수를 통해 함수의 행동을 제어하는 것은 암시적이고 혼란스럽다. 예를 들면:
+>Controlling the behavior of a function through a global (namespace scope) variable (a call mode) is implicit and potentially confusing. For example:
 
     int rnd(double d)
     {
         return (rnd_up) ? ceil(d) : d;    // don't: "invisible" dependency
     }
 
-It will not be obvious to a caller that the meaning of two calls of `rnd(7.2)` might give different results.
+`rnd(7.2)`를 두번 호출해서 서로다른 결과가 발생한다면 호출하는 입장에서는 명확하지 않을 것이다.
+>It will not be obvious to a caller that the meaning of two calls of `rnd(7.2)` might give different results.
 
-**Exception**: Sometimes we control the details of a set of operations by an environment variable, e.g., normal vs. verbose output or debug vs. optimized.
+**Exception**: 때때로 우리는 환경변수를 가지고 연산들을 상세하게 제어한다. 일반 대 상세 아웃풋, 디버그 대 최적화 등.
+전역 제어를 사용하면 잠재적인 문제가 있기는 하지만, 그렇게 하지 않으면 고정되었을 의도를 구현하는데 세밀하게 제어할 수 있다.
+>**Exception**: Sometimes we control the details of a set of operations by an environment variable, e.g., normal vs. verbose output or debug vs. optimized.
 The use of a non-local control is potentially confusing, but controls only implementation details of otherwise fixed semantics.
 
 ##### Example, bad
 
-Reporting through non-local variables (e.g., `errno`) is easily ignored. For example:
+`errno`같은 전역변수를 통해 에러를 보고하는 것은 무시되기 쉽다. 예를 들면:
+>Reporting through non-local variables (e.g., `errno`) is easily ignored. For example:
 
     fprintf(connection, "logging: %d %d %d\n", x, y, s); // don't: no test of printf's return value
 
-What if the connection goes down so that no logging output is produced? See Rule I.??.
+connection이 다운되서 로그가 만들어지지 않으면 어떨까? I.?? 규칙을 봐라.
+>What if the connection goes down so that no logging output is produced? See Rule I.??.
 
-**Alternative**: Throw an exception. An exception cannot be ignored.
+**Alternative**: 예외를 발생시켜라. 예외는 무시할 수 없다.
+>**Alternative**: Throw an exception. An exception cannot be ignored.
 
-**Alternative formulation**: Avoid passing information across an interface through non-local state.
+**Alternative formulation**: 전역 상태값으로 인터페이스를 통해 정보를 전달하는 것을 피해라.
+비상수 멤버함수는 다른 멤버 함수에게 객체의 상태값을 통해 정보를 전달한다는 점을 참고하라.
+>**Alternative formulation**: Avoid passing information across an interface through non-local state.
 Note that non-`const` member functions pass information to other member functions through their object's state.
 
-**Alternative formulation**: An interface should be a function or a set of functions.
+**Alternative formulation**: 인터페이스는 함수나 함수의 집합이어야 한다.
+함수는 템플릿일 수도 있고 함수집합은 클래스나 클래스 템플릿일 수도 있다.
+>**Alternative formulation**: An interface should be a function or a set of functions.
 Functions can be template functions and sets of functions can be classes or class templates.
 
 ##### Enforcement
 
-* (Simple) A function should not make control-flow decisions based on the values of variables declared at namespace scope.
-* (Simple) A function should not write to variables declared at namespace scope.
+* (Simple) 함수는 이름공간 범위에서 선언된 변수값에 따라 제어흐름을 결정해서는 안된다.
+* (Simple) 함수는 이름공간 범위에서 선언된 변수에 값을 저장해서는 안된다.
 
-### <a name="Ri-global"></a> I.2 Avoid global variables
+>* (Simple) A function should not make control-flow decisions based on the values of variables declared at namespace scope.
+>* (Simple) A function should not write to variables declared at namespace scope.
+
+### <a name="Ri-global"></a> I.2 전역변수를 피하라.
+>### <a name="Ri-global"></a> I.2 Avoid global variables
 
 ##### Reason
 
-Non-`const` global variables hide dependencies and make the dependencies subject to unpredictable changes.
+비상수 전역변수는 의존성을 숨기고 예측못한 변화에 의존하게 만든다.
+>Non-`const` global variables hide dependencies and make the dependencies subject to unpredictable changes.
 
 ##### Example
 
@@ -96,31 +118,40 @@ Non-`const` global variables hide dependencies and make the dependencies subject
         // ... use data ...
     }
 
-Who else might modify `data`?
+누가 `data`를 수정하는가?
+>Who else might modify `data`?
 
 ##### Note
 
-Global constants are useful.
+전역상수는 도움이 많이 된다.
+>Global constants are useful.
 
 ##### Note
 
-The rule against global variables applies to namespace scope variables as well.
+전역변수에 반대하는 규칙은 이름공간 범위의 변수에도 동일하게 적용된다.
+>The rule against global variables applies to namespace scope variables as well.
 
-**Alternative**: If you use global (more generally namespace scope data) to avoid copying, consider passing the data as an object by const reference.
+**Alternative**: 복사를 피하기 위해 전역변수(좀더 일반화해서 이름공간 범위의 데이터)를 사용한다면 상수 참조로 객체를 전달하는 것을 고려해라.
+또 하나의 해결책은 객체의 상태로써 데이터와 멤버 함수로써 연산을 정의하는 것이다.
+>**Alternative**: If you use global (more generally namespace scope data) to avoid copying, consider passing the data as an object by const reference.
 Another solution is to define the data as the state of some object and the operations as member functions.
 
-**Warning**: Beware of data races: If one thread can access nonlocal data (or data passed by reference) while another thread executes the callee, we can have a data race.
+**Warning**: 데이터 레이스를 조심해라: 한 스레드가 실행하는 동안 다른 스레드가 전역 데이터(또는 참조로 전달된 데이터)를 접근하려고 한다면, 데이터 경쟁상태가 될 수 있다.
+>**Warning**: Beware of data races: If one thread can access nonlocal data (or data passed by reference) while another thread executes the callee, we can have a data race.
 Every pointer or reference to mutable data is a potential data race.
 
 ##### Note
 
-You cannot have a race condition on immutable data.
+변경할 수 없는 데이터에 대해서는 경쟁조건이 생기지 않는다.
+>You cannot have a race condition on immutable data.
 
-**Reference**: See the [rules for calling functions](#SS-call).
+**Reference**: [rules for calling functions](#SS-call)를 보라.
+>**Reference**: See the [rules for calling functions](#SS-call).
 
 ##### Enforcement
 
-(Simple) Report all non-`const` variables declared at namespace scope.
+(Simple) 이름공간 범위 내에 정의된 비상수 변수에 대해서 모두 보고하라.
+>(Simple) Report all non-`const` variables declared at namespace scope.
 
 ### <a name="Ri-singleton"></a> I.3: 싱글턴 패턴을 피하라.
 >### <a name="Ri-singleton"></a> I.3: Avoid singletons
@@ -567,7 +598,7 @@ TS 스타일 요구사항 명세에 ISO concept를 사용하라. 예제:
 
 
 ### <a name="Ri-except"></a> I.10: 테스크 실행 실패를 알리려면 예외를 사용하라.
-### <a name="Ri-except"></a> I.10: Use exceptions to signal a failure to perform a required task
+>### <a name="Ri-except"></a> I.10: Use exceptions to signal a failure to perform a required task
 
 ##### Reason
 
@@ -582,7 +613,8 @@ This is a major source of errors.
 	template <class F, class ...Args>
 	explicit thread(F&& f, Args&&... args);	// good: throw system_error if unable to start the new thread
 
-##### Note: What is an error?
+##### Note: 에러란 무엇인가?
+>##### Note: What is an error?
 
 에러는 기능이 의도한 목적을 이룰 수 없는 것을 의미한다.(후행조건을 만족시키면서)
 에러를 무시하는 코드를 호출하면 정의되지 않는 시스템 상태나 잘못된 결과를 야기할 수 있다.
@@ -972,7 +1004,7 @@ You just knew that `Shape` would turn up somewhere :-)
 (Simple) 'C' 클래스 포인터가 부모클래스의 포인터를 가지고 있고 그 부모클래스가 데이터 멤버를 가진다면 경고하라.
 >(Simple) Warn if a pointer to a class `C` is assigned to a pointer to a base of `C` and the base class contains data members.
 
-### <a name="Ri-abi"></a> I.16: 컴파일러간 호환을 위한 바이너리 인터페이스(ABI: Application Binary Interface)을 원한다면 C 스타일을 사용하라.
+### <a name="Ri-abi"></a> I.16: 컴파일러간 호환을 위한 바이너리 인터페이스(ABI)을 원한다면 C 스타일을 사용하라.
 >### <a name="Ri-abi"></a> I.16: If you want a cross-compiler ABI, use a C-style subset
 
 ##### Reason
