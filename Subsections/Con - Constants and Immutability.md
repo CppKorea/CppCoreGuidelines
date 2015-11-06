@@ -34,7 +34,7 @@ Constant rule summary:
 
 ???
 
-### <a name="Rconst-fct"></a> Con.2: 기본적으로 맴버 함수를 `const`로 만들어라.
+### <a name="Rconst-fct"></a> Con.2: 기본적으로 멤버 함수를 `const`로 만들어라.
 >### <a name="Rconst-fct"></a> Con.2: By default, make member functions `const`
 
 ##### Reason
