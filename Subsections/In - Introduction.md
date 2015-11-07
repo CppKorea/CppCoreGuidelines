@@ -1,4 +1,4 @@
-# In: Introduction
+# <a name="S-introduction"></a> In: Introduction
 
 This is a set of core guidelines for modern C++, C++14, and taking likely future enhancements and taking ISO Technical Specifications (TSs) into account.
 The aim is to help C++ programmers to write simpler, more efficient, more maintainable code.
@@ -12,54 +12,42 @@ Introduction summary:
 * [In.struct: The structure of this document](#SS-struct)
 * [In.sec: Major sections](#SS-sec)
 
-
-<a name ="SS-readers"></a>
-## In.target: Target readership
+## <a name="SS-readers"></a> In.target: Target readership
 
 All C++ programmers. This includes [programmers who might consider C](#S-cpl).
 
-
-<a name ="SS-aims"></a>
-## In.aims: Aims
+## <a name="SS-aims"></a> In.aims: Aims
 
 The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
 
-We do not suffer the delusion that every one of these rules can be effectively applied to every code base.
-Upgrading old systems is hard.
-However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not.
-Often, rules also lead to faster/easier initial development.
-As far as we can tell, these rules lead to code that performs as well or better that older, more conventional techniques;
-they are meant to follow the zero-overhead principle
-("what you don't use, you don't pay for" or "When you use an abstraction mechanism appropriately,
-you get at least as good performance as if you had handcoded using lower-level language constructs").
+We do not suffer the delusion that every one of these rules can be effectively applied to every code base. Upgrading old systems is hard. However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not. Often, rules also lead to faster/easier initial development.
+As far as we can tell, these rules lead to code that performs as well or better than older, more conventional techniques; they are meant to follow the zero-overhead principle ("what you don't use, you don't pay for" or "when you use an abstraction mechanism appropriately, you get at least as good performance as if you had handcoded using lower-level language constructs").
 Consider these rules ideals for new code, opportunities to exploit when working on older code, and try to approximate these ideas as closely as feasible.
 Remember:
 
-<a name="R0"></a>
-### In.0: Don't panic!
+### <a name="R0"></a> In.0: Don't panic!
 
 Take the time to understand the implications of a guideline rule on your program.
 
-These guidelines are designed according to the "subset of a superset" principle ([Stroustrup,2005](#BS2005)).
+These guidelines are designed according to the "subset of a superset" principle ([Stroustrup05](#Stroustrup05)).
 They do not simply define a subset of C++ to be used (for reliability, safety, performance, or whatever).
-Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-support))
+Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-gsl))
 that make the use of the most error-prone features of C++ redundant, so that they can be banned (in our set of rules).
 
 The rules emphasize static type safety and resource safety.
 For that reason, they emphasize possibilities for range checking, for avoiding dereferencing `nullptr`, for avoiding dangling pointers, and the systematic use of exceptions (via RAII).
-Partly to achieve that and partly to minimize obscure code as a source of errors,
-the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
+Partly to achieve that and partly to minimize obscure code as a source of errors, the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
 
 Many of the rules are prescriptive.
-We are uncomfortable with rules that simply states "don't do that!" without offering an alternative.
+We are uncomfortable with rules that simply state "don't do that!" without offering an alternative.
 One consequence of that is that some rules can be supported only by heuristics, rather than precise and mechanically verifiable checks.
 Other rules articulate general principles. For these more general rules, more detailed and specific rules provide partial checking.
 
 These guidelines address a core of C++ and its use.
 We expect that most large organizations, specific application areas, and even large projects will need further rules, possibly further restrictions, and further library support.
-For example, hard-real time programmers typically can't use free store (dynamic memory) freely and will be restricted in their choice of libraries.
+For example, hard real-time programmers typically can't use free store (dynamic memory) freely and will be restricted in their choice of libraries.
 We encourage the development of such more specific rules as addenda to these core guidelines.
-Build your ideal small foundation library and use that, rather than lowering you level of programming to glorified assembly code.
+Build your ideal small foundation library and use that, rather than lowering your level of programming to glorified assembly code.
 
 The rules are designed to allow [gradual adoption](#S-modernizing).
 
@@ -67,14 +55,13 @@ Some rules aim to increase various forms of safety while others aim to reduce th
 The guidelines aimed at preventing accidents often ban perfectly legal C++.
 However, when there are two ways of expressing an idea and one has shown itself a common source of errors and the other has not, we try to guide programmers towards the latter.
 
-<a name="SS-non"></a>
-## In.not: Non-aims
+## <a name="SS-non"></a> In.not: Non-aims
 
 The rules are not intended to be minimal or orthogonal.
-In particular, general rules can be simple, but unenforcable.
+In particular, general rules can be simple, but unenforceable.
 Also, it is often hard to understand the implications of a general rule.
 More specialized rules are often easier to understand and to enforce, but without general rules, they would just be a long list of special cases.
-We provide rules aimed as helping novices as well as rules supporting expert use.
+We provide rules aimed at helping novices as well as rules supporting expert use.
 Some rules can be completely enforced, but others are based on heuristics.
 
 These rules are not meant to be read serially, like a book.
@@ -103,9 +90,7 @@ The rules are not value-neutral.
 They are meant to make code simpler and more correct/safer than most existing C++ code, without loss of performance.
 They are meant to inhibit perfectly valid C++ code that correlates with errors, spurious complexity, and poor performance.
 
-
-<a name="SS-force"></a>
-## In.force: Enforcement
+## <a name="SS-force"></a> In.force: Enforcement
 
 Rules with no enforcement are unmanageable for large code bases.
 Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
@@ -114,7 +99,7 @@ But different people have different needs.
 But people don't like to read lots of rules.
 But people can't remember many rules.
 So, we need subsetting to meet a variety of needs.
-But arbitrary subsetting leads to chaos: We want guidelines that help a lot of people, make code more uniform, and strongly encourages people to modernize their code.
+But arbitrary subsetting leads to chaos: We want guidelines that help a lot of people, make code more uniform, and strongly encourage people to modernize their code.
 We want to encourage best practices, rather than leave all to individual choices and management pressures.
 The ideal is to use all rules; that gives the greatest benefits.
 
@@ -135,16 +120,14 @@ For a start, we have a few profiles corresponding to common needs (desires, idea
 The profiles are intended to be used by tools, but also serve as an aid to the human reader.
 We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
 
-
-<a name ="SS-struct"></a>
-## In.struct: The structure of this document
+## <a name="SS-struct"></a> In.struct: The structure of this document
 
 Each rule (guideline, suggestion) can have several parts:
 
 * The rule itself - e.g., **no naked `new`**
 * A rule reference number - e.g., **C.7** (the 7th rule related to classes).
-Since the major sections are not inherently ordered, we use a letter as the first part of a rule reference "number".
-We leave gaps in the numbering to minimize "disruption" when we add or remove rules.
+  Since the major sections are not inherently ordered, we use a letter as the first part of a rule reference "number".
+  We leave gaps in the numbering to minimize "disruption" when we add or remove rules.
 * **Reason**s (rationales) - because programmers find it hard to follow rules they don't understand
 * **Example**s - because rules are hard to understand in the abstract; can be positive or negative
 * **Alternative**s - for "don't do this" rules
@@ -160,16 +143,14 @@ Also, we assume that the rules will be refined over time to make them more preci
 
 A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
 Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
-If you don't understand a rule or disagree with it, please visit it's **Discussion**.
+If you don't understand a rule or disagree with it, please visit its **Discussion**.
 If you feel that a discussion is missing or incomplete, send us an email.
 
 This is not a language manual.
 It is meant to be helpful, rather than complete, fully accurate on technical details, or a guide to existing code.
 Recommended information sources can be found in [the references](#S-references).
 
-
-<a name ="SS-sec"></a>
-## In.sec: Major sections
+## <a name="SS-sec"></a> In.sec: Major sections
 
 * [P: Philosophy](#S-philosophy)
 * [I: Interfaces](#S-interfaces)
@@ -181,11 +162,12 @@ Recommended information sources can be found in [the references](#S-references).
 * [R: Resource management](#S-resource)
 * [T: Templates and generic programming](#S-templates)
 * [CP: Concurrency](#S-concurrency)
-* [STL: The Standard library](#S-stdlib)
+* [SL: The Standard library](#S-stdlib)
 * [SF: Source files](#S-source)
 * [CPL: C-style programming](#S-cpl)
 * [PRO: Profiles](#S-profile)
-* [GSL: Guideline support library](#S-support)
+* [GSL: Guideline support library](#S-gsl)
+* [FAQ: Answers to frequently asked questions](#S-faq)
 
 Supporting sections:
 
@@ -196,9 +178,10 @@ Supporting sections:
 * [Appendix A: Libraries](#S-libraries)
 * [Appendix B: Modernizing code](#S-modernizing)
 * [Appendix C: Discussion](#S-discussion)
+* [Glossary](#S-glossary)
 * [To-do: Unclassified proto-rules](#S-unclassified)
 
 These sections are not orthogonal.
 
-Each section (e.g., "P" for "Philosophy") and each subsection (e.g., "C.hier" for "Class Hierachies (OOP)") have an abbreviation for ease of searching and reference.
+Each section (e.g., "P" for "Philosophy") and each subsection (e.g., "C.hier" for "Class Hierarchies (OOP)") have an abbreviation for ease of searching and reference.
 The main section abbreviations are also used in rule numbers (e.g., "C.11" for "Make concrete types regular").
