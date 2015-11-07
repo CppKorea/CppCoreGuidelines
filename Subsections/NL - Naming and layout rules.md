@@ -1,6 +1,6 @@
 <a name="S-naming"></a>
 # NL: 이름짓기와 코드 배치 규칙
-> NL: Naming and layout rules
+> # NL: Naming and layout rules
 
 만약 다른 이유가 없다면 일관된 이름짓기와 배치는 도움이 된다. 이는 "내 스타일이 당신의 것보다 더 좋다"라는 논의를 최소화할 수 있기 때문이다.
 그러나 여기저기 매우 다양한 스타일들이 있어 사람들은 그것들에 대해 (찬반으로) 열렬하다.
@@ -40,41 +40,43 @@ IDEs also tend to have defaults and a range of alternatives. These rules are sug
 > More specific and detailed rules are easier to enforce.
 
 <a name="Rl-comments"></a>
-### NL.1: 코드에서 말할 수 있는 내용을 주석문에 넣지 마라.
+### NL.1: 코드에서 명확하게 나타낼 수 있는 내용을 주석문에 넣지 말자
 > ### NL.1: Don't say in comments what can be clearly stated in code
 
-#####근거
-> #####Reason
+**근거**
+> **Reason**
 
 컴파일러는 주석문을 읽지 않는다.
 주석문은 코드보다 덜 정확하다.
 주석문은 코드와 같이 일관되게 업데이트되지 않는다.
+
 > Compilers do not read comments.
 Comments are less precise than code.
 Comments are not updated as consistently as code.
 
-##### 잘못된 예
-> ##### Example, bad
+**잘못된 예**
+> **Example, bad**
 
-    auto x = m*v1 + vv;	// multiply m with v1 and add the result to vv
+    auto x = m*v1 + vv;	// m을 v1과 곱하고 결과를 vv에 더함 // multiply m with v1 and add the result to vv
 
-##### 시행하기
-> ##### Enforcement
+**시행하기**
+> **Enforcement**
 
-구어체 문장을 번역하는 인공지능 프로그램을 만들고 C++로 잘 표현할 수 있는지 살펴봐라.
+구어체 문장을 번역하는 인공지능 프로그램을 만들고 C++로 잘 표현할 수 있는지 살펴보자.
 > Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
 
 <a name="Rl-comments-intent"></a>
-### NL.2: 주석문에 목적을 나타내라
+### NL.2: 주석문에 의도를 나타내자
 > ### NL.2: State intent in comments
 
-##### 근거
-코드는 무엇을 할지가 아니라 무엇을 했는지를 말한다. 주석은 구현된 내용보다 목적이나 의도를 간결하고 명쾌하게 기술할 수 있다.
->
-##### Reason
-Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
+**근거**
+> **Reason**
 
-##### Example
+코드는 무엇을 할지가 아니라 무엇을 했는지를 말한다. 자주 주석은 구현된 내용보다 더 명확하고 간결하게 의도를 나타낼 수 있다.
+> Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
+
+**예제**
+> **Example**
 
     void stable_sort(Sortable& c)
         // sort c in the order determined by <, keep equal elements (as defined by ==) in their original relative order
@@ -82,75 +84,87 @@ Code says what is done, not what is supposed to be done. Often intent can be sta
         // ... quite a few lines of non-trivial code ...
     }
 
-##### Note
+**참고 사항**
+> **Note**
 
-주석과 코드가 다르다면 둘다 틀렸을거다.
->If the comment and the code disagrees, both are likely to be wrong.
+주석과 코드가 맞지 않다면, 둘 다 잘못될 가능성이 있다.
+> If the comment and the code disagrees, both are likely to be wrong.
 
-### <a name="Rl-comments-crisp"></a> NL.3: 주석을 간략하게 유지하라.
->### <a name="Rl-comments-crisp"></a> NL.3: Keep comments crisp
+<a name="Rl-comments-crisp"></a>
+### NL.3: 주석을 간략하게 유지하자
+> ### NL.3: Keep comments crisp
 
-##### Reason
 
-말이 많으면 이해도가 떨어지고 소스파일에 퍼져 보여서 코드를 읽기 어렵게 만든다.
->Verbosity slows down understanding and makes the code harder to read by spreading it around in the source file.
+##### 근거
+> ##### Reason
+
+장황함은 이해를 느리게 하고 그것(주석)이 소스 파일 안에 퍼져있어 코드를 더 읽기 어렵게 만든다.
+> Verbosity slows down understanding and makes the code harder to read by spreading it around in the source file.
 
 ##### Enforcement
 
 불가능하다.
->not possible.
+> not possible.
 
-### <a name="Rl-indent"></a> NL.4: 일관적인 들여쓰기 스타일을 유지하라.
->### <a name="Rl-indent"></a> NL.4: Maintain a consistent indentation style
+<a name="Rl-indent"></a>
+### NL.4: 일관적인 들여쓰기 스타일을 유지하자
+> ### NL.4: Maintain a consistent indentation style
 
-##### Reason
+**근거**
+> **Reason**
 
-가독성 향상. 멍청한 실수를 피하기 위해.
->Readability. Avoidance of "silly mistakes."
+가독성(향상). "어리석은 실수들"의 방지.
+> Readability. Avoidance of "silly mistakes."
 
-##### Example, bad
+**잘못된 예**
+> **Example, bad**
 
     int i;
-    for (i = 0; i < max; ++i); // bug waiting to happen
+    for (i = 0; i < max; ++i); // 버그 발생이 기다립니다! // bug waiting to happen
     if (i == j)
         return i;
 
-##### Enforcement
+**시행하기**
+> **Enforcement**
 
-툴을 사용하라.
->Use a tool.
+도구를 사용하자.
+> Use a tool.
 
-### <a name="Rl-name-type"></a> NL.5 이름 안에 타입 정보를 포함하지 마라.
->### <a name="Rl-name-type"></a> NL.5 Don't encode type information in names
+<a name="Rl-name-type"></a>
+### NL.5 이름 안에 타입 정보를 포함하지 말자
+> ### NL.5 Don't encode type information in names
 
-**Rationale**: 이름을 기능보다는 타입을 반영한다면 기능을 다른 종류의 타입으로 변경시키기가 힘들 것이다.
-타입을 포함한 이름은 부차적이거나 약간 이해 못할 수도 있다.
-헝가리안 표기법은 최악이다.(적어도 정적 타입 언어에 있어서는)
->**Rationale**: If names reflects type rather than functionality, it becomes hard to change the types used to provide that functionality.
+**이론적 근거**: 이름이 기능성보다는 타입을 반영한다면, 이는 기능성을 제공하기 위해 사용된 타입을 바꾸기 어렵게 할 것이다.
+타입을 포함한 이름은 장황하거나 아리송할 수 있다.
+헝가리안 표기법은 최악이다. (적어도 강한 정적 타입 언어에 있어)
+
+> **Rationale**: If names reflects type rather than functionality, it becomes hard to change the types used to provide that functionality.
 Names with types encoded are either verbose or cryptic.
 Hungarian notation is evil (at least in a strongly statically-typed language).
 
-##### Example
+**Example**
 
     ???
 
-##### Note
+**참고 사항**
+> **Note**
 
-어떤 스타일은 지역변수와 맴버변수를 구분하거나 전역변수를 구분하려고 한다.
->Some styles distinguishes members from local variable, and/or from global variable.
+어떤 스타일은 지역변수와 맴버변수를 구분하거나, 전역변수를 구분하려고 한다.
+> Some styles distinguishes members from local variable, and/or from global variable.
 
     struct S {
         int m_;
         S(int m) :m_{abs(m)} { }
     };
 
-이건 그렇게 나쁘지는 않다.
->This is not evil.
+이것은 나쁘지는 않다.
+> This is not evil.
 
-##### Note
+**참고 사항**
+> **Note**
 
-또 어떤 스타일은 타입과 비타입을 구분하려고 한다.
->Some styles distinguishes types from non-types.
+어떤 스타일은 타입과 타입이 아닌 것을 구분하려고 한다.
+> Some styles distinguishes types from non-types.
 
     typename<typename T>
     class Hash_tbl {	// maps string to T
@@ -159,82 +173,92 @@ Hungarian notation is evil (at least in a strongly statically-typed language).
 
     Hash_tbl<int> index;
 
-이것도 그렇게 나쁘지는 않다.
->This is not evil.
+이것은 나쁘지는 않다.
+> This is not evil.
 
-### <a name="Rl-name-length"></a> NL.7: 변수범위의 크기에 비례해서 이름의 길이를 맞춰라.
->### <a name="Rl-name-length"></a> NL.7: Make the length of a name roughly proportional to the length of its scope
+<a name="Rl-name-length"></a>
+### NL.7: 이름의 길이를 그것의 범위의 길이에 대략 비슷하게 만들자
+> NL.7: Make the length of a name roughly proportional to the length of its scope
 
-**Rationale**: ???
+**이론적 근거**: ???
+> **Rationale**: ???
 
-##### Example
+**예**
+> **Example**
 
     ???
 
-##### Enforcement
+**시행하기**
+> **Enforcement**
 
 ???
 
-### <a name="Rl-name"></a> NL.8: 일관적인 이름짓기 스타일을 사용하라.
->### <a name="Rl-name"></a> NL.8: Use a consistent naming style
+<a name="Rl-name"></a>
+### NL.8: 일관적인 이름짓기 스타일을 사용하자
+> ###  NL.8: Use a consistent naming style
 
-**Rationale**:  일관성 있게 이름을 정하면 가독성을 높여준다.
->**Rationale**: Consistence in naming and naming style increases readability.
+**이론적 근거**: 일관적인 이름짓기와 이름짓기 스타일은 가독성을 높여준다.
+> **Rationale**: Consistence in naming and naming style increases readability.
 
-##### Note
+**참고 사항**
+**Note**
 
-많은 스타일이 공존하고 복수개의 라이브러리를 사용할 때 모든 네이밍 방식을 따를 수는 없다.
-다양한 라이브러리가 가진 고유 스타일을 버리고 자기 스타일을 선택하라.
->Where are many styles and when you use multiple libraries, you can't follow all their differences conventions.
+많은 스타일이 공존하고 여러 개의 라이브러리를 사용할 때, 서로 다른 규칙을 모두 따를 수는 없다.
+"house style"을 선택하되, "가져온" 라이브러리는 원래의 스타일을 남겨둔다.
+> Where are many styles and when you use multiple libraries, you can't follow all their differences conventions.
 Choose a "house style", but leave "imported" libraries with their original style.
 
-##### Example
+**예**
+> **Example**
 
-ISO 표준은 소문자, 숫자, `_`로 구분된 단어만 사용한다.
->ISO Standard, use lower case only and digits, separate words with underscores:
+ISO 표준, 소문자, 숫자를 사용하고, 단어들을 `_`로 구분:
+> ISO Standard, use lower case only and digits, separate words with underscores:
 
 * `int`
 * `vector`
 * `my_map`
 
-두개 짜리 `__`를 사용하지 마라.
->Avoid double underscores `__`.
+두 개 짜리 밑줄 `__`를 사용하지 마라(금기).
+> Avoid double underscores `__`.
 
-##### Example
+**Example**
 
 [Stroustrup](http://www.stroustrup.com/Programming/PPP-style.pdf):
-대문자로 된 사용자 정의 타입과 컨셉을 지원하는 ISO 표준
->ISO Standard, but with upper case used for your own types and concepts:
+ISO 표준, 그러나 대문자는 사용자만의 타입과 개념에서 사용:
+> ISO Standard, but with upper case used for your own types and concepts:
 
 * `int`
 * `vector`
 * `My_map`
 
-##### Example
+**예**
+> **Example**
 
-낙타표기법(CamelCase): 여러 단어로 구성된 식별자에서 단어의 첫글자를 대문자로 한다.
->CamelCase: capitalize each word in a multi-word identifier:
+낙타표기법(CamelCase): 여러 단어로된 식별자에서 단어의 첫 글자를 대문자로 한다.
+> CamelCase: capitalize each word in a multi-word identifier:
 
 * `int`
 * `vector`
 * `MyMap`
 * `myMap`
 
-맨 첫글자를 소문자로 하는 경우도 있다.
->Some conventions capitalize the first letter, some don't.
+어떤 규칙은 첫 글자를 소문자로 하고, 어떤 것은 하지 않는다.
+> Some conventions capitalize the first letter, some don't.
 
-##### Note
+**참고사항**
+**Note**
 
-약어나 식별자 길이도 일관성을 유지하도록 하라.
->Try to be consistent in your use of acronyms, lengths of identifiers:
+사용자의 약어 사용과 식별자의 길이를 일관되게 시도:
+> Try to be consistent in your use of acronyms, lengths of identifiers:
 
     int mtbf {12};
-    int mean_time_between_failor {12};		// make up your mind
+    int mean_time_between_failor {12};		// 마음데로 만들어라 // make up your mind
 
-##### Enforcement
+**시행 하기**
+> **Enforcement**
 
-스타일이 다른 라이브러리를 사용할 때를 뻬고는 시행이 가능할 것이다.
->Would be possible except for the use of libraries with varying conventions.
+다양한 규칙을 사용한 라이브러리를 사용할 때를 뻬고는 가능할 것이다.
+> Would be possible except for the use of libraries with varying conventions.
 
 ### <a name="Rl-all-caps"></a> NL 9: 매크로 명칭에만 전체 대문자를 사용하라.
 >### <a name="Rl-all-caps"></a> NL 9: Use `ALL_CAPS` for macro names only
