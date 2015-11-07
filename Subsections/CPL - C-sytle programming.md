@@ -69,7 +69,7 @@ It provides better support for high-level programming and often generates faster
 
 
 <a name="Rcpl-interface"></a>
-### CPL.3: 
+### CPL.3: 만약 인터페이스를 위해 C를 써야한다면, 인터페이스를 쓴 코드 안에 C++를 사용하자
 > ### CPL.3: If you must use C for interfaces, use C++ in the calling code using such interfaces
 
 **근거**: C++는 C보다 더 표현력이 있으며 프로그래밍에서 더 나은 형(types)들을 제공한다.
