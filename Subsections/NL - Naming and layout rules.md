@@ -1,19 +1,20 @@
-# <a name="S-naming"></a> NL: 이름짓기와 코드 배치 규칙
-># <a name="S-naming"></a> NL: Naming and layout rules
+<a name="S-naming"></a>
+# NL: 이름짓기와 코드 배치 규칙
+> NL: Naming and layout rules
 
 만약 다른 이유가 없다면 일관된 이름짓기와 배치는 도움이 된다. 이는 "내 스타일이 당신의 것보다 더 좋다"라는 논의를 최소화할 수 있기 때문이다.
 그러나 여기저기 매우 다양한 스타일들이 있어 사람들은 그것들에 대해 (찬반으로) 열렬하다.
 게다가 대부분의 실제 프로젝트들은 많은 원점(sources)으로부터 코드를 포함하여, 모든 코드를 단일 스타일로 표준화하는 것은 흔히 불가능하다.
 여기서 더 좋은 아이디어가 없다면 사용할 일련의 규칙들 소개하며, 진짜 목표는 특정 규칙 집합이 아닌 일관성이다.
 IDE들과 툴들이 도와줄 수 있다. (게다가 방해도 할 것이다.)
->Consistent naming and layout are helpful. If for no other reason because it minimizes "my style is better than your style" arguments.
+> Consistent naming and layout are helpful. If for no other reason because it minimizes "my style is better than your style" arguments.
 However, there are many, many, different styles around and people are passionate about them (pro and con).
 Also, most real-world projects includes code from many sources, so standardizing on a single style for all code is often impossible.
 We present a set of rules that you might use if you have no better ideas, but the real aim is consistency, rather than any particular rule set.
 IDEs and tools can help (as well as hinder).
 
 이름짓기와 배치 규칙:
->Naming and layout rules:
+> Naming and layout rules:
 
 * [NL 1: Don't say in comments what can be clearly stated in code](#Rl-comments)
 * [NL.2: State intent in comments](#Rl-comments-intent)
@@ -32,38 +33,46 @@ IDEs and tools can help (as well as hinder).
 
 대부분의 규칙들은 미학적이고 개발자들은 강한 의견을 유지한다.
 IDE 역시 기본값 외에 다양한 대안을 가지고 있는 경향이다. 이 규칙들은 이유가 되지 않는다면 기본으로 따르도록 제안된다.
->Most of these rules are aesthetic and programmers hold strong opinions.
+> Most of these rules are aesthetic and programmers hold strong opinions.
 IDEs also tend to have defaults and a range of alternatives. These rules are suggested defaults to follow unless you have reasons not to.
 
 더 구체적이고 세부적인 규칙들이 시행하기 쉬울 것이다.
->More specific and detailed rules are easier to enforce.
+> More specific and detailed rules are easier to enforce.
 
-### <a name="Rl-comments"></a> NL.1: 코드에서 말할 수 있는 내용을 주석문에 넣지 마라.
->### <a name="Rl-comments"></a> NL.1: Don't say in comments what can be clearly stated in code
+<a name="Rl-comments"></a>
+### NL.1: 코드에서 말할 수 있는 내용을 주석문에 넣지 마라.
+> ### NL.1: Don't say in comments what can be clearly stated in code
 
-##### Reason
+#####근거
+> #####Reason
 
-컴파일러는 주석문을 읽지 않는다. 주석문은 코드보다 정확하지 않다. 주석문은 코드보다 일관성있게 업데이트되지 않는다.
->Compilers do not read comments.
+컴파일러는 주석문을 읽지 않는다.
+주석문은 코드보다 덜 정확하다.
+주석문은 코드와 같이 일관되게 업데이트되지 않는다.
+> Compilers do not read comments.
 Comments are less precise than code.
 Comments are not updated as consistently as code.
 
-##### Example, bad
+##### 잘못된 예
+> ##### Example, bad
 
     auto x = m*v1 + vv;	// multiply m with v1 and add the result to vv
 
-##### Enforcement
+##### 시행하기
+> ##### Enforcement
 
-구어체 문장을 번역하는 인공지능 프로그램을 만들어라. 그리고는 C++로 잘 표현할 수 있는지 살펴봐라.
->Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
+구어체 문장을 번역하는 인공지능 프로그램을 만들고 C++로 잘 표현할 수 있는지 살펴봐라.
+> Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
 
-### <a name="Rl-comments-intent"></a> NL.2: 주석문에 목적을 기술하라.
->### <a name="Rl-comments-intent"></a> NL.2: State intent in comments
+<a name="Rl-comments-intent"></a>
+### NL.2: 주석문에 목적을 나타내라
+> ### NL.2: State intent in comments
 
-##### Reason
-
+##### 근거
 코드는 무엇을 할지가 아니라 무엇을 했는지를 말한다. 주석은 구현된 내용보다 목적이나 의도를 간결하고 명쾌하게 기술할 수 있다.
->Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
+>
+##### Reason
+Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
 
 ##### Example
 
