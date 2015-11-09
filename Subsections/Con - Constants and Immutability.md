@@ -10,11 +10,11 @@ Interfaces that promises "no change" of objects passed as arguments greatly incr
 상수 규칙 요약:
 Constant rule summary:
 
-* [Con.1: By default, make objects immutable](#Rconst-immutable)
-* [Con.2: By default, make member functions `const`](#Rconst-fct)
-* [Con.3: By default, pass pointers and references to `const`s](#Rconst-ref)
-* [Con.4: Use `const` to define objects with values that do not change after construction](#Rconst-const)
-* [Con.5: Use `constexpr` for values that can be computed at compile time](#Rconst-constexpr)
+* [Con.1: 기본적으로 값이 안 바뀌는 객체를 만들어라.](#Rconst-immutable)
+* [Con.2: 기본적으로 멤버 함수를 `const`로 만들어라.](#Rconst-fct)
+* [Con.3: 기본적으로 포인터, 참조자를 `const`인자로 넘겨라.](#Rconst-ref)
+* [Con.4: 생성 후에 값이 안 바뀐다면 `const` 객체를 사용하라.](#Rconst-const)
+* [Con.5: 컴파일 시에 계산할 수 있는 값이라면 `constexpr`를 사용하라.](#Rconst-constexpr)
 
 ### <a name="Rconst-immutable"></a> Con.1: 기본적으로 값이 안 바뀌는 객체를 만들어라.
 >### <a name="Rconst-immutable"></a> Con.1: By default, make objects immutable
