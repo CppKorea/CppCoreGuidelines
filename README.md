@@ -15,21 +15,14 @@
 - Chris Ohk (utilForever)
 - Seokjoon Yun (DevStarSJ)
 - Giyeon Bang (GiyeonBang-rhathd)
-- Dongwoo Lee	(aichaku)
-- Giyeon Bang (GiyeonBang-rhathd)
-- Yonghyun Kim (drvoss)
 - Byungwook Eric Ahn (bwahn)
 - Eundoo Song (sedman)
-- Inchul Kang (kangic)
 - Jongdeok Kim (jenix21)
 - Jihoon Song (jihoonsong)
 - Junsung Jang (naxxster)
 - Jonghee Yun (jongheeyun)
 - Changjun Lee (yiatom)
-- Minjang Kim (minjang)
-- Hyungtae Kim (cavecafe)
 - Sangbae Kang (typeon)
-- Junseong Kim (codertimo)
 
 ## 번역 진행 상황
 
