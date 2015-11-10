@@ -313,7 +313,8 @@ We know of only a few good reasons:
 * 진짜 실시간 시스템이 있어서, 요구된 시간 안에 예외를 처리할 수 있는 툴을 가지고 있지 않다.
 * 난해한 방식으로 포인터를 사용하는 몇 톤의 과거 코드를 가진 시스템 상에 있다.
 (특히 소유권 관련된 정책이 보이지 않을 때) 예외가 메모리 누수를 야기할 수 있다.
-* 매니저가 가진 오래된 지식에 도전하면 해고당한다.
+* 매니저가 가진 오래된 지식에 도전하면 해고당한다.  
+
 >* We are on a system so small that the exception support would eat up most of our 2K or memory.
 >* We are in a hard-real-time system and we don't have tools that allows us that an exception is handled within the required time.
 >* We are in a system with tons of legacy code using lots of pointers in difficult-to-understand ways
