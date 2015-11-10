@@ -18,8 +18,8 @@ General rules:
 Declaration rules:
 
 * [ES.5: 스코프를 작게 유지하자](#Res-scope)
-* [ES.6: for-구문 초기화나 조건 설정에 사용한 이름은 스코프 안으로 한정하자](#Res-cond)
-* [ES.7: 자주 쓰거나 지역변수는 이름을 짧게, 그렇지 않은 경우는 길게](#Res-name-length)
+* [ES.6: for-구문 초기화나 조건 설정에 사용하는 변수는 스코프 안으로 한정하자](#Res-cond)
+* [ES.7: 자주 쓰는 변수, 지역변수는 이름을 짧게, 그렇지 않은 경우는 길게](#Res-name-length)
 * [ES.8: 비슷해보이는 네이밍은 피하자](#Res-name-similar)
 * [ES.9: `ALL_CAPS` 네이밍은 피하자](#Res-!CAPS)
 * [ES.10: 한 선언당 (단) 하나의 이름만 선언하자 ](#Res-name-one)
@@ -124,8 +124,8 @@ Statement rules:
 Arithmetic rules:
 
 * [ES.100: 부호가 있는 연산과 없는 연산을 섞지 말자](#Res-mix)
-* [ES.101: 비트 조작을 할때는 unsigned호타입을 사용하자](#Res-unsigned)
-* [ES.102: 연산할때는 signed 타입을 사용하자](#Res-signed)
+* [ES.101: 비트 조작을 할때는 부호가 없는(unsigned) 타입을 사용하자](#Res-unsigned)
+* [ES.102: 연산할때는 부호가 있는(signed) 타입을 사용하자](#Res-signed)
 * [ES.103: 오버플로우 금지](#Res-overflow)
 * [ES.104: 언더플로우 금지](#Res-underflow)
 * [ES.105: 0으로 나누기 금지](#Res-zero)
@@ -137,15 +137,37 @@ Arithmetic rules:
 * [ES.104: Don't underflow](#Res-underflow)
 * [ES.105: Don't divide by zero](#Res-zero)
 
+
+### <a name="Res-lib"></a> ES.1: 다른 라이브러리나 "직접 짠 코드" 대신 표준 라이브러리를 쓰자
 ### <a name="Res-lib"></a> ES.1: Prefer the standard library to other libraries and to "handcrafted code"
 
+##### 이유
 ##### Reason
 
+라이브러리를 사용하는 코드는 언어의 기능을 직접적으로 사용하는 것보다 작성하기 쉽고, 더 짧게 작성할 수 있고, 고수준의 추상화가 된다. 그리고, 라이브러리의 코드는 대개는 이미 테스트되어 있다.
+ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 라이브러리다.
+그리고 모든 C++ 구현체에서 사용할 수 있다.
 Code using a library can be much easier to write than code working directly with language features, much shorter, tend to be of a higher level of abstraction, and the library code is presumably already tested.
 The ISO C++ standard library is among the most widely know and best tested libraries.
 It is available as part of all C++ Implementations.
 
+##### 예
 ##### Example
+
+    auto sum = accumulate(begin(a), end(a), 0.0);	// 괜찮음
+
+`accumulate`의 범위 버전이 더 낫다:
+
+    auto sum = accumulate(v, 0.0); // 더 좋음
+
+그런데 잘 알려진 알고리즘을 직접 만들지는 말자:
+
+    int max = v.size();		// 안좋다. 장황하고 목적이 불분명하다.
+    double sum = 0.0;
+    for (int i = 0; i < max; ++i)
+        sum = sum + v[i];
+
+**예외**: 표준라이브러리의 대다수가 동적 할당(자유 저장소)에 의존한다. 이런 부분은 알고리즘의 문제는 아닐지라도, 컨테이너 레벨에서 실시간 정확성이 요구되는 상황이나, 임베디드 어플리케이션에는 잘 맞지 않는다. 이런 경우에는, 비슷한 기능을 구현하여 사용하는 것을 고려해볼 수 있다. 예를 들면 표준 라이브러리 스타일로 구현된 메모리 풀 할당 컨테이너 같은 것들이다.
 
     auto sum = accumulate(begin(a), end(a), 0.0);	// good
 
@@ -162,17 +184,51 @@ but don't hand-code a well-known algorithm:
 
 **Exception**: Large parts of the standard library rely on dynamic allocation (free store). These parts, notably the containers but not the algorithms, are unsuitable for some hard-real time and embedded applications. In such cases, consider providing/using similar facilities, e.g.,  a standard-library-style container implemented using a pool allocator.
 
+##### 강제사항
 ##### Enforcement
 
 Not easy. ??? Look for messy loops, nested loops, long functions, absence of function calls, lack of use of non-built-in types. Cyclomatic complexity?
 
+
+
+### <a name="Res-abstr"></a> ES.2: 언어의 기능을 직접적으로 사용하기 보다는 적절한 추상화를 하자
 ### <a name="Res-abstr"></a> ES.2: Prefer suitable abstractions to direct use of language features
 
+##### 이유
 ##### Reason
 
+"적절한 추상화"(예를 들어 라이브러리나 클래스 같은 것)가 민짜 언어보다 어플리케이션의 컨셉에 더 가깝다. 적절한 추상화를 사용하면 코드를 짧고 간결하게 만들수 있으며, 테스트하기도 더 쉽다.
 A "suitable abstraction" (e.g., library or class) is closer to the application concepts than the bare language, leads to shorter and clearer code, and is likely to be better tested.
 
+##### 예
 ##### Example
+
+    vector<string> read1(istream& is)	// 좋다
+    {
+        vector<string> res;
+        for (string s; is >> s;)
+            res.push_back(s);
+        return res;
+    }
+
+아래와 같은 전통적인 코드, 시스템 레벨과 거의 동등한 로우레벨 코드는 길고, 지저분하고, 이해하기도 어렵고, 느리게 돌아간다.
+
+    char** read2(istream& is, int maxelem, int maxstring, int* nread)	// 나쁘다: 장황하고, 미완성된 코드다
+    {
+        auto res = new char*[maxelem];
+        int elemcount = 0;
+        while (is && elemcount < maxelem) {
+            auto s = new char[maxstring];
+            is.read(s, maxstring);
+            res[elemcount++] = s;
+        }
+        nread = elemcount;
+        return res;
+    }
+
+오버플로우나 에러 핸들링 코드가 일단 한 번 들어가게 되면, 코드는 확 지저분해진다. 그리고, 리턴하는 포인터와 배열로 구현되는 C스타일의 스트링을 `delete`를 꼭 해줘야하는 문제도 있다.
+
+
 
     vector<string> read1(istream& is)	// good
     {
@@ -199,23 +255,47 @@ The more traditional and lower-level near-equivalent is longer, messier, harder 
 
 Once the checking for overflow and error handling has been added that code gets quite messy, and there is the problem remembering to `delete` the returned pointer and the C-style strings that array contains.
 
+##### 강제사항
 ##### Enforcement
 
 Not easy. ??? Look for messy loops, nested loops, long functions, absence of function calls, lack of use of non-built-in types. Cyclomatic complexity?
 
+## ES.dcl: 선언
 ## ES.dcl: Declarations
 
+선언은 문(statement)이다. 선언은 한 스코프에 변수를 알려주고, 명명된 객체를 생성하게 된다.
 A declaration is a statement. a declaration introduces a name into a scope and may cause the construction of a named object.
 
+### <a name="Res-scope"></a> ES.5: 스코프를 작게 유지하자
 ### <a name="Res-scope"></a> ES.5: Keep scopes small
 
+##### 이유
 ##### Reason
 
+가독성이 좋아진다. 리소스 점유를 최소화할 수 있다. 값의 잘못된 사용을 피할 수 있다.
 Readability. Minimize resource retention. Avoid accidental misuse of value.
 
+**달리 말하자면**: 불필요하게 큰 스코프에 변수를 선언하지 말자
 **Alternative formulation**: Don't declare a name in an unnecessarily large scope.
 
+##### 예
 ##### Example
+
+    void use()
+    {
+        int i;									// 나쁘다: 루프 종료 후에도 i에 접근할 필요가 없다
+        for (i = 0; i < 20; ++i) { /* ... */ }
+        // 이 부분에서 i를 써서는 안된다
+        for (int i = 0; i < 20; ++i) { /* ... */ }  // 좋다: i가 for 루프의 지역변수로 선언되었다
+     
+        if (auto pc = dynamic_cast<Circle*>(ps)) {  // 좋다: pc가 if문의 지역변수로 선언되었다
+            // ... Circle과 관련된 코드 ...
+        }
+        else {
+            // ... 에러 핸들 코드 ...
+        }
+    }
+
 
     void use()
     {
@@ -232,7 +312,36 @@ Readability. Minimize resource retention. Avoid accidental misuse of value.
         }
     }
 
+##### 나쁜 예
 ##### Example, bad
+
+    void use(const string& name)
+    {
+        string fn = name+".txt";
+        ifstream is {fn};
+        Record r;
+        is >> r;
+        // ... 여기에는 fn과 is를 쓰면 안되는 200 줄짜리 코드가 들어간다 ...
+    }
+
+무엇보다 이 코드는 길다는 문제점이 있지만, `fn`의 값과 `is`가 갖고 있는 파일 핸들러 필요 이상으로 길게 값이 유지된다는 게 가장 큰 문제다. 이러면 함수의 뒷부분에서 `is`와 `fn`을 실수로 사용해버릴 수 있다. 이럴 때는, 분할해버리는 게 낫다.
+
+    void fill_record(Record& r, const string& name)
+    {
+        string fn = name+".txt";
+        ifstream is {fn};
+        Record r;
+        is >> r;
+    }
+
+    void use(const string& name)
+    {
+        Record r;
+        fill_record(r, name);
+        // ... 200 lines of code ...
+    }
+
+이 코드에서 `Record`는 사이즈가 크고, 이동 기능도 별로인 것 같다. 그래서, `Record`를 리턴하는 것보다는 아웃파라미터를 쓰는 게 더 나아보인다.
 
     void use(const string& name)
     {
@@ -264,18 +373,44 @@ In this case, it might be a good idea to factor out the read:
 
 I am assuming that `Record` is large and doesn't have a good move operation so that an out-parameter is preferable to returning a `Record`.
 
+##### 강조사항
 ##### Enforcement
+
+* 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않을 때를 주의하라
+* 파일 핸들이나 락과 같은 중요한 리소스를 사용하는 코드가 장황해질 때 주의하라
 
 * Flag loop variable declared outside a loop and not used after the loop
 * Flag when expensive resources, such as file handles and locks are not used for N-lines (for some suitable N)
 
+### <a name="Res-cond"></a> ES.6: for-구문 초기화나 조건 설정에 사용하는 변수는 스코프 안으로 한정하자
 ### <a name="Res-cond"></a> ES.6: Declare names in for-statement initializers and conditions to limit scope
 
+##### 이유
 ##### Reason
 
+가독성. 낮은 시스템 자원 점유.
 Readability. Minimize resource retention.
 
+##### 예
 ##### Example
+
+    void use()
+    {
+        for (string s; cin >> s;)
+            v.push_back(s);
+
+        for (int i = 0; i < 20; ++i) {	// 좋다. i가 for 루프의 지역 변수로 선언됐다.
+            // ...
+        }
+
+        if (auto pc = dynamic_cast<Circle*>(ps)) {	// 좋다. pc가 if문의 지역변수로 선언되었다.
+            // ... Circle을 다루는 코드 ...
+        }
+        else {
+            // ... 에러 핸들링 코드 ...
+        }
+    }
+
 
     void use()
     {
@@ -294,18 +429,50 @@ Readability. Minimize resource retention.
         }
     }
 
+##### 강조사항
 ##### Enforcement
+
+* 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않을 때를 주의하라
+* (중요) 루프 바깥에서 루프 변수를 선언하고, 루프가 끝난 뒤에 관계없는 목적으로 그 변수를 사용할 때를 주의하라
 
 * Flag loop variables declared before the loop and not used after the loop
 * (hard) Flag loop variables declared before the loop and used after the loop for an unrelated purpose.
 
+### <a name="Res-name-length"></a> ES.7: 자주 쓰는 변수, 지역변수는 이름을 짧게, 그렇지 않은 경우는 길게
 ### <a name="Res-name-length"></a> ES.7: Keep common and local names short, and keep uncommon and nonlocal names longer
 
+##### 이유
 ##### Reason
 
+가독성.  관계없는 전역변수들의 충돌 확률을 낮추기 위하여.
 Readability. Lowering the chance of clashes between unrelated non-local names.
 
+##### 예
 ##### Example
+
+관습적으로 쓰이는 짧은 지역변수명은 가독성을 향상시킨다.
+
+    template<typename T>							// 좋다
+    void print(ostream& os, const vector<T>& v)
+    {
+        for (int i = 0; i < v.end(); ++i)
+            os << v[i] << '\n';
+    }
+
+인덱스는 관습적으로 `i`라고 쓰고, 이 일반 함수에는 벡터의 의미를 알만한 힌트가 없으므로, `v`가 어떤 경우에든지 맞는 이름이다. 아래와 비교를 해보자.
+
+    template<typename Element_type>					// 별로다. 장황하고 가독성이 떨어진다
+    void print(ostream& target_stream, const vector<Element_type>& current_vector)
+    {
+        for (int current_element_index = 0;
+                current_element_index < current_vector.end();
+                ++current_element_index
+        )
+        target_stream << current_vector[i] << '\n';
+    }
+
+과장해서 표현하긴 했지만, 이것보다 더 심한 것도 본적이 있다.
+
 
 Conventional short, local names increase readability:
 
@@ -330,7 +497,28 @@ An index is conventionally called `i` and there is no hint about the meaning of 
 
 Yes, it is a caricature, but we have seen worse.
 
+##### 예
 ##### Example
+
+관습에 따르지 않는 짧은 比지역 변수는 코드를 모호하게 만든다.
+
+    void use1(const string& s)
+    {
+        // ...
+        tt(s);		// 안좋다. tt()란 무엇일까?
+        // ...
+    }
+
+전역 엔티티에 가독성있는 이름을 부여하면 좀 나아진다.
+
+    void use1(const string& s)
+    {
+        // ...
+        trim_tail(s);		// 이게 더 낫다
+        // ...
+    }
+
+이렇게 하면, 코드를 읽는 사람이 `trim_tail`의 의미를 알 수 있게 되고, 기억할 수 있게 된다.
 
 Unconventional and short non-local names obscure code:
 
@@ -352,7 +540,19 @@ Better, give non-local entities readable names:
 
 Here, there is a chance that the reader knows what `trim_tail` means and that the reader can remember it after looking it up.
 
+#### 나쁜 예
 ##### Example, bad
+
+큰 사이즈의 함수의 인자는 사실상 比지역변수라고 볼 수 있다. 그래서 의미를 갖춰야 한다.
+
+    void complicated_algorithm(vector<Record>&vr, const vector<int>& vi, map<string, int>& out)
+    // vr(사용된 레코드를 마킹한다)에서 이벤트를 읽어와서 vi의 인덱스로 넘기고 out으로 빼낸다
+    {
+        // ... vr, vi, out을 사용하는 500줄 코드 ...
+    }
+
+함수는 짧게 유지하는 것을 권장하지만, 이 룰을 모두 적용시키긴 힘들 때가 있다. 그럴 경우엔 변수명을 적절히 줘야 한다.
+
 
 Argument names of large functions are de facto non-local and should be meaningful:
 
@@ -364,8 +564,10 @@ Argument names of large functions are de facto non-local and should be meaningfu
 
 We recommend keeping functions short, but that rule isn't universally adhered to and naming should reflect that.
 
+##### 강조사항
 ##### Enforcement
 
+지역 변수와 전역변수의 길이를 체크하자. 함수도 이런 점을 고려하자.
 Check length of local and non-local names. Also take function length into account.
 
 ### <a name="Res-name-similar"></a> ES.8: Avoid similar-looking names
