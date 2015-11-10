@@ -45,7 +45,7 @@
 - P - Philosophy (20%)
 - PER - Performance (100%)
 - PRO - Profiles (0%)
-- R - Resource management (0%)
+- R - Resource management (100%)
 - RF - References (0%)
 - SF - Source files (100%)
 - STL - The Standard Library (0%)
