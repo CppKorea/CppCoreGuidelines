@@ -2,7 +2,7 @@
 > # R: Resource management
 
 이 장은 자원과 관련된 규칙을 포함하고 있다. 자원은 메모리나 파일 핸들, 소켓, 락과 같은 것을 말하며 반드시 획득되야 하고
-명시적 또는 암묵적으로 해체되어야 한다. 해체되어야 하는 일반적인 이유는 한정 잉여 자원으로 인해 생기는 자원 부족인데 지연 > 해체조차도 이런 문제를 야기할 수 있다.
+명시적 또는 암묵적으로 해체되어야 한다. 해체되어야 하는 일반적인 이유는 한정 잉여 자원으로 인해 생기는 자원 부족인데 지연 해체조차도 이런 문제를 야기할 수 있다.
 어떤 자원도 새지 않으며 필요한 기간 보다 길게 자원을 소유하고 있지 않는 것이 근본적으로 자원을 관리하는 목표다.
 자원을 해체하는 책임을 가지는 주체를 우리는 오너(owner)라고 한다. 
 
@@ -19,7 +19,7 @@ if you are writing a program that simply produces an output based on an input an
 the optimal strategy (for performance and ease of programming) is sometimes simply never to delete anything.
 If you have enough memory to handle your largest input, leak away, but be sure to give a good error message if you are wrong.
 Here, we ignore such cases.
-
+을
 자원 관리 규칙 요약
 >Resource management rule summary:
 
