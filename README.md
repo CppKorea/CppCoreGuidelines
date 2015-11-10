@@ -36,34 +36,34 @@
 
 ## 번역 진행 상황
 
-- <B>Abstract (100%)</B>
+- Abstract (100%)
 - C++ Core Guildlines (0%)
 - A - Architectural Ideas (0%)
 - C - Classes and Class Hierarchies (0%)
-- Con - Constants and Immutability (0%)
+- Con - Constants and Immutability (100%)
 - CP - Concurrency and Parallelism (0%)
 - CPL - C-Style programming (100%)
 - E - Error Handling (100%)
 - Enum - Enumerations (100%)
 - ES - Expressions and Statements (70%)
-- F - Functions (1%)
+- F - Functions (10%)
 - GSL - Guideline support library (0%)
-- I - Interfaces (60%)
+- I - Interfaces (100%)
 - In - Introduction (0%)
-- N - Non-Rules and myths (0%)
+- N - Non-Rules and myths (100%)
 - NL - Naming and layout rules (100%)
-- P - Philosophy (0%)
-- PER - Performance (50%)
+- P - Philosophy (20%)
+- PER - Performance (100%)
 - PRO - Profiles (0%)
 - R - Resource management (0%)
 - RF - References (0%)
-- SF - Source files (0%)
+- SF - Source files (100%)
 - STL - The Standard Library (0%)
 - T - Templates and generic programming (0%)
 - To-do - Unclassified proto-rules (0%)
 - Appendix A - Libraries (0%)
 - Appendix B - Modernizing code (100%)
-- Appendix C - Discussion (0%)
+- Appendix C - Discussion (5%)
 
 ## 개요
 
