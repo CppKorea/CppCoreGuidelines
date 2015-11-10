@@ -52,7 +52,7 @@
 
 ##### Enforcement
 
-정수값을 정의하는 메크로를 flag하라.
+정수값을 정의하는 메크로를 더이상 사용하지 말자.
 >Flag macros that define integer values
 
 ### <a name="Renum-set"></a> Enum.2: 상수 집합을 정의하는데 열거형을 사용하라.
@@ -76,7 +76,7 @@
 
 ##### Reason
 
-놀라지 않도록.
+뜻하지 않은 오류를 줄이기 위해서.
 >To minimize surprises.
 
 ##### Example
