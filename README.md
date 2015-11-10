@@ -17,9 +17,6 @@
 - Giyeon Bang (GiyeonBang-rhathd)
 - Ilgook Jo	(Ilgook)
 - Dongwoo Lee	(aichaku)
-- Joowon Ryoo (HIPERCUBE)		
-- Geon Son (jen6)		
-- Minseob Kwon (kmu9842)
 - Giyeon Bang (GiyeonBang-rhathd)
 - Yonghyun Kim (drvoss)
 - Byungwook Eric Ahn (bwahn)
@@ -33,6 +30,7 @@
 - Minjang Kim (minjang)
 - Hyungtae Kim (cavecafe)
 - Sangbae Kang (typeon)
+- Junseong Kim (codertimo)
 
 ## 번역 진행 상황
 
