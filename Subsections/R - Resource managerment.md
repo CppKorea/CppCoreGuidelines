@@ -19,7 +19,7 @@ if you are writing a program that simply produces an output based on an input an
 the optimal strategy (for performance and ease of programming) is sometimes simply never to delete anything.
 If you have enough memory to handle your largest input, leak away, but be sure to give a good error message if you are wrong.
 Here, we ignore such cases.
-을
+
 자원 관리 규칙 요약
 >Resource management rule summary:
 
