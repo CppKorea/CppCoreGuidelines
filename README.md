@@ -15,7 +15,6 @@
 - Chris Ohk (utilForever)
 - Seokjoon Yun (DevStarSJ)
 - Giyeon Bang (GiyeonBang-rhathd)
-- Ilgook Jo	(Ilgook)
 - Dongwoo Lee	(aichaku)
 - Giyeon Bang (GiyeonBang-rhathd)
 - Yonghyun Kim (drvoss)
