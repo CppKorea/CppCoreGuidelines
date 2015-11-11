@@ -23,6 +23,7 @@
 - Jonghee Yun (jongheeyun)
 - Changjun Lee (yiatom)
 - Sangbae Kang (typeon)
+- Minjang Kim (minjang)
 
 ## 번역 진행 상황
 
