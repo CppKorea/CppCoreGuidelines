@@ -23,6 +23,7 @@
 - Jonghee Yun (jongheeyun)
 - Changjun Lee (yiatom)
 - Sangbae Kang (typeon)
+- Minjang Kim (minjang)
 
 ## 번역 진행 상황
 
@@ -31,7 +32,7 @@
 - A - Architectural Ideas (0%)
 - C - Classes and Class Hierarchies (0%)
 - Con - Constants and Immutability (100%)
-- CP - Concurrency and Parallelism (0%)
+- CP - Concurrency and Parallelism (5%)
 - CPL - C-Style programming (100%)
 - E - Error Handling (100%)
 - Enum - Enumerations (100%)
