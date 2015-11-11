@@ -28,7 +28,7 @@
 ## 번역 진행 상황
 
 - Abstract (100%)
-- C++ Core Guildlines (0%)
+- C++ Core Guildlines (100%)
 - A - Architectural Ideas (0%)
 - C - Classes and Class Hierarchies (0%)
 - Con - Constants and Immutability (100%)
