@@ -210,68 +210,97 @@ For a start, we have a few profiles corresponding to common needs (desires, idea
 >The profiles are intended to be used by tools, but also serve as an aid to the human reader.
 We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
 
-## <a name="SS-struct"></a> In.struct: The structure of this document
+## <a name="SS-struct"></a> In.struct: 이 문서의 구조
+>## <a name="SS-struct"></a> In.struct: The structure of this document
 
-Each rule (guideline, suggestion) can have several parts:
+규칙(가이드라인, 제안)은 여러 부분으로 나뉜다.
+>Each rule (guideline, suggestion) can have several parts:
 
-* The rule itself - e.g., **no naked `new`**
-* A rule reference number - e.g., **C.7** (the 7th rule related to classes).
+* 규칙 - **no naked `new`**
+* 규칙 번호 - **C.7** (클래스와 관련된 7번째 규칙)
+  주요 단원이 순서대로 나열되지 않았기 때문에 참조번호를 문자로 시작한다.
+  규칙을 추가하거나 삭제할 때 혼란스럽지 않도록 숫자를 매길때 간격을 뒀다.
+* **Reason**s (근거) - 프로그래머는 이해할 수 없는 규칙을 따르지 않으려 하기 때문에.
+* **Example**s - 내용만으로 규칙을 이해할 수 없기 때문에; 좋은 예도 있고 나쁜 예도 있다.
+* **Alternative**s - "이런 식으로 하지 마라"에 대한 대안을 제시.
+* **Exception**s - 단순하고 일반적인 규칙을 좋아한다. 그러나 많은 규칙이 광범위하지만 일반적이지 않게 적용될 수 있으므로 예외를 언급했다.
+* **Enforcement** - 어떻게 기계적으로 규칙을 체크할지에 대한 아이디어.
+* **See also**s - 관련된 규칙이나 토의를 위한 참조(이 문서 내에서나 외부에서)
+* **Note**s (의견) - 다른 분류에 들어갈 수 없는 의견
+* **Discussion** - 더 확장된 근거, 규칙에 적용되지 않는 예제들에 대한 언급.
+
+>* The rule itself - e.g., **no naked `new`**
+>* A rule reference number - e.g., **C.7** (the 7th rule related to classes).
   Since the major sections are not inherently ordered, we use a letter as the first part of a rule reference "number".
   We leave gaps in the numbering to minimize "disruption" when we add or remove rules.
-* **Reason**s (rationales) - because programmers find it hard to follow rules they don't understand
-* **Example**s - because rules are hard to understand in the abstract; can be positive or negative
-* **Alternative**s - for "don't do this" rules
-* **Exception**s - we prefer simple general rules. However, many rules apply widely, but not universally, so exceptions must be listed
-* **Enforcement** - ideas about how the rule might be checked "mechanically"
-* **See also**s - references to related rules and/or further discussion (in this document or elsewhere)
-* **Note**s (comments) - something that needs saying that doesn't fit the other classifications
-* **Discussion** - references to more extensive rationale and/or examples placed outside the main lists of rules
+>* **Reason**s (rationales) - because programmers find it hard to follow rules they don't understand
+>* **Example**s - because rules are hard to understand in the abstract; can be positive or negative
+>* **Alternative**s - for "don't do this" rules
+>* **Exception**s - we prefer simple general rules. However, many rules apply widely, but not universally, so exceptions must be listed
+>* **Enforcement** - ideas about how the rule might be checked "mechanically"
+>* **See also**s - references to related rules and/or further discussion (in this document or elsewhere)
+>* **Note**s (comments) - something that needs saying that doesn't fit the other classifications
+>* **Discussion** - references to more extensive rationale and/or examples placed outside the main lists of rules
 
-Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
+어떤 규칙들은 기계적으로 체크하기가 어렵다.
+그러나 전문가들이 쉽게 위반 내용을 지적할 수 있는 최소한의 기준을 만족시킨다.
+우리는 기계적인 툴이 시간이 지나면 전문가가 언급한 것을 추정해 낼 것으로 기대한다.
+또한 규칙들이 시간이 지남에 따라 더 정확하게 체크할 수 있을 정도로 정제될 것으로 기대한다.
+>Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
 We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
 Also, we assume that the rules will be refined over time to make them more precise and checkable.
 
-A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
+규칙은 모든 대안이나 특수한 경우를 언급하는 것보다는 단순화가 목적이다.
+그런 정보는 **Alternative** 단락, [Discussion](#S-discussion) 절에서 찾을 수 있다.
+>A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
 Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
 If you don't understand a rule or disagree with it, please visit its **Discussion**.
 If you feel that a discussion is missing or incomplete, send us an email.
 
-This is not a language manual.
+이 문서는 언어 메뉴얼이 아니다.
+완전하거나, 기술적으로 완벽하거나, 현 코드에 대한 가이드라기 보다는 실질적으로 도움이 되기를 기대한다.
+추천할만한 내용은 [the references](#S-references)에서 찾을 수 있다.
+>This is not a language manual.
 It is meant to be helpful, rather than complete, fully accurate on technical details, or a guide to existing code.
 Recommended information sources can be found in [the references](#S-references).
 
-## <a name="SS-sec"></a> In.sec: Major sections
+## <a name="SS-sec"></a> In.sec: 주단원
+>## <a name="SS-sec"></a> In.sec: Major sections
 
-* [P: Philosophy](#S-philosophy)
-* [I: Interfaces](#S-interfaces)
-* [F: Functions](#S-functions)
-* [C: Classes and class hierarchies](#S-class)
-* [Enum: Enumerations](#S-enum)
-* [ES: Expressions and statements](#S-expr)
-* [E: Error handling](#S-errors)
-* [R: Resource management](#S-resource)
-* [T: Templates and generic programming](#S-templates)
-* [CP: Concurrency](#S-concurrency)
-* [SL: The Standard library](#S-stdlib)
-* [SF: Source files](#S-source)
-* [CPL: C-style programming](#S-cpl)
-* [PRO: Profiles](#S-profile)
-* [GSL: Guideline support library](#S-gsl)
-* [FAQ: Answers to frequently asked questions](#S-faq)
+* [P: 철학](#S-philosophy)
+* [I: 인터페이스](#S-interfaces)
+* [F: 함수](#S-functions)
+* [C: 클래스와 상속](#S-class)
+* [Enum: 열거](#S-enum)
+* [ES: 연산식과 구문](#S-expr)
+* [E: 에러 처리](#S-errors)
+* [R: 자원 관리](#S-resource)
+* [T: 템플릿과 일반 프로그래밍](#S-templates)
+* [CP: 동시성](#S-concurrency)
+* [SL: 표준 라이브러리](#S-stdlib)
+* [SF: 소스 파일](#S-source)
+* [CPL: C스타일 프로그래밍](#S-cpl)
+* [PRO: 프로필](#S-profile)
+* [GSL: 가이드라인 지원 라이브러리](#S-gsl)
+* [FAQ: 자주 묻는 질문의 답변들](#S-faq)
 
-Supporting sections:
+부가 단원:
+>Supporting sections:
 
-* [NL: Naming and layout](#S-naming)
-* [PER: Performance](#S-performance)
-* [N: Non-Rules and myths](#S-not)
-* [RF: References](#S-references)
-* [Appendix A: Libraries](#S-libraries)
-* [Appendix B: Modernizing code](#S-modernizing)
-* [Appendix C: Discussion](#S-discussion)
-* [Glossary](#S-glossary)
-* [To-do: Unclassified proto-rules](#S-unclassified)
+* [NL: 이름짓기와 배치 구조](#S-naming)
+* [PER: 성능](#S-performance)
+* [N: 비규칙과 미신](#S-not)
+* [RF: 참고문헌](#S-references)
+* [Appendix A: 라이브러리](#S-libraries)
+* [Appendix B: 현대화 코드](#S-modernizing)
+* [Appendix C: 토론](#S-discussion)
+* [용어정리](#S-glossary)
+* [할일: 분류되지 않은 규칙들](#S-unclassified)
 
-These sections are not orthogonal.
+이 단원들은 orthogonal(?)하지 않다.
+>These sections are not orthogonal.
 
-Each section (e.g., "P" for "Philosophy") and each subsection (e.g., "C.hier" for "Class Hierarchies (OOP)") have an abbreviation for ease of searching and reference.
+각각의 단원("P"는 "Philosophy"), 각각의 부단원("C.hier"는 "Class Hierarchies (OOP)")들은 검색, 참조 편의를 위해 약칭이 있다.
+주 단원에 대한 약칭은 규칙번호에도 사용된다.("C.11"은 "Make concrete types regular")
+>Each section (e.g., "P" for "Philosophy") and each subsection (e.g., "C.hier" for "Class Hierarchies (OOP)") have an abbreviation for ease of searching and reference.
 The main section abbreviations are also used in rule numbers (e.g., "C.11" for "Make concrete types regular").
