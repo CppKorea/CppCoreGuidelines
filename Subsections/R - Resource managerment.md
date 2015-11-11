@@ -1,19 +1,31 @@
-# R: Resource management
+자원 관리
+> # R: Resource management
 
-This section contains rules related to resources.
-A resource is anything that must be acquired and (explicitly or implicitly) released, such as memory, file handles, sockets, and locks.
-The reason it must be released is typically that it can be in short supply, so even delayed release may do harm.
-The fundamental aim is to ensure that we don't leak any resources and that we don't hold a resource longer than we need to.
-An entity that is responsible for releasing a resource is called an owner.
+이 장은 자원과 관련된 규칙을 포함하고 있다. 자원은 메모리나 파일 핸들, 소켓, 락과 같은 것을 말하며 반드시 획득되야 하고
+명시적 또는 암묵적으로 해체되어야 한다. 해체되어야 하는 일반적인 이유는 한정 잉여 자원으로 인해 생기는 자원 부족인데 지연 해체조차도 이런 문제를 야기할 수 있다.
+어떤 자원도 새지 않으며 필요한 기간 보다 길게 자원을 소유하고 있지 않는 것이 근본적으로 자원을 관리하는 목표다.
+자원을 해체하는 책임을 가지는 주체를 우리는 오너(owner)라고 한다. 
 
-There are a few cases where leaks can be acceptable or even optimal:
+>This section contains rules related to resources. A resource is anything that must be acquired and (explicitly or implicitly) released, such as memory, file handles, sockets, and locks. The reason it must be released is typically that it can be in short supply, so even delayed release may do harm. The fundamental aim is to ensure that we don't leak any resources and that we don't hold a resource longer than we need to. An entity that is responsible for releasing a resource is called an owner.
+
+자원 누출이 용인되고 심지어 최선인 경우가 몇몇 있긴 하다.
+입력을 기반으로 단순히 출력하는 프로그램을 구현하고 입력에 비례하여 필요한 메모리 양이 증가한다면,  
+(성능과 프로그래밍 용이성을 위해) 어떤 자원도 삭제하지 않는 것이 때로는 최선의 전략일 수 있다.
+가장 큰 입력을 처리하기 위해서 충분한 메모리를 가졌다면 자원이 소비되도록 내버려 둬라. 다만 뭔가 잘못을 했다면 상황에 맞는
+에러 메시지를 주도록 해라. 이제부터 이런 경우는 더 이상 언급하지 않겠다.
+
+>There are a few cases where leaks can be acceptable or even optimal:
 if you are writing a program that simply produces an output based on an input and the amount of memory needed is proportional to the size of the input,
 the optimal strategy (for performance and ease of programming) is sometimes simply never to delete anything.
 If you have enough memory to handle your largest input, leak away, but be sure to give a good error message if you are wrong.
 Here, we ignore such cases.
 
-Resource management rule summary:
+자원 관리 규칙 요약
+>Resource management rule summary:
 
+* 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동으로 리소스를 관리해라.  
+
+>
 * [R.1: Manage resources automatically using resource handles and RAII (resource acquisition is initialization)](#Rr-raii)
 * [R.2: In interfaces, use raw pointers to denote individual objects (only)](#Rr-use-ptr)
 * [R.3: A raw pointer (a `T*`) is non-owning](#Rr-ptr)

@@ -23,15 +23,16 @@
 - Jonghee Yun (jongheeyun)
 - Changjun Lee (yiatom)
 - Sangbae Kang (typeon)
+- Minjang Kim (minjang)
 
 ## 번역 진행 상황
 
 - Abstract (100%)
-- C++ Core Guildlines (0%)
+- C++ Core Guildlines (100%)
 - A - Architectural Ideas (0%)
 - C - Classes and Class Hierarchies (0%)
 - Con - Constants and Immutability (100%)
-- CP - Concurrency and Parallelism (0%)
+- CP - Concurrency and Parallelism (5%)
 - CPL - C-Style programming (100%)
 - E - Error Handling (100%)
 - Enum - Enumerations (100%)
@@ -45,7 +46,7 @@
 - P - Philosophy (20%)
 - PER - Performance (100%)
 - PRO - Profiles (0%)
-- R - Resource management (0%)
+- R - Resource management (100%)
 - RF - References (0%)
 - SF - Source files (100%)
 - STL - The Standard Library (0%)
