@@ -46,7 +46,7 @@ Remember:
 가이드라인은 상위집합의 부분집합 원칙([Stroustrup05](#Stroustrup05))에 따라 디자인되었다.
 신뢰성, 안정성, 성능 등을 위해 단순히 C++의 부분집합으로 정의하지는 않았다.
 대신, 몇몇의 간단한 "확장"([library components](#S-gsl))을 사용하도록 강력히 추천한다.
-C++의 에러를 일으키기 쉬운 불필요한 특징을 사용하는 것 같은 규칙들은 제외하고 사용하실 수 있다.
+C++의 에러를 일으키기 쉬운 불필요한 특징을 사용하는 것 같은 규칙들은 제외하고 사용할 수 있다.
 >These guidelines are designed according to the "subset of a superset" principle ([Stroustrup05](#Stroustrup05)).
 They do not simply define a subset of C++ to be used (for reliability, safety, performance, or whatever).
 Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-gsl))
