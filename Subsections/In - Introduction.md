@@ -261,7 +261,6 @@ If you feel that a discussion is missing or incomplete, send us an email.
 
 이 문서는 언어 메뉴얼이 아니다.
 기술적으로 완전히 완벽하기 보다는, 기존에 작성 된 코드에 대한 가이드로써 도움이 되기를 기대한다.
-완전하거나, 기술적으로 완벽하거나, 현 코드에 대한 가이드라기 보다는 실질적으로 도움이 되기를 기대한다.
 추천할만한 내용은 [the references](#S-references)에서 찾을 수 있다.
 >This is not a language manual.
 It is meant to be helpful
