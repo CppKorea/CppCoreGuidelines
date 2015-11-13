@@ -27,9 +27,9 @@ The aim is to help C++ programmers to write simpler, more efficient, more mainta
 이 문서의 목적은 개발자들이 현대 C++(C++11, C++14, 이후 C++17까지)에 적응하는 것을 돕고 코드에 일정한 스타일을 적용하도록 하는 것이다.
 >The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
 
-우리는 여기 규칙들이 모든 코드에 효과적으로 적용될 수 있다는 환상을 갖고 있지는 않다.
+우리는 이 규칙들이 모든 코드에 효과적으로 적용될 수 있다는 환상을 갖고 있지는 않다.
 오래된 시스템을 업그레이드하는 것은 어렵지만, 이 규칙을 사용하는 프로그램이 에러를 덜 만들고 더 유지보수가 쉬울 거라고 믿는다.
-아마도 이런 규칙들이 초기 개발을 더 쉽고 빠르게 만들지도 모른다.
+아마도 이 규칙들이 초기 개발을 더 쉽고 빠르게 만들지도 모른다.
 우리가 말할 수 있는 한, 이 규칙들이 이전보다 더 좋은 성능, 더 관례적인 기술을 쓰는 코드를 만든다는 점이고 오버헤드가 없는 규칙을 따른다는 것이다.
 ("사용하지 않으면 지불하지 않아도 된다.", "추상화 방법을 적절히 사용하면 하위레벨 언어구조를 사용해서 직접 코딩한 정도의 성능을 얻을 것이다.")
 새 코드에 대한 이상으로, 오래된 코드를 동작시킬 때 활용할 기회로 이 규칙을 고려해보라. 그리고 실행 가능할 정도로 가깝게 이 아이디어를 가지고 추정해 보라.
@@ -92,10 +92,10 @@ Build your ideal small foundation library and use that, rather than lowering you
 The guidelines aimed at preventing accidents often ban perfectly legal C++.
 However, when there are two ways of expressing an idea and one has shown itself a common source of errors and the other has not, we try to guide programmers towards the latter.
 
-## <a name="SS-non"></a> In.not: 목표로 안하기.
+## <a name="SS-non"></a> In.not: 목표로 하지 않기.
 >## <a name="SS-non"></a> In.not: Non-aims
 
-규칙들을 최소로 하거나, 직각(?)을 할 의도는 없다.
+규칙들을 최소로 하거나, 관계 없이 할 의도는 없다.
 특히 일반화된 규칙은 단순하지만 시행할 수 없기도 하고, 규칙의 의미를 이해하기가 어렵기도 하다.
 구체적인 규칙들은 종종 이해하기가 더 쉽고 시행하기도 쉽다. 그러나 일반화된 규칙들이 없다면 특수한 경우의 나열일 뿐이다.
 우리는 초보자들을 돕기 위한 규칙들, 전문가를 잘 지원하는 규칙들을 제공하려고 한다.
@@ -252,19 +252,23 @@ Also, we assume that the rules will be refined over time to make them more preci
 
 규칙은 모든 대안이나 특수한 경우를 언급하는 것보다는 단순화가 목적이다.
 그런 정보는 **Alternative** 단락, [Discussion](#S-discussion) 절에서 찾을 수 있다.
+만약 당신이 이 룰에 대해 이해가 되지 않거나 동의하지 않는 경우, **Alternative**를 방문해라.
+만약 당신이 불안정하거나 빠진 부분에 대해 논의 할 것이 있으면 우리에게 이메일을 보내라.
 >A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
 Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
 If you don't understand a rule or disagree with it, please visit its **Discussion**.
 If you feel that a discussion is missing or incomplete, send us an email.
 
 이 문서는 언어 메뉴얼이 아니다.
+기술적으로 완전히 완벽하기 보다는, 기존에 작성 된 코드에 대한 가이드로써 도움이 되기를 기대한다.
 완전하거나, 기술적으로 완벽하거나, 현 코드에 대한 가이드라기 보다는 실질적으로 도움이 되기를 기대한다.
 추천할만한 내용은 [the references](#S-references)에서 찾을 수 있다.
 >This is not a language manual.
-It is meant to be helpful, rather than complete, fully accurate on technical details, or a guide to existing code.
+It is meant to be helpful
+rather than complete, fully accurate on technical details, or a guide to existing code.
 Recommended information sources can be found in [the references](#S-references).
 
-## <a name="SS-sec"></a> In.sec: 주단원
+## <a name="SS-sec"></a> In.sec: 주 단원
 >## <a name="SS-sec"></a> In.sec: Major sections
 
 * [P: 철학](#S-philosophy)
@@ -297,7 +301,7 @@ Recommended information sources can be found in [the references](#S-references).
 * [용어정리](#S-glossary)
 * [할일: 분류되지 않은 규칙들](#S-unclassified)
 
-이 단원들은 orthogonal(?)하지 않다.
+이 단원들은 관련이 있진 않다.
 >These sections are not orthogonal.
 
 각각의 단원("P"는 "Philosophy"), 각각의 부단원("C.hier"는 "Class Hierarchies (OOP)")들은 검색, 참조 편의를 위해 약칭이 있다.
