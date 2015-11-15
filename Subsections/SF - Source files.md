@@ -1,7 +1,7 @@
 #SF: 소스 파일 (Source Files)
 
-인터페이스로 사용되는 선언, 구현으로 사용되는 정의를 구분해 놓아야한다.
-헤더 파일은 인터페이스를 표현하고, 논리적 구조를 보여주기 위해서 사용해야 한다.
+인터페이스로 알려진 선언부와 구현으로 알려진 정의부를 구분해 놓아야 한다.
+헤더 파일은 인터페이스를 표현하고 논리적 구조를 보여주기 위해서 사용해야 한다.
 >Distinguish between declarations (used as interfaces) and definitions (used as implementations)
 >Use header files to represent interfaces and to emphasize logical structure.
 
@@ -45,7 +45,7 @@
 >**Reason**: Convention
 
 **참고 사항**: `.h` 와 `.cpp` 를 사용하는 것이 권장되기는 하지만 필수는 아니다. 다른 이름들도 많이 사용된다.
-예를 들자면 `.hh` 와 `.cxx` 같은 것이 있다. 이런 이름들도 동등한 방식으로 사용해야 한다.
+예를 들자면 `.hh` 와 `.cxx` 같은 것이 있다. 이런 이름을 같이 써도 좋다.
 >**Note**: The specific names `.h` and `.cpp` are not required (but recommended) and other names are in widespread use.
 >Examples are `.hh` and `.cxx`. Use such names equivalently.
 
@@ -54,7 +54,7 @@
 	// foo.h:
 	extern int a;	// 선언
 	extern void foo();
-	
+
 	// foo.cpp:
 	int a;	// 정의
 	void foo() { ++a; }
@@ -64,7 +64,7 @@
 	// foo.h:
 	extern int a;	// a declaration
 	extern void foo();
-	
+
 	// foo.cpp:
 	int a;	// a definition
 	void foo() { ++a; }
@@ -84,30 +84,31 @@
 	int a;	// a definition
 	void foo() { ++a; }
 
-`#include<foo.h>` 문구가 프로그램 상에서 두 번 이상 처리될 경우 두 번 이상 정의가 되어있다며 링크 오류가 발생한다.
+`#include<foo.h>` 문구가 한 프로그램 내에 두 번 이상 포함된다면 한번만 정의하기 규칙에 위배된다는 링크 오류가 뜰 것이다.
 >`#include<foo.h>` twice in a program and you get a linker error for two one-definition-rule violations.
-	
+
 
 >**시행하기**:
 
-* 컨벤션에 맞지 않는 파일 이름들 찾아내기
-* `.h` 와 `.cpp`` (혹은 동일한 의미의 파일들)이 아래의 규칙들을 따르는지 검토하기
+* 컨벤션에 맞지 않는 파일명이 있다면 표시한다.
+* `.h` 와 `.cpp` (혹은 동일한 의미의 파일들)이 아래의 규칙들을 지키는지 체크한다.
+
 >**Enforcement**:
 >
 >* Flag non-conventional file names.
->* Check that `.h` and `.cpp`` (and equivalents) follow the rules below.
+>* Check that `.h` and `.cpp` (and equivalents) follow the rules below.
 
 
 <a name="Rs-inline"></a>
 ### SF.2: `.h` 파일은 객체에 대한 정의나, 인라인이 아닌 함수에 대한 정의를 포함하지 않도록 한다 (A `.h` file may not contain object definitions or non-inline function definitions)
 
-**근거**: 하나의 정의만 가져야하는 대상을 `포함`하게 되면 링크 오류로 발전할 수 있다.
+**근거**: 하나의 정의만 가져야하는 대상을 `포함`하게 되면 링크에러를 야기한다.
 >**Reason**: Including entities subject to the one-definition rule leads to linkage errors.
 
 **Example**:
 
 	???
-	
+
 **다른 공식**: `.h` 파일은 다음의 항목만 가질 수 있다:
 >**Alternative formulation**: A `.h` file must contain only:
 
@@ -150,7 +151,7 @@
 	// foo.cpp:
 	extern void bar();
 	void foo() { bar(); }
-	
+
 **example, bad**:
 
 	// bar.cpp:
@@ -159,19 +160,19 @@
 	// foo.cpp:
 	extern void bar();
 	void foo() { bar(); }
-	
-`bar` 를 관리하는 사람은 `bar` 의 타입에 변경이 필요할 경우 `bar` 에 대한 모든 선언을 찾을 수가 없다.
-`bar` 를 사용하는 사람은 이 인터페이스가 완전하고 올바른 것인지 알 수가 없다. 기껐해야, 나중에 링커로 부터 오류 메시지를 받는 것이 고작이다.
+
+`bar`를 관리하는 사람이 그 타입을 바꾸고자 하더라도 `bar`의 모든 선언문을 찾을 수가 없다.
+`bar`를 사용하는 입장에서는 이 인터페이스가 완벽한지 알 수가 없다. 기껏해야 나중에 링커로부터 오류메시지를 받는 것이 고작이다.
 >A maintainer of `bar` cannot find all declarations of `bar` if its type needs changing.
 >The user of `bar` cannot know if the interface used is complete and correct. At best, error messages come (late) from the linker.
 
 **시행하기**:
 
-* `.h` 파일에 없는 선언이 다른 소스 파일에 선언되어 있는 지 찾아내기
+* `.h`파일에는 없지만 다른 소스파일들에 선언된 엔티티가 있다면 표시하기.
+
 >**Enforcement**:
 >
 >* Flag declarations of entities in other source files not placed in a `.h`.
-
 
 <a name="Rs-include-order"></a>
 ### SF.4: `.h` 파일들을 `포함`할 때는 다른 선언들 이전에 한다 (Include `.h` files before other declarations in a file)
@@ -219,12 +220,12 @@
 
 **시행하기**: 쉽다.
 >**Enforcement**: Easy.
-	
+
 
 <a name="Rs-consistency"></a>
 ### SF.5: `.cpp` 파일은 자신의 인터페이스를 정의하고 있는 `.h` 파일들을 포함해야 한다 (A `.cpp` file must include the `.h` file(s) that defines its interface)
 
-**근거** 컴파일러가 좀 더 빠르게 일관성 검사를 진행할 수 있다.
+**근거** 컴파일러가 좀더 일찍 일관성 체크를 할 수 있도록 한다.
 >**Reason** This enables the compiler to do an early consistency check.
 
 **잘못된 예**:
@@ -233,7 +234,7 @@
 	void foo(int);
 	int bar(long double);
 	int foobar(int);
-	
+
 	// foo.cpp:
 	void foo(int) { /* ... */ }
 	int bar(double) { /* ... */ }
@@ -245,7 +246,7 @@
 	void foo(int);
 	int bar(long double);
 	int foobar(int);
-	
+
 	// foo.cpp:
 	void foo(int) { /* ... */ }
 	int bar(double) { /* ... */ }
@@ -260,10 +261,10 @@
 	void foo(int);
 	int bar(long double);
 	int foobar(int);
-	
+
 	// foo.cpp:
 	#include<foo.h>
-		
+
 	void foo(int) { /* ... */ }
 	int bar(double) { /* ... */ }
 	double foobar(int);		// 오류: 잘못된 반환 형
@@ -274,17 +275,17 @@
 	void foo(int);
 	int bar(long double);
 	int foobar(int);
-	
+
 	// foo.cpp:
 	#include<foo.h>
-		
+
 	void foo(int) { /* ... */ }
 	int bar(double) { /* ... */ }
 	double foobar(int);		// error: wrong return type
 
-`foobar` 의 반환 형 오류가 이번엔 `foo.cpp` 파일이 컴파일될 때 즉시 발생한다.
-`bar` 의 인자 형 오류는 오버로딩이 가능하기 때문에 링크 이전에는 발생하지 않지만,
-체계적으로 `.h` 파일을 사용하게 되면, 프로그래머가 일찍 오류를 확인할 수 있게 해준다.
+`foobar` 의 반환 형 오류는 `foo.cpp` 파일이 컴파일될 때 즉시 발견된다.
+`bar` 의 인자 형 오류는 오버로딩 때문에 링크때까지 발견되지 않지만,
+기계적으로 `.h` 파일을 사용하게 되면, 프로그래머가 일찍 오류를 발견할 가능성을 높인다.
 >The return-type error for `foobar` is now caught immediately when `foo.cpp` is compiled.
 >The argument-type error for `bar` cannot be caught until link time because of the possibility of overloading,
 >but systematic use of `.h` files increases the likelyhood that it is caught earlier by the programmer.
@@ -308,7 +309,7 @@
 <a name="Rs-using-directive"></a>
 ### SF.7: 헤더 파일에는 `using` 지시자를 사용하지 않는다 (Don't put a `using`-directive in a header file)
 
-**근거** 헤더 파일에 `using` 지시자를 사용하는 경우 `#include` 를 사용하는 쪽에서 대체 구현을 효과적으로 구분할 수 있는 방안을 없애버린다.
+**근거** 헤더 파일에 `using` 지시자를 사용하는 경우 `#include`를 사용하는 쪽에서 대체 구현을 효과적으로 구분할 수 있는 방안을 없애버린다.
 >**Reason** Doing so takes away an `#include`r's ability to effectively disambiguate and to use alternatives.
 
 **Example**:
@@ -321,7 +322,7 @@
 <a name="Rs-guards"></a>
 ### SF.8: 모든 `.h` 파일에 `#include` 보호 문구를 사용한다 (Use `#include` guards for all `.h` files)
 
-**근거**: 파일이 여러 번 `#include` 되는 것을 방지한다.
+**근거**: 파일이 여러 번 `#include`되는 것을 방지한다.
 >**Reason**: To avoid files being `#include`d several times.
 
 **예**:
@@ -340,7 +341,8 @@
 	// ... declarations ...
 	#endif // FOOBAR_H
 
-**시행하기**: `#include` 보호 문구 없는 `.h` 파일 찾아내기
+**시행하기**: `#include`보호 문구가 없는 `.h` 파일이 있다면 표시한다.
+
 >**Enforcement**: Flag `.h` files without `#include` guards
 
 
@@ -348,7 +350,7 @@
 ### SF.9: 소스 파일들 사이에는 순환 의존 구조를 만들지 않는다 (Avoid cyclic dependencies among source files)
 
 **근거**: 순환은 이해하기 어렵고, 컴파일 속도도 느려지게 한다.
-향후 모듈 기능이 지원디는 경우 이 기능을 사용하도록 변경하기 어렵게 된다.
+향후 모듈 기능이 지원하는 경우 이 기능을 사용하도록 변경하기 어렵게 된다.
 >**Reason**: Cycles complicates comprehension and slows down compilation.
 >Complicates conversion to use language-supported modules (when they become available).
 
@@ -359,10 +361,10 @@
 
 	// file1.h:
 	#include "file2.h"
-	
+
 	// file2.h:
 	#include "file3.h"
-	
+
 	// file3.h:
 	#include "file1.h"
 
@@ -370,15 +372,15 @@
 
 	// file1.h:
 	#include "file2.h"
-	
+
 	// file2.h:
 	#include "file3.h"
-	
+
 	// file3.h:
 	#include "file1.h"
 
 **시행하기**: 모든 순환 구조를 찾아내기
->**Enforcement: Flag all cycles.
+>**Enforcement**: Flag all cycles.
 
 
 <a name="Rs-namespace"></a>

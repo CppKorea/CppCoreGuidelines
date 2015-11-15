@@ -7,12 +7,12 @@
 열거형 규칙 정리:
 >Enumeration rule summary:
 
-* [Enum.1: Prefer enums over macros](#Renum-macro)
-* [Enum.2: Use enumerations to represent sets of named constants](#Renum-set)
+* [Enum.1: 메크로보다 enum을 선호하라.](#Renum-macro)
+* [Enum.2: 상수 집합을 정의하는데 열거형을 사용하라.](#Renum-set)
 * [Enum.3: Prefer class enums over "plain" enums](#Renum-class)
-* [Enum.4: Define operations on enumerations for safe and simple use](#Renum-oper)
-* [Enum.5: Don't use `ALL_CAPS` for enumerators](#Renum-caps)
-* [Enum.6: Use unnamed enumerations for ???](#Renum-unnamed)
+* [Enum.4: 단순 열거형보다 클래스 열거형을 선호하라.](#Renum-oper)
+* [Enum.5: 열거형 상수에 전체 대문자를 사용하지 마라.](#Renum-caps)
+* [Enum.6: 이름없는 열거형을 사용하라.](#Renum-unnamed)
 * ???
 
 ### <a name="Renum-macro"></a> Enum.1: 메크로보다 enum을 선호하라.
@@ -52,7 +52,7 @@
 
 ##### Enforcement
 
-정수값을 정의하는 메크로를 flag하라.
+정수값을 정의하는 메크로를 더이상 사용하지 말자.
 >Flag macros that define integer values
 
 ### <a name="Renum-set"></a> Enum.2: 상수 집합을 정의하는데 열거형을 사용하라.
@@ -76,7 +76,7 @@
 
 ##### Reason
 
-놀라지 않도록.
+뜻하지 않은 오류를 줄이기 위해서.
 >To minimize surprises.
 
 ##### Example

@@ -1,51 +1,93 @@
-# C: Classes and Class Hierarchies
+# C: 클래스와 클래스 계층 구조
 
-A class is a user-defined type, for which a programmer can define the representation, operations, and  interfaces.
-Class hierarchies are used to organize related classes into hierarchical structures.
+># C: Classes and Class Hierarchies
 
-Class rule summary:
+클래스는 사용자 정의 타입으로써, 프로그래머가 표현과 동작, 인터페이스를 정의할 수 있다.
+클래스 계층 구조는 관련된 클래스들을 계층 구조로 구조화 할 때 사용된다.
 
-* [C.1: Organize related data into structures (`struct`s or `class`es)](#Rc-org)
-* [C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently](#Rc-struct)
-* [C.3: Represent the distinction between an interface and an implementation using a class](#Rc-interface)
-* [C.4: Make a function a member only if it needs direct access to the representation of a class](#Rc-member)
-* [C.5: Place helper functions in the same namespace as the class they support](#Rc-member)
-* [C.6: Declare a member function that does not modify the state of its object `const`](#Rc-const)
+> A class is a user-defined type, for which a programmer can define the representation, operations, and  interfaces.
+> Class hierarchies are used to organize related classes into hierarchical structures.
 
-Subsections:
+클래스 규칙 요약:
 
-* [C.concrete: Concrete types](#SS-concrete)
-* [C.ctor: Constructors, assignments, and destructors](#SS-ctor)
-* [C.con: Containers and other resource handles](#SS-containers)
-* [C.lambdas: Function objects and lambdas](#SS-lambdas)
-* [C.hier: Class hierarchies (OOP)](SS-hier)
-* [C.over: Overloading and overloaded operators](#SS-overload)
-* [C.union: Unions](#SS-union)
+> Class rule summary:
+
+* [C.1: 관련된 데이터를 구조를 사용해서 조직화 하라 (`struct`s or `class`es)](#Rc-org)
+* [C.2: 클래스가 invariant 하다면 `class` 를 사용하고; 데이터 멤버가 독립적으로 달라질 수 있으면 `struct` 를 사용하라](#Rc-struct)
+* [C.3: 클래스를 사용할 때 인터페이스 인지 구현인지 분명하게 표현하라](#Rc-interface)
+* [C.4: 클래스의 표현에 직접 접근 할 필요가 있는 경우만 함수를 멤버로 만들어라](#Rc-member)
+* [C.5: 헬퍼 함수들은 그들이 도와주는 클래스와 같은 네임스페이스에 두어라](#Rc-member)
+* [C.6: 객체의 상태를 수정하지 않는 멤버 함수는 `const` 로 선언하라](#Rc-const)
+
+> * [C.1: Organize related data into structures (`struct`s or `class`es)](#Rc-org)
+> * [C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently](#Rc-struct)
+> * [C.3: Represent the distinction between an interface and an implementation using a class](#Rc-interface)
+> * [C.4: Make a function a member only if it needs direct access to the representation of a class](#Rc-member)
+> * [C.5: Place helper functions in the same namespace as the class they support](#Rc-member)
+> * [C.6: Declare a member function that does not modify the state of its object `const`](#Rc-const)
+
+하위 영역:
+
+> Subsections:
+
+* [C.concrete: 구체적인 타입](#SS-concrete)
+* [C.ctor: 생성자, 할당, 파괴자](#SS-ctor)
+* [C.con: 컨테이너와 다른 리소스 핸들](#SS-containers)
+* [C.lambdas: 함수 객체와 람다](#SS-lambdas)
+* [C.hier: 클래스 계층구조 (OOP)](SS-hier)
+* [C.over: 오버로딩과 오버로딩된 연산자](#SS-overload)
+* [C.union: 유니온](#SS-union)
+
+> * [C.concrete: Concrete types](#SS-concrete)
+> * [C.ctor: Constructors, assignments, and destructors](#SS-ctor)
+> * [C.con: Containers and other resource handles](#SS-containers)
+> * [C.lambdas: Function objects and lambdas](#SS-lambdas)
+> * [C.hier: Class hierarchies (OOP)](SS-hier)
+> * [C.over: Overloading and overloaded operators](#SS-overload)
+> * [C.union: Unions](#SS-union)
 
 
 <a name="Rc-org"></a>
-### C.1: Organize related data into structures (`struct`s or `class`es)
 
-**Reason**: Ease of comprehension. If data is related (for fundamental reasons), that fact should be reflected in code.
+### C.1: 관련된 데이터를 구조를 사용해서 조직화 하라 (`struct`s or `class`es)
+
+> ### C.1: Organize related data into structures (`struct`s or `class`es)
+
+**Reason**: 이해하기 쉽다. 근본적인 이유로 데이터가 관련이 있다면, 코드에 반영되어야 한다.
+
+> **Reason**: Ease of comprehension. If data is related (for fundamental reasons), that fact should be reflected in code.
 
 **Example**:
 
 	void draw(int x, int y, int x2, int y2);	// BAD: unnecessary implicit relationships
 	void draw(Point from, Point to)				// better
 
-**Note**: A simple class without virtual functions implies no space or time overhead.
+**Note**: 가상 함수가 없는 간단한 클래스는 공간, 시간적인 오버헤드가 없다는 것을 의미한다.
+	
+> **Note**: A simple class without virtual functions implies no space or time overhead.
 
-**Note**: From a language perspective `class` and `struct` differ only in the default visibility of their members.
+**Note**: 언어적인 관점에서 볼 때 `class` 와 `struct` 는 멤버의 기본적인 가시성만 다르다.
 
-**Enforcement**: Probably impossible. Maybe a heuristic looking for date items used together is possible.
+> **Note**: From a language perspective `class` and `struct` differ only in the default visibility of their members.
+
+**Enforcement**: 아마도 불가능하다. 데이터 항목들에 대한 경험적인 관점을 함께 사용하는 것은 가능할 것이다.
+
+> **Enforcement**: Probably impossible. Maybe a heuristic looking for date items used together is possible.
 
 
 <a name="Rc-struct"></a>
-### C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently
 
-**Reason**: Ease of comprehension. The use of `class` alerts the programmer to the need for an invariant
+### C.2: 클래스가 invariant 하다면 `class` 를 사용하고; 데이터 멤버가 독립적으로 달라질 수 있으면 `struct` 를 사용하라 
 
-**Note**: An invariant is logical condition for the members of an object that a constructor must establish for the public member functions to assume. After the invariant is established (typically by a constructor) every member function can be called for the object. An invariant can be stated informally (e.g., in a comment) or more formally using `Expects`.
+> ### C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently
+
+**Reason**: 이해하기 쉽다. 프로그래머가 `class` 를 사용함으로써, invariant 가 필요하다는 것을 알게 된다.
+
+> **Reason**: Ease of comprehension. The use of `class` alerts the programmer to the need for an invariant
+
+**Note**: invariant 는 객체 멤버들의 논리적인 상태로써, 공개 멤버 함수들이 가정할 수 있도록 생성자가 설정 해 주어야 한다. invariant 가 설정된 후에 (일반적으로 생성자에 의해) 모든 멤버 함수는 객체를 통해 호출될 수 있다. invariant 는 형식에 구애받지 않고 (예. 주석) 기술될 수 있으며, 더 형식을 갖춘다면 `Expects` 를 사용한다.
+
+> **Note**: An invariant is logical condition for the members of an object that a constructor must establish for the public member functions to assume. After the invariant is established (typically by a constructor) every member function can be called for the object. An invariant can be stated informally (e.g., in a comment) or more formally using `Expects`.
 
 **Example**:
 
@@ -66,13 +108,20 @@ but
 		// ...
 	};
 
-**Enforcement**: Look for `struct`s with all data private and `class`es with public members.
+**Enforcement**: 모든 데이터가 비공개인 `struct` 와 모든 멤버가 공개인 `class` 들을 찾아보라.
+	
+> **Enforcement**: Look for `struct`s with all data private and `class`es with public members.
 
 
 <a name="Rc-interface"></a>
-### C.3: Represent the distinction between an interface and an implementation using a class
 
-**Reason**: an explicit distinction between interface and implementation improves readability and simplifies maintenance.
+### C.3: 클래스를 사용할 때 인터페이스 인지 구현인지 분명하게 표현하라
+
+> ### C.3: Represent the distinction between an interface and an implementation using a class
+
+**Reason**: 인터페이스와 구현에 대한 명시적인 구분은 가독성을 더 좋게 하고, 유지 보수를 단순하게 한다.
+
+> **Reason**: an explicit distinction between interface and implementation improves readability and simplifies maintenance.
 
 **Example**:
 
@@ -87,22 +136,34 @@ but
 		// ...
 	};
 
-For example, we can now change the representation of a `Date` without affecting its users (recompilation is likely, though).
+예를 들면, 이제 사용자에게 영향을 주지 않고 `Date` 에 대한 표현을 변경할 수 있다. (비록 다시 컴파일 해야 할지라도)
 
-**Note**: Using a class in this way to represent the distinction between interface and implementation is of course not the only way.
-For example, we can use a set of declarations of freestandanding functions in a namespace,
-an abstract base class,
-or a template fuction with concepts to represent an interface.
-The most important issue is to explicitly distinguish between an interface and its implementation "details."
-Ideally, and typically, an interface is far more stable than its implementation(s).
+> For example, we can now change the representation of a `Date` without affecting its users (recompilation is likely, though).
+
+**Note**: 인터페이스와 구현간의 구분을 표현하기 위해 클래스를 사용하는 것이 유일한 방법은 아니다.
+예를 들면, 인터페이스를 표현하기 위한 개념으로 네임스페이스 안에 독립적인 함수들이나 추상 기본 클래스 혹은 템플릿 함수들을 선언해서 사용할 수 있다.
+가장 중요한 이슈는 명시적으로 인터페이스와 그것들의 "상세한" 구현을 구분하는 것이다.
+이상적으로, 그리고 전형적으로 인터페이스는 그 구현보다 훨씬 더 안정적이다.
+
+> **Note**: Using a class in this way to represent the distinction between interface and implementation is of course not the only way.
+> For example, we can use a set of declarations of freestandanding functions in a namespace,
+> an abstract base class,
+> or a template fuction with concepts to represent an interface.
+> The most important issue is to explicitly distinguish between an interface and its implementation "details."
+> Ideally, and typically, an interface is far more stable than its implementation(s).
 
 **Enforcement**: ???
 		
 
 <a name="Rc-member"></a>
-### C.4: Make a function a member only if it needs direct access to the representation of a class
 
-**Reason**: Less coupling than with member functions, fewer functions that can cause trouble by modifying object state, reduces the number of functions that needs to be modified after a change in representation.
+### C.4: 클래스의 표현에 직접 접근 할 필요가 있는 경우만 함수를 멤버로 만들어라
+
+> ### C.4: Make a function a member only if it needs direct access to the representation of a class
+
+**Reason**: 멤버 함수간 커플링을 작게하고, 객체 상태 변경에 의해 문제가 생기는 함수를 줄이고, 표현이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
+
+> **Reason**: Less coupling than with member functions, fewer functions that can cause trouble by modifying object state, reduces the number of functions that needs to be modified after a change in representation.
 
 **Example**:
 
@@ -114,20 +175,32 @@ Ideally, and typically, an interface is far more stable than its implementation(
 	Date next_weekday(Date);
 	bool operator==(Date, Date);
 
-The "helper functions" have no need for direct access to the representation of a `Date`.
+"헬퍼 함수"는 `Date` 의 표현에 직접 접근 할 필요가 없다.
+	
+> The "helper functions" have no need for direct access to the representation of a `Date`.
 
-**Note**: This rule becomes even better if C++17 gets "uniform function call." ???
+**Note**: 이 규칙은 C++17 에서 "uniform function call" 이 들어오면 더 좋아질 것이다. ???
 
-**Enforcement**: Look for member function that do not touch data members directly.
+> **Note**: This rule becomes even better if C++17 gets "uniform function call." ???
+
+**Enforcement**: 데이터 멤버를 직접 건드리지 않는 멤버 함수를 찾아보라. 문제는 데이터 멤버를 직접 건드릴 필요가 없는 많은 멤버 함수들이 실제로 그렇게 한다는 것이다.
+
+> **Enforcement**: Look for member function that do not touch data members directly.
 The snag is that many member functions that do not need to touch data members directly do.
 
 
 <a name="Rc-member"></a>
-### C.5: Place helper functions in the same namespace as the class they support
 
-**Reason**: A helper function is a function (usually supplied by the writer of a class) that does not need direct access to the representation of the class,
-yet is seen as part of the useful interface to the class.
-Placing them in the same namespace as the class makes their relationship to the class obvious and allows them to be found by argument dependent lookup.
+### C.5: 헬퍼 함수들은 그들이 도와주는 클래스와 같은 네임스페이스에 두어라
+
+> ### C.5: Place helper functions in the same namespace as the class they support
+
+**Reason**: 헬퍼 함수는 (보통 클래스 작성자가 제공하는) 클래스의 표현에 직접 접근할 필요가 없는 함수이며, 클래스에 대한 유용한 인터페이스 중에 하나로 볼 수 있다.
+헬퍼 함수들을 같은 네임스페이스에 넣으면 클래스에 대한 관계가 명확해지고, 인자 종속적인 검색에서 발견 할 수 있게 된다.
+
+> **Reason**: A helper function is a function (usually supplied by the writer of a class) that does not need direct access to the representation of the class,
+> yet is seen as part of the useful interface to the class.
+> Placing them in the same namespace as the class makes their relationship to the class obvious and allows them to be found by argument dependent lookup.
 
 **Example**:
 
@@ -144,46 +217,79 @@ Placing them in the same namespace as the class makes their relationship to the 
 	
 **Enforcement**:
 
-* Flag global functions taking argument types from a single namespace.
+* 하나의 네임스페이스에서 인자 타입을 취하는 전역함수들을 표시해 두어라.
+
+> * Flag global functions taking argument types from a single namespace.
 
 		
 <a name="Rc-const"></a>
-### C.6: Declare a member function that does not modify the state of its object `const`
 
-**Reason**: More precise statement of design intent, better readability, more errors caught by the compiler, more optimization opportunities.
+### C.6: 객체의 상태를 수정하지 않는 멤버 함수는 `const` 로 선언하라
+
+> ### C.6: Declare a member function that does not modify the state of its object `const`
+
+**Reason**: 더 정확한 디자인 의도에 대한 기술, 더 좋은 가독성, 컴파일러에 의해 더 많은 에러가 찾아짐, 더 많은 최적화 기회.
+
+> **Reason**: More precise statement of design intent, better readability, more errors caught by the compiler, more optimization opportunities.
 
 **Example**:
 
 	int Date::day() const { return d; }
 
-**Note**: [Do not cast away `const`](#Res-casts-const).
+**Note**: [`const` 를 멀리하지 말라](#Res-casts-const).
+	
+> **Note**: [Do not cast away `const`](#Res-casts-const).
 
-**Enforcement**: Flag non-`const` member functions that do not write to their objects
+**Enforcement**: 겍체를 수정하지 않는 `const`가 아닌 멤버 함수들을 표시해 보라.
+
+> **Enforcement**: Flag non-`const` member functions that do not write to their objects
 
 
 <a name="SS-concrete"></a>
-## C.concrete: Concrete types
 
-One ideal for a class is to be a regular type.
-That means roughly "behaves like an `int`." A concrete type is the simplest kind of class.
-A value of regular type can be copied and the result of a copy is an independent object with the same value as the original.
-If a concrete type has both `=` and `==`, `a=b` should result in `a==b` being `true`.
-Concrete classes without assignment and equality can be defined, but they are (and should be) rare.
-The C++ built-in types are regular, and so are standard-library classes, such as `string`, `vector`, and `map`.
-Concrete types are also often referred to as value types to distinguish them from types uses as part of a hierarchy.
+## C.concrete: 구체적인 타입
 
-Concrete type rule summary:
+> ## C.concrete: Concrete types
 
-* [C.10: Prefer a concrete type over more complicated classes](#Rc-concrete)
-* [C.11: Make a concrete types regular](#Rc-regular)
+이상적인 클래스는 규칙적인 타입이 되는 것이다.
+대략 "`int` 처럼 동작하는 것"을 의미한다. 구체적인 타입은 가장 간단한 종류의 클래스이다.
+규칙적인 타입의 값은 복사 될 수 있고, 복사이 결과는 원본과 같은 값을 갖는 독립적인 객체이다.
+구체적인 타입이 `=` 와 `==` 를 둘다 갖는다면, `a=b` 는 `a==b` 일 때 참이 될 것이다.
+할당과 동등연산이 없는 구체적인 타입을 정의할 수 있지만, 이렇게 하는 것은 드물다. (그래야 한다.)
+C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스인 `string`, `vector`, `map` 도 그렇다.
+구체적인 타입들은 계층구조의 일부로 사용되는 클래스와 구분하기 위해 종종 값 타입으로 언급되기도 한다.
+
+> One ideal for a class is to be a regular type.
+> That means roughly "behaves like an `int`." A concrete type is the simplest kind of class.
+> A value of regular type can be copied and the result of a copy is an independent object with the same value as the original.
+> If a concrete type has both `=` and `==`, `a=b` should result in `a==b` being `true`.
+> Concrete classes without assignment and equality can be defined, but they are (and should be) rare.
+> The C++ built-in types are regular, and so are standard-library classes, such as `string`, `vector`, and `map`.
+> Concrete types are also often referred to as value types to distinguish them from types uses as part of a hierarchy.
+
+구체적인 타입 규칙 요약:
+
+> Concrete type rule summary:
+
+* [C.10: 복잡한 클래스들 보다는 구체적인 타입을 선호하라](#Rc-concrete)
+* [C.11: 구체적인 타입은 규칙적으로 만들어라](#Rc-regular)
+
+> * [C.10: Prefer a concrete type over more complicated classes](#Rc-concrete)
+> * [C.11: Make a concrete types regular](#Rc-regular)
 
 
 <a name="Rc-concrete"></a>
-### C.10 Prefer a concrete type over more complicated classes
 
-**Reason**: A concrete type is fundamentally simpler than a hierarchy:
-easier to design, easier to implement, easier to use, easier to reason about, smaller, and faster.
-You need a reason (use cases) for using a hierarchy.
+### C.10 복잡한 클래스들 보다는 구체적인 타입을 선호하라
+
+> ### C.10 Prefer a concrete type over more complicated classes
+
+**Reason**: 구체적인 타입은 근본적으로 계층구조 보다 단순하다:
+디자인이 더 쉽고, 구현이 더 쉽고, 사용하기가 더 쉬우며, 추론하기 더 쉽다. 더 작고 더 빠르기도 하다. 
+
+> **Reason**: A concrete type is fundamentally simpler than a hierarchy:
+> easier to design, easier to implement, easier to use, easier to reason about, smaller, and faster.
+> You need a reason (use cases) for using a hierarchy.
 
 **Example**
 
@@ -210,15 +316,25 @@ You need a reason (use cases) for using a hierarchy.
 		// ...
 	}
 
-If a class can be part of a hierarchy, we (in real code if not necessarily in small examples) must manipulate it's objects through pointers or references.
-That implies more memory overhead, more allocations and deallocations, and more run-time overhead to perform the resulting indiretions.
+클래스가 계층구조의 일부가 될 수 있다면, (실제 코드에서 작은 예들에서는 필연적이지 않다면) 포인터나 레퍼런스로 객체를 다루어야 한다.
+이것으로 인한 간접처리를 위해 더 많은 메모리를 사용하게 되고, 더 많은 할당과 해제, 실행시간 추가비용이 발생하게 된다.
+	
+> If a class can be part of a hierarchy, we (in real code if not necessarily in small examples) must manipulate it's objects through pointers or references.
+> That implies more memory overhead, more allocations and deallocations, and more run-time overhead to perform the resulting indiretions.
 
-**Note**: Concrete types can be stack allocated and be members of other classes.
+**Note**: 구체적인 타입은 스택에 할당 될 수 있고, 다른 클래스의 멤버가 될 수 있다.
 
-**Note**: The use of indirection is fundamental for run-time polymorphic interfaces.
-The allocation/deallocation overhead is not (that's just the most common case).
-We can use a base class as the interface of a scoped object of a derived class.
-This is done where dynamic allocation is prohibited (e.g. hard real-time) and to provide a stable interface to some kinds of plug-ins.
+> **Note**: Concrete types can be stack allocated and be members of other classes.
+
+**Note**: 실행시간 다형적 인터페이스를 위해 간접처리는 필수적이다.
+할당과 해제의 추가비용은 그렇지 않다. (단지 가장 흔한 사례일 뿐이다)
+패생 클래스의 scoped object 에 대한 인터페이스로 베이스 클래스를 사용할 수 있다.
+동적 할당을 할 수 없으며, 플러그인과 같은 것들에게 안정적인 인터페이스를 제공하고자 할 때 이렇게 할 수 있다. (예, 하드 리얼타임)
+ 
+> **Note**: The use of indirection is fundamental for run-time polymorphic interfaces.
+> The allocation/deallocation overhead is not (that's just the most common case).
+> We can use a base class as the interface of a scoped object of a derived class.
+> This is done where dynamic allocation is prohibited (e.g. hard real-time) and to provide a stable interface to some kinds of plug-ins.
 
 **Enforcement**: ???
 
