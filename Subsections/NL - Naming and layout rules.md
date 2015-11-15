@@ -127,7 +127,7 @@ Hungarian notation is evil (at least in a strongly statically-typed language).
 
 ##### Note
 
-어떤 스타일은 지역변수와 맴버변수를 구분하거나 전역변수를 구분하려고 한다.
+어떤 스타일은 지역변수와 멤버변수를 구분하거나 전역변수를 구분하려고 한다.
 >Some styles distinguishes members from local variable, and/or from global variable.
 
     struct S {
@@ -328,7 +328,7 @@ The need for consistency beats personal taste.
 잘 정리된 스페이스는 가독성 향상에 많은 도움이 된다. 과도하게 쓰지는 말자.
 >We value well-placed whitespace as a significant help for readability. Just don't overdo it.
 
-### <a name="Rl-order"></a> NL.16: 일반적인 클래스 맴버 선언 순서를 지켜라.
+### <a name="Rl-order"></a> NL.16: 일반적인 클래스 멤버 선언 순서를 지켜라.
 >### <a name="Rl-order"></a> NL.16: Use a conventional class member declaration order
 
 ##### Reason
