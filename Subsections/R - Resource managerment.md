@@ -155,7 +155,7 @@ Further, if any of the code marked `...` throws an exception, then `x` is leaked
         ~Port() { ClosePort(port); }
         operator PortHandle() { return port; }
 
-        // port handles can't usually be cloned, so disable copying and assignment if necessary
+>        // port handles can't usually be cloned, so disable copying and assignment if necessary
         Port(const Port&) =delete;
         Port& operator=(const Port&) =delete;
     };
