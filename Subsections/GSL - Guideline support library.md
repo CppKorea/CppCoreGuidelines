@@ -1,4 +1,4 @@
-#GSL : 지원 라이브러리에 대한 안내서
+#GSL : 가이드라인 지원 라이브러리
 
 ># GSL: Guideline support library
 
@@ -87,7 +87,7 @@ Reasons for that include
 
 `nullptr`을 지원하지 않는다면 다음과 같이 사용하면 됩니다.
 
-* `not_null<T>`		// `T` 는 `nullptr`일수 없는 포인터 타입 (e.g., `not_null<int*>` , `not_null<owner<Foo*>>`) 입니다. 
+* `not_null<T>`		// `T` 는 `nullptr`이 아닌 포인터 타입 (e.g., `not_null<int*>` , `not_null<owner<Foo*>>`) 입니다. 
 `T`는 `==nullptr`이 의미있는 어떤 타입도 가능합니다.
 
 >An `owner<T>` differs from a resource handle for a `T` by still requiring and explicit `delete`.
@@ -109,7 +109,7 @@ Reasons for that include
 * `string_view`		// `array_view<char>`
 * `cstring_view`	// `array_view<const char>`
 
-`*_view<T>`는 0이나 수정가능한 (`const`가 아닌) `T`를 참조합니다.
+`*_view<T>`는 하나 이상의 비상수 `T`를 참조합니다.
 
 >A `*_view<T>` refer to zero or more mutable `T`s unless `T` is a `const` type.
 
@@ -121,8 +121,8 @@ C스타일 string(e.g. input buffer에 대한 포인터)가 아닌 뭔가를 가
 A `char*` that points to something that is not a C-style string (e.g., a pointer into an input buffer) should be represented by an `array_view`.
 There is no really good way to say "pointer to a single `char` (`string_view{p,1}` can do that, and `T*` where `T` is a `char` in a template that has not been specialized for C-style strings).
 
-* `zstring`		// C스타일 string을 지원하는 `char*`; 0를 만나면 끝나는 `char` 배열 혹은 `null_ptr`
-* `czstring`	        // C스타일 string을 지원하는 `const char*`; 0를 만나면 끝나는 `const char` 배열 혹은 `null_ptr`
+* `zstring`		// C스타일 string을 지원하는 `char*`; NULL(0) 종료 문자열 혹은 `null_ptr`
+* `czstring`	        // C스타일 string을 지원하는 `const char*`; NULL(0) 종료 상수문자열 혹은 `null_ptr`
 
 >* `zstring`		// a `char*` supposed to be a C-style string; that is, a zero-terminated sequence of `char` or `null_ptr`
 * `czstring`	// a `const char*` supposed to be a C-style string; that is, a zero-terminated sequence of `const` `char` ort `null_ptr`
