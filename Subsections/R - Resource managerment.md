@@ -110,18 +110,17 @@ Alocation and deallocation rule summary:
 **Note**: 소멸자를 가진 클래스에서 표현되지 않는 다루기 힘든 자원인 경우 클래스로 감싸거나 [`finally`](#S-GSL) 를 사용해라.
 
 **참고**: [RAII](Rr-raii).
->
 
-### Rule R.1: Manage resources automatically using resource handles and RAII (resource acquisition is initialization)
+>### Rule R.1: Manage resources automatically using resource handles and RAII (resource acquisition is initialization)
 
-**Reason**: To avoid leaks and the complexity of manual resource management.
+>**Reason**: To avoid leaks and the complexity of manual resource management.
  C++'s language-enforced constructor/destructor symmetry mirrors the symmetry inherent in resource acquire/release function pairs such as `fopen`/`fclose`, `lock`/`unlock`, and `new`/`delete`.
  Whenever you deal with a resource that needs paired acquire/release function calls,
  encapsulate that resource in an object that enforces pairing for you -- acquire the resource in its constructor, and release it in its destructor.
 
-**Example, bad**: Consider
+>**Example, bad**: Consider
 
-	void send( X* x, cstring_view destination ) {
+>	void send( X* x, cstring_view destination ) {
         auto port = OpenPort(destination);
         my_mutex.lock();
         // ...
@@ -132,12 +131,12 @@ Alocation and deallocation rule summary:
         delete x;
 	}
 
-In this code, you have to remember to `unlock`, `ClosePort`, and `delete` on all paths, and do each exactly once.
+>In this code, you have to remember to `unlock`, `ClosePort`, and `delete` on all paths, and do each exactly once.
 Further, if any of the code marked `...` throws an exception, then `x` is leaked and `my_mutex` remains locked.
 
-**Example**: Consider
+>**Example**: Consider
 
-	void send( unique_ptr<X> x, cstring_view destination ) { // x owns the X
+>	void send( unique_ptr<X> x, cstring_view destination ) { // x owns the X
         Port port{destination};            // port owns the PortHandle
         lock_guard<mutex> guard{my_mutex}; // guard owns the lock
         // ...
@@ -145,11 +144,11 @@ Further, if any of the code marked `...` throws an exception, then `x` is leaked
         // ...
 	} // automatically unlocks my_mutex and deletes the pointer in x
 
-Now all resource cleanup is automatic, performed once on all paths whether or not there is an exception. As a bonus, the function now advertises that it takes over ownership of the pointer.
+>Now all resource cleanup is automatic, performed once on all paths whether or not there is an exception. As a bonus, the function now advertises that it takes over ownership of the pointer.
 
-What is `Port`? A handy wrapper that encapsulates the resource:
+>What is `Port`? A handy wrapper that encapsulates the resource:
 
-    class Port {
+>    class Port {
         PortHandle port;
     public:
         Port( cstring_view destination ) : port{OpenPort(destination)} { }
@@ -161,9 +160,9 @@ What is `Port`? A handy wrapper that encapsulates the resource:
         Port& operator=(const Port&) =delete;
     };
 
-**Note**: Where a resource is "ill-behaved" in that it isn't represented as a class with a destructor, wrap it in a class or use [`finally`](#S-GSL)
+>**Note**: Where a resource is "ill-behaved" in that it isn't represented as a class with a destructor, wrap it in a class or use [`finally`](#S-GSL)
 
-**See also**: [RAII](Rr-raii).
+>**See also**: [RAII](Rr-raii).
 
 <a name ="Rr-use-ptr"></a>
 ### R.2: In interfaces, use raw pointers to denote individual objects (only)
