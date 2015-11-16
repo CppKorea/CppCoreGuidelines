@@ -25,6 +25,7 @@ Here, we ignore such cases.
 
 * R.1 : 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동으로 리소스를 관리해라.  
 >
+
 * [R.1: Manage resources automatically using resource handles and RAII (resource acquisition is initialization)](#Rr-raii)
 * [R.2: In interfaces, use raw pointers to denote individual objects (only)](#Rr-use-ptr)
 * [R.3: A raw pointer (a `T*`) is non-owning](#Rr-ptr)
