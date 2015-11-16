@@ -79,7 +79,7 @@ Alocation and deallocation rule summary:
 	}
 
 이 코드에서 모든 경로에서 unlock 그리고 ClosePort, delete 호출을 해야 하고 한 번만 해야 한다. 그리고
-`...`로 표시된 코드에서 예외가 던져진다면 `x`는 누출되고 `my_mutex`는 락을 유지한다.
+`...`로 표시된 코드에서 예외가 던져진다면 `x`는 누출되고 `my_mutex`는 락을 해체하지 못한다.
 
 **좋은 예**
 
