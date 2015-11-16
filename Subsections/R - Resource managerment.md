@@ -23,8 +23,7 @@ Here, we ignore such cases.
 자원 관리 규칙 요약
 >Resource management rule summary:
 
-* 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동으로 리소스를 관리해라.  
-
+* R.1 : 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동으로 리소스를 관리해라.  
 >
 * [R.1: Manage resources automatically using resource handles and RAII (resource acquisition is initialization)](#Rr-raii)
 * [R.2: In interfaces, use raw pointers to denote individual objects (only)](#Rr-use-ptr)
@@ -60,6 +59,58 @@ Alocation and deallocation rule summary:
 
 
 <a name ="Rr-raii"></a>
+
+### Rule R.1 : 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동으로 리소스를 관리해라.
+**이유** : 수동 자원 관리의 복잡성과 누출을 피하기 위한 방법을 알아본다. C++ 언어적 강제인 생성자 소멸자 대칭은 `fopen`/`fclose`,  그리고 `lock`/`unlock`, `new`/`delete`과 같은 자원 획득/해체 함수의 짝과 같은 구조를 가진다.
+이 특징을 사용해서 자원의 획득/해체시 짝 함수 호출이 필요한 자원을 다룰 때 생성자에서 자원을 획득하고 소멸자에서 해체하는 방법으로 강제되도록 오브젝트에 리소스를 갭슐화해라.
+
+**나쁜 예** 
+
+	void send( X* x, cstring_view destination ) {
+        auto port = OpenPort(destination);
+        my_mutex.lock();
+        // ...
+        Send(port, x);
+        // ...
+        my_mutex.unlock();
+        ClosePort(port);
+        delete x;
+	}
+
+이 코드에서 모든 경로에서 unlock 그리고 ClosePort, delete 호출을 해야 하고 한 번만 해야 한다. 그리고
+`...`로 표시된 코드에서 예외가 던져진다면 `x`는 누출되고 `my_mutex`는 락을 유지한다.
+
+**좋은 예**
+
+	void send( unique_ptr<X> x, cstring_view destination ) { // x가 X를 소유했다.
+        Port port{destination};            // port가 Port 핸들을 소유했다.
+        lock_guard<mutex> guard{my_mutex}; // guard가 락을 소유했다.
+        // ...
+        Send(port, x);
+        // ...
+	} // 자동으로 my_mutex 그리고 x, port의 자원이 해체될 것이다.
+
+모든 자원 정리가 자동화되었고 예외와 상관없이 모든 경로에서 한번 수행된다. 참고로 함수가 포인터 소유권을 가져간 것도 보여주고 있다.
+
+`Port`는 무엇일까? 자원을 캡슐화하는 간단한 래퍼로 구현할 수 있다.
+
+    class Port {
+        PortHandle port;
+    public:
+        Port( cstring_view destination ) : port{OpenPort(destination)} { }
+        ~Port() { ClosePort(port); }
+        operator PortHandle() { return port; }
+
+	 // port 핸들은 보통 복제될 수 없다, 그래서 필요에 따라 복사, 대입 연산자를 disable시키자.
+        Port(const Port&) =delete;
+        Port& operator=(const Port&) =delete;
+    };
+
+**Note**: 소멸자를 가진 클래스에서 표현되지 않는 다루기 힘든 자원인 경우 클래스로 감싸거나 [`finally`](#S-GSL) 를 사용해라.
+
+**참고**: [RAII](Rr-raii).
+>
+
 ### Rule R.1: Manage resources automatically using resource handles and RAII (resource acquisition is initialization)
 
 **Reason**: To avoid leaks and the complexity of manual resource management.
@@ -112,7 +163,6 @@ What is `Port`? A handy wrapper that encapsulates the resource:
 **Note**: Where a resource is "ill-behaved" in that it isn't represented as a class with a destructor, wrap it in a class or use [`finally`](#S-GSL)
 
 **See also**: [RAII](Rr-raii).
-
 
 <a name ="Rr-use-ptr"></a>
 ### R.2: In interfaces, use raw pointers to denote individual objects (only)
