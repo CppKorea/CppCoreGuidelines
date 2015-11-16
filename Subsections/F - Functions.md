@@ -127,7 +127,7 @@ If something is a well-specified action, separate it out from its  surrounding c
 >For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
 
-**주의**: 한군데 이상에서 사용되는 사소하지 않은 람다를 작성한다면 함수에 이름을 짓고 (대부분 로컬이 아닌)변수에 할당하세요.
+**참고사항**: 한군데 이상에서 사용되는 사소하지 않은 람다를 작성한다면 함수에 이름을 짓고 (대부분 로컬이 아닌)변수에 할당하세요.
 >**Note**: If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
 
 **예**:
@@ -301,12 +301,12 @@ Yes, it break other rules also.
   		return 0.;
 	}
 
-**주의**: "한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이 되기도 합니다.
+**참고사항**: "한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이 되기도 합니다.
 왠만하면 최대 다섯줄짜리 함수로 구현 할 수 있을지 고민해 봐야 합니다.
 >**Note**: "It doesn't fit on a screen" is often a good practical definition of "far too large."
 One-to-five-line functions should be considered normal.
 
-**주의**: 긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누세요. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 내제화되어 사용될 수 있습니다. 
+**참고사항**: 긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누세요. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 내제화되어 사용될 수 있습니다.
 >**Note**: Break large functions up into smaller cohesive and named functions.
 Small simple functions are easily inlined where the cost of a function call is significant.
 
@@ -326,11 +326,14 @@ You could use cyclomatic complexity. Try "more that 10 logical path through." Co
 
 
 <a name="Rf-constexpr"></a>
-### F.4: If a function may have to be evaluated at compile time, declare it `constexpr`
+### F.4: 함수가 컴파일 타임에 평가되어야 한다면  `constexpr`로 선언하라
+>### F.4: If a function may have to be evaluated at compile time, declare it `constexpr`
 
-**Reason**: `constexpr` is needed to tell the compiler to allow compile-time evaluation.
+**근거**: `constexpr`는 컴파일러에게 컴파일 타임에 평가하라고 지시하는데 사용됩니다.
+>**Reason**: `constexpr` is needed to tell the compiler to allow compile-time evaluation.
 
-**Example**: The (in)famous factorial:
+**예**: 유명한 팩토리얼:
+>**Example**: The (in)famous factorial:
 
 	constexpr int fac(int n)
 	{
@@ -340,10 +343,13 @@ You could use cyclomatic complexity. Try "more that 10 logical path through." Co
 		for (int i=2; i<=n; ++i) x*= n;
 		return x;
 	}
-	
-This is C++14. For C++11, use a functional formulation of `fac()`.
 
-**Note**: `constexpr` does not guarantee compile-time evaluation;
+이 예는  C++14 형태 입니다. C++11 형태를 사용하려면 	`fac()`의  functional formulation를 사용하세요.
+>This is C++14. For C++11, use a functional formulation of `fac()`.
+
+**참고사항**: `constexpr`은 컴파일 타임 평가를 보장하지 않습니다;
+이것은 프로그래머가 요구하거나 컴파일러가 최적화를 하기로 결정했을 때 상수 표현 인자에 대해서 컴파일 타임에 평가 될 수 있다는 것을 보장 할 뿐입니다.
+>**Note**: `constexpr` does not guarantee compile-time evaluation;
 it just guarantees that the function can be evaluated at compile time for constant expression arguments if the programmer requires it or the compiler decides to do so to optimize.
 
 	constexpr int min(int x, int y) { return x<y?x:y;}
@@ -356,7 +362,8 @@ it just guarantees that the function can be evaluated at compile time for consta
 		constexpr int m4 = min(-1,2);	// error: connot evaluate at compile-time
 	}
 	
-**Note**: `constexpr` functions are pure: they can have no sideefects.
+**참고사항**: `constexpr` 함수는 결점이 없습니다: 부작용을 가질리 없습니다.
+>**Note**: `constexpr` functions are pure: they can have no sideefects.
 
 	int dcount = 0;
 	constexpr int double(int v)
@@ -364,12 +371,16 @@ it just guarantees that the function can be evaluated at compile time for consta
 		++dcount;		// error: attempted side effect from constexpr function
 		return v+v;
 	}
-	
-This is usually a very good thing.
 
-**Note**: Don't try to make all functions `constexpr`. Most computation is best done at run time.
+대체적으로 매우 유용 합니다.
+>This is usually a very good thing.
 
-**Enforcement**: Imposible and unnecessary.
+**참고사항**: 모든 함수를 `constexpr`로 만들지 마세요. 대부분의 계산은 런타임에 수행되는 것이 좋습니다.
+>**Note**: Don't try to make all functions `constexpr`. Most computation is best done at run time.
+
+**시행하기**: 불가능하고 불필요한 것.
+만약 상수를 필요로하는 곳에서 `constexpr`로 선언되지 않은 함수가 호출 된다면 컴파일러는 에러를 출력합니다.
+>**Enforcement**: Imposible and unnecessary.
 The compiler gives an error if a non-`constexpr` function is called where a constant is required.
 
 
