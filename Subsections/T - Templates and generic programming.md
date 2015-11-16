@@ -436,15 +436,20 @@ The shorter versions better match the way we speak. Note that many templates don
 * Not feasible in the short term when people convert from the `<typename T>` and `<class T`> notation.
 * Later, flag declarations that first introduces a typename and then constrains it with a simple, single-type-argument concept.
 
-## <a name="SS=concept-def"></a> T.con-def: Concept definition rules
+## <a name="SS=concept-def"></a> T.con-def: 컨셉 정의 규칙
+>## <a name="SS=concept-def"></a> T.con-def: Concept definition rules
 
 ???
 
-### <a name="Rt-low"></a> T.20: Avoid "concepts" without meaningful semantics
+### <a name="Rt-low"></a> T.20: 의미없는 컨셉을 피하라.
+>### <a name="Rt-low"></a> T.20: Avoid "concepts" without meaningful semantics
 
 ##### Reason
 
-Concepts are meant to express semantic notions, such as "a number", "a range" of elements, and "totally ordered."
+컨셉은 의미적인 개념을 표현하려는 의도이다. 예를 들면 "숫자", 요소들의 "범위", 그리고 "완전히 소팅된".
+단순한 제약조건, `+`연산자를 가진다거나, `>`연산자를 가지는 것과 같은, 독자적으로 기술되어선 의미가 없다.
+유저 코드보다는 의미있는 개념을 위한 블록을 구성하는데 사용되어야 한다.
+>Concepts are meant to express semantic notions, such as "a number", "a range" of elements, and "totally ordered."
 Simple constraints, such as "has a `+` operator" and "has a `>` operator" cannot be meaningfully specified in isolation
 and should be used only as building blocks for meaningful concepts, rather than in user code.
 
@@ -467,12 +472,15 @@ and should be used only as building blocks for meaningful concepts, rather than 
     string yy = "9";
     auto zz = plus(xx, yy);	// zz = "79"
 
-Maybe the concatenation was expected. More likely, it was an accident. Defining minus equivalently would give dramatically different sets of accepted types.
+아마도 스트링 연결일 수도 있고 어쩌면 실수였을 것이다. 동일하게 마이너스를 정의한다면 가능한 타입에 대해서 완전히 다른 집합을 보여 줄 것이다.
+이 `Addable`은 +는 교환법칙(`a + b == b + a`)이 성립해야 한다는 수학적인 규칙에 위배된다.
+>Maybe the concatenation was expected. More likely, it was an accident. Defining minus equivalently would give dramatically different sets of accepted types.
 This `Addable` violates the mathematical rule that addition is supposed to be commutative: `a + b == b + a`.
 
 ##### Note
 
-The ability to specify a meaningful semantics is a defining characteristic of a true concept, as opposed to a syntactic constraint.
+의미구조를 기술하는 능력은 문법 제약에 반대되는 진짜 컨셉을 정의하는 특징이다.
+>The ability to specify a meaningful semantics is a defining characteristic of a true concept, as opposed to a syntactic constraint.
 
 ##### Example (using TS concepts)
 
@@ -499,24 +507,30 @@ The ability to specify a meaningful semantics is a defining characteristic of a 
 
 ##### Note
 
-Concepts with multiple operations have far lower chance of accidentally matching a type than a single-operation concept.
+여러 연산자를 가진 컨셉은 한 연산자를 가진 컨셉에 비해 실수로 타입으로 만족될 가능성이 낮을 것이다.
+>Concepts with multiple operations have far lower chance of accidentally matching a type than a single-operation concept.
 
 ##### Enforcement
 
-* Flag single-operation `concepts` when used outside the definition of other `concepts`.
-* Flag uses of `enable_if` that appears to simulate single-operation `concepts`.
+* 다른 `concepts` 밖에서 사용되어진 한 연산자를 가진 `concepts`가 있다면 표시한다.
+* 한 연산자를 가진 `concepts`를 시뮬레이트하는 `enable_if`가 사용되고 있다면 표시한다.
+>* Flag single-operation `concepts` when used outside the definition of other `concepts`.
+>* Flag uses of `enable_if` that appears to simulate single-operation `concepts`.
 
-### <a name="Rt-complete"></a> T.21: Define concepts to define complete sets of operations
+### <a name="Rt-complete"></a> T.21: 완벽한 연산자 집합을 정의하려면 컨셉을 정의하라.
+>### <a name="Rt-complete"></a> T.21: Define concepts to define complete sets of operations
 
 ##### Reason
 
-Improves interoperability. Helps implementers and maintainers.
+상호운용성 개선. 구현이나 유지보수 인력에게 도움이 됨.
+>Improves interoperability. Helps implementers and maintainers.
 
 ##### Example, bad
 
     template<typename T> Subtractable = requires(T a, T, b) { a-b; }	// correct syntax?
 
-This makes no semantic sense. You need at least `+` to make `-` meaningful and useful.
+의미적인 감각이 없다. 적어도 `+`, `-` 정도는 있어야 쓸만하다.
+>This makes no semantic sense. You need at least `+` to make `-` meaningful and useful.
 
 Examples of complete sets are
 
@@ -527,7 +541,8 @@ Examples of complete sets are
 
 ???
 
-### <a name="Rt-axiom"></a> T.22: Specify axioms for concepts
+### <a name="Rt-axiom"></a> T.22: 컨셉을 위해 axioms를 기술하라.
+>### <a name="Rt-axiom"></a> T.22: Specify axioms for concepts
 
 ##### Reason
 
@@ -769,7 +784,8 @@ The rule supports the view that a concept should reflect a (mathematically) cohe
 ##### Reason
 
 개선된 가독성. 구현 내용 숨김.
-
+템플릿 별칭이 타입을 계산하기 위한 특성의 많은 사용을 치환한다.
+그것은 타입특성을 숨기는데 사용할 수도 있다.
 >Improved readability. Implementation hiding. Note that template aliases replace many uses of traits to compute a type. They can also be used to wrap a trait.
 
 ##### Example
@@ -781,25 +797,32 @@ The rule supports the view that a concept should reflect a (mathematically) cohe
         // ...
     };
 
-This saves the user of `Matrix` from having to know that its elements are stored in a `vector` and also saves the user from repeatedly typing `typename std::vector<T>::`.
+`Matrix` 사용자들이 그 요소가 `vector`에 저장되는 점을 알 필요가 없게 한다. 반복적으로 `typename std::vector<T>::`를 타이핑하는 것을 줄여준다.
+>This saves the user of `Matrix` from having to know that its elements are stored in a `vector` and also saves the user from repeatedly typing `typename std::vector<T>::`.
 
 ##### Example
 
     template<typename T>
     using Value_type<T> = container_traits<T>::value_type;
 
-This saves the user of `Value_type` from having to know the technique used to implement `value_type`s.
+이것은 `Value_type`을 쓰는 사용자에게 `value_type`을 구현하는 테크닉을 알 필요가 없게 한다.
+>This saves the user of `Value_type` from having to know the technique used to implement `value_type`s.
 
 ##### Enforcement
 
-* Flag use of `typename` as a disambiguator outside `using` declarations.
-* ???
+* `using`으로 선언이외에 중의성 제거용으로 `typename`을 사용한다면 표시한다.
+>* Flag use of `typename` as a disambiguator outside `using` declarations.
+>* ???
 
-### <a name="Rt-using"></a> T.43: Prefer `using` over `typedef` for defining aliases
+### <a name="Rt-using"></a> T.43: 별칭을 정의하기 위해 `typedef` 대신에 `using`을 선호하라.
+>### <a name="Rt-using"></a> T.43: Prefer `using` over `typedef` for defining aliases
 
 ##### Reason
 
-Improved readability: With `using`, the new name comes first rather than being embedded somewhere in a declaration.
+가독성 개선:  `using`을 사용하면 새 명칭은 선언 시에 뒤쪽 어딘가에 숨어 있기보다는 제일 앞에 나온다.
+일반화: `using`은 템플릿 별칭으로 사용할 수 있다. 반면 `typedef`는 템플릿으로 쓸 수 없다.
+일률성: `using`은 구문상 `auto`와 비슷하다.
+>Improved readability: With `using`, the new name comes first rather than being embedded somewhere in a declaration.
 Generality: `using` can be used for template aliases, whereas `typedef`s can't easily be templates.
 Uniformity: `using` is syntactically similar to `auto`.
 
@@ -817,51 +840,46 @@ Uniformity: `using` is syntactically similar to `auto`.
 
 ##### Enforcement
 
-* Flag uses of `typedef`. This will give a lot of "hits" :-(
+* `typedef`를 사용하고 있다면 표시한다. 그것은 아주 많은 'hits'를 줄 것이다. (? - 뭐지?)
 
-### <a name="Rt-deduce"></a> T.44: Use function templates to deduce class template argument types (where feasible)
+>* Flag uses of `typedef`. This will give a lot of "hits" :-(
+
+### <a name="Rt-deduce"></a> T.44: 클래스 템플릿 인자 타입을 추정하기 위해 함수 템플릿을 사용하라.
+>### <a name="Rt-deduce"></a> T.44: Use function templates to deduce class template argument types (where feasible)
 
 ##### Reason
 
-Writing the template argument types explicitly can be tedious and unnecessarily verbose.
+템플릿 인자 타입을 명시적으로 쓴다면 지루해질 수 있고 불필요하게 길어질 수 있다.
+>Writing the template argument types explicitly can be tedious and unnecessarily verbose.
 
 ##### Example
 
-    tuple<int, string, double> t1 = {1, "Hamlet", 3.14};	// explicit type
-    auto t2 = make_tuple(1, "Ophelia"s, 3.14);			// better; deduced type
+    tuple<int, string, double> t1 = {1, "Hamlet", 3.14};	// 명시적인 타입.
+    auto t2 = make_tuple(1, "Ophelia"s, 3.14);			// better; 추정된 타입.
 
-Note the use of the `s` suffix to ensure that the string is a `std::string`, rather than a C-style string.
+스트링이 C스타일이 아니라 `std::string`이라는 것을 보장하기 위해 `s`어미를 사용한 것에 주목하라.
+>Note the use of the `s` suffix to ensure that the string is a `std::string`, rather than a C-style string.
 
 ##### Note
 
-Since you can trivially write a `make_T` function, so could the compiler. Thus, `make_T` functions may become redundant in the future.
+당신이 `make_T` 함수를 작성하듯이 컴파일러도 그렇게 할 수 있다. 따라서 `make_T` 함수는 미래에는 불필요해질 것이다.
+>Since you can trivially write a `make_T` function, so could the compiler. Thus, `make_T` functions may become redundant in the future.
 
 ##### Exception
 
-Sometimes there isn't a good way of getting the template arguments deduced and sometimes, you want to specify the arguments explicitly:
+때로는 템플릿 인자를 추정할 좋은 방법이 없어서 인자를 명시적으로 기술하고 싶을 것이다.
+>Sometimes there isn't a good way of getting the template arguments deduced and sometimes, you want to specify the arguments explicitly:
 
     vector<double> v = { 1, 2, 3, 7.9, 15.99 };
     list<Record*> lst;
 
 ##### Enforcement
 
-Flag uses where an explicitly specialized type exactly matches the types of the arguments used.
+명시적으로 특수화된 타입이 정확하게 인자에 사용된 타입과 일치하도록 사용하고 있다면 표시한다.
+>Flag uses where an explicitly specialized type exactly matches the types of the arguments used.
 
-### <a name="Rt-regular"></a> T.46: Require template arguments to be at least `Regular` or `SemiRegular`
-
-##### Reason
-
- ???
-
-##### Example
-
-    ???
-
-##### Enforcement
-
-???
-
-### <a name="Rt-visible"></a> T.47: Avoid highly visible unconstrained templates with common names
+### <a name="Rt-regular"></a> T.46: 템플릿인자를 `Regular`, `SemiRegular`하도록 요청하라.
+>### <a name="Rt-regular"></a> T.46: Require template arguments to be at least `Regular` or `SemiRegular`
 
 ##### Reason
 
@@ -875,7 +893,22 @@ Flag uses where an explicitly specialized type exactly matches the types of the 
 
 ???
 
-### <a name="Rt-concept-def"></a> T.48: 컴파일러가 컨셉을 지원하지 않는다면 `enable_if`문을 뺑끼로 사용하라.
+### <a name="Rt-visible"></a> T.47: 동일한 명칭을 가진 잘 보이는 제한조건이 없는 템플릿을 피하라. (? - 내용을 이해할 수 없다.)
+>### <a name="Rt-visible"></a> T.47: Avoid highly visible unconstrained templates with common names
+
+##### Reason
+
+ ???
+
+##### Example
+
+    ???
+
+##### Enforcement
+
+???
+
+### <a name="Rt-concept-def"></a> T.48: 컴파일러가 컨셉을 지원하지 않는다면 `enable_if`문을 훼이크로 사용하라.
 >### <a name="Rt-concept-def"></a> T.48: If your compiler does not support concepts, fake them with `enable_if`
 
 ##### Reason
@@ -890,19 +923,19 @@ Flag uses where an explicitly specialized type exactly matches the types of the 
 
 ???
 
-### <a name="Rt-erasure"></a> T.49: 가능한 곳이면 어디든 타입 제거를 피하라.
+### <a name="Rt-erasure"></a> T.49: 가능한 곳이면 어디든 타입제거를 없애라.
 >### <a name="Rt-erasure"></a> T.49: Where possible, avoid type-erasure
 
 ##### Reason
 
-타입 제거는 분리된 컴파일 범위로 인해 타입 정보가 없어지므로 추가적으로 간접효과을 초래한다.
+타입제거는 분리된 컴파일 범위로 인해 타입 정보가 없어지므로 추가적으로 간접효과을 초래한다.
 >Type erasure incurs an extra level of indirection by hiding type information behind a separate compilation boundary.
 
 ##### Example
 
     ???
 
-**Exceptions**: `std::function`에 대해서는 타입 제거는 적절할 수 있다.
+**Exceptions**: `std::function`에 대해서는 타입제거는 적절할 수 있다.
 >**Exceptions**: Type erasure is sometimes appropriate, such as for `std::function`.
 
 ##### Enforcement
