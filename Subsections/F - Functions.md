@@ -127,7 +127,7 @@ If something is a well-specified action, separate it out from its  surrounding c
 >For a tiny example, this looks OK, but if the input opeartion, the output operation, and the error handling had been more complicated the tangled 
 mess could become hard to understand.
 
-**참고사항**: 한군데 이상에서 사용되는 사소하지 않은 람다를 작성한다면 함수에 이름을 짓고 (대부분 로컬이 아닌)변수에 할당하세요.
+**참고 사항**: 한군데 이상에서 사용되는 사소하지 않은 람다를 작성한다면 함수에 이름을 짓고 (대부분 로컬이 아닌)변수에 할당하세요.
 >**Note**: If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
 
 **예**:
@@ -146,7 +146,7 @@ mess could become hard to understand.
 유지보수나 성능을 고려하다면 짧은 코드가 항상 좋은것은 아닙니다.
 >The shortest code is not always the best for performance or maintainability.
 
-**예외**: 반복문, 람다를 반복문으로 사용하는 경우는 거의 이름을 지어줄 필요가 없습니다.
+**예외 사항**: 반복문, 람다를 반복문으로 사용하는 경우는 거의 이름을 지어줄 필요가 없습니다.
 그러나 수십줄에서 수십페이지가 되는 큰 반복문에는 문제가 있습니다.
 [함수를 간결하게 유지하라](#Rf-single)는 규칙은 "반복문을 간결하게 유지하라"를 의미합니다.
 비슷한 경우로, 콜백함수 인자로 사용되는 람다가 중요한 경우도 있습니다. 물론 재사용 될지는 알 수 없습니다.
@@ -301,12 +301,12 @@ Yes, it break other rules also.
   		return 0.;
 	}
 
-**참고사항**: "한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이 되기도 합니다.
+**참고 사항**: "한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이 되기도 합니다.
 왠만하면 최대 다섯줄짜리 함수로 구현 할 수 있을지 고민해 봐야 합니다.
 >**Note**: "It doesn't fit on a screen" is often a good practical definition of "far too large."
 One-to-five-line functions should be considered normal.
 
-**참고사항**: 긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누세요. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 내제화되어 사용될 수 있습니다.
+**참고 사항**: 긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누세요. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 내제화되어 사용될 수 있습니다.
 >**Note**: Break large functions up into smaller cohesive and named functions.
 Small simple functions are easily inlined where the cost of a function call is significant.
 
@@ -347,7 +347,7 @@ You could use cyclomatic complexity. Try "more that 10 logical path through." Co
 이 예는  C++14 형태 입니다. C++11 형태를 사용하려면 	`fac()`의  functional formulation를 사용하세요.
 >This is C++14. For C++11, use a functional formulation of `fac()`.
 
-**참고사항**: `constexpr`은 컴파일 타임 평가를 보장하지 않습니다;
+**참고 사항**: `constexpr`은 컴파일 타임 평가를 보장하지 않습니다;
 이것은 프로그래머가 요구하거나 컴파일러가 최적화를 하기로 결정했을 때 상수 표현 인자에 대해서 컴파일 타임에 평가 될 수 있다는 것을 보장 할 뿐입니다.
 >**Note**: `constexpr` does not guarantee compile-time evaluation;
 it just guarantees that the function can be evaluated at compile time for constant expression arguments if the programmer requires it or the compiler decides to do so to optimize.
@@ -362,7 +362,7 @@ it just guarantees that the function can be evaluated at compile time for consta
 		constexpr int m4 = min(-1,2);	// error: connot evaluate at compile-time
 	}
 	
-**참고사항**: `constexpr` 함수는 결점이 없습니다: 부작용을 가질리 없습니다.
+**참고 사항**: `constexpr` 함수는 결점이 없습니다: 부작용을 가질리 없습니다.
 >**Note**: `constexpr` functions are pure: they can have no sideefects.
 
 	int dcount = 0;
@@ -375,7 +375,7 @@ it just guarantees that the function can be evaluated at compile time for consta
 대체적으로 매우 유용 합니다.
 >This is usually a very good thing.
 
-**참고사항**: 모든 함수를 `constexpr`로 만들지 마세요. 대부분의 계산은 런타임에 수행되는 것이 좋습니다.
+**참고 사항**: 모든 함수를 `constexpr`로 만들지 마세요. 대부분의 계산은 런타임에 수행되는 것이 좋습니다.
 >**Note**: Don't try to make all functions `constexpr`. Most computation is best done at run time.
 
 **시행하기**: 불가능하고 불필요한 것.
@@ -385,9 +385,14 @@ The compiler gives an error if a non-`constexpr` function is called where a cons
 
 
 <a name="Rf-inline"></a>
-### F.5: If a function is very small and time critical, declare it `inline`
+### F.5: 만약 함수가 매우 짧고 수행시간이 중요하다면 `inline`으로 선언하라
+>### F.5: If a function is very small and time critical, declare it `inline`
 
-**Reason**: Some optimizers are good an inlining without hints from the programmer, but don't rely on it.
+**근거**: 일부 최적화기는 프로그래머로부터 힌트를 받지 않아도 함수 인라인화를 잘 해내지만 그것에 의존하지는 마세요.
+지난 40년간 우리는 컴파일러가 아무런 힌트가 없어도 사람보다 더 인라인화를 잘 할거라고 약속해 왔습니다.
+우리는 계속 그 약속이 이뤄지길 기다리고 있습니다.
+`inline`키워드를 지정하는 것은 컴파일러가 일을 더 잘 할 수 있도록 독려해주는 것 입니다.
+>**Reason**: Some optimizers are good an inlining without hints from the programmer, but don't rely on it.
 Measure! Over the last 40 years or so, we have been promised compilers that can inline better than humans without hints from humans.
 We are still waiting.
 Specifying `inline` encourages the compiler to do a better job.
@@ -395,27 +400,37 @@ Specifying `inline` encourages the compiler to do a better job.
 **Exception**: Do not put an `inline` function in what is meant to be a stable interface unless you are really sure that it will not change.
 An inline function is part of the ABI.
 
-**Note**: `constexpr` implies `inline`.
+**참고 사항**: `constexpr`은 `inline`을 내포하고 합니다.
+>**Note**: `constexpr` implies `inline`.
 
-**Note**: Member functions defined in-class are `inline` by default.
+**참고 사항**: 클래스에 정의된 멤버 함수는 기본으로 인라인화 됩니다.
+>**Note**: Member functions defined in-class are `inline` by default.
 
-**Exception**: Template functions (incl. template member functions) must be in headers and therefore inline.
+**예외 사항**: 템플릿 함수(템플릿 멤버 함수 포함)는 헤더에 정의 되어야 합니다. 따라서 인라인 함수가 됩니다.
+>**Exception**: Template functions (incl. template member functions) must be in headers and therefore inline.
 
-**Enforcement**: Flag `inline` functions that are more than three statements and could have been declared out of line (such as class member functions).
+**시행 하기**: `inline`함수가 3줄이상 된다면 표시해 두세요. (추가번역 필요)
+>**Enforcement**: Flag `inline` functions that are more than three statements and could have been declared out of line (such as class member functions).
 To fix: Declare the function out of line. [[NM: Certainly possible, but size-based metrics can be very annoying.]]
 
 
 <a name="Rf-noexcept"></a>
-### F.6: If your function may not throw, declare it `noexcept`
+### F.6: 만약 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라.
+>### F.6: If your function may not throw, declare it `noexcept`
 
-**Reason**: If an exception is not supposed to be thrown, the program cannot be assumed to cope with the error and should be terminated as soon as possible. Declaring a function `noexcept` helps optimizers by reducing the number of alternative execution paths. It also speeds up the exit after failure.
+**근거**: 예외를 던지지 않기로 계획 했다면, 프로그램은 오류를 처리하지 않을 것이기 때문에 가능하면 빨리 종료되어야 합니다. `noexcept`를 선언하면 최적화기가 선택하는 여러가지 대안들을 사전에 제거할 수 있도록 도와주게 됩니다.
+>**Reason**: If an exception is not supposed to be thrown, the program cannot be assumed to cope with the error and should be terminated as soon as possible. Declaring a function `noexcept` helps optimizers by reducing the number of alternative execution paths. It also speeds up the exit after failure.
 
-**Example**: Put `noexcept` on every function written completely in C or in any other language without exceptions.
+**예**: C언어로 구현이 되었거나 예외를 지원하지 않는 모든 함수에 `noexcept`를 추가하세요.
+C++ 표준 라이브러리는 C 표준 라이브러리에 대해서 암시적으로 그렇게하고 있습니다.
+>**Example**: Put `noexcept` on every function written completely in C or in any other language without exceptions.
 The C++ standard library does that implicitly for all functions in the C standard library.
 
-**Note**: `constexpr` functions cannot throw, so you don't need to use `noexcept` for those.
+**참고 사항**: `constexpr` 함수는 예외를 던질 수 없기 때문에 `noexcept`를 사용할 필요가 없습니다.
+>**Note**: `constexpr` functions cannot throw, so you don't need to use `noexcept` for those.
 
-**Example**: You can use `noexcept` even on functions that can throw:
+**예**: `noexcept`는 예외를 던질 수 있는 함수에서 사용할 수 있습니다.
+>**Example**: You can use `noexcept` even on functions that can throw:
 
 	vector<string> collect(istream& is) noexcept
 	{
@@ -425,58 +440,82 @@ The C++ standard library does that implicitly for all functions in the C standar
 		return res;
 	}
 
-If `collect()` runs out of memory, the program crashes.
+`collect()` 함수가 메모리를 모두 사용해 버리면 프로그램은 비정상적인 종료가 됩니다.
+프로그램이 메모리 소진상태를 만들지 않기위해서 개선되지 않는다면 다음의 것을 할 수 밖에 없을 것입니다;
+`terminate()`가 적절한 에러 로그 정보를 만들어 낼 것 입니다 (그러나 메모리가 이미 다 소진된 상태라면 현명한 무언가를 하기가 어려울 것 입니다).
+>If `collect()` runs out of memory, the program crashes.
 Unless the program is crafted to survive memory exhaustion, that may be just the right thing to do;
 `terminate()` may generate suitable error log information (but after memory runs out it is hard to do anything clever).
 
-**Note**: In most programs, most functions can throw
+**참고 사항**: 대부분의 프로그램에서, 대부분의 함수는 예외를 던질 수 있습니다
+(예외를 던져서 실패상황을 보고하는 함수나 라이브러리를 사용하세요).
+다만 모든 곳에 `noexcept` 덫을 놓지는 마세요.
+`noexcept`는 저수준 함수에서 빈번하게 사용하기에 가장 유용합니다. 
+>**Note**: In most programs, most functions can throw
 (e.g., because they use `new`, call functions that do, or use library functions that reports failure by throwing),
 so don't just springle `noexcept` all over the place.
 `noexcept` is most useful for frequently used, low-level functions.
 
-**Note**: Destructors, `swap` functions, move operations, and default constructors should never throw.
+**참고 사항**: 소멸자, `swap` 함수, move 연산자 그리고 기본 생성자에서는 절대로 예를 던지면 안 됩니다.
+>**Note**: Destructors, `swap` functions, move operations, and default constructors should never throw.
 
 
-**Enforcement**:
+**시행하기**:
+>**Enforcement**:
 
-* Flag functions that are not `noexcept`, yet cannot thow
+* 아직까지 예외를 던질 수 없는 함수가 있다면 표시해 두세요.
+* 예외를 던지는 `swap`, move 연산자, 소멸자 그리고 기본 생성자가 있다면 표시해 두세요.
+
+>* Flag functions that are not `noexcept`, yet cannot thow
 * Flag throwing `swap`, `move`, destructors, and default constructors.
 
 
 <a name="Rf-smart"></a>
-### F.7: For general use, take `T*` arguments rather than a smart pointers
+### F.7: 범용으로 사용하려면 스마트포인터 대신에 `T*`형 인자를 사용하라.
+>### F.7: For general use, take `T*` arguments rather than a smart pointers
 
-**Reason**: Passing a smart pointer transfers or shares ownership.
+**근거**: 스마트 포인터를 인자로 사용하면 소유권이 이전되거나 공유 됩니다.
+스마트 포인터를 인자로 사용하면 함수 호출 시 스마트 포인터를 사용해야한다는 제약이 생깁니다.
+공유 스마트 포인터를 인자로 사용하는 것은 (예, `std::shared_ptr`) 런타임시 추가 비용을 부담하게 됩니다.   
+>**Reason**: Passing a smart pointer transfers or shares ownership.
 Passing by smart pointer restricts the use of a function to callers that use smart pointers.
 Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost.
 
-**Example**:
+**예**:
+>**Example**:
 
 	void f(int*);		// accepts any int*
 	void g(unique_ptr<int>);	// can only accept ints for which you want to transfer ownership
 	void g(shared_ptr<int>);	// can only accept ints for which you are willing to share ownership
 
-**Note**: We can catch dangling pointers statically, so we don't need to rely on resource management to avoid violations from dangling pointers.
+**참고 사항**: 우리는 정적분석으로 허상포인터 문제를 잡아 낼 수 있습니다. 그래서 굳이 허상 포인터 문제를 피하기위해서 자원관리를 할 필요는 없습니다.
+>**Note**: We can catch dangling pointers statically, so we don't need to rely on resource management to avoid violations from dangling pointers.
 
-**See also**: Discussion of [smart pointer use](#Rr-summary-smartptrs).
+**더 보기**: [smart pointer use](#Rr-summary-smartptrs)에 대한 논의.
+>**See also**: Discussion of [smart pointer use](#Rr-summary-smartptrs).
 
-**Enforcement**: Flag smart pointer arguments.
+**시행하기**: 스마트 포인터 인자가 있다면 표시해 두세요.
+>**Enforcement**: Flag smart pointer arguments.
 
 
 <a name="Rf-pure"></a>
-### F.8: Prefer pure functions
+### F.8: 간결한 함수를 선호하라
+>### F.8: Prefer pure functions
 
+**근거**: 간결한 함수는 이유를 이해하기 쉽고, 최적화하기 쉽고(병렬화되어 있더라도), 메모이제이션하기 쉽습니다.
+>**Reason**: Pure functions are easier to reason about, sometimes easier to optimize (and even parallelize), and sometimes can be memoized.
 
-**Reason**: Pure functions are easier to reason about, sometimes easier to optimize (and even parallelize), and sometimes can be memoized.
-
-**Example**:
+**예**:
+>**Example**:
 
     template<class T>
 	auto square(T t) { return t*t; }
 	
-**Note**: `constexpr` functions are pure.
+**참고 사항**: `constexpr`는 간결한 함수 입니다.
+>**Note**: `constexpr` functions are pure.
 	
-**Enforcement**: not possible.
+**시행하기**: 할게 없습니다(간결하기 때문에).
+>**Enforcement**: not possible.
 
 
 <a name="SS-call"></a>
