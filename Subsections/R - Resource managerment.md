@@ -107,7 +107,7 @@ Alocation and deallocation rule summary:
         Port& operator=(const Port&) =delete;
     };
 
-**Note**: 소멸자를 가진 클래스에서 표현되지 않는 다루기 힘든 자원인 경우 클래스로 감싸거나 [`finally`](#S-GSL) 를 사용해라.
+**Note**: 소멸자를 가진 클래스에서 표현되지 않고 다루기 힘든 자원인 경우 클래스로 감싸거나 [`finally`](#S-GSL)를 사용해라.
 
 **참고**: [RAII](Rr-raii).
 
