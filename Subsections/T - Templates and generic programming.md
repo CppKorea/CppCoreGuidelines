@@ -541,12 +541,16 @@ Examples of complete sets are
 
 ???
 
-### <a name="Rt-axiom"></a> T.22: 컨셉을 위해 axioms를 기술하라.
+### <a name="Rt-axiom"></a> T.22: 컨셉을 위해 공리를 기술하라.
 >### <a name="Rt-axiom"></a> T.22: Specify axioms for concepts
 
 ##### Reason
 
-A meaningful/useful concept has a semantic meaning.
+의미있고 유용한 컨셉은 의미구조적이다.
+비공식적인, 반쯤 공식적인, 공식적인 방법으로 의미구조를 표현하는 것은 컨셉을 이해할 수 있게 만든다.
+그것을 표현하는 노력은 컨셉 에러를 잡는데 도움을 준다.
+의미구조를 기술할 수 있다는 것은 강력한 디자인 도구이다.
+>A meaningful/useful concept has a semantic meaning.
 Expressing this semantics in a informal, semi-formal, or informal way makes the concept comprehensible to readers and the effort to express it can catch conceptual errors.
 Specifying semantics is a powerful design tool.
 
@@ -564,41 +568,56 @@ Specifying semantics is a powerful design tool.
 
 ##### Note
 
-This is an axiom in the mathematical sense: something that may be assumed without proof.
+이것은 수학적 개념으로 공리이다: 증명이 없이도 자명한 것.
+일반적으로 공리는 증명하지 않는다. 게다가 그것을 증명함은 컴파일러의 능력을 넘어서는 것이다.
+공리가 일반적이지 않을지도 모른다. 그러나 템플릿 작성자는 실제로 사용하는 모든 입력에 대해서 공리를 가지고 있다고 가정하는게 좋다. (선행조건과 비슷하다)
+>This is an axiom in the mathematical sense: something that may be assumed without proof.
 In general, axioms are not provable, and when they are the proof is often beyond the capability of a compiler.
 An axiom may not be general, but the template writer may assume that it holds for all inputs actually used (similar to a precondition).
 
 ##### Note
 
-In this context axioms are Boolean expressions.
+이 문맥에서 공리는 불리언 연산식이다. 그 예로 [Palo Alto TR](#S-references)를 참조하라.
+현재 C++은 공리를 지원하지 않는다.(ISO 컨셉 TS에서도) 그래서 꽤 오래동안 주석으로 대신해야만 한다.
+나중에 언어가 지원한다면 '//'를 없애면 된다.
+>In this context axioms are Boolean expressions.
 See the [Palo Alto TR](#S-references) for examples.
 Currently, C++ does not support axioms (even the ISO Concepts TS), so we have to make do with comments for a longish while.
 Once language support is available, the `//` in front of the axiom can be removed
 
 ##### Note
 
-The GSL concepts have well defined semantics; see the Palo Alto TR and the Ranges TS.
+GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 the Ranges TS를 참조하라.
+>The GSL concepts have well defined semantics; see the Palo Alto TR and the Ranges TS.
 
 ##### Exception
 
-Early versions of a new "concept" still under development will often just define simple sets of constraints without a well-specified semantics.
+현재 개발중인 새 "컨셉" 초기버전은 의미구조를 기술하지 않고 제약조건들을 정의하려고 한다.
+좋은 의미구조는 노력과 시간이 필요하다.
+불완전한 제약조건이라도 쓸만하다:
+>Early versions of a new "concept" still under development will often just define simple sets of constraints without a well-specified semantics.
 Finding good semantics can take effort and time.
 An incomplete set of constraints can still be very useful:
 
     ??? binary tree: rotate(), ...
 
-A "concept" that is incomplete or without a well-specified semantics can still be useful.
+불완전하거나 의미구조가 잘 정의되지 않은 컨셉이라도 쓸만하다.
+그러나 안정화됐다고 생각해서는 안된다. 새로운 사용예제를 발견하면 불완전한 컨셉이 개선될 것이다.
+>A "concept" that is incomplete or without a well-specified semantics can still be useful.
 However, it should not be assumed to be stable. Each new use case may require such an incomplete concepts to be improved.
 
 ##### Enforcement
 
-* Look for the word "axiom" in concept definition comments
+* 컨셉 정의 주석 내에 "axiom" 단어를 찾아라.
+>* Look for the word "axiom" in concept definition comments
 
-### <a name="Rt-refine"></a> T.23: Differentiate a refined concept from its more general case by adding new use patterns.
+### <a name="Rt-refine"></a> T.23: 정제된 컨셉과 새로운 사용패턴을 추가함으로써 더 일반화된 경우를 구별하라.
+>### <a name="Rt-refine"></a> T.23: Differentiate a refined concept from its more general case by adding new use patterns.
 
 ##### Reason
 
-Otherwise they cannot be distinguished automatically by the compiler.
+그렇지 않으면 컴파일러가 자동으로 구분할 수 없다.
+>Otherwise they cannot be distinguished automatically by the compiler.
 
 ##### Example
 
@@ -608,21 +627,28 @@ Otherwise they cannot be distinguished automatically by the compiler.
     template<typename I>
     concept bool Fwd_iter = Input_iter<I> && requires (I iter) { iter++; }
 
-The compiler can determine refinement based on the sets of required operations.
+컴파일러는 요구된 연산들에 기반해서 정제를 결정할 수 있다.
+2개의 컨셉이 요구사항이 정확하게 동일하다면 그들은 논리적으로 동일하다.(정제가 없다.)
+>The compiler can determine refinement based on the sets of required operations.
 If two concepts have exactly the same requirements, they are logically equivalent (there is no refinement).
 
-This also decreases the burden on implementers of these types since
+컨셉을 끌어들이기 위한 특별한 선언이 필요없기에 이것은 타입 구현자들의 짐을 좀 줄여준다.
+>This also decreases the burden on implementers of these types since
 they do not need any special declarations to "hook into the concept".
 
 ##### Enforcement
 
-* Flag a concept that has exactly the same requirements as another already-seen concept (neither is more refined). To disambiguate them, see [T.24](#Rt-tag).
+이미 본 다른 컨셉과 요구사항이 정확하게 일치하는 컨셉이 있다면 표시한다.
+차이를 분명하게 보고 싶다면 [T.24](#Rt-tag)를 참조하라.
+>* Flag a concept that has exactly the same requirements as another already-seen concept (neither is more refined). To disambiguate them, see [T.24](#Rt-tag).
 
-### <a name="Rt-tag"></a> T.24: Use tag classes or traits to differentiate concepts that differ only in semantics.
+### <a name="Rt-tag"></a> T.24: 의미구조만 다른 컨셉을 구별하기 위해서는 테그 클래스나 타입특성을 사용하라.
+>### <a name="Rt-tag"></a> T.24: Use tag classes or traits to differentiate concepts that differ only in semantics.
 
 ##### Reason
 
-Two concepts requiring the same syntax but having different semantics leads to ambiguity unless the programmer differentiates them.
+동일한 문법을 요구하지만 의미구조가 다르다면 두 컨셉은 프로그래머가 구별시키지 않는다면 애매모호함을 야기한다.
+>Two concepts requiring the same syntax but having different semantics leads to ambiguity unless the programmer differentiates them.
 
 ##### Example
 
@@ -633,29 +659,40 @@ Two concepts requiring the same syntax but having different semantics leads to a
     concept bool Contiguous_iter =
         RA_iter<I> && is_contiguous<I>::value;  // ??? why not is_contiguous<I>() or is_contiguous_v<I>?
 
-The programmer (in a library) must define `is_contiguous` (a trait) appropriately.
+프로그래머가 `is_contiguous`를 적절하게 정의해야 한다.
+>The programmer (in a library) must define `is_contiguous` (a trait) appropriately.
 
 ##### Note
 
-Traits can be trait classes or type traits.
+트레잇은 트레잇 클래스나 타입 트레잇이다.
+이들은 사용자가 정의했거나 표준라이브러리 중의 하나이다.
+표준라이브러리를 선호하라.
+>Traits can be trait classes or type traits.
 These can be user-defined or standard-library ones.
 Prefer the standard-library ones.
 
 ##### Enforcement
 
-* The compiler flags ambiguous use of identical concepts.
-* Flag the definition of identical concepts.
+* 컴파일러는 동일한 컨셉을 애매하게 사용하는 것을 표시한다.
+* 동일한 컨셉을 정의한다면 표시한다.
 
-### <a name="Rt-not"></a> T.25: Avoid negating constraints.
+>* The compiler flags ambiguous use of identical concepts.
+>* Flag the definition of identical concepts.
+
+### <a name="Rt-not"></a> T.25: 정반대인 제약조건은 피하라.
+>### <a name="Rt-not"></a> T.25: Avoid negating constraints.
 
 ##### Reason
 
-Clarity. Maintainability.
+단순명료, 유지보수가 좋음.
+반대를 나타내려고 쓴 보완적인 요구사항이 있는 함수는 불안정하다.
+>Clarity. Maintainability.
 Functions with complementary requirements expressed using negation are brittle.
 
 ##### Example
 
-Initially, people will try to define functions with complementary requirements:
+초기에 사람들은 보완적인 요구사항을 가진 함수를 정의하려고 시도할 것이다.
+>Initially, people will try to define functions with complementary requirements:
 
     template<typename T>
         requires !C<T>    // bad
@@ -665,34 +702,44 @@ Initially, people will try to define functions with complementary requirements:
         requires C<T>
     void f();
 
-This is better:
+아래가 더 낫다:
+>This is better:
 
     template<typename T>	// general template
         void f();
 
-    template<typename T>	// specialization by concept
+    template<typename T>	// 컨셉으로 특수화
         requires C<T>
     void f();
 
-The compiler will choose the unconstrained template only when `C<T>` is
+`C<T>`가 만족되지 않을 때만 컴파일러는 제한조건이 없는 템플릿을 선택할 것이다.
+제약조건이 없는`f()`를 정의하고 싶지 않다면 그냥 없애라.
+>The compiler will choose the unconstrained template only when `C<T>` is
 unsatisfied. If you do not want to (or cannot) define an unconstrained
 version of `f()`, then delete it.
 
     template<typename T>
     void f() = delete;
 
-The compiler will select the overload and emit an appropriate error.
+컴파일러는 오버로드된 함수를 선택할 것이고 적당한 에러를 낼 것이다.
+>The compiler will select the overload and emit an appropriate error.
 
 ##### Enforcement
 
-* Flag pairs of functions with `C<T>` and `!C<T>` constraints
+* `C<T>`, `!C<T>`를 같이 가진 함수들이 있다면 표시한다.
+* 정반대 제약조건이 있다면 모두 표시한다.
+
+>* Flag pairs of functions with `C<T>` and `!C<T>` constraints
 * Flag all constraint negation
 
-### <a name="Rt-use"></a> T.27: Prefer to define concepts in terms of use-patterns rather than simple syntax
+### <a name="Rt-use"></a> T.27: 단순화된 문법보다는 사용패턴으로 컨셉을 정의하는 것을 선호하라.
+>### <a name="Rt-use"></a> T.27: Prefer to define concepts in terms of use-patterns rather than simple syntax
 
 ##### Reason
 
-The definition is more readable and corresponds directly to what a user has to write.
+정의가 더 읽기 쉽고 사용자가 작성하고 싶은 것과 직접적으로 일치한다.
+형변환은 고려해야 한다. 모든 타입특성의 이름을 기억할 필요가 없다.
+>The definition is more readable and corresponds directly to what a user has to write.
 Conversions are taken into account. You don't have to remember the names of all the type traits.
 
 ##### Example
