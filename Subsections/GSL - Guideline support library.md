@@ -194,7 +194,7 @@ The elements are mutable unless `T` is a `const` type. Basically an `array_view`
 <a name="SS-concepts"></a>
 ## GSL.concept: 개념
 
-이런 개념들 (타입 추론)은Amdrew Sutton의 Origin 라이브러리, Range 제안, ISO WG21 Palo Alto TR로부터 개념을 빌려왔습니다.
+이런 개념들 (타입 추론)은 Amdrew Sutton의 Origin 라이브러리, Range 제안, ISO WG21 Palo Alto TR로부터 개념을 빌려왔습니다.
 아마도 ISO C++ 표준으로 채택될 가능성이 큽니다.
 표기법은 ISO WG21 Concepts TS 입니다. (???ref???)
 
