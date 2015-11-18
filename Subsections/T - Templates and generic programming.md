@@ -100,15 +100,18 @@ Other template rules summary:
 
 Generic programming is programming using types and algorithms parameterized by types, values, and algorithms.
 
-### <a name="Rt-raise"></a> T.1: Use templates to raise the level of abstraction of code
+### <a name="Rt-raise"></a> T.1: 추상화 레벨을 올리기 위해 템플릿을 사용하라.
+>### <a name="Rt-raise"></a> T.1: Use templates to raise the level of abstraction of code
 
 ##### Reason
 
-Generality. Re-use. Efficiency. Encourages consistent definition of user types.
+일반화. 재사용성. 효율성. 사용자타입의 일관된 정의를 고취한다.
+>Generality. Re-use. Efficiency. Encourages consistent definition of user types.
 
 ##### Example, bad
 
-Conceptually, the following requirements are wrong because what we want of `T` is more than just the very low-level concepts of "can be incremented" or "can be added":
+개념적으로, 아래 요구사항은 틀렸다. 왜냐하면 `T`는 "증가될 수 있다"거나 "추가될 수 있다"는 하위레벨 개념 이상이다.
+>Conceptually, the following requirements are wrong because what we want of `T` is more than just the very low-level concepts of "can be incremented" or "can be added":
 
     template<typename T, typename A>
         // requires Incrementable<T>
@@ -126,7 +129,9 @@ Conceptually, the following requirements are wrong because what we want of `T` i
         return s;
     }
 
-Assuming that `Incrementable` does not support `+` and `Simple_number` does not support `+=`, we have overconstrained implementers of `sum1` and `sum2`.
+`Incrementable`이 `+`를 지원하지 않고, `Simple_number`이 `+=`를 지원하지 않는다고 가정하면 `sum1`과 `sum2`의 구현을 과도하게 제약해왔다.
+그리고 이런 경우에는 일반화를 위해 기회를 놓쳤다.
+>Assuming that `Incrementable` does not support `+` and `Simple_number` does not support `+=`, we have overconstrained implementers of `sum1` and `sum2`.
 And, in this case, missed an opportunity for a generalization.
 
 ##### Example
@@ -153,23 +158,30 @@ We aim to minimize requirements on template arguments, but the absolutely minima
 
 ##### Note
 
-Templates can be used to express essentially everything (they are Turing complete), but the aim of generic programming (as expressed using templates)
+템플릿은 
+>Templates can be used to express essentially everything (they are Turing complete), but the aim of generic programming (as expressed using templates)
 is to efficiently generalize operations/algorithms over a set of types with similar semantic properties.
 
 ##### Enforcement
 
-* Flag algorithms with "overly simple" requirements, such as direct use of specific operators without a concept.
-* Do not flag the definition of the "overly simple" concepts themselves; they may simply be building blocks for more useful concepts.
+* 컨셉없이 특정 연산자를 바로 사용하는 것같은, 과도하게 단순한 요구사항을 가진 알고리즘이 있다면 표시한다.
+* 과도하게 단순한 컨셉 정의가 있다면 표시하지 않는다; 더 쓸만한 컨셉을 위해 블록을 만들지도 모른다.
 
-### <a name="Rt-algo"></a> T.2: Use templates to express algorithms that apply to many argument types
+>* Flag algorithms with "overly simple" requirements, such as direct use of specific operators without a concept.
+>* Do not flag the definition of the "overly simple" concepts themselves; they may simply be building blocks for more useful concepts.
+
+### <a name="Rt-algo"></a> T.2: 다수의 인자 타입에 적용되는 알고리즘을 표현하기 위해 템플릿을 사용하라.
+>### <a name="Rt-algo"></a> T.2: Use templates to express algorithms that apply to many argument types
 
 ##### Reason
 
-Generality. Minimizing the amount of source code. Interoperability. Re-use.
+일반화. 소스코드 사이즈를 최소화한다. 상호운용성. 재사용.
+>Generality. Minimizing the amount of source code. Interoperability. Re-use.
 
 ##### Example
 
-That's the foundation of the STL. A single `find` algorithm easily works with any kind of input range:
+STL의 기본이다. `find` 알고리즘은 모든 종류의 입력 범위에서 잘 작동한다.
+>That's the foundation of the STL. A single `find` algorithm easily works with any kind of input range:
 
     template<typename Iter, typename Val>
         // requires Input_iterator<Iter>
@@ -181,18 +193,24 @@ That's the foundation of the STL. A single `find` algorithm easily works with an
 
 ##### Note
 
-Don't use a template unless you have a realistic need for more than one template argument type.
+한개 이상의 템플릿 인자타입에 대한 현실적인 필요가 없다면 템플릿을 사용하지 마라.
+과도하게 추상화하지 마라.
+>Don't use a template unless you have a realistic need for more than one template argument type.
 Don't overabstract.
 
 ##### Enforcement
 
-??? tough, probably needs a human
+??? 터프, 아마도 인간이 필요한다.
+>??? tough, probably needs a human
 
-### <a name="Rt-cont"></a> T.3: Use templates to express containers and ranges
+### <a name="Rt-cont"></a> T.3: 컨테이너와 범위를 표현하기 위해 템플릿을 사용하라.
+>### <a name="Rt-cont"></a> T.3: Use templates to express containers and ranges
 
 ##### Reason
 
-Containers need an element type, and expressing that as a template argument is general, reusable, and type safe.
+컨테이너는 요소의 타입을 필요로 하고, 템플릿인자로 표현하는 것이 일반적이고, 재사용가능하고, 타입 안전하다.
+불안정하고 비효율적인 해결방법을 피한다. 관례: STL이 하는 방법이다.
+>Containers need an element type, and expressing that as a template argument is general, reusable, and type safe.
 It also avoids brittle or inefficient workarounds. Convention: That's the way the STL does it.
 
 ##### Example
@@ -219,18 +237,25 @@ It also avoids brittle or inefficient workarounds. Convention: That's the way th
     Container c(10, sizeof(double));
     ((double*)c.elem)[] = 9.9;
 
-This doesn't directly express the intent of the programmer and hides the structure of the program from the type system and optimizer.
+이것은 프로그래머의 의도를 직접적으로 표현하지 않는다. 타입시스템과 옵티마이저로부터 프로그램의 구조를 숨긴다.
+>This doesn't directly express the intent of the programmer and hides the structure of the program from the type system and optimizer.
 
-Hiding the `void*` behind macros simply obscures the problems and introduces new opportunities for confusion.
+메크로 뒤에서 `void*`를 숨김은 단순히 문제를 어렵게 한다. 혼란스럽게도 새로운 기회를 제공한다.
+>Hiding the `void*` behind macros simply obscures the problems and introduces new opportunities for confusion.
 
-**Exceptions**: If you need an ABI-stable interface, you might have to provide a base implementation and express the (type-safe) template in terms of that.
+**Exceptions**: ABI지원 인터페이스가 필요하다면 기본 구현을 제공하고, 타입안전 템플릿으로 표현해야 할지도 모른다.
+[Stable base](#Rt-abi)를 참조하라.
+>**Exceptions**: If you need an ABI-stable interface, you might have to provide a base implementation and express the (type-safe) template in terms of that.
 See [Stable base](#Rt-abi).
 
 ##### Enforcement
 
-* Flag uses of `void*`s and casts outside low-level implementation code
+* `void*`과 하위레벨 구현코드 외에 형변환을 사용한다면 표시한다.
 
-### <a name="Rt-expr"></a> T.4: Use templates to express syntax tree manipulation
+>* Flag uses of `void*`s and casts outside low-level implementation code
+
+### <a name="Rt-expr"></a> T.4: 문법 트리 조작을 표현하기 위해 템플릿을 사용하라.
+>### <a name="Rt-expr"></a> T.4: Use templates to express syntax tree manipulation
 
 ##### Reason
 
@@ -242,15 +267,18 @@ See [Stable base](#Rt-abi).
 
 **Exceptions**: ???
 
-### <a name="Rt-generic-oo"></a> T.5: Combine generic and OO techniques to amplify their strengths, not their costs
+### <a name="Rt-generic-oo"></a> T.5: 비용이 아니라 강점을 증폭시킬 일반화와 객체지향 기술을 결합하라.
+>### <a name="Rt-generic-oo"></a> T.5: Combine generic and OO techniques to amplify their strengths, not their costs
 
 ##### Reason
 
-Generic and OO techniques are complementary.
+일반화와 객체지향 기술은 상호보완적이다.
+>Generic and OO techniques are complementary.
 
 ##### Example
 
-Static helps dynamic: Use static polymorphism to implement dynamically polymorphic interfaces.
+정적은 동적을 돕는다: 동적으로 다형적 인터페이스를 구현하기 위해 정적 다형성을 사용하라.
+>Static helps dynamic: Use static polymorphism to implement dynamically polymorphic interfaces.
 
     class Command {
         // pure virtual functions
@@ -264,24 +292,36 @@ Static helps dynamic: Use static polymorphism to implement dynamically polymorph
 
 ##### Example
 
-Dynamic helps static: Offer a generic, comfortable, statically bound interface, but internally dispatch dynamically, so you offer a uniform object layout. Examples include type erasure as with `std::shared_ptr`’s deleter. (But [don't overuse type erasure](#Rt-erasure).)
+동적은 정적을 돕는다: 일반적인, 편안한, 정적으로 묶인 인터페이스, 그러나 내부적으로는 동적으로 dispatch(?)를 제공한다.
+그래서 획일적인 객체 배치를 제공한다. `std::shared_ptr`의 제거자로써 타입제거를 예제로 포함할 수 있다.
+([don't overuse type erasure](#Rt-erasure).)
+>Dynamic helps static: Offer a generic, comfortable, statically bound interface, but internally dispatch dynamically, so you offer a uniform object layout. Examples include type erasure as with `std::shared_ptr`’s deleter. (But [don't overuse type erasure](#Rt-erasure).)
 
 ##### Note
 
-In a class template, nonvirtual functions are only instantiated if they're used -- but virtual functions are instantiated every time. This can bloat code size, and may overconstrain a generic type by instantiating functionality that is never needed. Avoid this, even though the standard facets made this mistake.
+클래스템플릿 속에 있는 비상속함수는 사용될때만 한번 인스턴스화된다. -- 가상함수는 매번 인스턴스화된다.
+이것은 코드사이즈를 늘리고 필요치도 않는 함수를 인스턴스화함으로써 일반화 타입에 대한 제약을 심화시킬지도 모른다.
+>In a class template, nonvirtual functions are only instantiated if they're used -- but virtual functions are instantiated every time. This can bloat code size, and may overconstrain a generic type by instantiating functionality that is never needed. Avoid this, even though the standard facets made this mistake.
 
 ##### Enforcement
 
-* Flag a class template that declares new (non-inherited) virtual functions.
+* 새로운(상속하지 않는) 가상 함수를 정의하는 클래스 템플릿이 있다면 표시한다.
 
-## <a name="SS-tpg-concepts"></a> TPG.concepts: Concept rules
+>* Flag a class template that declares new (non-inherited) virtual functions.
 
-Concepts is a facility for specifying requirements for template arguments.
+## <a name="SS-tpg-concepts"></a> TPG.concepts: 컨셉 규칙
+>## <a name="SS-tpg-concepts"></a> TPG.concepts: Concept rules
+
+컨셉은 템플릿 인자용 요구사항을 기술하기 위한 기능이다.
+[ISO technical specification](#Ref-conceptsTS)이다. 아직 컴파일러가 지원하지 않는다.
+그러나 컨셉은 일반화 프로그래밍, 미래의 C++ 라이브러리(표준과 다른 것)에 대한 많은 기초작업에 대해 고려할 때는 결정적이다.
+>Concepts is a facility for specifying requirements for template arguments.
 It is an [ISO technical specification](#Ref-conceptsTS), but not yet supported by currently shipping compilers.
 Concepts are, however, crucial in the thinking about generic programming and the basis of much work on future C++ libraries
 (standard and other).
 
-Concept use rule summary:
+컨셉 사용 규칙 요약:
+>Concept use rule summary:
 
 * [T.10: Specify concepts for all template arguments](#Rt-concepts)
 * [T.11: Whenever possible use standard concepts](#Rt-std-concepts)
@@ -289,7 +329,8 @@ Concept use rule summary:
 * [T.15: Prefer the shorthand notation for simple, single-type argument concepts](#Rt-shorthand)
 * ???
 
-Concept definition rule summary:
+컨셉 정의 규칙 요약:
+>Concept definition rule summary:
 
 * [T.20: Avoid "concepts" without meaningful semantics](#Rt-low)
 * [T.21: Define concepts to define complete sets of operations](#Rt-complete)
@@ -300,13 +341,19 @@ Concept definition rule summary:
 * [T.26: Prefer to define concepts in terms of use-patterns rather than simple syntax](#Rt-use)
 * ???
 
-## <a name="SS-concept-use"></a> T.con-use: Concept use
+## <a name="SS-concept-use"></a> T.con-use: 컨셉 사용
+>## <a name="SS-concept-use"></a> T.con-use: Concept use
 
-### <a name="Rt-concepts"></a> T.10: Specify concepts for all template arguments
+### <a name="Rt-concepts"></a> T.10: 모든 템플릿 인자를 위해 개념을 기술하라.
+>### <a name="Rt-concepts"></a> T.10: Specify concepts for all template arguments
 
 ##### Reason
 
-Correctness and readability.
+정확함과 가독성.
+템플릿 인자의 가정된 의미(문법과 의미구조)는 템플릿 인터페이스의 기본이다.
+컨셉은 문서화와 템플릿용 에러 처리를 드라마틱하게 개선시킨다.
+템플릿 인자를 위한 개념을 기술하는 것은 강력한 디자인 도구이다.
+>Correctness and readability.
 The assumed meaning (syntax and semantics) of a template argument is fundamental to the interface of a template.
 A concept dramatically improves documentation and error handling for the template.
 Specifying concepts for template arguments is a powerful design tool.
@@ -321,7 +368,8 @@ Specifying concepts for template arguments is a powerful design tool.
         // ...
     }
 
-or equivalently and more succinctly:
+또는 동등하게, 그리고 더 간결하게:
+>or equivalently and more succinctly:
 
     template<Input_iterator Iter, typename Val>
         requires Equality_comparable<Value_type<Iter>, Val>
@@ -332,7 +380,8 @@ or equivalently and more succinctly:
 
 ##### Note
 
-Until your compilers support the concepts language feature, leave the concepts in comments:
+컴파일러가 언어특징으로 컨셉을 지원할때까지 컨셉을 주석으로 묶어라:
+>Until your compilers support the concepts language feature, leave the concepts in comments:
 
     template<typename Iter, typename Val>
         // requires Input_iterator<Iter>
@@ -344,7 +393,10 @@ Until your compilers support the concepts language feature, leave the concepts i
 
 ##### Note
 
-Plain `typename` (or `auto`) is the least constraining concept.
+평범한 `typename`(또는 `auto`)는 가장 제약이 작은 컨셉이다.
+타입이라는 것을 가정하지 않는다면 단지 아주 예외적으로만 써야 한다.
+(템플릿 메타프로그래밍 코드의 한 부분으로써) 우리가 순수한 연산식 트리를 조작하고, 타입 체크를 연기할때만 필요하다.
+>Plain `typename` (or `auto`) is the least constraining concept.
 It should be used only rarely when nothing more than "it's a type" can be assumed.
 This is typically only needed when (as part of template metaprogramming code) we manipulate pure expression trees, postponing type checking.
 
@@ -352,18 +404,24 @@ This is typically only needed when (as part of template metaprogramming code) we
 
 ##### Enforcement
 
-Flag template type arguments without concepts
+컨셉없이 템플릿 타입 인자가 있다면 표시한다.
+>Flag template type arguments without concepts
 
-### <a name="Rt-std-concepts"></a> T.11: Whenever possible use standard concepts
+### <a name="Rt-std-concepts"></a> T.11: 가능하면 표준 컨셉을 사용하라.
+>### <a name="Rt-std-concepts"></a> T.11: Whenever possible use standard concepts
 
 ##### Reason
 
- "Standard" concepts (as provided by the GSL, the ISO concepts TS, and hopefully soon the ISO standard itself)
+우리만의 컨셉을 생각해 내는 작업을 도울 수 있는 (GSL, ISO 컨셉 TS 그리고 희망적이이게도 곧 ISO 표준이 될)표준 컨셉은
+우리가 서둘러 한 것과 상호운용성을 개선한 것보다 더 신중히 고려되었다.
+
+>"Standard" concepts (as provided by the GSL, the ISO concepts TS, and hopefully soon the ISO standard itself)
 saves us the work of thinking up our own concepts, are better thought out than we can manage to do in a hurry, and improves interoperability.
 
 ##### Note
 
-Unless you are creating a new generic library, most of the concepts you need will already be defined by the standard library.
+새로운 일반화 라이브러리를 만들지 않는다면 필요한 많은 컨셉은 이미 표준 라이브러리 안에 정의되어 있다.
+>Unless you are creating a new generic library, most of the concepts you need will already be defined by the standard library.
 
 ##### Example
 
@@ -373,7 +431,10 @@ Unless you are creating a new generic library, most of the concepts you need wil
 
     void sort(Ordered_container& s);
 
-This `Ordered_container` is quite plausible, but it is very similar to the `Sortable` concept in the GSL (and the Range TS).
+이 `Ordered_container`는 아주 타당해 보인다. 그러나 GSL(그리고 Range TS)안에 있는 `Sortable` 컨셉과 아주 비슷하다.
+더 좋냐? 더 올바르냐? `sort`에 대한 표준 요구사항을 정확하게 반영하고 있느냐?
+`Sortable`을 사용하는 것이 더 좋고 단순하다.
+>This `Ordered_container` is quite plausible, but it is very similar to the `Sortable` concept in the GSL (and the Range TS).
 Is it better? Is it right? Does it accurately reflect the standard's requirements for `sort`?
 It is better and simpler just to use `Sortable`:
 
@@ -381,24 +442,32 @@ It is better and simpler just to use `Sortable`:
 
 ##### Note
 
-The set of "standard" concepts is evolving as we approaches real (ISO) standardization.
+표준 컨셉집합은 실제 ISO 표준화로 진화하고 있다.
+>The set of "standard" concepts is evolving as we approaches real (ISO) standardization.
 
 ##### Note
 
-Designing a useful concept is challenging.
+쓸만한 컨셉을 디자인하는 것은 굉장히 도전적인 일이다.
+>Designing a useful concept is challenging.
 
 ##### Enforcement
 
-Hard.
+어렵다.
+>Hard.
 
-* Look for unconstrained arguments, templates that use "unusual"/non-standard concepts, templates that use "homebrew" concepts without axioms.
+* 제약조건이 없는 인자, 비표준 컨셉을 쓰는 템플릿, 공리없이 'homebrew' 컨셉을 쓰는 템플릿을 찾아라.
+* 컨셉 발견 툴을 개발하라. [an early experiment](http://www.stroustrup.com/sle2010_webversion.pdf)을 참조하라.
+
+>* Look for unconstrained arguments, templates that use "unusual"/non-standard concepts, templates that use "homebrew" concepts without axioms.
 * Develop a concept-discovery tool (e.g., see [an early experiment](http://www.stroustrup.com/sle2010_webversion.pdf).
 
-### <a name="Rt-auto"></a> T.12: Prefer concept names over `auto` for local variables
+### <a name="Rt-auto"></a> T.12: 지역변수에 대해 `auto`외에 컨셉이름을 선호하라.
+>### <a name="Rt-auto"></a> T.12: Prefer concept names over `auto` for local variables
 
 ##### Reason
 
- `auto` is the weakest concept. Concept names convey more meaning than just `auto`.
+`auto`는 가장 약한 컨셉이다. 컨셉 이름은 `auto`보다 더 많은 의미을 전달한다.
+ >`auto` is the weakest concept. Concept names convey more meaning than just `auto`.
 
 ##### Example
 
@@ -410,15 +479,18 @@ Hard.
 
 * ???
 
-### <a name="Rt-shorthand"></a> T.13: Prefer the shorthand notation for simple, single-type argument concepts
+### <a name="Rt-shorthand"></a> T.13: 한 종류 인자 컨셉에 대해서는 약칭 표기법을 선호하라.
+>### <a name="Rt-shorthand"></a> T.13: Prefer the shorthand notation for simple, single-type argument concepts
 
 ##### Reason
 
-Readability. Direct expression of an idea.
+가독성. 아이디어의 직접적인 표현.
+>Readability. Direct expression of an idea.
 
 ##### Example
 
-To say "`T` is `Sortable`":
+`T`는 `Sortable`라고 말하면:
+>To say "`T` is `Sortable`":
 
     template<typename T>		// Correct but verbose: "The parameter is
         requires Sortable<T>	// of type T which is the name of a type
@@ -429,12 +501,16 @@ To say "`T` is `Sortable`":
 
     void sort(Sortable&);		// Best: "The parameter is Sortable"
 
-The shorter versions better match the way we speak. Note that many templates don't need to use the `template` keyword.
+약칭 버전이 우리가 말하는 방법과 더 잘 일치한다. 많은 템플릿은 `template` 키워드를 사용할 필요가 없다는 점에 주목하라.
+>The shorter versions better match the way we speak. Note that many templates don't need to use the `template` keyword.
 
 ##### Enforcement
 
-* Not feasible in the short term when people convert from the `<typename T>` and `<class T`> notation.
-* Later, flag declarations that first introduces a typename and then constrains it with a simple, single-type-argument concept.
+* `<typename T>`과 `<class T>`를 변경할 때 짧은 단어로는 쓰기가 불가능하다.
+* 후에 처음 typename을 도입하고, 그 후에 한 종류 인자 컨셉으로 제한되는 선언이 있다면 표시한다.
+
+>* Not feasible in the short term when people convert from the `<typename T>` and `<class T`> notation.
+>* Later, flag declarations that first introduces a typename and then constrains it with a simple, single-type-argument concept.
 
 ## <a name="SS=concept-def"></a> T.con-def: 컨셉 정의 규칙
 >## <a name="SS=concept-def"></a> T.con-def: Concept definition rules
