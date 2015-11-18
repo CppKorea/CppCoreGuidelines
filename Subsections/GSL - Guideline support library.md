@@ -141,9 +141,16 @@ French accent optional.
 
 
 <a name="SS-ownership"></a>
-## GSL.owner: Ownership pointers
+## GSL.owner: 포인터의 소유권
 
-* `unique_ptr<T>`	// unique ownership: `std::unique_ptr<T>`
+* `unique_ptr<T>`	// 독점 소유권: `std::unique_ptr<T>`
+* `shared_ptr<T>`	// 공유 소유권: `std::shared_ptr<T>` (공유 횟수를 관리하는 포인터)
+* `stack_array<T>`	// 스택영영에 생성되는 배열. 생성자에서 요소수가 고정됨. 요소의 값은 `const` 타입이 아닌 이상 변경가능.
+* `dyn_array<T>`	// ??? needed ??? 힙영역에 생성되는 배열. 생성자에서 요소수가 고정됨. 요소의 값은 `const` 타입이 아닌 이상 변경가능. 통상 `array_view`가 할당하고 요소들을 소유함.
+
+>## GSL.owner: Ownership pointers
+>
+>* `unique_ptr<T>`	// unique ownership: `std::unique_ptr<T>`
 * `shared_ptr<T>`	// shared ownership: `std::shared_ptr<T>` (a counted pointer)
 * `stack_array<T>`	// A stack-allocated array. The number of elements are determined at construction and fixed thereafter. The elements are mutable unless `T` is a `const` type.
 * `dyn_array<T>`	// ??? needed ??? A heap-allocated array. The number of elements are determined at construction and fixed thereafter.
@@ -151,33 +158,75 @@ The elements are mutable unless `T` is a `const` type. Basically an `array_view`
 
 
 <a name="SS-assertions"></a>
-## GSL.assert: Assertions
+## GSL.assert: 주장 (Debug 모드나 Unit Test에서 주로 사용하는 기능)
 
-* `Expects`		// precondition assertion. Currently placed in function bodies. Later, should be moved to declarations.
+* `Expects`		// 선행조건 주장. 현재는 함수 내부에 있지만, 나중에 선언부로 옮겨야 합니다.  
+				// `Expects(p)` `p==true` 가 아니면 프로그램 종료  
+				// ??? `Expect` 몇가지 옵션에 의해 제어 (강제, 에러 메세지, 종료할지 선택)
+* `Ensures`		// 결과조건 주장. 현재는 함수 내부에 있지만, 나중에 선언부로 옮겨야 합니다.
+
+>## GSL.assert: Assertions
+>
+>* `Expects`		// precondition assertion. Currently placed in function bodies. Later, should be moved to declarations.
 				// `Expects(p)` terminates the program unless `p==true`
 				// ??? `Expect` in under control of some options (enforcement, error message, alternatives to terminate)
 * `Ensures`		// postcondition assertion.	Currently placed in function bodies. Later, should be moved to declarations.
 
 
 <a name="SS-utilities"></a>
-## GSL.util: Utilities
+## GSL.util: 유틸리티
 
-* `finally`		// `finally(f)` makes a `Final_act{f}` with a destructor that invokes `f`
+* `finally`		// `finally(f)` f를 호출하는 소멸자를 가진 `Final_act{f}`를 생성
+* `narrow_cast`	// `narrow_cast<T>(x)` 는 `static_cast<T>(x)`
+* `narrow`		// `narrow<T>(x)`는 `static_cast<T>(x)==x` 일 경우 `static_cast<T>(x)`이고 아니면 `narrowing_error`를 발생시킴
+* `implicit`	// 명시적인 단일인수 생성자를 비명시적으로 만들어주는 "기호" (매크로 `#define implicit`를 제외하고는 어떻게 하는지 모르겠습니다.)
+* `move_owner`	// `p=move_owner(q)`는 `p=q`를 의미하지만 ???
+
+>## GSL.util: Utilities
+>
+>* `finally`		// `finally(f)` makes a `Final_act{f}` with a destructor that invokes `f`
 * `narrow_cast`	// `narrow_cast<T>(x)` is `static_cast<T>(x)`
 * `narrow`		// `narrow<T>(x)` is `static_cast<T>(x)` if `static_cast<T>(x)==x` or it throws `narrowing_error`
 * `implicit`	// "Marker" to put on single-argument constructors to explicitly make them non-explicit
 (I don't know how to do that except with a macro: `#define implicit`).
 * `move_owner`	// `p=move_owner(q)` means `p=q` but ???
 
-
 <a name="SS-concepts"></a>
-## GSL.concept: Concepts
+## GSL.concept: 개념
 
-These concepts (type predicates) are borrowed from Andrew Sutton's Origin library, the Range proposal, and the ISO WG21 Palo Alto TR.
+이런 개념들 (타입 추론)은 Amdrew Sutton의 Origin 라이브러리의 특정 범위에서 제안하여 ISO WG21 Palo Alto TR에서 차용하였습니다.
+아마도 ISO C++ 표준으로 채택될 가능성이 큽니다.
+표기법은 ISO WG21 Concepts TS 입니다. (???ref???)
+
+>## GSL.concept: Concepts
+>
+>These concepts (type predicates) are borrowed from Andrew Sutton's Origin library, the Range proposal, and the ISO WG21 Palo Alto TR.
 They are likely to be very similar to what will become part of the ISO C++ standard.
 The notation is that of the ISO WG21 Concepts TS (???ref???).
 
 * `Range`
+* `String`	// ???
+* `Number`	// ???
+* `Sortable`
+* `Pointer`  // `*`, `->`, `==`, 기본생성자("null"값으로 설정)과 함께 사용되는 타입 [스마트포인트 개념 참조](#Rr-smartptrconcepts)
+* `Unique_ptr`  // `Pointer`와 같은 타입이지만 `move`가 가능하고 (`copy`는 불가능), `unique` 소유자 타입과 수명이 일치 [스마트포인트 개념 참조](#Rr-smartptrconcepts)
+* `Shared_ptr`   // `Pointer`와 같은 타입이지만 `copy`가 가능하고, `shared` 소유자 타입과 수명이 일치 [스마트포인트 개념 참조](#Rr-smartptrconcepts)
+* `EqualityComparable`	// ??? 카멜표기법으로 고통 받아야 하나요 ???
+* `Convertible`
+* `Common`
+* `Boolean`
+* `Integral`
+* `SignedIntegral`
+* `SemiRegular`
+* `Regular`
+* `TotallyOrdered`
+* `Function`
+* `RegularFunction`
+* `Predicate`
+* `Relation`
+* ...
+
+>* `Range`
 * `String`	// ???
 * `Number`	// ???
 * `Sortable`
