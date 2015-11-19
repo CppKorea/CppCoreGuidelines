@@ -1,21 +1,43 @@
-# Profiles
+# 프로파일
 
-A "profile" is a set of deterministic and portably enforceable subset rules (i.e., restrictions) that are designed to achieve a specific guarantee. "Deterministic" means they require only local analysis and could be implemented in a compiler (though they don't need to be). "Portably enforceable" means they are like language rules, so programmers can count on enforcement tools giving the same answer for the same code.
+># Profiles
 
-Code written to be warning-free using such a language profile is considered to conform to the profile. Conforming code is considered to be safe by construction with regard to the safety properties targeted by that profile. Conforming code will not be the root cause of errors for that property, although such errors may be introduced into a program by other code, libraries or the external environment. A profile may also introduce additional library types to ease conformance and encourage correct code.
+"프로파일"은 특정한 보장하기 위한 "결정성" "이식성" 규칙들(즉, 제한사항) 입니다.
+여기서 "결정성"은 로컬 분석이 되어야 하며, 컴파일러에 의해 구현 될수 있음(꼭 그러지 않아도 됨)을 의미합니다.
+"이식성"은 언어 규칙같이 같은 코드에 따른 그 결과가 같아야 한다는 것을 의미합니다.
 
-Profiles summary:
+>A "profile" is a set of deterministic and portably enforceable subset rules (i.e., restrictions) that are designed to achieve a specific guarantee. "Deterministic" means they require only local analysis and could be implemented in a compiler (though they don't need to be). "Portably enforceable" means they are like language rules, so programmers can count on enforcement tools giving the same answer for the same code.
 
-* [Pro.type: Type safety](#SS-type)
+이런 프로파일을 이용하여 경고가 없도록 작성된 코드는 프로파일에 일치하는 것이라 말할 수 있습니다.
+규격에 부합하는 코드는 프로파일 상의 안전성을 지켜서 작성된 것이므로 안전하다고 판단할 수 있습니다.
+규격에 부합하는 코드는 다른 코드나, 라이브러리 또는 외부환경에 의해서 에러가 발생할 수는 있어도 그 자체에서 오류가 발생하지 않습니다.
+프로파일은 올바른 코드의 작성을 도와주는 라이브러리들을 소개해 드릴 것입니다.
+
+>Code written to be warning-free using such a language profile is considered to conform to the profile. Conforming code is considered to be safe by construction with regard to the safety properties targeted by that profile. Conforming code will not be the root cause of errors for that property, although such errors may be introduced into a program by other code, libraries or the external environment. A profile may also introduce additional library types to ease conformance and encourage correct code.
+
+프로파일 요약:
+
+* [Pro.type: 타입 안전성](#SS-type)
+* [Pro.bounds: 범위 안전성](#SS-bounds)
+* [Pro.lifetime: 수명 안전성](#SS-lifetime)
+
+>Profiles summary:
+>
+>* [Pro.type: Type safety](#SS-type)
 * [Pro.bounds: Bounds safety](#SS-bounds)
 * [Pro.lifetime: Lifetime safety](#SS-lifetime)
 
 
 
 <a name="SS-type"></a>
-## Type safety profile
+## 타입 안전성 프로파일
 
-This profile makes it easier to construct code that uses types correctly and avoids inadvertent type punning. It does so by focusing on removing the primary sources of type violations, including unsafe uses of casts and unions.
+>## Type safety profile
+
+이 유형의 프로파일은 타입을 정확히 사용하며, 부주의한 타입변형을 방지하면서 코드를 작성하도록 도와드릴 것입니다.
+안전하지 않은 캐스팅과 `union`의 사용을 포함하여 타입이 잘못사용되는 것에 대한 주요 원인을 제거하는 것에 초점을 맞춰서 진행하겠습니다.
+
+>This profile makes it easier to construct code that uses types correctly and avoids inadvertent type punning. It does so by focusing on removing the primary sources of type violations, including unsafe uses of casts and unions.
 
 For the purposes of this section, type-safety is defined to be the property that a program does not use a variable as a type it is not. Memory accessed as a type `T` should not be valid memory that actually contains an object of an unrelated type `U`. (Note that the safety is intended to be complete when combined also with [Bounds safety](#SS-bounds) and [Lifetime safety](#SS-lifetime).)
 
