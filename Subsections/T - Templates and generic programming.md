@@ -1,14 +1,20 @@
 # <a name="S-templates"></a> T: Templates and generic programming
 
-Generic programming is programming using types and algorithms parameterized by types, values, and algorithms.
+일반화 프로그래밍은 타입, 값, 알고리즘을 매개변수화하는 타입과 알고리즘을 사용하는 프로그래밍이다.
+C++에서 일반화 프로그래밍은 `template` 언어적 장치로 지원하고 있다.
+>Generic programming is programming using types and algorithms parameterized by types, values, and algorithms.
 In C++, generic programming is supported by the `template` language mechanisms.
 
-Arguments to generic functions are characterized by sets of requirements on the argument types and values involved.
+일반화된 함수의 인자는 인자타입과 관련된 값에 대한 요구사항들을 특징짓는다.
+C++에서 이런 요구사항은 컨셉이라는 컴파일타임 서술어로 표현된다.
+>Arguments to generic functions are characterized by sets of requirements on the argument types and values involved.
 In C++, these requirements are expressed by compile-time predicates called concepts.
 
-Templates can also be used for meta-programming; that is, programs that compose code at compile time.
+템플릿은 메타프로그래밍용으로 사용될 수 있다; 즉 컴파일 타임 때 코드를 만들어내는 프로그램이다.
+>Templates can also be used for meta-programming; that is, programs that compose code at compile time.
 
-Template use rule summary:
+템플릿 사용 규칙 요약:
+>Template use rule summary:
 
 * [T.1: Use templates to raise the level of abstraction of code](#Rt-raise)
 * [T.2: Use templates to express algorithms that apply to many argument types](#Rt-algo)
@@ -16,7 +22,8 @@ Template use rule summary:
 * [T.4: Use templates to express syntax tree manipulation](#Rt-expr)
 * [T.5: Combine generic and OO techniques to amplify their strengths, not their costs](#Rt-generic-oo)
 
-Concept use rule summary:
+컨셉 사용 규칙 요약:
+>Concept use rule summary:
 
 * [T.10: Specify concepts for all template arguments](#Rt-concepts)
 * [T.11: Whenever possible use standard concepts](#Rt-std-concepts)
@@ -24,7 +31,8 @@ Concept use rule summary:
 * [T.13: Prefer the shorthand notation for simple, single-type argument concepts](#Rt-shorthand)
 * ???
 
-Concept definition rule summary:
+컨셉 정의 규칙 요약:
+>Concept definition rule summary:
 
 * [T.20: Avoid "concepts" without meaningful semantics](#Rt-low)
 * [T.21: Define concepts to define complete sets of operations](#Rt-complete)
@@ -35,7 +43,8 @@ Concept definition rule summary:
 * [T.26: Prefer to define concepts in terms of use-patterns rather than simple syntax](#Rt-use)
 * ???
 
-Template interface rule summary:
+템플릿 인터페이스 규칙 요약:
+>Template interface rule summary:
 
 * [T.40: Use function objects to pass operations to algorithms](#Rt-fo)
 * [T.41: Require complete sets of operations for a concept](#Rt-operations)
@@ -48,7 +57,8 @@ Template interface rule summary:
 * [T.49: Where possible, avoid type-erasure](#Rt-erasure)
 * [T.50: Avoid writing an unconstrained template in the same namespace as a type](#Rt-unconstrained-adl)
 
-Template definition rule summary:
+템플릿 정의 규칙 요약:
+>Template definition rule summary:
 
 * [T.60: Minimize a template's context dependencies](#Rt-depend)
 * [T.61: Do not over-parameterize members (SCARY)](#Rt-scary)
@@ -60,7 +70,8 @@ Template definition rule summary:
 * [T.68: Use `{}` rather than `()` within templates to avoid ambiguities](#Rt-cast)
 * [T.69: Inside a template, don't make an unqualified nonmember function call unless you intend it to be a customization point](#Rt-customization)
 
-Template and hierarchy rule summary:
+템플릿과 상속구조 규칙 요약:
+>Template and hierarchy rule summary:
 
 * [T.80: Do not naively templatize a class hierarchy](#Rt-hier)
 * [T.81: Do not mix hierarchies and arrays](#Rt-array) // ??? somewhere in "hierarchies"
@@ -69,7 +80,8 @@ Template and hierarchy rule summary:
 * [T.84: Use a non-template core implementation to provide an ABI-stable interface](#Rt-abi)
 * [T.??: ????](#Rt-???)
 
-Variadic template rule summary:
+가변인자 템플릿규칙 요약:
+>Variadic template rule summary:
 
 * [T.100: Use variadic templates when you need a function that takes a variable number of arguments of a variety of types](#Rt-variadic)
 * [T.101: ??? How to pass arguments to a variadic template ???](#Rt-variadic-pass)
@@ -77,7 +89,8 @@ Variadic template rule summary:
 * [T.103: Don't use variadic templates for homogeneous argument lists](#Rt-variadic-not)
 * [T.??: ????](#Rt-???)
 
-Metaprogramming rule summary:
+메타프로그래밍 규칙 요약:
+>Metaprogramming rule summary:
 
 * [T.120: Use template metaprogramming only when you really need to](#Rt-metameta)
 * [T.121: Use template metaprogramming primarily to emulate concepts](#Rt-emulate)
@@ -87,7 +100,8 @@ Metaprogramming rule summary:
 * [T.125: If you need to go beyond the standard-library TMP facilities, use an existing library](#Rt-lib)
 * [T.??: ????](#Rt-???)
 
-Other template rules summary:
+다른 템플릿 규칙 요약:
+>Other template rules summary:
 
 * [T.140: Name all nontrivial operations](#Rt-name)
 * [T.141: Use an unnamed lambda if you need a simple function object in one place only](#Rt-lambda)
@@ -96,21 +110,23 @@ Other template rules summary:
 * [T.144: Don't specialize function templates](#Rt-specialize-function)
 * [T.??: ????](#Rt-???)
 
-## <a name="SS-GP"></a> T.gp: Generic programming
+## <a name="SS-GP"></a> T.gp: 일반화 프로그래밍
+>## <a name="SS-GP"></a> T.gp: Generic programming
 
-Generic programming is programming using types and algorithms parameterized by types, values, and algorithms.
+일반화 프로그래밍은 타입, 값, 알고리즘을 매개변수화하는 타입과 알고리즘을 사용하는 프로그래밍이다.
+>Generic programming is programming using types and algorithms parameterized by types, values, and algorithms.
 
 ### <a name="Rt-raise"></a> T.1: 추상화 레벨을 올리기 위해 템플릿을 사용하라.
 >### <a name="Rt-raise"></a> T.1: Use templates to raise the level of abstraction of code
 
 ##### Reason
 
-일반화. 재사용성. 효율성. 사용자타입의 일관된 정의를 고취한다.
+일반화. 재사용성. 효율성. 사용자타입의 일관된 정의를 장려한다.
 >Generality. Re-use. Efficiency. Encourages consistent definition of user types.
 
 ##### Example, bad
 
-개념적으로, 아래 요구사항은 틀렸다. 왜냐하면 `T`는 "증가될 수 있다"거나 "추가될 수 있다"는 하위레벨 개념 이상이다.
+개념적으로, 아래 요구사항은 잘못됐다. 왜냐하면 우리가 원하는 `T`는 "증가될 수 있다"거나 "추가될 수 있다"는 하위레벨 컨셉 그 이상이다.
 >Conceptually, the following requirements are wrong because what we want of `T` is more than just the very low-level concepts of "can be incremented" or "can be added":
 
     template<typename T, typename A>
@@ -158,7 +174,8 @@ We aim to minimize requirements on template arguments, but the absolutely minima
 
 ##### Note
 
-템플릿은 
+템플릿은 모든 것을 표현하는데 사용할 수 있다.(모든 것은 튜링(?)에 닫혀있다.)
+그러나 일반화 프로그래밍의 목표는 비슷한 의미특성을 가진 타입집합에 대한 연산/알고리즘을 효과적으로 일반화하는 것이다.
 >Templates can be used to express essentially everything (they are Turing complete), but the aim of generic programming (as expressed using templates)
 is to efficiently generalize operations/algorithms over a set of types with similar semantic properties.
 
