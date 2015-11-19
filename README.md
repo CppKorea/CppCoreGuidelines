@@ -30,7 +30,7 @@
 - Abstract (100%)
 - C++ Core Guildlines (100%)
 - A - Architectural Ideas (100%)
-- C - Classes and Class Hierarchies (3%)
+- C - Classes and Class Hierarchies (10%)
 - Con - Constants and Immutability (100%)
 - CP - Concurrency and Parallelism (40%)
 - CPL - C-Style programming (100%)
