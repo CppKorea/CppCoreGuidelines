@@ -158,12 +158,12 @@ The elements are mutable unless `T` is a `const` type. Basically an `array_view`
 
 
 <a name="SS-assertions"></a>
-## GSL.assert: 주장 (Debug 모드나 Unit Test에서 주로 사용하는 기능)
+## GSL.assert: Assert (확인)
 
-* `Expects`		// 선행조건 주장. 현재는 함수 내부에 있지만, 나중에 선언부로 옮겨야 합니다.  
+* `Expects`		// 선행조건 확인. 현재는 함수 내부에 있지만, 나중에 선언부로 옮겨야 합니다.  
 				// `Expects(p)` `p==true` 가 아니면 프로그램 종료  
-				// ??? `Expect` 몇가지 옵션에 의해 제어 (강제, 에러 메세지, 종료할지 선택)
-* `Ensures`		// 결과조건 주장. 현재는 함수 내부에 있지만, 나중에 선언부로 옮겨야 합니다.
+				// ??? `Expect` 몇가지 옵션에 의해 제어 (수행여부, 에러 메세지, 종료할지 선택)
+* `Ensures`		// 결과조건 확인. 현재는 함수 내부에 있지만, 나중에 선언부로 옮겨야 합니다.
 
 >## GSL.assert: Assertions
 >
@@ -194,7 +194,7 @@ The elements are mutable unless `T` is a `const` type. Basically an `array_view`
 <a name="SS-concepts"></a>
 ## GSL.concept: 개념
 
-이런 개념들 (타입 추론)은 Amdrew Sutton의 Origin 라이브러리의 특정 범위에서 제안하여 ISO WG21 Palo Alto TR에서 차용하였습니다.
+이런 개념들 (타입 추론)은 Amdrew Sutton의 Origin 라이브러리, Range 제안, ISO WG21 Palo Alto TR로부터 개념을 빌려왔습니다.
 아마도 ISO C++ 표준으로 채택될 가능성이 큽니다.
 표기법은 ISO WG21 Concepts TS 입니다. (???ref???)
 
