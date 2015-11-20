@@ -39,17 +39,29 @@
 
 >This profile makes it easier to construct code that uses types correctly and avoids inadvertent type punning. It does so by focusing on removing the primary sources of type violations, including unsafe uses of casts and unions.
 
-For the purposes of this section, type-safety is defined to be the property that a program does not use a variable as a type it is not. Memory accessed as a type `T` should not be valid memory that actually contains an object of an unrelated type `U`. (Note that the safety is intended to be complete when combined also with [Bounds safety](#SS-bounds) and [Lifetime safety](#SS-lifetime).)
+이 장의 목적인, 타입 안전성을 정의하자면, 프로그램 상에서 변수를 원래 타입과 다르게 사용하지 않는 것이라 하겠습니다. 실제 `U` 타입으로 정의된 객체가 저장된 메모리에 `T`타입으로 읽어서 사용하지 말자는 겁니다. (타입 안전성 하나만 지켜서는 코드가 안전하다는 보장을 받기 힘듭니다. [범위 안전성](#SS-bounds)과 [수명 안전성](#SS-lifetime)을 함께 지켰을 때 비로서 완전히 안전성이 보장된다고 할 수 있습니다.)
 
-The following are under consideration but not yet in the rules below, and may be better in other profiles:
+>For the purposes of this section, type-safety is defined to be the property that a program does not use a variable as a type it is not. Memory accessed as a type `T` should not be valid memory that actually contains an object of an unrelated type `U`. (Note that the safety is intended to be complete when combined also with [Bounds safety](#SS-bounds) and [Lifetime safety](#SS-lifetime).)
 
-   - narrowing arithmetic promotions/conversions (likely part of a separate safe-arithmetic profile)
+아래 사항들에 대해서는 고려중에 있지만 이번에 다루지는 않을 것이며, 다른 프로파일에 더 있을 수도 있습니다. :
+
+>The following are under consideration but not yet in the rules below, and may be better in other profiles:
+
+   - 내로우잉 산술 승격/변환 (안전한 산술 프로파일 단위로 나누는 것 같은 식의)
+   - 음수 부동소수점 연산을 양수 정수형 타입으로 산술 변환 (상동)
+   - 정의되지 않은 동작 선택 : ??? 너무 큰 주제라서, Gaby의 UB 목록에서 다뤄야할지...
+   - 지정되지 않은 동작 선택 : ??? 이건 안전성에 관한거라기 보단 이식성에 더 가깝지 않을까요 ?
+   - 상수성 위반 ? 이것이 안정성에 관계된거라면요.
+
+>   - narrowing arithmetic promotions/conversions (likely part of a separate safe-arithmetic profile)
    - arithmetic cast from negative floating point to unsigned integral type (ditto)
    - selected undefined behavior: ??? this is a big bucket, start with Gaby's UB list
    - selected unspecified behavior: ??? would this really be about safety, or more a portability concern?
    - constness violations? if we rely on it for safety
 
-An implementation of this profile shall recognize the following patterns in source code as non-conforming and issue a diagnostic.
+이러한 프로파일의 구현은 소스코드 상에서 다음과 같은 패턴들을 부적합한 것으로 판단하고 수정 조치합니다.
+
+>An implementation of this profile shall recognize the following patterns in source code as non-conforming and issue a diagnostic.
 
 
 <a name="Pro-type-reinterpretcast"></a>
