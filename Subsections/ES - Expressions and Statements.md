@@ -22,7 +22,7 @@ Declaration rules:
 * [ES.7: 자주 쓰는 변수, 지역변수는 이름을 짧게, 그렇지 않은 경우는 길게](#Res-name-length)
 * [ES.8: 비슷해보이는 네이밍은 피하자](#Res-name-similar)
 * [ES.9: `ALL_CAPS` 네이밍은 피하자](#Res-!CAPS)
-* [ES.10: 한 선언당 (단) 하나의 이름만 선언하자 ](#Res-name-one)
+* [ES.10: 한 선언당 (단) 하나의 변수만 선언하자 ](#Res-name-one)
 * [ES.11: 타입명을 풍부하게 재사용할 수 있도록 'auto'를 쓰자](#Res-auto)
 * [ES.20: 객체를 언제나 초기화하자](#Res-always)
 * [ES.21: 변수(혹은 상수)를 필요하기도 전에 선언하지 말자](#Res-introduce)
@@ -584,20 +584,40 @@ Such names slow down comprehension and increase the likelihood of error.
 
 Check names against a list of known confusing letter and digit combinations.
 
-### <a name="Res-!CAPS"></a> ES.9: Avoid `ALL_CAPS` names
+### <a name="Res-!CAPS"></a> ES.9: `ALL_CAPS` 네이밍은 피하자
+>### <a name="Res-!CAPS"></a> ES.9: Avoid `ALL_CAPS` names
 
-##### Reason
+##### 이유
+>##### Reason
 
-Such names are commonly used for macros. Thus, `ALL_CAPS` name are vulnerable to unintended macro substitution.
+그런 변수명은 매크로를 정의할 때 흔히들 쓴다. 그러므로, `ALL_CAPS` 네이밍은 매크로와 충돌될 가능성이 많다. 
+>Such names are commonly used for macros. Thus, `ALL_CAPS` name are vulnerable to unintended macro substitution.
 
+##### 예
 ##### Example
 
-    // somewhere in some header:
+    // 헤더의 한 부분:
     #define NE !=
 
-    // somewhere else in some other header:
+    // 다른 헤더의 또 어떤 부분:
     enum Coord { N, NE, NW, S, SE, SW, E, W };
 
+    // 이 헤더를 사용하는 어느 불쌍한 프로그래머의 cpp 파일
+    switch (direction) {
+    case N:
+        // ...
+    case NE:
+        // ...
+    // ...
+    }
+
+>
+    // somewhere in some header:
+    #define NE !=
+>
+    // somewhere else in some other header:
+    enum Coord { N, NE, NW, S, SE, SW, E, W };
+>
     // somewhere third in some poor programmer's .cpp:
     switch (direction) {
     case N:
@@ -607,53 +627,88 @@ Such names are commonly used for macros. Thus, `ALL_CAPS` name are vulnerable to
     // ...
     }
 
-##### Note
+##### 요약
+>##### Note
 
-Do not use `ALL_CAPS` for constants just because constants used to be macros.
+단지 상수가 매크로처럼 쓰인다는 이유로 상수에 `ALL_CAPS` 네이밍을 하지는 말자.
+>Do not use `ALL_CAPS` for constants just because constants used to be macros.
 
-##### Enforcement
+##### 시행하기
+>##### Enforcement
 
-Flag all uses of ALL CAPS. For older code, accept ALL CAPS for macro names and flag all non-ALL-CAPS macro names.
+ALL CAPS 변수가 어디서 쓰이고 있는지 체크하자. 옛날 코드라면, 매크로 변수에 ALL CAPS를 허용하고 대신 소문자로 쓰여진 매크로 변수를 체크하자.
+>Flag all uses of ALL CAPS. For older code, accept ALL CAPS for macro names and flag all non-ALL-CAPS macro names.
 
-### <a name="Res-name-one"></a> ES.10: Declare one name (only) per declaration
+### <a name="Res-name-one"></a> 한 선언당 (단) 하나의 변수만 선언하자
+>### <a name="Res-name-one"></a> ES.10: Declare one name (only) per declaration
 
-##### Reason
+##### 이유
+>##### Reason
 
-One-declaration-per line increases readability and avoid mistake related to the C/C++ grammar. It leaves room for a `//`-comment.
+한 줄에 선언 하나씩 하면 가독성을 향상시킬 수 있고, C/C++ 문법과 관련된 실수를 피할 수 있다. 그리고 `//`주석을 달 수 있는 공간이 생긴다.
+>One-declaration-per line increases readability and avoid mistake related to the C/C++ grammar. It leaves room for a `//`-comment.
 
-##### Example, bad
+##### 나쁜 예
+>##### Example, bad
 
-       char *p, c, a[7], *pp[7], **aa[10];	// yuck!
+       char *p, c, a[7], *pp[7], **aa[10];	// 우웩!
+>       char *p, c, a[7], *pp[7], **aa[10];	// yuck!
 
-**Exception**: a function declaration can contain several function argument declarations.
+**예외**: 함수 정의는 여러 함수 인자 정의를 포함할 수 있다.
+>**Exception**: a function declaration can contain several function argument declarations.
 
-##### Example
+##### 예
+>##### Example
+	
+	template <class InputIterator, class Predicate>
+    bool any_of(InputIterator first, InputIterator last, Predicate pred);
 
+>
     template <class InputIterator, class Predicate>
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
 
-or better using concepts:
+이것보다 더 나은 사용 예는..
+>or better using concepts:
 
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
+>
+	bool any_of(InputIterator first, InputIterator last, Predicate pred);
 
+##### 예
 ##### Example
 
+    double scalbn(double x, int n);	 	// 괜찮다: x*pow(FLT_RADIX, n); FLT_RADIX는 일반적으로 2입니다
+
+또는,
+
+    double scalbn(    // 좀 더 낫다: x*pow(FLT_RADIX, n); FLT_RADIX는 일반적으로 2입니다
+        double x,     // 기수부입니다
+        int n         // 지수부입니다
+    );
+
+또는,
+
+    double scalbn(double base, int exponent);	// 좋다: base*pow(FLT_RADIX, exponent); FLT_RADIX는 일반적으로 2입니다
+
+>
     double scalbn(double x, int n);	 	// OK: x*pow(FLT_RADIX, n); FLT_RADIX is usually 2
-
+>
 or:
-
+>
     double scalbn(    // better: x*pow(FLT_RADIX, n); FLT_RADIX is usually 2
         double x,     // base value
         int n         // exponent
     );
-
+>
 or:
-
+>
     double scalbn(double base, int exponent);	// better: base*pow(FLT_RADIX, exponent); FLT_RADIX is usually 2
 
+##### 시행하기
 ##### Enforcement
 
-Flag non-function arguments with multiple declarators involving declarator operators (e.g., `int* p, q;`)
+함수 정의도 아니면서, 선언자로 다중 선언을 한 곳을 체크하자.(예를 들어, `int* p, q;`같은 것)
+>Flag non-function arguments with multiple declarators involving declarator operators (e.g., `int* p, q;`)
 
 ### <a name="Res-auto"></a> ES.11: Use `auto` to avoid redundant repetition of type names
 
