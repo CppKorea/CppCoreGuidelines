@@ -44,8 +44,10 @@ Alocation and deallocation rule summary:
 	
 <a name ="Rr-summary-smartptrs"></a>Smart pointer rule summary:
 
-* [R.20: Use `unique_ptr` or `shared_ptr` to represent ownership](#Rr-owner)
-* [R.21: Prefer `unique_ptr` over `shared_ptr` unless you need to share ownership](#Rr-unique)
+* [R.20: 소유권을 나타내기 위해 unique_ptr이나 shared_ptr을 사용하라.]
+>* [R.20: Use `unique_ptr` or `shared_ptr` to represent ownership](#Rr-owner)
+* [R.21: 소유권 공유가 필요없다면 shared_ptr보다 unique_ptr이 낫다.]
+>* [R.21: Prefer `unique_ptr` over `shared_ptr` unless you need to share ownership](#Rr-unique)
 * [R.22: Use `make_shared()` to make `shared_ptr`s](#Rr-make_shared)
 * [R.23: Use `make_unique()` to make `unique_ptr`s](#Rr-make_unique)
 * [R.24: Use `std::weak_ptr` to break cycles of `shared_ptr`s](#Rr-weak_ptr)
@@ -525,9 +527,11 @@ Don't leave it undeclared.
 
 
 <a name="Rr-owner"></a>
-### Rule R.20: Use `unique_ptr` or `shared_ptr` to represent ownership
+### R.20: 소유권을 나타내기 위해 unique_ptr이나 shared_ptr을 사용하라.
+>### Rule R.20: Use `unique_ptr` or `shared_ptr` to represent ownership
 
-**Reason**: They can prevent resource leaks.
+**이유**: 리소스 누수를 막을 수 있다.
+>**Reason**: They can prevent resource leaks.
 
 **Example**: Consider
 
@@ -539,17 +543,23 @@ Don't leave it undeclared.
 		shared_ptr<T> p3 { new X };	// shared ownership; see also ???
 	}
 
-This will leak the object used to initialize `p1` (only).
+이 코드는 초기화하는데만 사용된 p1 객체가 누수될 것이다.
+>This will leak the object used to initialize `p1` (only).
 
-**Enforcement:** (Simple) Warn if the return value of `new` or a function call with return value of pointer type is assigned to a raw pointer.
+**시행하기** new로 리턴되는 값 혹은 포인터 원형으로 할당된 포인터 타입을 리턴하는 함수 호출이 있다면 경고하라.
+>**Enforcement:** (Simple) Warn if the return value of `new` or a function call with return value of pointer type is assigned to a raw pointer.
 
 
 <a name="Rr-unique"></a>
-### Rule R.21: Prefer `unique_ptr` over `shared_ptr` unless you need to share ownership
+### R.21: 소유권 공유가 필요없다면 shared_ptr보다 unique_ptr이 낫다.
+>### Rule R.21: Prefer `unique_ptr` over `shared_ptr` unless you need to share ownership
 
-**Reason**: a `unique_ptr` is conceptually simpler and more predictable (you know when destruction happens) and faster (you don't implicitly maintain a use count).
+**이유**: unique_ptr은 개념적으로 단순하고 예측가능하며(파괴가
+    일어날 때를 알고) 빠르다(사용 횟수를 암시적으로 관리하지 않는다).
+>**Reason**: a `unique_ptr` is conceptually simpler and more predictable (you know when destruction happens) and faster (you don't implicitly maintain a use count).
 
-**Example, bad**: This needlessly adds and maintains a reference count
+**안 좋은 예**: 이 코드는 불필요하게 참조카운트를 추가 및 관리하고 있다.
+>**Example, bad**: This needlessly adds and maintains a reference count
 
     void f()
     {
