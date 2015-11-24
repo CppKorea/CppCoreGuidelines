@@ -65,26 +65,61 @@
 
 
 <a name="Pro-type-reinterpretcast"></a>
-### Type.1: Don't use `reinterpret_cast`.
+### Type.1: `reinterpret_cast`를 사용하지 마세요.
 
-**Reason**:
+**근거**:
+타입 안전성을 위반하고 있으며, 실제로 `X`타입을 서로 호환되지 않는 타입 `Z`인 것처럼 읽을 여지가 있습니다.
+
+>### Type.1: Don't use `reinterpret_cast`.
+>
+>**Reason**:
 Use of these casts can violate type safety and cause the program to access a variable that is actually of type `X` to be accessed as if it were of an unrelated type `Z`.
 
-**Example; bad**:
+**잘못된 예**:
 
     std::string s = "hello world";
     double* p = reinterpret_cast<double*>(&s); // BAD
 
-**Enforcement**: Issue a diagnostic for any use of `reinterpret_cast`. To fix: Consider using a `variant` instead.
+>**Example; bad**:
+
+    std::string s = "hello world";
+    double* p = reinterpret_cast<double*>(&s); // BAD
+    
+**시행하기**: `reinterpret_cast`가 사용된 곳을 찾아내서 대신 `variant`를 사용하세요.
+
+>**Enforcement**: Issue a diagnostic for any use of `reinterpret_cast`. To fix: Consider using a `variant` instead.
 
 
 <a name="Pro-type-downcast"></a>
-### Type.2: Don't use `static_cast` downcasts. Use `dynamic_cast` instead.
+### Type.2: `static_cast`를 다운캐스팅하는 곳에 사용하지 말고, 대신 `dynamic_cast`를 사용하세요.
 
-**Reason**:
+**근거**:
+타입 안전성을 위반하고 있으며, 실제로 `X`타입을 서로 호환되지 않는 타입 `Z`인 것처럼 읽을 여지가 있습니다.
+
+>### Type.2: Don't use `static_cast` downcasts. Use `dynamic_cast` instead.
+>
+>**Reason**:
 Use of these casts can violate type safety and cause the program to access a variable that is actually of type `X` to be accessed as if it were of an unrelated type `Z`.
 
-**Example; bad**:
+**잘못된 예**:
+
+    class base { public: virtual ~base() =0; };
+
+    class derived1 : public base { };
+
+    class derived2 : public base {
+        std::string s;
+    public:
+        std::string get_s() { return s; }
+    };
+
+    derived1 d1;
+    base* p = &d1; // OK. base 타입포인터로 암시적 변환은 괜찮습니다.
+
+    derived2* p2 = static_cast<derived2*>(p); // BAD, d1은 a derived2가 아닌데도 그렇게 취급하려 합니다.
+    cout << p2.get_s(); // d1에는 string 멤버가 없는데도 제어하려 합니다. 결과적으로 d1 근처 임의의 바이트를 출력하게 됩니다.
+
+>**Example; bad**:
 
     class base { public: virtual ~base() =0; };
 
@@ -102,16 +137,35 @@ Use of these casts can violate type safety and cause the program to access a var
     derived2* p2 = static_cast<derived2*>(p); // BAD, tries to treat d1 as a derived2, which it is not
     cout << p2.get_s(); // tries to access d1's nonexistent string member, instead sees arbitrary bytes near d1
 
-**Enforcement**: Issue a diagnostic for any use of `static_cast` to downcast, meaning to cast from a pointer or reference to `X` to a pointer or reference to a type that is not `X` or an accessible base of `X`. To fix: If this is a downcast or cross-cast then use a `dynamic_cast` instead, otherwise consider using a `variant` instead.
+**시행하기**: `static_cast`로 다운캐스팅하는 곳을 찾으세요. 즉, `X`의 포인터나 참조 중 `X`가 아니거나 `X`의 부모클래스로 부터 참조된 것들을 찾으세요. 그 대신 `dynamic_cast`나 `variant`를 사용하세요.
+
+>**Enforcement**: Issue a diagnostic for any use of `static_cast` to downcast, meaning to cast from a pointer or reference to `X` to a pointer or reference to a type that is not `X` or an accessible base of `X`. To fix: If this is a downcast or cross-cast then use a `dynamic_cast` instead, otherwise consider using a `variant` instead.
 
 
 <a name="Pro-type-constcast"></a>
-### Type.3: Don't use `const_cast` to cast away `const` (i.e., at all).
+### Type.3: `const`를 없애기 위해 `const_cast`를 사용하지 마세요.
 
-**Reason**:
+**근거**:
+`const` 제거는 말도 안됩니다. 실제로 `const`로 정의된 변수라면, 정의되지 않은 동작이 발생하게 됩니다.
+
+>### Type.3: Don't use `const_cast` to cast away `const` (i.e., at all).
+>
+>**Reason**:
 Casting away `const` is a lie. If the variable is actually declared `const`, it's a lie punishable by undefined behavior.
 
-**Example; bad**:
+**잘못된 예**:
+
+    void f(const int& i) {
+        const_cast<int&>(i) = 42;   // BAD
+    }
+
+    static int i = 0;
+    static const int j = 0;
+
+    f(i); // 조용히 부작용이 발생합니다.
+    f(j); // 정의되지 않은 동작이 발생합니다.
+
+>**Example; bad**:
 
     void f(const int& i) {
         const_cast<int&>(i) = 42;   // BAD
@@ -124,19 +178,60 @@ Casting away `const` is a lie. If the variable is actually declared `const`, it'
     f(j); // undefined behavior
     
 
-**Exception**: You may need to cast away `const` when calling `const`-incorrect functions. Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate the cast in one place.
+**예외**: 잘못된 `const` 함수를 호출할 때는 `const`를 없에야 합니다. 이런 함수들을 올바른 `const`  inline 래퍼로 한 곳에서 캐스팅하는 것을 캡슐화 하는거보다는 `const_cast`를 사용하는 것이 더 좋습니다.
 
-**Enforcement**: Issue a diagnostic for any use of `const_cast`. To fix: Either don't use the variable in a non-`const` way, or don't make it `const`.
+**시행하기**: `const_cast`가 사용된 곳을 찾아서 값을 변경하지 말거나 아니면 아에 `const`로 만들지 마세요.
+
+>**Exception**: You may need to cast away `const` when calling `const`-incorrect functions. Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate the cast in one place.
+>
+>**Enforcement**: Issue a diagnostic for any use of `const_cast`. To fix: Either don't use the variable in a non-`const` way, or don't make it `const`.
 
 
 <a name="Pro-type-cstylecast"></a>
-### Type.4: Don't use C-style `(T)expression` casts that would perform a `static_cast` downcast, `const_cast`, or `reinterpret_cast`.
+### Type.4: `static_cast` 다운캐스팅, `const_cast`, `reinterpret_cast` 처럼 사용 될 수 있는 C-스타일의 `(T)expression`을 사용하지 마세요.
 
-**Reason**:
+**근거**:
+이런 변환들은 타입 안전성을 위반하고 있으며, 실제로 `X`타입을 서로 호환되지 않는 타입 `Z`인 것처럼 읽을 여지가 있습니다.
+C-스타일의 `(T)expression`는 실제로 다음의 순서대로 가능한 방법을 판단합니다: `const_cast`, `static_cast`, `const_cast` 이후 `static_cast`, `reinterpret_cast`, `const_cast` 이후 `reinterpret_cast`. 이 규칙은 안전하지 않은 변환으로 사용될 때에만 `(T)expression` 사용을 금지시킵니다.
+
+>### Type.4: Don't use C-style `(T)expression` casts that would perform a `static_cast` downcast, `const_cast`, or `reinterpret_cast`.
+>
+>**Reason**:
 Use of these casts can violate type safety and cause the program to access a variable that is actually of type `X` to be accessed as if it were of an unrelated type `Z`.
 Note that a C-style `(T)expression` cast means to perform the first of the following that is possible: a `const_cast`, a `static_cast`, a `static_cast` followed by a `const_cast`, a `reinterpret_cast`, or a `reinterpret_cast` followed by a `const_cast`. This rule bans `(T)expression` only when used to perform an unsafe cast.
 
-**Example; bad**:
+**잘못된 예**:
+
+    std::string s = "hello world";
+    double* p = (double*)(&s); // BAD
+
+    class base { public: virtual ~base() = 0; };
+
+    class derived1 : public base { };
+
+    class derived2 : public base {
+        std::string s;
+    public:
+        std::string get_s() { return s; }
+    };
+
+    derived1 d1;
+    base* p = &d1; // OK. 부모 class로의 암시적 변환은 괜찮아요.
+
+    derived2* p2 = (derived2*)(p); // BAD, d1은 derived2가 아닌데도 그렇게 취급하려 합니다.
+    cout << p2.get_s(); // d1에는 string 멤버가 없는데도 제어하려 합니다. 결과적으로 d1 근처 임의의 바이트를 출력하게 됩니다.
+
+    void f(const int& i) {
+        (int&)(i) = 42;   // BAD
+    }
+
+    static int i = 0;
+    static const int j = 0;
+
+    f(i); // 조용히 부작용이 발생합니다.
+    f(j); // 정의되지 않은 동작이 발생합니다.
+
+>**Example; bad**:
 
     std::string s = "hello world";
     double* p = (double*)(&s); // BAD
@@ -167,24 +262,43 @@ Note that a C-style `(T)expression` cast means to perform the first of the follo
     f(i); // silent side effect
     f(j); // undefined behavior
 
+>**시행하기**: `static_cast` 다운캐스팅, `const_cast`, `reinterpret_cast`로 동작하는 C-스타일 `(T)expression`를 찾아서 `static_cast` 다운캐스팅는 `dynamic_cast`, `const_cast`는 제대로 된 `const` 선언, `reinterpret_cast`는 `variant`로 수정하세요.
+
 **Enforcement**: Issue a diagnostic for any use of a C-style `(T)expression` cast that would invoke a `static_cast` downcast, `const_cast`, or `reinterpret_cast`. To fix: Use a `dynamic_cast`, `const`-correct declaration, or `variant`, respectively.
 
 
-
 <a name="Pro-type-init"></a>
-### Type.5: Don't use a variable before it has been initialized.
+### Type.5: 초기화되지 않은 변수를 사용하지 마세요.
 
-[ES.20: Always initialize an object](#Res-always) is required.
+[ES.20: Always initialize an object](#Res-always) 참조.
 
+>### Type.5: Don't use a variable before it has been initialized.
+>
+>[ES.20: Always initialize an object](#Res-always) is required.
 
 
 <a name="Pro-type-memberinit"></a>
-### Type.6: Always initialize a member variable.
+### Type.6: 멤버 변수는 반드시 초기화하세요.
 
-**Reason**:
+**근거**:
+변수가 초기화되기 전에는 해당 타입에 부합하는 값을 가지고 있지 않을 수 있습니다. 임의의 비트 패턴값을 가지고 있어서 호출 할때마다 다른 값으로 보일 수 있습니다.
+
+>### Type.6: Always initialize a member variable.
+>
+>**Reason**:
 Before a variable has been initialized, it does not contain a deterministic valid value of its type. It could contain any arbitrary bit pattern, which could be different on each call.
 
-**Example**:
+**예**:
+
+    struct X { int i; };
+
+    X x;
+    use(x); // BAD, x는 초기화되지 않았습니다.
+
+    X x2{}; // GOOD
+    use(x2);
+
+>**Example**:
 
     struct X { int i; };
 
@@ -194,15 +308,24 @@ Before a variable has been initialized, it does not contain a deterministic vali
     X x2{}; // GOOD
     use(x2);
 
+>**수행하기**:
+   - 모든 멤버 변수를 초기화하지 않는 생성자를 찾아서 초기화 하도록 수정하거나, 초기화 목록에 멤버들을 작성하세요.
+   - `()`나 `{}`를 이용하여 멤버를 초기화하지 않는 생성자를 찾아서 `()`나 `{}`를 추가하세요.
+
 **Enforcement**:
    - Issue a diagnostic for any constructor of a non-trivially-constructible type that does not initialize all member variables. To fix: Write a data member initializer, or mention it in the member initializer list.
    - Issue a diagnostic when constructing an object of a trivially constructible type without `()` or `{}` to initialize its members. To fix: Add `()` or `{}`.
 
 
 <a name="Pro-type-unions"></a>
-### Type.7: Avoid accessing members of raw unions. Prefer `variant` instead.
+### Type.7: `union`을 이용하여 멤버들을 제어하지 말고, `variant`를 사용하세요.
 
-**Reason**:
+**근거**:
+`union` 멤버를 읽으면 가장 마지막에 저장된 것을 읽게되며, 저장을 하면 다른 멤버의 해제자가 호출되게 됩니다. 그로 인해 일반 적인 언어의 안전성에 의존 할 수가 없게되며, 프로그래머가 판단하여야 하므로 취약할 수 밖에 없습니다.
+
+>### Type.7: Avoid accessing members of raw unions. Prefer `variant` instead.
+>
+>**Reason**:
 Reading from a union member assumes that member was the last one written, and writing to a union member assumes another member with a nontrivial destructor had its destructor called. This is fragile because it cannot generally be enforced to be safe in the language and so relies on programmer discipline to get it right.
 
 **Example**:
