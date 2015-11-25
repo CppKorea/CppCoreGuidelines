@@ -262,9 +262,9 @@ Note that a C-style `(T)expression` cast means to perform the first of the follo
     f(i); // silent side effect
     f(j); // undefined behavior
 
->**시행하기**: `static_cast` 다운캐스팅, `const_cast`, `reinterpret_cast`로 동작하는 C-스타일 `(T)expression`를 찾아서 `static_cast` 다운캐스팅는 `dynamic_cast`, `const_cast`는 제대로 된 `const` 선언, `reinterpret_cast`는 `variant`로 수정하세요.
+**시행하기**: `static_cast` 다운캐스팅, `const_cast`, `reinterpret_cast`로 동작하는 C-스타일 `(T)expression`를 찾아서 `static_cast` 다운캐스팅는 `dynamic_cast`, `const_cast`는 제대로 된 `const` 선언, `reinterpret_cast`는 `variant`로 수정하세요.
 
-**Enforcement**: Issue a diagnostic for any use of a C-style `(T)expression` cast that would invoke a `static_cast` downcast, `const_cast`, or `reinterpret_cast`. To fix: Use a `dynamic_cast`, `const`-correct declaration, or `variant`, respectively.
+>**Enforcement**: Issue a diagnostic for any use of a C-style `(T)expression` cast that would invoke a `static_cast` downcast, `const_cast`, or `reinterpret_cast`. To fix: Use a `dynamic_cast`, `const`-correct declaration, or `variant`, respectively.
 
 
 <a name="Pro-type-init"></a>
@@ -308,11 +308,11 @@ Before a variable has been initialized, it does not contain a deterministic vali
     X x2{}; // GOOD
     use(x2);
 
->**수행하기**:
+**시행하기**:
    - 모든 멤버 변수를 초기화하지 않는 생성자를 찾아서 초기화 하도록 수정하거나, 초기화 목록에 멤버들을 작성하세요.
    - `()`나 `{}`를 이용하여 멤버를 초기화하지 않는 생성자를 찾아서 `()`나 `{}`를 추가하세요.
 
-**Enforcement**:
+>**Enforcement**:
    - Issue a diagnostic for any constructor of a non-trivially-constructible type that does not initialize all member variables. To fix: Write a data member initializer, or mention it in the member initializer list.
    - Issue a diagnostic when constructing an object of a trivially constructible type without `()` or `{}` to initialize its members. To fix: Add `()` or `{}`.
 
@@ -321,14 +321,28 @@ Before a variable has been initialized, it does not contain a deterministic vali
 ### Type.7: `union`을 이용하여 멤버들을 제어하지 말고, `variant`를 사용하세요.
 
 **근거**:
-`union` 멤버를 읽으면 가장 마지막에 저장된 것을 읽게되며, 저장을 하면 다른 멤버의 해제자가 호출되게 됩니다. 그로 인해 일반 적인 언어의 안전성에 의존 할 수가 없게되며, 프로그래머가 판단하여야 하므로 취약할 수 밖에 없습니다.
+`union` 멤버를 읽으면 가장 마지막에 저장된 것을 읽게되며, 저장을 하면 다른 멤버의 해제자가 호출되게 됩니다.
+그로인해 일반적인 C++언어의 안전성에 의존 할 수가 없게되며, 프로그래머가 판단하여야 하므로 취약할 수 밖에 없습니다.
 
 >### Type.7: Avoid accessing members of raw unions. Prefer `variant` instead.
 >
 >**Reason**:
 Reading from a union member assumes that member was the last one written, and writing to a union member assumes another member with a nontrivial destructor had its destructor called. This is fragile because it cannot generally be enforced to be safe in the language and so relies on programmer discipline to get it right.
 
-**Example**:
+**예**:
+
+    union U { int i; double d; };
+    
+    U u;
+    u.i = 42;
+    use(u.d); // BAD, 아직 정의되지 않았음
+    
+    variant<int,double> u;
+    u = 42; // 이제 u는 int 값을 가지고 있음
+    use(u.get<int>()); // OK
+    use(u.get<double>()); // 예외발생 ??? variant에 대한 표준화작업이 아직 완료되지 않아서, 그 이후 업데이트 하겠음
+
+>**Example**:
 
     union U { int i; double d; };
     
@@ -341,20 +355,52 @@ Reading from a union member assumes that member was the last one written, and wr
     use(u.get<int>()); // ok
     use(u.get<double>()); // throws ??? update this when standardization finalizes the variant design
     
-Note that just copying a union is not type-unsafe, so safe code can pass a union from one piece of unsafe code to another.
+단지 `union`을 복사하는 것 자체가 타입안전성에 위배되는 것은 아닙니다. 그래서, 안전한 코드도 `union`을 통해 안전하지 않은 코드를 다른 곳으로 전달이 가능합니다.
 
-**Enforcement**:
+**시행하기**:
+   - `union`이 사용된 곳을 찾아서 대신 `variant`를 사용하세요.
+
+>Note that just copying a union is not type-unsafe, so safe code can pass a union from one piece of unsafe code to another.
+>
+>**Enforcement**:
    - Issue a diagnostic for accessing a member of a union. To fix: Use a `variant` instead.
    
  
 
 <a name="Pro-type-varargs"></a>
-### Type.8: Avoid reading from varargs or passing vararg arguments. Prefer variadic template parameters instead.
+### Type.8: 가변 인자를 사용하지 말고 가변 인자 템플릿을 사용하세요.
 
-**Reason**:
+**근거**:
+가변인자를 읽는 것은 정확한 타입으로 전달된 것으로 간주합니다.
+가변인자로 보내는 것은 정확한 타입으로 읽을 것이라 간주합니다.
+그로인해 일반적인 C++언어의 안전성에 의존 할 수가 없게되며, 프로그래머가 판단하여야 하므로 취약할 수 밖에 없습니다.
+
+>### Type.8: Avoid reading from varargs or passing vararg arguments. Prefer variadic template parameters instead.
+>
+>**Reason**:
 Reading from a vararg assumes that the correct type was actually passed. Passing to varargs assumes the correct type will be read. This is fragile because it cannot generally be enforced to be safe in the language and so relies on programmer discipline to get it right.
 
-**Example**:
+**예**:
+
+    int sum(...) {
+        // ...
+        while( /*...*/ )
+            result += va_arg(list, int); // NG : int로 전달되었다 가정합니다.
+        // ...
+    }
+        
+    sum( 3, 2 ); // OK
+    sum( 3.14159, 2.71828 ); // NG : 위 함수에서 int라 가정했는데 double을 전달하였습니다.
+    
+    template<class ...Args>
+    auto sum(Args... args) { // GOOD, 좀 더 유연하게 사용이 가능한 형태입니다.
+        return (... + args); // note: C++17 "fold 표현식"
+    }
+        
+    sum( 3, 2 ); // OK : 5
+    sum( 3.14159, 2.71828 ); // OK : ~5.85987
+
+>**Example**:
 
     int sum(...) {
         // ...
@@ -374,26 +420,46 @@ Reading from a vararg assumes that the correct type was actually passed. Passing
     sum( 3, 2 ); // ok: 5
     sum( 3.14159, 2.71828 ); // ok: ~5.85987
 
-Note: Declaring a `...` parameter is sometimes useful for techniques that don't involve actual argument passing, notably to declare “take-anything” functions so as to disable "everything else" in an overload set or express a catchall case in a template metaprogram.
+참고: `...`로 인자를 선언하는 것은 실제 인수 전달과 관련이 없는 경우에 대해서는 유용합니다. 템플릿메타 프로그래밍에서 모든 것을 받는 경우를 표현하거나 중복정의(overload)를 매번 할 수 없기 때문에 아무거나 다 받는 함수를 정의하는 것입니다.
     
-**Enforcement**:
+**시행하기**:
+   - `va_list`, `va_start`, `va_arg`이 사용된 곳을 찾아서 가변인자 템플릿으로 수정하세요.
+   - 가변인자를 사용하는 곳을 찾아서 다른 함수로 만들거나 `[[suppress(types)]]`를 참조하세요.
+
+>Note: Declaring a `...` parameter is sometimes useful for techniques that don't involve actual argument passing, notably to declare “take-anything” functions so as to disable "everything else" in an overload set or express a catchall case in a template metaprogram.
+>
+>**Enforcement**:
    - Issue a diagnostic for using `va_list`, `va_start`, or `va_arg`. To fix: Use a variadic template parameter list instead.
    - Issue a diagnostic for passing an argument to a vararg parameter. To fix: Use a different function, or `[[suppress(types)]]`.
 
 
-
 <a name="SS-bounds"></a>
-## Bounds safety profile
+## 범위 안전성 프로파일
 
-This profile makes it easier to construct code that operates within the bounds of allocated blocks of memory. It does so by focusing on removing the primary sources of bounds violations: pointer arithmetic and array indexing. One of the core features of this profile is to restrict pointers to only refer to single objects, not arrays.
+이 프로파일은 메모리 블록 할당 작업에 대해 코드 작성을 쉽게 해 줍니다.
+포인터 연산, 배열 인덱스 연산 등에서 발생하는 범위 위반 사항을 제거하는 것에 초점을 맞춰서 진행하겠습니다.
+이 프로파일의 주요 기능중 하나는 (하나의 객체가 아니라) 배열을 참조하는 포인터를 제한하자는 것입니다.
 
-For the purposes of this document, bounds-safety is defined to be the property that a program does not use a variable to access memory outside of the range that was allocated and assigned to that variable. (Note that the safety is intended to be complete when combined also with [Type safety](#SS-type) and [Lifetime safety](#SS-lifetime), which cover other unsafe operations that allow bounds violations, such as type-unsafe casts that 'widen' pointers.)
+이 문서에 목적에 따르면, 범위-안정성이란 변수가 할당된 범위 외부에서 해당 변수를 사용하지 않는 것을 의미합니다.
+([타입 안전성](#SS-type)과 [수명 안전성](#SS-lifetime)을 함께 지켰을 때 범위 안전성도 그 의미가 있습니다. 예를 들엇 포인터 간의 변환에서 타입 안전성이 깨진 경우에는 범위 안전성 만으로 해당 작업에 대한 안전성을 확보하지 못합니다.)
 
-The following are under consideration but not yet in the rules below, and may be better in other profiles:
+아래 사항들에 대해서는 고려중에 있지만 이번에 다루지는 않을 것이며, 다른 프로파일에 더 있을 수도 있습니다. :
 
    -
 
-An implementation of this profile shall recognize the following patterns in source code as non-conforming and issue a diagnostic.
+이러한 프로파일의 구현은 소스코드 상에서 다음과 같은 패턴들을 부적합한 것으로 판단하고 수정 조치합니다.
+
+>## Bounds safety profile
+>
+>This profile makes it easier to construct code that operates within the bounds of allocated blocks of memory. It does so by focusing on removing the primary sources of bounds violations: pointer arithmetic and array indexing. One of the core features of this profile is to restrict pointers to only refer to single objects, not arrays.
+>
+>For the purposes of this document, bounds-safety is defined to be the property that a program does not use a variable to access memory outside of the range that was allocated and assigned to that variable. (Note that the safety is intended to be complete when combined also with [Type safety](#SS-type) and [Lifetime safety](#SS-lifetime), which cover other unsafe operations that allow bounds violations, such as type-unsafe casts that 'widen' pointers.)
+>
+>The following are under consideration but not yet in the rules below, and may be better in other profiles:
+>
+>   -
+>
+>An implementation of this profile shall recognize the following patterns in source code as non-conforming and issue a diagnostic.
 
 
 <a name="Pro-bounds-arithmetic"></a>
