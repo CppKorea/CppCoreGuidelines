@@ -551,11 +551,15 @@ Other default operations rules:
 
 
 <a name="Rc-five"></a>
-### C.21: If you define or `=delete` any default operation, define or `=delete` them all
+### C.21: 기본 연산을 정의 하거나 `=delete` 로 선언 한다면, 모두 정의하거나 모두 `=delete` 로 선언하라
 
-**Reason**: The semantics of the special functions are closely related, so it one needs to be non-default, the odds are that other need modification.
+> ### C.21: If you define or `=delete` any default operation, define or `=delete` them all
 
-**Example, bad**:
+**근거**: 특별한 함수들의 의미는 아주 밀접하게 연관되어 있으며, 하나가 기본 제공 함수가 아니여야 한다면, 다른 것들도 수정이 필요하다.
+
+> **Reason**: The semantics of the special functions are closely related, so it one needs to be non-default, the odds are that other need modification.
+
+**잘못된 예**:
 
 	struct M2 {		// bad: incomplete set of default operations
 	public:
@@ -575,27 +579,44 @@ Other default operations rules:
 		// ...
 	}
 
-Given that "special attention" was needed for the destructor (here, to deallocate), the likelihood that copy and move assignment (both will implicitly destroy an object) are correct is low (here, we would get double deletion).
+소멸자(여기서는, 할당해제)에 대한 "특별한 주의"가 필요하다고 한다면, 복사와 이동 할당(둘 다 묵시적으로 객체를 소멸할 것이다)이 정확하게 동작할 가능성은 적다. (여기서는, 두번 삭제를 시도할 것이다)
 
-**Note**: This is known as "the rule of five" or "the rule of six", depending on whether you count the default constructor.
+> Given that "special attention" was needed for the destructor (here, to deallocate), the likelihood that copy and move assignment (both will implicitly destroy an object) are correct is low (here, we would get double deletion).
 
-**Note**: If you want a default implementation of a default operation (while defining another), write `=default` to show you're doing so intentionally for that function.
-If you don't want a default operation, suppress it with `=delete`.
+**참고 사항**: 기본 생성자를 중요하게 생각하는지에 달려있는데, 이것은 "다섯의 규칙" 혹은 "여섯의 규칙" 이라고 알려져 있다.
 
-**Note:** Compilers enforce much of this rule and ideally warn about any violation.
+> **Note**: This is known as "the rule of five" or "the rule of six", depending on whether you count the default constructor.
 
-**Note**: Relying on an implicitly generated copy operation in a class with a destructor is deprecated.
+**참고 사항**: 다른 것은 정의 하더라도 기본 연산의 기본 구현이 필요하다면, `=default` 을 사용하여 해당 함수에 대한 의도를 표현하라.
 
-**Enforcement**: (Simple) A class should have a declaration (even a `=delete` one) for either all or none of the special functions.
+> **Note**: If you want a default implementation of a default operation (while defining another), write `=default` to show you're doing so intentionally for that function.
+> If you don't want a default operation, suppress it with `=delete`.
+
+**참고 사항**: 컴파일러는 이 규칙 대체적으로 시행하고, 이상적으로는 위반하는 것을 경고 해준다.
+
+> **Note:** Compilers enforce much of this rule and ideally warn about any violation.
+
+**참고 사항**: 클래스에 묵시적으로 생성된 복사 연산에 의존하는 것은 더 이상 사용되지 않는다.
+
+> **Note**: Relying on an implicitly generated copy operation in a class with a destructor is deprecated.
+
+**시행 하기**: (간단함) 클래스는 특별한 함수들에 대한 선언(`=delete` 도 포함하여)을 모두 갖거나 갖지 말아야 한다.
+
+> **Enforcement**: (Simple) A class should have a declaration (even a `=delete` one) for either all or none of the special functions.
 
 
 <a name="Rc-matched"></a>
-### C.22: Make default operations consistent
+### C.22: 기본 연산들을 일관성 있도록 하라
 
-**Reason**: The default operations are conceptually a matched set. Their semantics is interrelated.
-Users will be surprised if copy/move construction and copy/move assignment do logically different things. Users will be surprised if constructors and destructors do not provide a consistent view of resource management. Users will be surprised if copy and move doesn't reflect the way constructors and destructors work.
+> ### C.22: Make default operations consistent
 
-**Example; bad**:
+**근거**: 기본 연산들은 개념적으로 맞춰져 있다. 그들의 의미는 내부적으로 연관 되어 있다.
+사용자는 복사/이동 생성과 복사/이동 할당이 논리적으로 동일하고, 생성자와 소멸자가 리소스 관리에 대해 일관적으로 동작하며, 복사와 이동이 생성자와 소멸자가 동작하는 방식을 반영한다는 것을 기대 할 것이다.
+
+> **Reason**: The default operations are conceptually a matched set. Their semantics is interrelated.
+> Users will be surprised if copy/move construction and copy/move assignment do logically different things. Users will be surprised if constructors and destructors do not provide a consistent view of resource management. Users will be surprised if copy and move doesn't reflect the way constructors and destructors work.
+
+**잘못된 예**:
 
 	class Silly { 		// BAD: Inconsistent copy operations
 		class Impl {
@@ -608,9 +629,16 @@ Users will be surprised if copy/move construction and copy/move assignment do lo
 		// ...
 	};
 
-These operations disagree about copy semantics. This will lead to confusion and bugs.
+이 연산들은 복사 연산에 대한 의미가 일치하지 않는다. 이것은 혼란을 야기하고 버그를 만들 것이다.
 
-**Enforcement**:
+> These operations disagree about copy semantics. This will lead to confusion and bugs.
+
+**시행하기**:
+
+* (복잡함) 복사/이동 생성자와 이에 대응하는 복사/이동 할당 연산자는 동일한 레벨에서 동일한 멤버 변수를 변경하는 것이 좋다.
+* (복잡함) 복사/이동 생성자에서 변경하는 멤버 변수들은 다른 생성자들에서도 초기화 하는 것이 좋다.
+* (복잡함) 복사/이동 생성자는 멤버 변수에 대해 깊은 복사를 수행하고 나서, 소멸자는 멤버 변수를 수정하는 것이 좋다.
+* (복잡함) 소멸자가 멤버 변수를 변경하면, 그 멤버 변수들은 복사/이동 생성자 혹은 할당 연산자에서 쓰여지는 것이 좋다.
 
 * (Complex) A copy/move constructor and the corresponding copy/move assignment operator should write to the same member variables at the same level of dereference.
 * (Complex) Any member variables written in a copy/move constructor should also be initialized by all other constructors.
@@ -620,22 +648,34 @@ These operations disagree about copy semantics. This will lead to confusion and 
 
 
 <a name="SS-dtor"></a>
-## C.dtor: Destructors
+## C.dtor: 소멸자
 
-Does this class need a destructor is a surprisingly powerful design question.
-For most classes the answer is "no" either because the class holds no resources or because destruction is handled by [the rule of zero](#Rc-zero);
-that is, it's members can take care of themselves as concerns destruction.
-If the answer is "yes", much of the design of the class follows (see [the rule of five](#Rc-five).
+> ## C.dtor: Destructors
+
+소멸자가 필요한지 생각해 보는 것은 놀랍게도 디자인에 대한 강력한 질문이다.
+대부분에 클래스들에 대한 답은 "아니오" 인데, 클래스가 리소스를 사용하지 않거나 소멸은 [0의 규칙](#Rc-zero)에 의해 다루어 지기 때문이다.
+답이 "예" 라면, 클래스 디자인은 [다섯의 규칙](#Rc-five)을 따른다.
+
+> Does this class need a destructor is a surprisingly powerful design question.
+> For most classes the answer is "no" either because the class holds no resources or because destruction is handled by [the rule of zero](#Rc-zero);
+> that is, it's members can take care of themselves as concerns destruction.
+> If the answer is "yes", much of the design of the class follows (see [the rule of five](#Rc-five).
 
 
 <a name="Rc-dtor"></a>
-### C.30: Define a destructor if a class needs an explicit action at object destruction
+### C.30: 객체가 없어질 때, 명시적인 동작이 필요할 경우 소멸자를 정의하라
 
-**Reason**: A destructor is implicitly invoked at the end of an objects lifetime.
-If the default destructor is sufficient, use it.
-Only if you need code that is not simply destructors of members executed, define a non-default destructor.
+> ### C.30: Define a destructor if a class needs an explicit action at object destruction
 
-**Example**:
+**근거**: 소멸자는 암묵적으로 객체의 생명주기의 마지막에 호출된다.
+기본 소멸자로 충분하다면 그것을 사용하라.
+단순하게 멤버의 소멸자를 호출하는 것이 아닌 코드가 필요할 경우 소멸자를 정의하라.
+
+> **Reason**: A destructor is implicitly invoked at the end of an objects lifetime.
+> If the default destructor is sufficient, use it.
+> Only if you need code that is not simply destructors of members executed, define a non-default destructor.
+
+**예**:
 
 	template<typename A>
 	struct Final_action {	// slightly simplified
@@ -658,14 +698,21 @@ Only if you need code that is not simply destructors of members executed, define
 		// ...
 	} // act done here
 
-The whole purpose of `Final_action` is to get a piece of code (usually a lambda) executed upon destruction.
+`Final_action` 의 목적은 소멸할 때 실행할 코드(보통 람다)를 얻는 것이다.
 
-**Note**: There are two general categories of classes that need a user-defined destructor:
+> The whole purpose of `Final_action` is to get a piece of code (usually a lambda) executed upon destruction.
 
-* A class with a resource that is not already represented as a class with a destructor, e.g., a `vector` or a transaction class.
-* A class that exists primarily to execute an action upon destruction, such as a tracer or `Final_action`.
+**참고 사항**: 사용자 정의 소멸자가 필요한 클래스를 보면, 일반적으로 두개의 카테고리가 있다.
 
-**Example, bad**:
+> **Note**: There are two general categories of classes that need a user-defined destructor:
+
+* 리소스를 사용하는 클래스가 아직 소멸자가 없는 경우, 예, `vector` 혹은 트랜잭션 코드
+* 소멸할 때 특정 코드를 실행하기 위해 사전에 만들어 둔 클래스, 추적자 혹은 `Final_action`
+
+> * A class with a resource that is not already represented as a class with a destructor, e.g., a `vector` or a transaction class.
+> * A class that exists primarily to execute an action upon destruction, such as a tracer or `Final_action`.
+
+**잘못된 예**:
 
 	class Foo {		// bad; use the default destructor
 	public:
@@ -677,87 +724,136 @@ The whole purpose of `Final_action` is to get a piece of code (usually a lambda)
 		vector<int> vi;
 	}
 
-The default destructor does it better, more efficiently, and can't get it wrong.
+기본 소멸자가 더 잘 동작하고, 더 효과적이며, 틀리지 않는다.
 
-**Note**: If the default destructor is needed, but its generation has been suppressed (e.g., by defining a move constructor), use `=default`.
+> The default destructor does it better, more efficiently, and can't get it wrong.
 
-**Enforcement**: Look for likely "implicit resources", such as pointers and references. Look for classes with destructors even though all their data members have destructors.
+**참고 사항**: 기본 소멸자가 필요하지만, 생성되지 않도록 되어 있다면 (예, 이동 생성자를 정의한 경우), `=default` 를 사용하라.
+
+> **Note**: If the default destructor is needed, but its generation has been suppressed (e.g., by defining a move constructor), use `=default`.
+
+**시행하기**: 포인터나 참조와 같은 "암묵적인 자원"이 될 수 있는 것들을 찾아보라. 모든 데이터 멤버가 소멸자를 갖고 있더라도, 소멸자가 있는 클래스들을 찾아보라.
+
+> **Enforcement**: Look for likely "implicit resources", such as pointers and references. Look for classes with destructors even though all their data members have destructors.
 
 
 <a name="Rc-dtor-release"></a>
-### C.31: All resources acquired by a class must be released by the class's destructor
+### C.31: 클래스에 의해 얻어진 모든 리소스는 소멸자에서 해제되어야 한다
 
-**Reason**: Prevention of resource leaks, especially in error cases.
+> ### C.31: All resources acquired by a class must be released by the class's destructor
 
-**Note**: For resources represented as classes with a complete set of default operations, this happens automatically.
+**근거**: 리소스 누수를 막는다, 특히 에러 상황에서.
 
-**Example**:
+> **Reason**: Prevention of resource leaks, especially in error cases.
+
+**참고 사항**: 클래스로 표현되는 리소스들이 기본 연산자들만 갖고 있을 때 자동적으로 발생한다.
+
+> **Note**: For resources represented as classes with a complete set of default operations, this happens automatically.
+
+**예**:
 
 	class X {
 		ifstream f;	// may own a file
 		// ... no default operations defined or =deleted ...
 	};
 
+`X`의 `ifstream` 은 `X`가 소멸될 때 묵시적으로 열었던 파일을 모두 닫는다.
+
 `X`'s `ifstream` implicitly closes any file it may have open upon destruction of its `X`.
 
-**Example; bad**:
+**잘못된 예**:
 
 	class X2 {	// bad
 		FILE* f;	// may own a file
 		// ... no default operations defined or =deleted ...
 	};
 
-`X2` may leak a file handle.
+`X2` 에서는 파일 핸들 누수가 생길 것이다.
 
-**Note**: What about a sockets that won't close? A destructor, close, or cleanup operation [should never fail](#Rc-dtor-fail).
-If it does nevertheless, we have a problem that has no really good solution.
-For starters, the writer of a destructor does not know why the destructor is called and cannot "refuse to act" by throwing an exception.
-See [discussion](#Sd-never-fail).
-To make the problem worse, many "close/release" operations are not retryable.
-Many have tried to solve this problem, but no general solution is known.
-If at all possible, consider failure to close/cleanup a fundamental design error and terminate.
+> `X2` may leak a file handle.
 
-**Note**: A class can hold pointers and references to objects that it does not own.
-Obviously, such objects should not be `delete`d by the class's destructor.
-For example:
+**참고사항**: 닫지 않은 소켓은 어떨까? 소멸자, 닫기, 정리 연산은 [실패하지 않는 것이 좋다](#Rc-dtor-fail).
+그럼에도 불구 하고 발생한다면, 정말 좋은 해결책을 찾기 힘든 문제를 만나는 것이다.
+초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리 거부"를 할 수 없는지 알지 못할 것이다.
+[discussion](#Sd-never-fail)을 보라.
+문제를 악화시키는 것은, 많은 "닫기/해제" 연산들이 재시도 할 수 없도록 되어있는 것이다.
+이 문제를 풀려는 시도는 많았지만, 일반적인 해결책은 알려지지 않았다.
+해결책이 없다면, 닫기/해제에 대한 실패를 디자인 오류로 간주하고 종료시키는 것을 고려해 보라.
+
+> **Note**: What about a sockets that won't close? A destructor, close, or cleanup operation [should never fail](#Rc-dtor-fail).
+> If it does nevertheless, we have a problem that has no really good solution.
+> For starters, the writer of a destructor does not know why the destructor is called and cannot "refuse to act" by throwing an exception.
+> See [discussion](#Sd-never-fail).
+> To make the problem worse, many "close/release" operations are not retryable.
+> Many have tried to solve this problem, but no general solution is known.
+> If at all possible, consider failure to close/cleanup a fundamental design error and terminate.
+
+**참고사항**: 클래스가 소유하고 있지 않은 객체에 대한 포인터나 참조를 갖고 있을 수 있다.
+명백하게, 이 객체들은 클래스의 소멸자에서 `delete`되지 않아야 한다.
+예:
+
+> **Note**: A class can hold pointers and references to objects that it does not own.
+> Obviously, such objects should not be `delete`d by the class's destructor.
+> For example:
 
 	Preprocessor pp { /* ... */ };
 	Parser p { pp, /* ... */ };
 	Type_checker tc { p, /* ... */ };
 
-Here `p` refers to `pp` but does not own it.
+`p`는 `pp`를 참조하지만, 소유하고 있지 않다.
 
-**Enforcement**:
+> Here `p` refers to `pp` but does not own it.
 
-* (Simple) If a class has pointer or reference member variables that are owners
-(e.g., deemed owners by using `GSL::owner`), then they should be referenced in its destructor.
-* (Hard) Determine if pointer or reference member variables are owners when there is no explicit statement of ownership
-(e.g., look into the constructors).
+**시행하기**:
+* (단순함) 클래스가 소유자인 포인터나 참조 멤버 변수를 갖고 있다면(예, 소유자는 `GSL::owner` 처럼 사용하는 것을 생각해보라), 소멸자에서 참조되는 것이 좋다.
+* (어려움) 소유권에 대해 명시적으로 기술하지 않은 경우, 포인터나 참조 멤버 변수들이 소유자 인지 판단하라. (예, 생성자를 보라)
+
+> * (Simple) If a class has pointer or reference member variables that are owners
+> (e.g., deemed owners by using `GSL::owner`), then they should be referenced in its destructor.
+> * (Hard) Determine if pointer or reference member variables are owners when there is no explicit statement of ownership
+> (e.g., look into the constructors).
 
 
 <a name="Rc-dtor-ptr"></a>
-### C.32: If a class has a raw  pointer (`T*`) or reference (`T&`), consider whether it might be owning
+### C.32: 클래스가 포인터(`T*`)나 참조(`T&`)를 갖고 있을 때, 소유하고 있는 것인지 고려해 보라
 
-**Reason**: There is a lot of code that is non-specific about ownership.
+> ### C.32: If a class has a raw  pointer (`T*`) or reference (`T&`), consider whether it might be owning
 
-**Example**:
+**근거**: 소유권에 대해 특이할게 없는 코드들이 많다.
+
+> **Reason**: There is a lot of code that is non-specific about ownership.
+
+**예**:
 
 	???
 
-**Note**: If the `T*` or `T&` is owning, mark it `owning`. If the `T*` is not owning, consider marking it `ptr`.
-This will aide documentation and analysis.
+**참고 사항**: `T*` 혹은 `T&` 가 소유를 나타낸다면, `소유한다는` 표시를 하라. `T*` 에 소유의 의미가 없다면 `ptr` 로 표시하는 것을 고려하라.
+이것은 문서화와 분석에 도움이 될 것이다.
 
-**Enforcement**: Look at the initialization of raw member pointers and member references and see if an allocation is used.
+> **Note**: If the `T*` or `T&` is owning, mark it `owning`. If the `T*` is not owning, consider marking it `ptr`.
+> This will aide documentation and analysis.
+
+**시행 하기**: 저수준 멤버 포인터나 멤버 참조의 초기화를 살펴보고, 할당이 사용되는지 보라.
+
+> **Enforcement**: Look at the initialization of raw member pointers and member references and see if an allocation is used.
 
 
 <a name="Rc-dtor-ptr"></a>
-### C.33: If a class has an owning pointer member, define a destructor
+### C.33: 클래스가 포인터 멤버를 소유하고 있다면, 소멸자를 정의하거나 `=delete` 로 선언하라
 
-**Reason**: An owned object must be `deleted` upon destruction of the object that owns it.
+> ### C.33: If a class has an owning pointer member, define a destructor
 
-**Example**: A pointer member may represent a resource.
-[A `T*` should not do so](#Rr-ptr), but in older code, that's common.
-Consider a `T*` a possible owner and therefore suspect.
+**근거**: 소유된 객체는 그것을 소유한 객체가 소멸될 때 `삭제`되어야 한다.
+
+> **Reason**: An owned object must be `deleted` upon destruction of the object that owns it.
+
+**예**: 포인터 멤버는 리소스일 것이다.
+[`T*`는 리소스가 아니여야 한다](#Rr-ptr), 오래된 코드에서는 일반적이다.
+`T*` 를 가능한 소유자라고 고려하고, 의심해보라.
+
+> **Example**: A pointer member may represent a resource.
+> [A `T*` should not do so](#Rr-ptr), but in older code, that's common.
+> Consider a `T*` a possible owner and therefore suspect.
 
 	template<typename T>
 	class Smart_ptr {
@@ -772,7 +868,9 @@ Consider a `T*` a possible owner and therefore suspect.
 		auto p2 = p1;	// error: p2.p leaked (if not nullptr and not owned by some other code)
 	}
 
-Note that if you define a destructor, you must define or delete [all default operations](#Rc-five):
+소멸자를 정의 한다면, [모든 기본 연산들](#Rc-five)을 정의하거나 삭제해야 한다.
+
+> Note that if you define a destructor, you must define or delete [all default operations](#Rc-five):
 
 	template<typename T>
 	class Smart_ptr2 {
@@ -788,7 +886,9 @@ Note that if you define a destructor, you must define or delete [all default ope
 		auto p2 = p1;	// error: double deletion
 	}
 
-The default copy operation will just copy the `p1.p` into `p2.p` leading to a double destruction of `p1.p`. Be explicit about ownership:
+기본 복사 연산은 단지 `p1.p` 를 `p2.p` 로 복사하고, `p1.p` 가 두번 소멸되게 만들 것이다. 소유권에 대해 명시적이 되라:
+
+> The default copy operation will just copy the `p1.p` into `p2.p` leading to a double destruction of `p1.p`. Be explicit about ownership:
 
 	template<typename T>
 	class Smart_ptr3 {
@@ -805,17 +905,25 @@ The default copy operation will just copy the `p1.p` into `p2.p` leading to a do
 		auto p2 = p1;	// error: double deletion
 	}
 
+**참고사항**: 가끔 소멸자를 사용하는 가장 단순한 방법은 포인터를 스마트 포인터(예, `std::unique_ptr`)로 교체하고, 컴파일러가
+적절한 소멸자를 암묵적으로 호출하게 만들도록 놔두는 것이다.
 
- **Note**: Often the simplest way to get a destructor is to replace the pointer with a smart pointer (e.g., `std::unique_ptr`)
- and let the compiler arrange for proper destruction to be done implicitly.
+> **Note**: Often the simplest way to get a destructor is to replace the pointer with a smart pointer (e.g., `std::unique_ptr`)
+> and let the compiler arrange for proper destruction to be done implicitly.
 
-**Note**: Why not just require all owning pointers to be "smart pointers"?
- That would sometimes require non-trivial code changes and may affect ABIs.
+**참고사항**: 왜 소유하고 있는 모든 포인터를 "스마트 포인터"로 사용하도록 하지 않는가?
+가끔 중요하지 않는 코드 변경을 만들게 되고, ABI 에 영향을 줄 수 있다.
 
-**Enforcement**:
+> **Note**: Why not just require all owning pointers to be "smart pointers"?
+> That would sometimes require non-trivial code changes and may affect ABIs.
 
-* A class with a pointer data member is suspect.
-* A class with an `owner<T>` should define its default operations.
+**시행하기**:
+
+* 포인터 데이터 맴버를 갖는 클래스를 의심하라.
+* `owner<T>` 를 갖는 클래스는 기본 연산들을 정의 하는 것이 좋다.
+
+> * A class with a pointer data member is suspect.
+> * A class with an `owner<T>` should define its default operations.
 
 
 <a name="Rc-dtor-ref"></a>
