@@ -3,11 +3,12 @@
 
 C++을 보다 전문적으로 사용하기 위하여 많은 코딩 표준, 규칙들이 만들어 지고 있다.
 Many coding standards, rules, and guidelines have been written for C++, and especially for specialized uses of C++.
+많은
 Many
 
 * 식별자들에 대한 스펠링과 같이 낮은 수준의 이슈들에 초점을 맞춘 것들
 * C++의 초보자들에 의해 작성되어진 것들
-* see "stopping programmers from doing unusual things" as their primary aim
+* 목표를 달성하기 위해 "개발자를 올바르게 인도하는" 것들
 * 심지어 10년도 넘은 소스코드를 많은 컴파일러로 이식하고자 할 때 적용하는 것들
 * 수십년도 넘은 오래된 코드 베이스를 유지보수 하기 위한 것들
 * 단일 애플리케이션 도메인에 적용하기 위한 것들
