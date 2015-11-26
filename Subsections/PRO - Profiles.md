@@ -463,12 +463,17 @@ Reading from a vararg assumes that the correct type was actually passed. Passing
 
 
 <a name="Pro-bounds-arithmetic"></a>
-### Bounds.1: Don't use pointer arithmetic. Use `array_view` instead.
+### Bounds.1: 포인터 연산을 사용하지 말고, 대신  `array_view`를 사용하세요.
 
-**Reason**:
+**근거**:
+포인터는 단일 객체를 참조할때만 써야 하며, 포인터 연산은 잘못되기 쉽습니다. `array_view`는 범위 체크가 되어서 배열 안의 데이터를 제어하기에 안전한 타입입니다.
+
+>### Bounds.1: Don't use pointer arithmetic. Use `array_view` instead.
+>
+>**Reason**:
 Pointers should only refer to single objects, and pointer arithmetic is fragile and easy to get wrong. `array_view` is a bounds-checked, safe type for accessing arrays of data.
 
-**Example; bad**:
+**잘못된 예**:
 
     void f(int* p, int count)
     {
@@ -492,7 +497,50 @@ Pointers should only refer to single objects, and pointer arithmetic is fragile 
         use(&p[0], 3); // BAD
     }
 
-**Example; good**:
+**올바른 예**:
+
+    void f(array_view<int> a) // BETTER: 함수 선언에 array_view를 사용하였습니다.
+    {
+        if (a.length() < 2) return;
+
+        int n = *a++; // OK
+
+        array_view<int> q = a + 1; // OK
+
+        if (a.length() < 6) return;
+
+        a[4] = 1; // OK
+
+        a[count – 1] = 2; // OK
+
+        use(a.data(), 3); // OK
+    }
+
+>**Example; bad**:
+
+    void f(int* p, int count)
+    {
+        if (count < 2) return;
+
+        int* q = p + 1; // BAD
+
+        ptrdiff_t d;
+        int n;
+        d = (p - &n); // OK
+        d = (q - p); // OK
+
+        int n = *p++; // BAD
+
+        if (count < 6) return;
+
+        p[4] = 1; // BAD
+
+        p[count - 1] = 2; // BAD
+
+        use(&p[0], 3); // BAD
+    }
+
+>**Example; good**:
 
     void f(array_view<int> a) // BETTER: use array_view in the function declaration
     {
@@ -511,17 +559,92 @@ Pointers should only refer to single objects, and pointer arithmetic is fragile 
         use(a.data(), 3); // OK
     }
 
-**Enforcement**:
+**시행하기**:
+포인터 타입 표현식에 대한 연산식에의해  포인터 타입의 결과값이 어떻게 되는지 진단하세요.
+
+>**Enforcement**:
 Issue a diagnostic for any arithmetic operation on an expression of pointer type that results in a value of pointer type.
 
 
 <a name="Pro-bounds-arrayindex"></a>
-### Bounds.2: Only index into arrays using constant expressions.
+### Bounds.2: 배열의 인덱스로 상수표현식 만을 사용하세요.
 
-**Reason**:
+**근거**:
+배열에 동적으로 제어하면서 안전성을 확인하는 것은 사람이든 툴이든 어렵습니다. 
+`array_view`는 범위체크를 해주어서 배열의 데이터를 제어하기에 안전한 타입입니다.
+`at()`는 하나의 요소를 제어하면서 범위체크를 해줍니다.
+배열을 제어하기 위해 반복자(iterator)를 사용해야할 경우라면 배열로 부터 생성한 `array_view`의 반복자를 사용하세요.
+
+>### Bounds.2: Only index into arrays using constant expressions.
+>
+>**Reason**:
 Dynamic accesses into arrays are difficult for both tools and humans to validate as safe. `array_view` is a bounds-checked, safe type for accessing arrays of data. `at()` is another alternative that ensures single accesses are bounds-checked. If iterators are needed to access an array, use the iterators from an `array_view` constructed over the array.
 
-**Example; bad**:
+**잘못된 예**:
+
+    void f(array<int,10> a, int pos)
+    {
+        a[pos/2] = 1; // BAD
+        a[pos-1] = 2; // BAD
+        a[-1] = 3;    // BAD - 잘못된 인덱스
+        a[10] = 4;    // BAD - 잘못된 인덱스
+    }
+
+**올바른 예**:
+
+    // 대안 A: array_view 사용
+
+	// A1: 인자 타입을 array_view로 변경
+    void f(array_view<int,10> a, int pos)
+    {
+        a[pos/2] = 1; // OK
+        a[pos-1] = 2; // OK
+    }
+
+    // A2: 내부적으로 array_view를 선언해서 사용
+    void f(array<int,10> arr, int pos)
+    {
+        array_view<int> a = arr, int pos)
+        a[pos/2] = 1; // OK
+        a[pos-1] = 2; // OK
+    }
+
+    // 대안 B: 제어하는데 at() 사용
+    void f()(array<int,10> a, int pos)
+    {
+        at(a, pos/2) = 1; // OK
+        at(a, pos-1) = 2; // OK
+    }
+
+**잘못된 예**:
+
+    void f()
+    {
+        int arr[COUNT];
+        for (int i = 0; i < COUNT; ++i)
+            arr[i] = i; // BAD, 비상수 값을 인덱스로 전달하면 안됨
+    }
+
+**올바른 예**:
+
+    // 대안 A: array_view 사용
+    void f()
+    {
+        int arr[COUNT];
+		array_view<int> av = arr;
+        for (int i = 0; i < COUNT; ++i)
+            av[i] = i;
+    }
+
+    // 대안 B:제어하는데 at() 사용
+    void f()
+    {
+        int arr[COUNT];
+        for (int i = 0; i < COUNT; ++i)
+            at(arr,i) = i;
+    }
+
+>**Example; bad**:
 
     void f(array<int,10> a, int pos)
     {
@@ -531,7 +654,7 @@ Dynamic accesses into arrays are difficult for both tools and humans to validate
         a[10] = 4;    // BAD - no replacement, just don't do this
     }
 
-**Example; good**:
+>**Example; good**:
 
     // ALTERNATIVE A: Use an array_view
 
@@ -557,7 +680,7 @@ Dynamic accesses into arrays are difficult for both tools and humans to validate
         at(a, pos-1) = 2; // OK
     }
 
-**Example; bad**:
+>**Example; bad**:
 
     void f()
     {
@@ -566,7 +689,7 @@ Dynamic accesses into arrays are difficult for both tools and humans to validate
             arr[i] = i; // BAD, cannot use non-constant indexer
     }
 
-**Example; good**:
+>**Example; good**:
 
     // ALTERNATIVE A: Use an array_view
     void f()
@@ -586,12 +709,27 @@ Dynamic accesses into arrays are difficult for both tools and humans to validate
     }
 
 
-**Enforcement**:
+**시행하기**:
+컴파일 타임에 상수표현식이 아닌 값을 인덱스로 사용하는 배열 타입 변수 (정적 배열, `std::array` 등...) 이나 인덱스 표현식을 진단하세요.
+
+배열 범위 밖의 값을 인덱스로 사용하는 배열 타입 변수 (정적 배열, `std::array` 등...) 이나 인덱스 표현식을 진단하세요.
+
+>**Enforcement**:
 Issue a diagnostic for any indexing expression on an expression or variable of array type (either static array or `std::array`) where the indexer is not a compile-time constant expression.
 
-Issue a diagnostic for any indexing expression on an expression or variable of array type (either static array or `std::array`) where the indexer is not a value between `0` or and the upper bound of the array.
+>Issue a diagnostic for any indexing expression on an expression or variable of array type (either static array or `std::array`) where the indexer is not a value between `0` or and the upper bound of the array.
 
-**Rewrite support**: Tooling can offer rewrites of array accesses that involve dynamic index expressions to use `at()` instead:
+**수정 지원**: IDE에서 동적 인덱스 표현식으로 배열을 제어하는 곳을 `at()`로 고치도록 제안할 수 있습니다 :
+
+    static int a[10];
+
+    void f(int i, int j)
+    {
+    	a[i + j] = 12; 		// BAD, 아래와 같이 수정해야 합니다.
+        at(a, i + j) = 12; 	// OK - 범위 체크
+    }
+
+>**Rewrite support**: Tooling can offer rewrites of array accesses that involve dynamic index expressions to use `at()` instead:
 
     static int a[10];
 
@@ -600,7 +738,6 @@ Issue a diagnostic for any indexing expression on an expression or variable of a
     	a[i + j] = 12; 		// BAD, could be rewritten as...
         at(a, i + j) = 12; 	// OK - bounds-checked
     }
-
 
 <a name="Pro-bounds-decay"></a>
 ### Bounds.3: No array-to-pointer decay.
