@@ -48,11 +48,13 @@ Alocation and deallocation rule summary:
 * [R.21: 소유권 공유가 필요없다면 `shared_ptr`보다 `unique_ptr`이 낫다.](#Rr-unique)
 * [R.22: `shared_ptr`을 만드려면 `make_shared()`를 사용하라.](#Rr-make_shared)
 * [R.23: `unique_ptr`을 만드려면 `make_unique()`를 사용하라.](#Rr-make_unique)
+
 > * [R.20: Use `unique_ptr` or `shared_ptr` to represent ownership](#Rr-owner)
 * [R.21: Prefer `unique_ptr` over `shared_ptr` unless you need to share ownership](#Rr-unique)
 * [R.22: Use `make_shared()` to make `shared_ptr`s](#Rr-make_shared)
 * [R.23: Use `make_unique()` to make `unique_ptr`s](#Rr-make_unique)
 * [R.24: Use `std::weak_ptr` to break cycles of `shared_ptr`s](#Rr-weak_ptr)
+
 * [R.30: Take smart pointers as parameters only to explicitly express lifetime semantics](#Rr-smartptrparam)
 * [R.31: If you have non-`std` smart pointers, follow the basic pattern from `std`](#Rr-smart)
 * [R.32: Take a `unique_ptr<widget>` parameter to express that a function assumes ownership of a `widget`](#Rr-uniqueptrparam)
@@ -601,16 +603,23 @@ Don't leave it undeclared.
 ### R.22: `shared_ptr`을 만드려면 `make_shared()`를 사용하라.
 >### R.22: Use `make_shared()` to make `shared_ptr`s
 
-**Reason**: If you first make an object and then gives it to a `shared_ptr` constructor, you (most likely) do one more allocation (and later deallocation) than if you use `make_shared()` because the reference counts must be allocated separately from the object.
+**이유**: 만약 당신이 `make_shared()`를 사용하는 대신 객체를 처음 만들고나서 그 객체를 `shared_ptr` 생성자에게 건네고 있다면, 당신은 (아마도) 할당을(이 후 해제도) 한 번 더 하게 되는 것이다. 왜냐하면 참조 횟수는 반드시 객체와 분리되어 할당되기 때문이다.
+>**Reason**: If you first make an object and then gives it to a `shared_ptr` constructor, you (most likely) do one more allocation (and later deallocation) than if you use `make_shared()` because the reference counts must be allocated separately from the object.
 
-**Example**: Consider
+**예**: 다음을 봐라
+	shared_ptr<X> p1 { new X{2} }; // 나쁜 예
+	auto p = make_shared<X>(2);    // 좋은 예
+
+>**Example**: Consider
 
 	shared_ptr<X> p1 { new X{2} }; // bad
 	auto p = make_shared<X>(2);    // good
 
-The `make_shared()` version mentions `X` only once, so it is usually shorter (as well as faster) than the version with the explicit `new`.
+`make_shared()` 버전은 `X`가 단 한 번만 나오는데, 그래서 명시적으로 `new`를 사용하는 버전보다 코드가 대개 짧다(게다가 빠르고).
+>The `make_shared()` version mentions `X` only once, so it is usually shorter (as well as faster) than the version with the explicit `new`.
 
-**Enforcement**: (Simple) Warn if a `shared_ptr` is constructed from the result of `new` rather than `make_shared`.
+**시행하기**: `make_shared` 대신 `new`로 만들어진 객체로 `shared_ptr`이 생성되고 있다면 경고하라.
+>**Enforcement**: (Simple) Warn if a `shared_ptr` is constructed from the result of `new` rather than `make_shared`.
 
 
 <a name ="Rr-make_shared"></a>
