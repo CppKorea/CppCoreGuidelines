@@ -603,7 +603,7 @@ Don't leave it undeclared.
 ### R.22: `shared_ptr`을 만드려면 `make_shared()`를 사용하라.
 >### R.22: Use `make_shared()` to make `shared_ptr`s
 
-**이유**: 만약 당신이 `make_shared()`를 사용하는 대신 객체를 처음 만들고나서 그 객체를 `shared_ptr` 생성자에게 건네고 있다면, 당신은 (아마도) 할당을(이 후 해제도) 한 번 더 하게 되는 것이다. 왜냐하면 참조 횟수는 반드시 객체와 분리되어 할당되기 때문이다.
+**이유**: 만약 당신이 `make_shared()`를 사용하는 대신 객체를 처음 만들고나서 그 객체를 `shared_ptr` 생성자에게 건네고 있다면, 당신은 (아마도) 할당을(이 후 해제도) 한 번 더 하게 되는 것이다. 왜냐하면 참조 횟수는 객체와 별개로 할당되어지기 때문이다.
 >**Reason**: If you first make an object and then gives it to a `shared_ptr` constructor, you (most likely) do one more allocation (and later deallocation) than if you use `make_shared()` because the reference counts must be allocated separately from the object.
 
 **예**: 다음을 봐라
@@ -618,7 +618,7 @@ Don't leave it undeclared.
 `make_shared()` 버전은 `X`가 단 한 번만 나오는데, 그래서 명시적으로 `new`를 사용하는 버전보다 코드가 대개 짧다(게다가 빠르고).
 >The `make_shared()` version mentions `X` only once, so it is usually shorter (as well as faster) than the version with the explicit `new`.
 
-**시행하기**: `make_shared` 대신 `new`로 만들어진 객체로 `shared_ptr`이 생성되고 있다면 경고하라.
+**시행하기**: `shared_ptr`이 `make_shared` 대신 `new`로 생성되어졌다면 경고하라.
 >**Enforcement**: (Simple) Warn if a `shared_ptr` is constructed from the result of `new` rather than `make_shared`.
 
 
@@ -626,11 +626,15 @@ Don't leave it undeclared.
 ### R.23: `unique_ptr`을 만드려면 `make_unique()`를 사용하라.
 >### Rule R.23: Use `make_unique()` to make `unique_ptr`s
 
-**Reason**: for convenience and consistency with `shared_ptr`.
+**이유**: 편리성과 `shared_ptr`과의 일관성을 위해서.
+>**Reason**: for convenience and consistency with `shared_ptr`.
 
-**Note**: `make_unique()` is C++14, but widely available (as well as simple to write).
+**참조**: `make_unique()`는 C++14에 있지만, 폭넓게 사용 가능하다(만들기 또한 간단하다).
+>**Note**: `make_unique()` is C++14, but widely available (as well as simple to write).
 
-**Enforcement**: (Simple) Warn if a `Shared_ptr` is constructed from the result of `new` rather than `make_unique`.
+**시행하기**: `Shared_ptr`이 `make_unique`대신 `new`로 생성되어졌다면 경고하라.
+(의견 - `unique_ptr`의 오기로 `Shared_ptr`로 기술되어있는 것 같습니다.)
+>**Enforcement**: (Simple) Warn if a `Shared_ptr` is constructed from the result of `new` rather than `make_unique`.
 
 
 <a name ="Rr-weak_ptr"></a>
