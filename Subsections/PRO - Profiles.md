@@ -740,12 +740,18 @@ Issue a diagnostic for any indexing expression on an expression or variable of a
     }
 
 <a name="Pro-bounds-decay"></a>
-### Bounds.3: No array-to-pointer decay.
+### Bounds.3: 배열을 포인터로 붕괴시키지 맙시다.
 
-**Reason**:
+**근거**:
+포인터를 배열처럼 사용할 수 없습니다. 배열의 값을 제어하는데 포인터를 사용하지 말고 범위체크가 되는 `array_view`를 사용하는 것이 안전한 대안입니다.
+
+>### Bounds.3: No array-to-pointer decay.
+>
+>**Reason**:
 Pointers should not be used as arrays. `array_view` is a bounds-checked, safe alternative to using pointers to access arrays.
 
-**Example; bad**:
+
+**잘못된 예**:
 
     void g(int* p, size_t length);
 
@@ -756,7 +762,32 @@ Pointers should not be used as arrays. `array_view` is a bounds-checked, safe al
         g(&a[0], 1);    // OK
     }
 
-**Example; good**:
+**올바른 예**:
+
+    void g(int* p, size_t length);
+    void g1(array_view<int> av); // BETTER: get g() changed.
+
+    void f()
+    {
+        int a[5];
+        array_view av = a;
+
+        g(a.data(), a.length());    // OK, 다른 대안이 없는 경우라면
+        g1(a);                      // OK - 묵시적 aray_biew 생성자를 사용함으로 붕괴현상이 발생하지 않음
+    }
+
+>**Example; bad**:
+
+    void g(int* p, size_t length);
+
+    void f()
+    {
+        int a[5];
+        g(a, 5);        // BAD
+        g(&a[0], 1);    // OK
+    }
+
+>**Example; good**:
 
     void g(int* p, size_t length);
     void g1(array_view<int> av); // BETTER: get g() changed.
@@ -770,26 +801,36 @@ Pointers should not be used as arrays. `array_view` is a bounds-checked, safe al
         g1(a);                      // OK - no decay here, instead use implicit array_view ctor
     }
 
-**Enforcement**:
+
+**시행하기**:
+배열을 포인터로 묵시적 변환하는 표현들을 찾아서 진단하세요.
+
+>**Enforcement**:
 Issue a diagnostic for any expression that would rely on implicit conversion of an array type to a pointer type.
 
 
 <a name="Pro-bounds-stdlib"></a>
-### Bounds.4: Don't use standard library functions and types that are not bounds-checked.
+### Bounds.4: 범위체크를 하지 않는 표준 라이브러리 함수나 타입을 사용하지 마세요.
 
-**Reason**:
+**근거**:
+이런 함수들은 모두 `array_view`를 활용한 범위 안전 중복정의(overload)를 가지고 있습니다.
+`vector`와 같은 표준 타입은 범위 프로파일 상의 범위체크를 하도록 수정하거나 (제약사항을 추가하는 등의 호환되는 방식), `at()`을 사용하세요.
+
+>### Bounds.4: Don't use standard library functions and types that are not bounds-checked.
+>
+>**Reason**:
 These functions all have bounds-safe overloads that take `array_view`. Standard types such as `vector` can be modified to perform bounds-checks under the bounds profile (in a compatible way, such as by adding contracts), or used with `at()`.
 
-**Example; bad**:
+**잘못된 예**:
 
     void f()
     {
         array<int,10> a, b;
-        memset(a.data(), 0, 10); 		// BAD, and contains a length error
-        memcmp(a.data(), b.data(), 10); // BAD, and contains a length error
+        memset(a.data(), 0, 10); 	// BAD, 길이 부분이 잘못되었습니다.
+        memcmp(a.data(), b.data(), 10); // BAD, 길이 부분이 잘못되었습니다.
     }
 
-**Example; good**:
+**올바른 예**:
 
     void f()
     {
@@ -798,7 +839,41 @@ These functions all have bounds-safe overloads that take `array_view`. Standard 
         memcmp({a,b}); 	// OK
     }
 
-**Example**: If code is using an unmodified standard library, then there are still workarounds that enable use of `std::array` and `std::vector` in a bounds-safe manner. Code can call the `.at()` member function on each class, which will result in an `std::out_of_range` exception being thrown. Alternatively, code can call the `at()` free function, which will result in fail-fast (or a customized action) on a bounds violation.
+>**Example; bad**:
+
+    void f()
+    {
+        array<int,10> a, b;
+        memset(a.data(), 0, 10); 		// BAD, and contains a length error
+        memcmp(a.data(), b.data(), 10); // BAD, and contains a length error
+    }
+
+>**Example; good**:
+
+    void f()
+    {
+        array<int,10> a, b;
+        memset(a, 0); 	// OK
+        memcmp({a,b}); 	// OK
+    }
+
+**예**: 
+코드가 수정되지 않은 표준 라이브러리를 사용하는 경우, `std::array`와 `std::vector`를 범위 안전성 방법으로 사용함으로 해결하는 방법이 있습니다.
+`std::out_of_range` 예외가 발생하는 클래스는 `.at()` 멤버 함수를 호출 할 수 있습니다.
+또한, 범위 위반에서 fail-fast (또는 사용자 정의 행동)을 하는 경우 `at()` 함수를 이용 할 수도 있습니다.
+
+    void f(std::vector<int>& v, std::array<int, 12> a, int i)
+    {
+        v[0] = a[0];        // BAD
+        v.at(0) = a[0];     // OK (대안 1)
+        at(v, 0) = a[0];    // OK (대안 2)
+
+        v.at(0) = a[i];     // BAD
+        v.at(0) = a.at(i)   // OK (대안 1)
+        v.at(0) = at(a, i); // OK (대안 2)
+    }
+
+>**Example**: If code is using an unmodified standard library, then there are still workarounds that enable use of `std::array` and `std::vector` in a bounds-safe manner. Code can call the `.at()` member function on each class, which will result in an `std::out_of_range` exception being thrown. Alternatively, code can call the `at()` free function, which will result in fail-fast (or a customized action) on a bounds violation.
 
     void f(std::vector<int>& v, std::array<int, 12> a, int i)
     {
