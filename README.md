@@ -24,6 +24,9 @@
 - Changjun Lee (yiatom)
 - Sangbae Kang (typeon)
 - Minjang Kim (minjang)
+- Yonghyun Kim (drvoss)
+- Hyungtae Kim (cavecafe)
+- Junho Kim (h4wldev)
 
 ## 번역 진행 상황
 
