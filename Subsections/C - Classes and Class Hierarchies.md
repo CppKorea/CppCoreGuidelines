@@ -927,14 +927,21 @@ Other default operations rules:
 
 
 <a name="Rc-dtor-ref"></a>
-### C.34: If a class has an owning reference member, define a destructor
+### C.34: 클래스가 참조 멤버를 소유하고 있다면, 파과자를 정의하라.
 
-**Reason**: A reference member may represent a resource.
-It should not do so, but in older code, that's common.
-See [pointer members and destructors](#Rc-dtor ptr).
-Also, copying may lead to slicing.
+> ### C.34: If a class has an owning reference member, define a destructor
 
-**Example, bad**:
+**근거**: 참조 멤버는 리소스를 표현할 수도 있다.
+그렇지 않는 것이 좋지만, 오래된 코드에서는 일반적이다.
+[포인터 멤버와 소멸자](#Rc-dtor ptr) 를 참고하라.
+복사 역시 손실문제를 발생시킬 수 있다.
+
+> **Reason**: A reference member may represent a resource.
+> It should not do so, but in older code, that's common.
+> See [pointer members and destructors](#Rc-dtor ptr).
+> Also, copying may lead to slicing.
+
+**잘못된 예**:
 
 	class Handle {		// Very suspect
 		Shape& s;	// use reference rather than pointer to prevent rebinding
@@ -945,10 +952,13 @@ Also, copying may lead to slicing.
 		// ...
 	};
 
-The problem of whether `Handle` is responsible for the destruction of its `Shape` is the same as for <a ref="#Rc-dtor ptr">the pointer case</a>:
-If the `Handle` owns the object referred to by `s` it must have a destructor.
+`Handle` 이 `Shape` 를 소멸할 책임이 있는지에 대한 문제는 <a ref="#Rc-dtor ptr">포인터의 경우</a> 와 동일하다:
+`Handle` 이 `s` 로 참조되는 객체를 소유한다면, 소멸자가 있어야 한다.
 
-**Example**:
+> The problem of whether `Handle` is responsible for the destruction of its `Shape` is the same as for <a ref="#Rc-dtor ptr">the pointer case</a>:
+> If the `Handle` owns the object referred to by `s` it must have a destructor.
+
+**예**:
 
 	class Handle {		// OK
 		owner<Shape&> s;	// use reference rather than pointer to prevent rebinding
@@ -959,36 +969,54 @@ If the `Handle` owns the object referred to by `s` it must have a destructor.
 		// ...
 	};
 
-Independently of whether `Handle` owns its `Shape`, we must consider the default copy operations suspect:
+`Handle` 이 `Shape` 를 소유하는지와는 별개로, 기본 복사 동작에 대해 의심해야 한다:
+
+> Independently of whether `Handle` owns its `Shape`, we must consider the default copy operations suspect:
 
 	Handle x {*new Circle{p1,17}};	// the Handle had better own the Circle or we have a leak
 	Handle y {*new Triangle{p1,p2,p3}};
 	x = y;		// the default assignment will try *x.s=*y.s
 
-That `x=y` is highly suspect.
-Assigning a `Triangle` to a `Circle`?
-Unless `Shape` has its [copy assignment `=deleted`](#Rc-copy-virtual), only the `Shape` part of `Triangle` is copied into the `Circle`.
+`x=y` 는 아주 의심스럽다.
+`Triangle` 을 `Circle` 에 할당한다?
+`Shape` 에 [복사 할당이 `=deleted`](#Rc-copy-virtual) 되어있지 않다면, `Triangle` 의 `Shape` 부분만 `Circle` 로 복사된다.
 
+> That `x=y` is highly suspect.
+> Assigning a `Triangle` to a `Circle`?
+> Unless `Shape` has its [copy assignment `=deleted`](#Rc-copy-virtual), only the `Shape` part of `Triangle` is copied into the `Circle`.
 
-**Note**: Why not just require all owning refereces to be replaced by "smart pointers"?
- Changing from references to smart pointers implies code changes.
- We don't (yet) havesmart references.
- Also, that may affect ABIs.
+**참고사항**: 모든 소유하는 참조는 "스마트 포인터"로 대체하도록 하는 것은 어떤가?
+참조를 스마트 포인터로 변경하는 것은 코드 변경을 의미한다.
+아직 스마트 참조는 없다.
+그것 역시 ABI 에 영향을 준다.
 
-**Enforcement**:
+> **Note**: Why not just require all owning refereces to be replaced by "smart pointers"?
+>  Changing from references to smart pointers implies code changes.
+>  We don't (yet) havesmart references.
+>  Also, that may affect ABIs.
 
-* A class with a reference data member is suspect.
-* A class with an `owner<T>` reference should define its default operations.
+**시행 하기**:
+* 참조 데이터 멤버를 갖는 클래스는 의심해보라.
+* `owner<T>` 참조를 갖는 클래스는 기본 연산들을 정의하는 것이 좋다.
+
+> * A class with a reference data member is suspect.
+> * A class with an `owner<T>` reference should define its default operations.
 
 
 <a name="Rc-dtor-virtual"></a>
-### C.35: A base class with a virtual function needs a virtual destructor
+### C.35: 가상 함수를 갖는 기본 클래스는 가상 소멸자가 필요하다.
+
+> ### C.35: A base class with a virtual function needs a virtual destructor
+
+**근거**: 정의되지 않은 행위를 막는다.
+애플리케이션에서 기본 클래스의 포인터로 파생된 클래스를 삭제하려고 할 때, 기본 클래스의 소멸자가 가상함수가 아니라면 결과는 정의되지 않는다.
+일반적으로, 기본 클래스를 작성하는 사람은 소멸시점에 어떤 적절한 행동이 필요한지 모른다.
 
 **Reason**: To prevent undefined behavior.
 If an application attempts to delete a derived class object through a base class pointer, the result is undefined if the base class's destructor is non-virtual.
 In general, the writer of a base class does not know the appropriate action to be done upon destruction.
 
-**Example; bad**:
+**잘못된 예**:
 
 	struct Base {  // BAD: no virtual destructor
 		virtual f();
@@ -1006,10 +1034,15 @@ In general, the writer of a base class does not know the appropriate action to b
         // ...
 	} // p's destruction calls ~Base(), not ~D(), which leaks D::s and possibly more
 
-**Note**: A virtual function defines an interface to derived classes that can be used without looking at the derived classes.
-Someone using such an interface is likely to also destroy using that interface.
+**참고사항**: 가상함수는 파생클래스에 대한 인터페이스를 정의하며, 파생클래스를 몰라도 사용될 수 있다.
+이런 인터페이스를 사용한다면, 역시 이 인터페이스를 통해서 파괴할 수도 있다.
 
-**Note**: A destructor must be `public` or it will prevent stack allocation and normal heap allocation via smart pointer (or in legacy code explicit `delete`):
+> **Note**: A virtual function defines an interface to derived classes that can be used without looking at the derived classes.
+> Someone using such an interface is likely to also destroy using that interface.
+
+**참고사항**: 소멸자는 `public` 이어야 하고 그렇지 않으면, 스택 할당과 스마트 포인터를 통한 일반적인 힙 할당이 해제되는 것을 막을 것이다. (혹은 레거시 코드에서 명시적인 `delete`)
+
+> **Note**: A destructor must be `public` or it will prevent stack allocation and normal heap allocation via smart pointer (or in legacy code explicit `delete`):
 
 	class X {
 		~X();	// private destructor
@@ -1022,16 +1055,23 @@ Someone using such an interface is likely to also destroy using that interface.
 		auto p = make_unique<X>();	// error: cannot destroy
 	}
 
-**Enforcement**: (Simple) A class with any virtual functions should have a virtual destructor.
+**시행 하기**: (단순함) 어떤 가상함수라도 갖는 클래스는 가상 소멸자를 정의하는 것이 좋다.
+
+> **Enforcement**: (Simple) A class with any virtual functions should have a virtual destructor.
 
 
 <a name="Rc-dtor-fail"></a>
-### C.36: A destructor may not fail
+### C.36: 소멸자는 실패하지 않을 것이다
 
-**Reason**: In general we do not know how to write error-free code if a destructor should fail.
-The standard library requires that all classes it deals with have destructors that do not exit by throwing.
+> ### C.36: A destructor may not fail
 
-**Example**:
+**근거**: 일반적으로 코드를 작성하는 사람은 소멸자가 실패할 때 에러 없는 코드를 작성하는 방법을 모른다.
+표준 라이브러리에서 다루는 모든 클래스들은 소멸자가 있어야 하고 예외를 던져서 빠져나가지 않도록 요구된다.
+
+> **Reason**: In general we do not know how to write error-free code if a destructor should fail.
+> The standard library requires that all classes it deals with have destructors that do not exit by throwing.
+
+**예**:
 
 	class X {
 	public:
@@ -1046,50 +1086,86 @@ The standard library requires that all classes it deals with have destructors th
 		// ...
 	}
 
-**Note**: Many have tried to devise a fool-proof scheme for dealing with failure in destructors.
-None have succeeded to come up with a general scheme.
-This can be be a real practical problem: For example, what about a sockets that won't close?
-The writer of a destructor does not know why the destructor is called and cannot "refuse to act" by throwing an exception.
-See <a =href="#Sd dtor">discussion</a>.
-To make the problem worse, many "close/release" operations are not retryable.
-If at all possible, consider failure to close/cleanup a fundamental design error and terminate.
+**참고사항**: 소멸자에서의 실패를 다루기 위해 실패할 염려가 없는 방법을 많이 고안해 왔다.
+일반적인 방법이 제시되진 않았다.
+이것은 정말 현실적인 문제가 될 수 있다: 예를 들면, 닫지 않은 소켓은 어떤가?
+소멸자를 작성하는 사람은 왜 소멸자가 호출되고 예외를 던짐으로써 "동작을 거부하는 것"을 할 수 없는지 모른다.
+<a =href="#Sd dtor">토론</a>부분을 보라.
+문제를 악화시키는 것은, 많은 "닫기/해제" 연산이 재시도할 수 없게 되어있는 것이다.
+전혀 가능하지 않다면, 닫기/정리에 대한 실패를 근본적인 디자인 오류로 간주하고 종료시켜라.
 
-**Note**: Declare a destructor `noexcept`. That will ensure that it either completes normally or terminate the program.
+> **Note**: Many have tried to devise a fool-proof scheme for dealing with failure in destructors.
+> None have succeeded to come up with a general scheme.
+> This can be be a real practical problem: For example, what about a sockets that won't close?
+> The writer of a destructor does not know why the destructor is called and cannot "refuse to act" by throwing an exception.
+> See <a =href="#Sd dtor">discussion</a>.
+> To make the problem worse, many "close/release" operations are not retryable.
+> If at all possible, consider failure to close/cleanup a fundamental design error and terminate.
 
-**Note**: If a resource cannot be released and the program may not fail, try to signal the failure to the rest of the system somehow
-(maybe even by modifying some global state and hope something will notice and be able to take care of the problem).
-Be fully aware that this technique is special-purpose and error-prone.
-Consider the "my connection will not close" example.
-Probably there is a problem at the other end of the connection and only a piece of code responsible for both ends of the connection can properly handle the problem.
-The destructor could send a message (somehow) to the responsible part of the system, consider that to have closed the connection, and return normally.
+**참고사항**: 소멸자를 `noexcept`로 선언하라. 이것은 소멸자가 정상적으로 완료했거나 프로그램을 종료한다는 것을 보장한다.
 
-**Note**: If a destructor uses operations that may fail, it can catch exceptions and in some cases still complete successfully
-(e.g., by using a different clean-up mechanism from the one that threw an exception).
+> **Note**: Declare a destructor `noexcept`. That will ensure that it either completes normally or terminate the program.
 
-**Enforcement**: (Simple) A destructor should be declared `noexcept`.
+**참고사항**: 만약 자원이 해제되지 않고 프로그램이 실패하지 않는다면, 어떤 방법으로든 시스템의 나머지 부분에서 실패 했다는 신호를 보내도록 하라.
+(아마도 전역 상태를 수정함으로써 그렇게 할 수 있으며, 프로그램이 관리 될 수 있다.)
+이 방식은 특별한 목적이 있고, 에러가 발생하기 쉽다는 것을 완전하게 인지하고 있어야 한다.
+"내 연결은 닫히지 않을 것이다" 예제를 살펴보라.
+아마도 연결의 다른 끝에 문제가 있을 수 있고, 연결의 양끝단에 관련된 코드들 만이 이 문제를 제대로 처리할 수 있다.
+소멸자는 어떤 방식으로든 시스템의 책임이 있는 부분에 메세지를 보내고, 연결이 닫혔다고 보고 정상적으로 리턴할 수 있을 것이다.
+
+> **Note**: If a resource cannot be released and the program may not fail, try to signal the failure to the rest of the system somehow
+> (maybe even by modifying some global state and hope something will notice and be able to take care of the problem).
+> Be fully aware that this technique is special-purpose and error-prone.
+> Consider the "my connection will not close" example.
+> Probably there is a problem at the other end of the connection and only a piece of code responsible for both ends of the connection can properly handle the problem.
+> The destructor could send a message (somehow) to the responsible part of the system, consider that to have closed the connection, and return normally.
+
+**참고사항**: 소멸자가 실패할 수도 있는 연산을 사용한다면, 예외를 잡을 수 있고, 어떤 경우에는 성공적으로 완료할 수 있다.
+(예, 예외를 던진 메커니즘과 다른 정리 메커니즘을 사용한다)
+
+> **Note**: If a destructor uses operations that may fail, it can catch exceptions and in some cases still complete successfully
+> (e.g., by using a different clean-up mechanism from the one that threw an exception).
+
+**시행 하기**: (단순함) 소멸자는 `noexcept`로 선언되는 것이 좋다.
+
+> **Enforcement**: (Simple) A destructor should be declared `noexcept`.
 
 
 <a name="Rc-dtor-noexcept"></a>
-### C.37: Make destructors `noexcept`
+### C.37 소멸자를 `noexcept`로 하라
 
-**Reason**: [A destructor may not fail](#Rc-dtor fail). If a destructor tries to exit with an exception, it's a bad design error and the program had better terminate.
+> ### C.37: Make destructors `noexcept`
 
-**Enforcement**: (Simple) A destructor should be declared `noexcept`.
+**근거**: [소멸자는 실패하지 않을 것이다](#Rc-dtor fail). 만약 소멸자가 예외로 인해 종료되려고 한다면, 좋지 않은 디자인 오류로 보고 종료하는 편이 더 좋다.
+
+> **Reason**: [A destructor may not fail](#Rc-dtor fail). If a destructor tries to exit with an exception, it's a bad design error and the program had better terminate.
+
+**시행하기**: (단순함) 소멸자는 `noexcept`로 선언되는 것이 좋다.
+
+> **Enforcement**: (Simple) A destructor should be declared `noexcept`.
 
 
 
 <a name="SS-ctor"></a>
-## C.ctor: Constructors
+## C.ctor: 생성자
 
-A constuctor defined how an object is initialized (constructted).
+> ## C.ctor: Constructors
+
+생성자는 객체가 초기화되는(만들어지는) 방법을 정의 한다.
+
+> A constuctor defined how an object is initialized (constructted).
 
 
 <a name="Rc-ctor"></a>
-### C.40: Define a constructor if a class has an invariant
+### C.40: 클래스가 불변조건이면 생성자를 정의하라
 
-**Reason**: That's what constructors are for.
+> ### C.40: Define a constructor if a class has an invariant
 
-**Example**:
+**근거**: 이것이 생성자가 존재하는 이유이다.
+
+> **Reason**: That's what constructors are for.
+
+**예**:
 
 	class Date {	// a Date represents a valid date
 					// in the January 1, 1900 to December 31, 2100 range
@@ -1103,9 +1179,13 @@ A constuctor defined how an object is initialized (constructted).
 		int d,m,y;
 	};
 
-It is often a good idea to express the invariant as an `Ensure` on the constructor.
+가끔 생성자에서 `Ensure`로 불변조건을 표현하는 것은 좋은 아이디어 이다.
 
-**Note**: A constructor can be used for convenience even if a class does not have an invariant. For example:
+> It is often a good idea to express the invariant as an `Ensure` on the constructor.
+
+**참고사항**: 생성자는 클래스가 불변조건이 아니더라도 편의를 위해 사용될 수 있다. 예:
+
+> **Note**: A constructor can be used for convenience even if a class does not have an invariant. For example:
 
 	struct Rec {
 		string s;
@@ -1117,7 +1197,9 @@ It is often a good idea to express the invariant as an `Ensure` on the construct
 	Rec r1 {7};
 	Rec r2 {"Foo bar"};
 
-**Note**: The C++11 initializer list rules eliminates the need for many constructors. For example:
+**참고사항**: C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한다. 예:
+
+> **Note**: The C++11 initializer list rules eliminates the need for many constructors. For example:
 
 	struct Rec2{
 		string s;
@@ -1128,22 +1210,33 @@ It is often a good idea to express the invariant as an `Ensure` on the construct
 	Rec r1 {"Foo",7};
 	Rec r2 {"Bar};
 
-The `Rec2` constructor is redundant.
-Also, the default for `int` would be better done as a [member initializer](#Rc-in-class initializer).
+`Rec2` 생성자는 중복이다.
+`int`에 대한 기본값은 [멤버 초기화자](#Rc-in-class initializer)를 사용하는 편이 났다.
 
-**See also**: [construct valid object](#Rc-complete) and [constructor throws](#Rc-throw).
+> The `Rec2` constructor is redundant.
+> Also, the default for `int` would be better done as a [member initializer](#Rc-in-class initializer).
+
+**참고**: [유효한 객체를 생성하라](#Rc-complete) and [생성자가 던지는 예외](#Rc-throw).
+
+> **See also**: [construct valid object](#Rc-complete) and [constructor throws](#Rc-throw).
 
 **Enforcement**:
 
-* Flag classes with user-define copy operations but no destructor (a user-defined copy is a good indicator that the class has an invariant)
+* 사용자 정의 복사 연산이 있지만 소멸자가 없는 클래스를 표시해보라 (사용자 정의 복사는 클래스가 불변조건이라는 좋은 표시이다)
+
+> * Flag classes with user-define copy operations but no destructor (a user-defined copy is a good indicator that the class has an invariant)
 
 
 <a name="Rc-complete"></a>
-### C.41: A constructor should create a fully initialized object
+### C.41: 생성자는 완전히 초기화된 객체를 생성하는 것이 좋다
 
-**Reason**: A constructor establishes the invariant for a class. A user of a class should be able to assume that a constructed object is usable.
+> ### C.41: A constructor should create a fully initialized object
 
-**Example; bad**:
+**근거**: 생성자는 클래스에 대한 불변조건을 정립한다. 클래스 사용자는 생성된 객체가 사용가능하다는 것을 가정할 수 있는 것이 좋다.
+
+> **Reason**: A constructor establishes the invariant for a class. A user of a class should be able to assume that a constructed object is usable.
+
+**잘못된 예**:
 
 	class X1 {
 		FILE* f;	// call init() before any other fuction
@@ -1164,12 +1257,19 @@ Also, the default for `int` would be better done as a [member initializer](#Rc-i
 		// ...
 	}
 
-Compilers do not read comments.
+컴파일러는 주석을 읽지 않는다.
 
-**Exception**: If a valid object cannot conveniently be constructed by a constructor [use a factory function](#C factory).
+> Compilers do not read comments.
 
-**Note**: If a constructor acquires a resource (to create a valid object), that resource should be [released by the destructor](#Rc-release).
-The idiom of having constructors acquire resources and destructors release them is called [RAII](Rr-raii) ("Resource Acquisitions Is Initialization").
+**예외**: 생성자만으로 유효한 객체를 쉽게 만들 수 없다면 [팩토리 함수를 사용하라](#C factory)
+
+> **Exception**: If a valid object cannot conveniently be constructed by a constructor [use a factory function](#C factory).
+
+**참고사항: 생성자가 유효한 객체를 만들기 위해 자원을 얻는다면, 리소스는 [소멸자에 의해 해제](#Rc-release) 되는 것이 좋다.
+생성자에서 자원을 얻고 소멸자에서 자원을 해제하는 것을 [RAII](Rr-raii) ("Resource Acquisitions Is Initialization") 라고 한다.
+
+> **Note**: If a constructor acquires a resource (to create a valid object), that resource should be [released by the destructor](#Rc-release).
+> The idiom of having constructors acquire resources and destructors release them is called [RAII](Rr-raii) ("Resource Acquisitions Is Initialization").
 
 
 <a name="Rc-throw"></a>
