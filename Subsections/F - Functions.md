@@ -476,7 +476,7 @@ so don't just springle `noexcept` all over the place.
 
 **근거**: 스마트 포인터를 인자로 사용하면 소유권이 이전되거나 공유 됩니다.
 스마트 포인터를 인자로 사용하면 함수 호출 시 스마트 포인터를 사용해야한다는 제약이 생깁니다.
-공유 스마트 포인터를 인자로 사용하는 것은 (예, `std::shared_ptr`) 런타임시 추가 비용을 부담하게 됩니다.   
+공유 스마트 포인터를 인자로 사용하는 것은 (예, `std::shared_ptr`) 런타임시 추가 비용을 부담하게 됩니다.
 >**Reason**: Passing a smart pointer transfers or shares ownership.
 Passing by smart pointer restricts the use of a function to callers that use smart pointers.
 Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost.
@@ -488,7 +488,7 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
 	void g(unique_ptr<int>);	// can only accept ints for which you want to transfer ownership
 	void g(shared_ptr<int>);	// can only accept ints for which you are willing to share ownership
 
-**참고 사항**: 우리는 정적분석으로 허상포인터 문제를 잡아 낼 수 있습니다. 그래서 굳이 허상 포인터 문제를 피하기위해서 자원관리를 할 필요는 없습니다.
+**참고 사항**: 우리는 정적분석으로 댕글링포인터 문제를 잡아 낼 수 있습니다. 그래서 굳이 댕글링포인터 문제를 피하기위해서 자원관리를 할 필요는 없습니다.
 >**Note**: We can catch dangling pointers statically, so we don't need to rely on resource management to avoid violations from dangling pointers.
 
 **더 보기**: [smart pointer use](#Rr-summary-smartptrs)에 대한 논의.
@@ -519,41 +519,59 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
 
 
 <a name="SS-call"></a>
-## F.call: Argument passing
+## F.call: 인자전달
+>## F.call: Argument passing
 
-There are a variety of ways to pass arguments to a function and to return values.
+함수에 인자를 전달하고 값을 반환하는 다양한 방법이 있습니다.
+>There are a variety of ways to pass arguments to a function and to return values.
 
 
 <a name="Rf-conventional"></a>
-### Rule F.15: Prefer simple and conventional ways of passing information
+### 규칙 F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라
+>### Rule F.15: Prefer simple and conventional ways of passing information
 
-**Reason**: Using "unusual and clever" techniques causes surprises, slows understanding by other programmers, and encourages bugs.
+**근거**: "별나면서 교묘한" 기법은 깜짝놀랄만한 버그를 만들어내거나, 다른 프로그래머가 코드를 이해하는데 어렵게 만든다. 
+정말로 일반적인 기법을 넘어서는 방법으로 최적화를 해야 한다면 꼭 필요한 개선사항이라는것을 확신할 수 있어야하고, 이식성이 없을 수 있기 때문에 문서나 주석을 남겨야 한다.
+>**Reason**: Using "unusual and clever" techniques causes surprises, slows understanding by other programmers, and encourages bugs.
 If you really feel the need for an optimization beyond the common techniques, measure to ensure that it really is an improvement,
 and document/comment because the improvement may not be portable.
 
 ![Normal parameter passing table](./param-passing-normal.png "Normal parameter passing")
 
-**For an "output-only" value:** Prefer return values to output parameters.
+**"결과값"에 대해서**: 출력 매개변수보다는 반환값을 더 선호하라.
+메모리 관리를 피하고 성능을 향상시키기 위해 move 연산자를 사용하는 표준 컨테이너와 같이 크기가 큰 객체에도 해당된다. 
+다수의 값을 반환해야 한다면 [튜플 사용하기](#Rf-T-multi)  또는 다수의 멤버를 같은 데이터형을 사용하세요.
+>**For an "output-only" value:** Prefer return values to output parameters.
 This includes large objects like standard containers that use implicit move operations for performance and to avoid explicit memory management.
 If you have multiple values to return, [use a tuple](#Rf-T-multi) or similar multi-member type.
 
-**Example**:
+**예**:
+>**Example**:
 
 	vector<const int*> find_all(const vector<int>&, int x);	// return pointers to elements with the value x
 	
-**Example, bad**:
+**나쁜 예**:
+>**Example, bad**:
 
 	void find_all(const vector<int>&, vector<const int*>& out, int x);	// place pointers to elements with value x in out
 
-**Exceptions**:
+**예외 사항**:
+>**Exceptions**:
 
-* For non-value types, such as types in an inheritance hierarchy, return the object by `unique_ptr` or `shared_ptr`.
+* 예를 들어 상속 관계에서 사용되는 타입처럼 값이 아닌 타입은 `unique_ptr`또는 `shared_ptr`로 객체를 반환하세요. 
+* move 사용하기에 비용이 많이 든다면 (예를들어, `array<BigPOD>`), 메모리를 할당하고 핸들을 반환하는 방법을 고려하거나 출력 매개변수로써 비상수 참조형을 사용하세요. 
+
+>* For non-value types, such as types in an inheritance hierarchy, return the object by `unique_ptr` or `shared_ptr`.
 * If a type is expensive to move (e.g., `array<BigPOD>`), consider allocating it on the free store and return a handle (e.g., `unique_ptr`), or passing it in a non-`const` reference to a target object to fill (to be used as an out-parameter).
 * In the special case of allowing a caller to reuse an object that carries capacity (e.g., `std::string`, `std::vector`) across multiple calls to the function in an inner loop, treat it as an in/out parameter instead and pass by `&`. This one use of the more generally named "caller-allocated out" pattern.
 
-**For an "in-out" parameter:** Pass by non-`const` reference. This makes it clear to callers that the object is assumed to be modified.
+**입출력 매개변수에 관하여:** 비상수 참조형으로 전달하세요. 이것은 호출자에게 객체가 수정될 것이라고 암시해주는 역활을 합니다.
+>**For an "in-out" parameter:** Pass by non-`const` reference. This makes it clear to callers that the object is assumed to be modified.
 
-**For an "input-only" value:** If the object is cheap to copy, pass by value.
+**값으로 입력 매개변수를 사용하는 것에 관하여:** 값으로 복사, 전달하는데 비용이 적게 든다면 그렇게 하세요. 하지만 그외에는 `const&`를 사용하세요. 이것은 함수가 매개변수를 변경하지 않는다는 것을 암시하고 rvalue로 초기화 할 수 있게 해줍니다. 
+"저렴한 복사 비용"이라는 것은 하드웨어 아키텍쳐에 따라 다릅니다.그러나 4바이트 또는 8바이트 (doubles, pointers, refereces)는 값으로 전달하는 것이 좋은 경우가 많습니다.
+특히, 값으로 전달되는 객체는 함수에서 접근하는데 추가적인 작업이 필요없습니다. 
+>**For an "input-only" value:** If the object is cheap to copy, pass by value.
 Otherwise, pass by `const&`. It is useful to know that a function does not mutate an argument, and both allow initialization by rvalues.
 What is "cheap to copy" depends on the machine architecture, but two or three words (doubles, pointers, references) are usually best passed by value.
 In particular, an object passed by value does not require an extra reference to access from the function.
@@ -602,50 +620,75 @@ such as passing a `const int&`, returning an `array<BigPOD>` by value, and retur
 
 
 <a name="Rf-ptr"></a>
-### F.16: Use `T*` or `owner<T*>` to designate a single object
+### F.16: 객체 하나를 가리킬 때는 `T*`또는 `owner<T*>`를 사용하라 
+>### F.16: Use `T*` or `owner<T*>` to designate a single object
 
-**Reason**: In traditional C and C++ code, "Plain `T*` is used for many weakly-related purposes, such as
+**근거**: 전통적인 C, C++에서는 많은 경우에  단순히 `T*`가 사용되었다. 예를 들어,
 
-* Identify a (single) object (not to be deleted by this function)
+>**Reason**: In traditional C and C++ code, "Plain `T*` is used for many weakly-related purposes, such as
+
+* (함수 내에서 삭제되지 않는) 객체 한개를 식별한다
+* (나중에 해제 될)동적할당 된 객체를 가리킨다
+* `nullptr`를 유지한다
+* (널문자로 끝나는 문자들) C언어 형태의 문자열을 식별한다
+* 길이와 함께 배열을 식별한다
+* 배열의 위치를 식별한다
+
+>* Identify a (single) object (not to be deleted by this function)
 * Point to an object allocated on the free store (and delete it later)
 * Hold the `nullptr`
 * Identify a C-style string (zero-terminated array of characters)
 * Identify an array with a length specified separately
 * Identify a location in an array
 
-Confusion about what meaning a `T*` is the source of many serious errors, so using separate names for pointers of these separate uses makes code clearer.
+`T*`가 어떤 의미를 갖는지 애매한 경우 심각한 오류를 유발시킨다. 그래서 포인터를 사용된 의미에 맞게 구분하면 코드의 의미를 더 명확하게 할 수 있다. 디버깅에서  `owner<T*>` 와 `not_null<T>`는 좋은 도구로 사용된다. 예를들어, `not_null<T*>`는 (기계든 사람이든) 코드를 읽은 주체에게 역참조하기전에 `nullptr`인지 확인하는 것이 필요없다는걸 알려준다.
+ 
+>Confusion about what meaning a `T*` is the source of many serious errors, so using separate names for pointers of these separate uses makes code clearer.
 For debugging, `owner<T*>` and `not_null<T>` can be instrumented to check.
 For example, `not_null<T*>` makes it obvious to a reader (human or machine) that a test for `nullptr` is not necessary before dereference.
 
-**Example**: Consider
+**예**:
+>**Example**: Consider
 
 	int length(Record* p);
 
-When I call `length(r)` should I test for `r==nullptr` first? Should the implementation of `length()` test for `p==nullptr`?
+`length(r)`을 호출 할 때 `r==nullptr`을 검사해야 합니까? 아니면 `length()`를 구현할 때 `p==nullptr`을 검사해야 합니까?
+
+>When I call `length(r)` should I test for `r==nullptr` first? Should the implementation of `length()` test for `p==nullptr`?
 
 	int length(not_null<Record*> p);	// it is the caller's job to make sure p!=nullptr
 
 	int length(Record* p);	// the implementor of length() must assume that p==nullptr is possible
 
-**Note**: A `not_null<T>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`; both can be represented in memory as a `T*` (so no run-time overhead is implied).
+**참고 사항**: `not_null<T>`은  `nullptr`은 아닐 거라고 가정을 합니다.; `T*`는 `nullptr`이 될 수도 있습니다; 둘 다 `T*`를 표현합니다. (그래서 실행시간에서의 오버헤드는 없습니다).
+>**Note**: A `not_null<T>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`; both can be represented in memory as a `T*` (so no run-time overhead is implied).
 
-**Note**: `owner<T*>` represents ownership.
+**참고 사항**: `owner<T*>`는 소유권을 표현합니다. 
+>**Note**: `owner<T*>` represents ownership.
 
-**Also**: Assume that a `T*` obtained from a smart pointer to `T` (e.g., unique_ptr<`T`>) pointes to a single element.
+**추가 사항**: `T*`는 하나의 요소를 가리키는 (unique_ptr<`T`>와 같은) 스마트 포인터로 부터 얻어진 `T`라고 가정합니다.
+>**Also**: Assume that a `T*` obtained from a smart pointer to `T` (e.g., unique_ptr<`T`>) pointes to a single element.
 
-**See also**: [Support library](#S-support).
+**더 보기**:  [Support library](#S-support).
+>**See also**: [Support library](#S-support).
 
-**Enforcement**:
+**시행 하기**:
+>**Enforcement**:
 
-* (Simple) ((Bounds)) Warn for any arithmetic operation on an expression of pointer type that results in a value of pointer type.
+* (단순) ((범위)) 포인터로 산술연산을 하면 포인터 변수의 타입의 값으로 연산이 되는 것에 주의하세요. 
+
+>* (Simple) ((Bounds)) Warn for any arithmetic operation on an expression of pointer type that results in a value of pointer type.
 
 
 <a name="Rf-nullptr"></a>
-### F.17: Use a `not_null<T>` to indicate that "null" is not a valid value
+### F.17: "널"이 유효하지 않은 값을 의미한다면 `not_null<T>`을 사용하세요 
+>### F.17: Use a `not_null<T>` to indicate that "null" is not a valid value
 
-**Reason**: Clarity. Making it clear that a test for null isn't needed.
+**근거**: 명확성. 널인지 확인 할 필요가 없다는 것을 명확히 해 줌.
+>**Reason**: Clarity. Making it clear that a test for null isn't needed.
 
-**Example**:
+**예제**:
+>**Example**:
 
 	not_null<T*> check(T* p) { if (p) return not_null<T*>{p}; throw Unexpected_nullptr{}; }
 
@@ -656,11 +699,17 @@ When I call `length(r)` should I test for `r==nullptr` first? Should the impleme
 		}
 	}
 
-**Note**: `not_null` is not just for built-in pointers. It works for `array_view`, `string_view`, `unique_ptr`, `shared_ptr`, and other pointer-like types.
+**참고 사항**: `not_null`은 내장형 포인터 타입에만 사용되는 것은 아닙니다. `array_view`, `string_view`, `unique_ptr`, `shared_ptr`, 그리고 다른 포인터 형에도 사용 됩니다.
+>**Note**: `not_null` is not just for built-in pointers. It works for `array_view`, `string_view`, `unique_ptr`, `shared_ptr`, and other pointer-like types.
 
-**Enforcement**:
+**시행 하기**:
+>**Enforcement**:
 
-* (Simple) Warn if a raw pointer is dereferenced without being tested against `nullptr` (or equivalent) within a function, suggest it is declared `not_null` instead.
+* (단순) 함수 내에서 `nullptr`를 검사하지 않고 포인터를 역참조 한다면 경고하세요. `not_null`로 선언하도록 제안하세요.
+* (단순) 함수 내에서 포인터가 역참조 될 때 `nullptr`를 검사할 때도 있고 검사하지 않을 때도 있다면 잘못되었다고 말하세요.
+* (단순) 함수 내에서 `not_null` 포인터를 `nullptr`인지 검사한다면 경고하세요. 
+
+>* (Simple) Warn if a raw pointer is dereferenced without being tested against `nullptr` (or equivalent) within a function, suggest it is declared `not_null` instead.
 * (Simple) Error if a raw pointer is sometimes dereferenced after first being tested against `nullptr` (or equivalent) within the function and sometimes is not.
 * (Simple) Warn if a `not_null` pointer is tested against `nullptr` within a function.
 
@@ -690,57 +739,80 @@ When I call `length(r)` should I test for `r==nullptr` first? Should the impleme
 
 
 <a name="Rf-string"></a>
-### F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string
+### F.19: C언어 형식의 문자열을 가리킬 때는 `zstring`또는 `not_null<zstring>`을 사용하라
+>### F.19: Use a `zstring` or a `not_null<zstring>` to designate a C-style string
 
-**Reason**: C-style strings are ubiquitous.
+**근거**: C언어 형식의 문자열은 어디에나 있습니다.
+C언어 형식의 문자열은 관습에 따라 정의 됩니다: 0으로 끝나는 문자 배열의 집합.
+함수들은 `nullptr`을 사용하는데 있어서 일관성이 없는데 이것들을 명백하게 할 필요가 있습니다.
+>**Reason**: C-style strings are ubiquitous.
 They are defined by convention: zero-terminated arrays of characters.
 Functions are inconsistent in their use of `nullptr` and we must be more explicit.
 
-**Example**: Consider
+**예**:
+>**Example**: Consider
 
 	int length(const char* p);
 
-When I call `length(s)` should I test for `s==nullptr` first? Should the implementation of `length()` test for `p==nullptr`?
+`length(s)`를 호출 할 때 `s==nullptr`을 검사해야 하나요? `length()`를 구현 할 때 `p==nullptr`을 검사해야 하나요?
+>When I call `length(s)` should I test for `s==nullptr` first? Should the implementation of `length()` test for `p==nullptr`?
 
 	int length(zstring p);	// it is the caller's job to make sure p!=nullptr
 
 	int length(not_null<Zstring> p);	// the implementor of length() must assume that p==nullptr is possible
 
-**Note**: `zstring` do not represent ownership.
+**참고 사항**: `zstring`은 소유권은 표현하지 않습니다.
+>**Note**: `zstring` do not represent ownership.
 
-**See also**: [Support library](#S-support).
+**더 보기**: [Support library](#S-support).
+>**See also**: [Support library](#S-support).
 
 
 <a name="Rf-const-T-ref"></a>
-### F.20: Use a `const T&` parameter for a large object
+### F.20: 크기가 큰 객체는 `const T&`형 매개변수를 사용하라
+>### F.20: Use a `const T&` parameter for a large object
 
-**Reason**: Copying large objects can be expensive. A `const T&` is always cheap and protects the caller from unintended modification.
+**근거**: 큰 객체를 복사하는데는 비용이 많이 들어갈 수 있습니다. `const T&`는 항상 비용이 적고 호출자가 의도하지 않게 값을 수정하는 오류를 저지르지 않게 막아 줍니다.
+>**Reason**: Copying large objects can be expensive. A `const T&` is always cheap and protects the caller from unintended modification.
 
-**Example**:
+**예**:
+>**Example**:
 
 	void fct(const string& s);	// OK: pass by const reference; always checp
 
 	void fct2(string s);		// bad: potentially expensive
 
-**Exception**: Sinks (that is, a function that eventually destroys an object or passes it along to another sink), may benefit ???
+**예외**: 소굴 (즉, 객체를 소멸시키거나 다른 소굴로 전달한다면) 이득이 있을까 ??? 
+>**Exception**: Sinks (that is, a function that eventually destroys an object or passes it along to another sink), may benefit ???
 
-**Note**: A reference may be assumed to refer to a valid object (language rule).
+**참고 사항**: 참조자는 유효한 객체를 가리키고 있다고 가정한다 (언어 규칙).
+"널 참조"는 없다.
+옵션 값을 사용하고자 하면 `std::optional`과 같은 포인터를 사용하거나 "값 없음"을 의미하는 특별한 값을 사용하세요. 
+>**Note**: A reference may be assumed to refer to a valid object (language rule).
 There in no (legitimate) "null reference."
 If you need the notion of an optional value, use a pointer, `std::optional`, or a special value used to denote "no value."
 
-**Enforcement**:
+**수행 하기**:
+>**Enforcement**:
 
-* (Simple) ((Foundation)) Warn when a parameter being passed by value has a size greater than `4*sizeof(int)`.
+* (단순) ((기초)) 매개변수에 `4*sizeof(int)`보다 큰 객체가 값으로 전달 된다면 경고 하세요.
+그리고 `const` 참조형을 사용하도록 제안하세요. 
+
+>* (Simple) ((Foundation)) Warn when a parameter being passed by value has a size greater than `4*sizeof(int)`.
 Suggest using a `const` reference instead.
 
 
 <a name="Rf-T"></a>
-### F.21: Use a `T` parameter for a small object
+### F.21: 크기가 작은 객체에는 `T`형 매개변수를 사용하세요
+>### F.21: Use a `T` parameter for a small object
 
-**Reason**: Nothing beats the simplicity and safety of copying.
+**근거**: 그 어떤것도 단순함과 복사 안정성을 이길 수는 없습니다.
+작은 객체의 경우 (최대 8또는 12바이트) 그 어떤 대안보다 더 빠릅니다.
+>**Reason**: Nothing beats the simplicity and safety of copying.
 For small objects (up to two or three words) is is also faster than alternatives.
 
-**Example**:
+**예**:
+>**Example**:
 
 	void fct(int x);		// OK: Unbeatable
 
@@ -748,9 +820,12 @@ For small objects (up to two or three words) is is also faster than alternatives
 
 	void fct(int& x);		// OK, but means something else; use only for an "out parameter"
 
-**Enforcement**:
+**시행 하기**:
+>**Enforcement**:
 
-* (Simple) ((Foundation)) Warn when a `const` parameter being passed by reference has a size less than `3*sizeof(int)`. Suggest passing by value instead.
+* (단순) ((기초)) `3*sizeof(int)`보다 작은 크기의 객체가 `const` 참조형 매개변수로 전달된다면 경고하세요. 대신 값형으로 전달 할 것을 제안 하세요.
+
+>* (Simple) ((Foundation)) Warn when a `const` parameter being passed by reference has a size less than `3*sizeof(int)`. Suggest passing by value instead.
 
 
 <a name="Rf-T-ref"></a>
