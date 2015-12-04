@@ -886,10 +886,19 @@ These functions all have bounds-safe overloads that take `array_view`. Standard 
         v.at(0) = at(a, i); // OK (alternative 2)
     }
 
-**Enforcement**:
+**시행하기**:
+   - 범위검사를 하지 않는 표준 라이브러리 함수를 호출하는 부분을 진단하세요. ??? 해당 함수 목록에 대한 링크 추가 예정
+
+>**Enforcement**:
    - Issue a diagnostic for any call to a standard library function that is not bounds-checked. ??? insert link to a list of banned functions
 
-**TODO Notes**:
+
+**앞으로 작업할 내용**:
+   - 이미 표준화가 된 것에 대한 것이라도 호환성을 보장하고자 한다면 WG21 위원회와의 긴밀한 협조를 하여 표준 라이브러리에 반영해야 합니다.
+   - `memcmp`의 경우같이 범위 안전성이 보장되는 stdlib의 항목에 대해서 GSL에 기재하는 것을 고려하고 있습니다.
+   - 이번 장의 목적은 `vector`의 경우같이 stdlib의 함수나 타입 중 완벽하게 범위 체크가 되지 않는 항목들에 대해서 범위 프로파일을 적용하여 범위 안정성을 확복하는 것입니다. 그리고, 예전(legacy) 코드에서 범위 안정성을 확인하지 않는 부분에 대해서는 계속해서 WG21의 여러 회원들에게 제안하고자 합니다.
+
+>**TODO Notes**:
    - Impact on the standard library will require close coordination with WG21, if only to ensure compatibility even if never standardized.
    - We are considering specifying bounds-safe overloads for stdlib (especially C stdlib) functions like `memcmp` and shipping them in the GSL.
    - For existing stdlib functions and types like `vector` that are not fully bounds-checked, the goal is for these features to be bounds-checked when called from code with the bounds profile on, and unchecked when called from legacy code, possibly using constracts (concurrently being proposed by several WG21 members).
@@ -898,4 +907,6 @@ These functions all have bounds-safe overloads that take `array_view`. Standard 
 
 
 <a name="SS-lifetime"></a>
-## Lifetime safety profile
+## 수명 안전성 프로파일
+
+>## Lifetime safety profile
