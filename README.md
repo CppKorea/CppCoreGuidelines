@@ -1,4 +1,4 @@
-> "C++은 작고 간단하면서도 안전한 언어이며, 많은 사람들이 사용할 수 있도록 고군분투하고 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)"
+> "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)"
 > -- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
 
 # C++ 핵심 가이드라인 한글화 프로젝트
