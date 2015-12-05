@@ -975,11 +975,14 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 
 
 <a name="Rf-T-return"></a>
-### F.40: Prefer return values to out-parameters
+### F.40: 값 반환을 선호하라
+>### F.40: Prefer return values to out-parameters
 
-**Reason**: It's self-documenting. A `&` parameter could be either in/out or out-only.
+**근거**: 코드만으로도 문서화가 된다. `&`는 입/출력 또는 출력용 매개변수가 될 수 있다.
+>**Reason**: It's self-documenting. A `&` parameter could be either in/out or out-only.
 
-**Example**:
+**예**:
+>**Example**:
 
 	void incr(int&);
 	int incr();
@@ -988,16 +991,21 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 	incr(i);
 	i = incr(i);
 
+ 
 **Enforcement**: Flag non-const reference parameters that are not read before being written to and are a type that could be cheaply returned.
 
 
 <a name="Rf-T-multi"></a>
-### F.41: Prefer to return tuples to multiple out-parameters
+### F.41: 다수의 출력 매개변수는 tuple을 사용하라 
+>### F.41: Prefer to return tuples to multiple out-parameters
 
-**Reason**: A return value is self-documenting as an "output-only" value.
+**근거**: 값 반환은 코드 자체가 "출력용"이라는 문서화 역할을 한다.
+예 그렇습니다, C++는 다수의 값을 반환할 수 있는데 `tuple`과 추가 편의를 제공하는 `tie`를 사용합니다.
+>**Reason**: A return value is self-documenting as an "output-only" value.
 And yes, C++ does have multiple return values, by convention of using a `tuple`, with the extra convenience of `tie` at the call site.
 
-**Example**:
+**예**:
+>**Example**:
 
     int f( const string& input, /*output only*/ string& output_data ) { // BAD: output-only parameter documented in a comment
 	    // ...
@@ -1010,27 +1018,36 @@ And yes, C++ does have multiple return values, by convention of using a `tuple`,
 		return make_tuple(something(), status);
     }
 
-In fact, C++98's standard library already used this convenient feature, because a `pair` is like a two-element `tuple`.
+사실, C++98의 표준 라이브러리에서는 `pair`가 두개의 `tuple` 요소를 갖는 것과 같기 때문에 편리한 이 기능을 사용하고 있었습니다.
+예를 들어, `set<string> myset`가 주어졌다고 가정해 봅시다:
+>In fact, C++98's standard library already used this convenient feature, because a `pair` is like a two-element `tuple`.
 For example, given a `set<string> myset`, consider:
 
     // C++98
-	result = myset.insert( “Hello” );
+	result = myset.insert( “Hello” );
 	if (result.second) do_something_with( result.first );    // workaround
 	
-With C++11 we can write this, putting the results directly in existing local variables:
+C++11에서는 이렇게 쓸 수 있습니다, 결과값들을 이미 존재하는 지역변수에 넣으세요:
+>With C++11 we can write this, putting the results directly in existing local variables:
 
 	Sometype iter;                                          // default initialize if we haven't already
 	Someothertype success;                                  // used these variables for some other purpose
 
 	tie( iter, success ) = myset.insert( “Hello” );         // normal return value
-	if (success) do_something_with( iter );
+	  if (success) do_something_with( iter );
 
-**Exception**: For types like `string` and `vector` that carry additional capacity, it can sometimes be useful to treat it as in/out instead by using the "caller-allocated out" pattern, which is to pass an output-only object by reference to non-`const` so that when the callee writes to it the object can reuse any capacity or other resources that it already contains. This technique can dramatically reduce the number of allocations in a loop that repeatedly calls other functions to get string values, by using a single string object for the entire loop.
+**예외 사항**: `string`이나 `vector`와 같이 부가적인 능력이 있는 타입은 입/출력 매개변수로 사용하는 것이 "호출자가 출력 메모리를 할당"하는 패턴보다 유용할 때가 있다. 출력을 위한 용도로 사용하기 위해서 비상수 참조형으로 객체를 선언하고 피호출자는 객체가 제공하는 부가기능나 객체가 이미 가지고 있는 자원을 재사용할 수 있다. 이 기법은 반복문안에서 반복적으로 함수를 호출 하면서 문자열 값을 구하는 경우에 메모리 할당 횟수를 많이 줄여준다.
+>**Exception**: For types like `string` and `vector` that carry additional capacity, it can sometimes be useful to treat it as in/out instead by using the "caller-allocated out" pattern, which is to pass an output-only object by reference to non-`const` so that when the callee writes to it the object can reuse any capacity or other resources that it already contains. This technique can dramatically reduce the number of allocations in a loop that repeatedly calls other functions to get string values, by using a single string object for the entire loop.
 
-**Note**: In some cases it may be useful to return a specific, user-defined `Value_or_error` type along the lines of `variant<T,error_code>`,
+**주의 사항**: 어떤 경우는 `tuple` 대신에 `variant<T,error_code>`처럼 사용될 수 있는 `Value_or_error`와 같은 사용자 정의형으로 값을 반환하는 것이 유용할 때도 있다. 
+>**Note**: In some cases it may be useful to return a specific, user-defined `Value_or_error` type along the lines of `variant<T,error_code>`,
 rather than using the generic `tuple`.
 
-**Enforcement**:
+**시행 하기**:
+    * 출력 매개변수는 반환값으로 대체되어야 한다.
+    출력 매개변수는 함수가 값을 저장하고 비상수 멤버 함수형으로 호출하거나, 비상수형으로 전달한다.
+
+>**Enforcement**:
 
     * Output parameters should be replaced by return values.
 	An output parameter is one that the function writes to, invokes a non-`const` member function, or passes on as a non-`const`.
