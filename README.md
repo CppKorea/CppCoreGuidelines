@@ -33,6 +33,7 @@
 - Yonghyun Kim (drvoss)
 - Hyungtae Kim (cavecafe)
 - Junho Kim (h4wldev)
+- Incheol Kang(kangic)
 
 ## C++ 핵심 가이드라인 1차 번역 진행 상황
 
