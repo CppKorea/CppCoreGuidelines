@@ -48,7 +48,7 @@ Alocation and deallocation rule summary:
 * [R.21: 소유권 공유가 필요없다면 `shared_ptr`보다 `unique_ptr`이 낫다.](#Rr-unique)
 * [R.22: `shared_ptr`을 만드려면 `make_shared()`를 사용하라.](#Rr-make_shared)
 * [R.23: `unique_ptr`을 만드려면 `make_unique()`를 사용하라.](#Rr-make_unique)
-* [R.30: `shared_ptr`의 순환을 끊으려면 `std::weak_ptr`을 사용하라.](#Rr-weak_ptr)
+* [R.24: `shared_ptr`의 순환을 끊으려면 `std::weak_ptr`을 사용하라.](#Rr-weak_ptr)
 
 > * [R.20: Use `unique_ptr` or `shared_ptr` to represent ownership](#Rr-owner)
 * [R.21: Prefer `unique_ptr` over `shared_ptr` unless you need to share ownership](#Rr-unique)
@@ -56,7 +56,8 @@ Alocation and deallocation rule summary:
 * [R.23: Use `make_unique()` to make `unique_ptr`s](#Rr-make_unique)
 * [R.24: Use `std::weak_ptr` to break cycles of `shared_ptr`s](#Rr-weak_ptr)
 
-* [R.30: Take smart pointers as parameters only to explicitly express lifetime semantics](#Rr-smartptrparam)
+* [R.31: 만약 non-`std` 스마트 포인터를 사용 중이라면, `std`의 기본 패턴을 따라라.](#Rr-smart)
+>* [R.30: Take smart pointers as parameters only to explicitly express lifetime semantics](#Rr-smartptrparam)
 * [R.31: If you have non-`std` smart pointers, follow the basic pattern from `std`](#Rr-smart)
 * [R.32: Take a `unique_ptr<widget>` parameter to express that a function assumes ownership of a `widget`](#Rr-uniqueptrparam)
 * [R.33: Take a `unique_ptr<widget>&` parameter to express that a function reseats the`widget`](#Rr-reseat)
@@ -668,12 +669,12 @@ You could "temporarily share ownership simply by using another `stared_ptr`.]]
 ### R.31: 만약 non-`std` 스마트 포인터를 사용 중이라면, `std`의 기본 패턴을 따라라.
 >### R.31: If you have non-`std` smart pointers, follow the basic pattern from `std`
 
-**이유**: 다음 섹션들의 규칙들 또한 다른 종류의 서드파티 혹은 사용자 스마트 포인터 등에서도 동작할 것이다. 그리고 성능과 정확성 문제를 일으키는 공통 스마트 포인터 에러에 대한 분석에 매우 유용할 것이다. 당신은 사용하고 있는 모든 스마트 포인터에 대해서 이 규칙이 작동하기 원한다.
+**이유**: 다음 섹션들의 규칙들 또한 다른 종류의 서드파티 혹은 커스텀 스마트 포인터 등에서도 동작할 것이며 성능과 정확성 문제를 일으키는 흔한 스마트 포인터 에러에 대한 분석에 매우 유용할 것이다. 당신은 사용하고 있는 모든 스마트 포인터에 대해서 이 규칙이 작동하기 원한다.
 
-단항 연산자 `*`와 `->`를 과하게 쓰는 (기본 또는 특수 템플릿을 포함한)어느 타입도 스마트 포인터가 고려되어진다.
+단항 연산자 `*`와 `->`를 과하게 쓰는 (기본 또는 특수 템플릿을 포함한)어떠한 타입이던 스마트 포인터가 고려되어진다:
 
-* 복사할 수 있으면, 참조 카운팅 되는 `Shared_ptr`로 간주되어진다.
-* 복사할 수 없다면, 고유한 `Unique_ptr`로 간주되어진다.
+* 복사할 수 있다면, 참조 카운팅 되는 `Shared_ptr`로 지정된다.
+* 복사할 수 없다면, 고유한 `Unique_ptr`로 지정된다.
 
 >**Reason**: The rules in the following section also work for other kinds of third-party and custom smart pointers and are very useful for diagnosing common smart pointer errors that cause performance and correctness problems.
 You want the rules to work on all the smart pointers you use.
@@ -712,8 +713,8 @@ Any type (including primary template or specialization) that overloads unary `*`
     }
 
 두 케이스는 [`sharedptrparam` 가이드라인]에서 오류가 있다.:
-`p`는 `Shared_ptr`이지만, 공유에 대해서는 아무것도 하지 않고 있다. 함수 안에서만 사용되며 값을 전달함으로써 묵시적인 비효율(pessimization<->optimization) 객체이다.
-이 함수들은 widget의 생명주기를 관리하고자 한다면 스마트 포인터를 넘겨받아야만 한다. 아니면 widget이 `nullptr`이 될 수 있다면 `widget*`를 넘겨받아야 하고, 그게 아니라면 이상적으로 `widget&`를 넘겨받아야 한다.
+`p`는 `Shared_ptr`이지만, 공유에 대해서는 아무것도 하지 않고 있다. 함수 안에서만 사용되는데 값을 전달함으로써 묵시적인 비효율(pessimization<->optimization) 객체이다.
+이 함수들은 widget의 생명주기를 관리하고자 한다면 스마트 포인터를 넘겨받아야만 한다. 아니면 widget이 `nullptr`이 될 수 있다면 `widget*`를 넘겨받아야 하고, 그게 아닌 이상적인 상황은 함수가 `widget&`를 넘겨받아야 한다.
 이 스마트포인터들은 `Shared_ptr` 컨셉과 잘 맞는다. 때문에 이 가이드라인 시행 규칙은 공통적인 비효율 객체를 드러내고 끄집어내어 위 함수들에서 잘 동작한다.
 >Both cases are an error under the [`sharedptrparam` guideline](#Rr-smartptrparam):
 `p` is a `Shared_ptr`, but nothing about its sharedness is used here and passing it by value is a silent pessimization;
