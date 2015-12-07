@@ -1273,11 +1273,15 @@ In general, the writer of a base class does not know the appropriate action to b
 
 
 <a name="Rc-throw"></a>
-### C.42: If a constructor cannot construct a valid object, throw an exception
+### C.42: 생성자가 유효한 객체를 생성하지 못한다면, 예외를 던지도록 하라
 
-**Reason**: Leaving behind an invalid object is asking for trouble.
+> ### C.42: If a constructor cannot construct a valid object, throw an exception
 
-**Example**:
+**근거**: 유효하지 않은 객체를 남겨두는 것은 문제를 만드는 것이다.
+
+> **Reason**: Leaving behind an invalid object is asking for trouble.
+
+**예**:
 
 	class X2 {
 		FILE* f;	// call init() before any other fuction
@@ -1301,7 +1305,7 @@ In general, the writer of a base class does not know the appropriate action to b
 		// ...
 	}
 
-**Example, bad**:
+**잘못된 예**:
 
 	class X3 {			// bad: the constructor leaves a non-valid object behind
 		FILE* f;	// call init() before any other fuction
@@ -1335,24 +1339,39 @@ In general, the writer of a base class does not know the appropriate action to b
 		// ...
 	}
 
-**Note**: For a variable definition (e.g., on the stack or as a member of another object) there is no explicit function call from which an error code could be returned. Leaving behind an invalid object an relying on users to consistently check an `is_valid()` function before use is tedious, error-prone, and inefficient.
+**참고사항**: 변수 정의에 있어서 (예, 스택에 혹은 다른 객체의 멤버로써) 에러코드가 리턴되는 명시적인 함수 호출은 없다.
+유효하지 않은 객체를 남겨두고 사용하기 전에 지속적으로 `is_valid()` 함수를 호출해야 하는 것은 번거롭고, 에러가 발생하기 쉬우며, 비효율적 이다.
 
-**Exception**: There are domains, such as some hard-real-time systems (think airplane controls) where (without additional tool support) exception handling is not sufficiently predictable from a timing perspective. There the `is_valed()` technique must be used. In such cases, check `is_valid()` consistently and immediately to simulate [RAII](#Rc-raii).
+> **Note**: For a variable definition (e.g., on the stack or as a member of another object) there is no explicit function call from which an error code could be returned. Leaving behind an invalid object an relying on users to consistently check an `is_valid()` function before use is tedious, error-prone, and inefficient.
 
-**Alternative**: If you feel tempted to use some "post-constructor initialization" or "two-stage initialization" idiom, try not to do that. If you really have to, look at [factory functions](#Rc-factory).
+**예외**: 타이밍의 관점에서 볼 때 (추가적인 툴 지원 없이) 예외 처리가 충분하게 예측 가능하지 않은 고실시간 시스템(비행기 제어를 생각해 보라)과 같은 영역이 있다. `is_valid()` 와 같은 방법이 사용되어야 한다. 이와 같은 경우 [RAII](#Rc-raii) 를 시뮬레이션 하기 위해 지속적이고 즉시 `is_valid()` 로 체크하라.
 
-**Enforcement**:
-* (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
-* (Unknown) If a constructor has an `Ensures` contract, try to see if it holds as a postcondition.
+> **Exception**: There are domains, such as some hard-real-time systems (think airplane controls) where (without additional tool support) exception handling is not sufficiently predictable from a timing perspective. There the `is_valed()` technique must be used. In such cases, check `is_valid()` consistently and immediately to simulate [RAII](#Rc-raii).
+
+**대안**: "생성자 이후 초기화" 혹은 "두 단계 초기화"를 사용해야 한다면, 그렇게 하지 않도록 해보라. 정말 그렇게 해야 한다면 [팩토리 함수](#Rc-factory)를 검토해 보라.
+
+> **Alternative**: If you feel tempted to use some "post-constructor initialization" or "two-stage initialization" idiom, try not to do that. If you really have to, look at [factory functions](#Rc-factory).
+
+**시행 하기**:
+* (단순함) 모든 생성자는 모든 멤버 변수를 초기화 하는 것이 좋다. (명시적으로 생성자 호출을 위임하거나 기본 생성자를 통해)
+* (알려지지 않음)  생성자가 `Ensure` 계약을 갖고 있다면, 사후 조건이 있는지 살펴보도록 하라.
+
+> * (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
+> * (Unknown) If a constructor has an `Ensures` contract, try to see if it holds as a postcondition.
 
 
 <a name="Rc-default0"></a>
-### C.43: Give a class a default constructor
+### C.43: 클래스가 기본 생성자를 갖도록 하라
 
-**Reason**: Many language and library facilities rely on default constructors,
-e.g. `T a[10]` and `std::vector<T> v(10)` default initializes their elements.
+> ### C.43: Give a class a default constructor
 
-**Example**:
+**근거**: 많은 언어나 라이브러리 설비들이 기본 생성자들에 의존한다,
+예. `T a[10]` 나 `std::vector<T> v(10)` 는 기본 생성자들이 각 요소를 초기화 한다.
+
+> **Reason**: Many language and library facilities rely on default constructors,
+> e.g. `T a[10]` and `std::vector<T> v(10)` default initializes their elements.
+
+**예**:
 
 	class Date {
 	public:
@@ -1363,21 +1382,31 @@ e.g. `T a[10]` and `std::vector<T> v(10)` default initializes their elements.
 	vector<Date> vd1(1000);	// default Date needed here
 	vector<Date> vd2(1000,Date{Month::october,7,1885});	// alternative
 
-There is no "natural" default date (the big bang is too far back in time to be useful for most people), so this example is non-trivial.
-`{0,0,0}` is not a valid date in most calendar systems, so choosing that would be introducing something like floating-point's NaN.
-However, most realistic `Date` classes has a "first date" (e.g. January 1, 1970 is popular), so making that the default is usually trivial.
+자연스러은 기본 날짜는 없다, 그래서 이 예는 사소하지 않다. (대부분의 사람들에게 태초의 시간은 필요없다)
+대부분의 달력 시스템에서 `{0,0,0}` 은 유효한 날짜가 아니다. 이것은 부동 소수점의 NaN 와 같은 것을 만드는 것이다.
+그러나, 대부분의 현실적인 `Date` 클래스는 "첫째 날" (예. 1970년 1월 1일이 많이 쓰인다)을 갖기 때문에 이것을 기본으로 갖는 것이 보통 일반적이다.
 
-**Enforcement**:
+> There is no "natural" default date (the big bang is too far back in time to be useful for most people), so this example is non-trivial.
+> `{0,0,0}` is not a valid date in most calendar systems, so choosing that would be introducing something like floating-point's NaN.
+> However, most realistic `Date` classes has a "first date" (e.g. January 1, 1970 is popular), so making that the default is usually trivial.
 
-* Flag classes without a default constructor
+**시행 하기**:
+
+* 기본 생성자가 없는 클래스들을 표시하라.
+
+> * Flag classes without a default constructor
 
 
 <a name="Rc-default00"></a>
-### C.44: Prefer default constructors to be simple and non-throwing
+### C.44: 단순하고 예외를 던지지 않는 기본 생성자를 선호하라
+
+> ### C.44: Prefer default constructors to be simple and non-throwing
+
+**근거**: 실패할 수 있는 연산없이 "기본"적인 값을 설정할 수 있다는 것은 에러 처리를 단순화 하고, 이동 연산을 추측 할 수 있도록 한다.
 
 **Reason**: Being able to set a value to "the default" without operations that might fail simplifies error handling and reasoning about move operations.
 
-**Example, problematic**:
+**문제 있는 예**:
 
 	template<typename T>
 	class Vector0 {		// elem points to space-elem element allocated using new
@@ -1391,11 +1420,15 @@ However, most realistic `Date` classes has a "first date" (e.g. January 1, 1970 
 		T* last;
 	};
 
-This is nice and general, but setting a `Vector0` to empty after an error involves an allocation, which may fail.
-Also, having a default `Vector` represented as `{new T[0],0,0}` seems wasteful.
-For example, `Vector0 v(100)` costs 100 allocations.
+이것은 일반적이고 좋지만, 에러 이후 `Vector0` 를 0으로 셋팅하는 것은 할당과 관련이 있고, 실패할 수 있다.
+기본 `Vector` 를 `{new T[0],0,0}` 으로 표현하는 것 역시 낭비처럼 보인다.
+예를 들면, `Vector0 v(100)` 는 100 만큼 할당하는 비용이 든다.
 
-**Example**:
+> This is nice and general, but setting a `Vector0` to empty after an error involves an allocation, which may fail.
+> Also, having a default `Vector` represented as `{new T[0],0,0}` seems wasteful.
+> For example, `Vector0 v(100)` costs 100 allocations.
+
+**예**:
 
 	template<typename T>
 	class Vector1 {		// elem is nullptr or elem points to space-elem element allocated using new
@@ -1409,20 +1442,29 @@ For example, `Vector0 v(100)` costs 100 allocations.
 		T* last = nullptr;
 	};
 
-Using `{nullptr,nullptr,nullptr}` makes `Vector1{}` cheap, but a special case and implies run-time checks.
-Setting a `Vector1` to empty after detecting an error is trivial.
+`Vector1{}` 를 `{nullptr,nullptr,nullptr}` 로 만드는 것은 비용이 적다, 이것은 특별한 경우이고 실행시간 체크가 필요하다.
+에러를 발견하고 빈 `Vector1` 로 설정하는 것은 쉽다.
 
-**Enforcement**:
+> Using `{nullptr,nullptr,nullptr}` makes `Vector1{}` cheap, but a special case and implies run-time checks.
+> Setting a `Vector1` to empty after detecting an error is trivial.
 
-* Flag throwing default constructors
+**시행하기**:
+
+* 예외를 던지는 기본 생성자를 표시하라.
+
+> * Flag throwing default constructors
 
 
 <a name="Rc-default"></a>
-### C.45: Don't define a default constructor that only initializes data members; use in-class member initializers instead
+### C.45: 데이터 멤버만을 초기화 하기 위해 기본 생성자를 정의하지 말라; 대신 클래스 내부 멤버 초기화자를 사용하라
 
-**Reason**: Using in-class member initializers lets the compiler generate the function for you. The compiler-generated function can be more efficient.
+> ### C.45: Don't define a default constructor that only initializes data members; use in-class member initializers instead
 
-**Example; bad**:
+**근거**: 클래스 내부 멤버 초기화자는 컴파일러가 작성자 대신 함수를 생성하도록 한다. 컴파일러가 생성하는 함수가 더 효율적일 수 있다.
+
+> **Reason**: Using in-class member initializers lets the compiler generate the function for you. The compiler-generated function can be more efficient.
+
+**잘못된 예**:
 
     class X1 { // BAD: doesn't use member initializers
         string s;
@@ -1432,7 +1474,7 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 		// ...
     };
 
-**Example**:
+**예**:
 
     class X2 {
         string s = "default";
@@ -1442,16 +1484,21 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 		// ...
     };
 
+**시행하기**: (단순함) 기본 생성자는 상수로 멤버 변수들을 초기화 하는 것 보다 더 많은 것을 하는 것이 좋다.
 
-**Enforcement**: (Simple) A default constructor should do more than just initialize member variables with constants.
+> **Enforcement**: (Simple) A default constructor should do more than just initialize member variables with constants.
 
 
 <a name="Rc-explicit"></a>
-### C.46: By default, declare single-argument constructors explicit
+### C.46: 기본적으로 하나의 인자를 받는 생성자는 `explicit` 로 선언하라
 
-**Reason**: To avoid unintended conversions.
+> ### C.46: By default, declare single-argument constructors explicit
 
-**Example; bad**:
+**근거**: 의도하지 않은 변환을 피한다.
+
+> **Reason**: To avoid unintended conversions.
+
+**잘못된 예**:
 
 	class String {
 		// ...
@@ -1462,8 +1509,9 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 
 	String s = 10;	// surprise: string of size 10
 
+**예외**: 생성자의 인자 타입에서 클래스 타입으로 묵시적 변환이 필요한 경우에는 `explicit` 를 사용하지 말라:
 
-**Exception**: If you really want an implicit conversion from the constructor argument type to the class type, don't use `explicit`:
+> **Exception**: If you really want an implicit conversion from the constructor argument type to the class type, don't use `explicit`:
 
 	class Complex {
 		// ...
@@ -1474,17 +1522,26 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 
 	Complex z = 10.7;	// unsurprising conversion
 
-**See also**: [Discussion of implicit conversions](#Ro-conversion).
+**참고**: [묵시적 변환에 대한 토론](#Ro-conversion).
 
-**Enforcement**: (Simple) Single-argument constructors should be declared `explicit`. Good single argument non-`explicit` constructors are rare in most code based. Warn for all that are not on a "positive list".
+> **See also**: [Discussion of implicit conversions](#Ro-conversion).
+
+**시행 하기**: (단순함) 하나의 인자를 받는 생성자는 `explicit` 로 선언되는 것이 좋다. 대부분의 코드에서 하나의 인자를 받는 생성자가 `explicit` 가 아닌데 좋은 경우는 드물다.
+"긍정적인 목록"에 없는 모든 것에 대해 경고하라.
+
+> **Enforcement**: (Simple) Single-argument constructors should be declared `explicit`. Good single argument non-`explicit` constructors are rare in most code based. Warn for all that are not on a "positive list".
 
 
 <a name="Rc-order"></a>
-### C.47: Define and initialize member variables in the order of member declaration
+### C.47: 멤버 변수들은 선언된 순서대로 정의하고 초기화 하라
+
+> ### C.47: Define and initialize member variables in the order of member declaration
+
+**근거**: 혼란과 에러를 최소화 한다. 선언된 순서가 초기화가 발생하는 순서이다. (멤버 초기화자의 순서와 독립적임)
 
 **Reason**: To minimize confusion and errors. That is the order in which the initialization happens (independent of the order of member initializers).
 
-**Example; bad**:
+**잘못된 예**:
 
 	class Foo {
 		int m1;
@@ -1496,17 +1553,25 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 
 	Foo x(1); // surprise: x.m1==x.m2==2
 
-**Enforcement**: (Simple) A member initializer list should mention the members in the same order they are declared.
+**시행 하기**: (단순함) 멤버 초기화자는 그들이 선언된 순서데로 멤버들을 기술해야 한다.
 
-**See also**: [Discussion](#Sd order)
+> **Enforcement**: (Simple) A member initializer list should mention the members in the same order they are declared.
+
+**참고**: [토론](#Sd order)
+
+> **See also**: [Discussion](#Sd order)
 
 
 <a name="Rc-in-class-initializer"></a>
-### C.48: Prefer in-class initializers to member initializers in constructors for constant initializers
+### C.48: 생성자에서 항상 동일하게 초기화 되는 멤버는 클래스내 초기화자를 선호하라
 
-**Reason**: Makes it explicit that the same value is expected to be used in all constructors. Avoids repetition. Avoids maintenance problems. It leads to the shortest and most efficient code.
+> ### C.48: Prefer in-class initializers to member initializers in constructors for constant initializers
 
-**Example; bad**:
+**근거**: 모든 생성자에서 같은 값이 예상되는 경우를 분명하게 하라. 반복을 피하라. 유지보수 문제를 피하라. 이것은 가장 짧고 효율적인 코드를 작성하도록 한다.
+
+> **Reason**: Makes it explicit that the same value is expected to be used in all constructors. Avoids repetition. Avoids maintenance problems. It leads to the shortest and most efficient code.
+
+**잘못된 예**:
 
 	class X {	// BAD
 		int i;
@@ -1518,9 +1583,11 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 		// ...
 	};
 
-How would a maintainer know whether `j` was deliberately uninitialized (probably a poor idea anyway) and whether it was intentional to give `s` the default value `""` in one case and `qqq` in another (almost certainly a bug)? The problem with `j` (forgetting to initialize a member) often happens when a new member is added to an existing class.
+유지보수하는 사람이 어떻게 `j` 가 의도적으로 초기화 되지 않았는지 (어쨌든 나쁜 생각임) 알 것이며, 의도적으로 `s`의 기본 값으로 `""` 주었는지, 또 어떤 경우에 `qqq` 를 주는지 (대부분 확실해 버그임) 알 수 있겠는가? `j` 에 대한 문제 (멤버를 초히화 하는것을 잊는 것)는 가끔 기존 클래스에 새로운 멤버를 추가할 때 발생한다.
 
-**Example**:
+> How would a maintainer know whether `j` was deliberately uninitialized (probably a poor idea anyway) and whether it was intentional to give `s` the default value `""` in one case and `qqq` in another (almost certainly a bug)? The problem with `j` (forgetting to initialize a member) often happens when a new member is added to an existing class.
+
+**예**:
 
 	class X2 {
 		int i {666};
@@ -1532,7 +1599,9 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 		// ...
 	};
 
-**Alternative**: We can get part of the benefits from default arguments to constructors, and that is not uncommon in older code. However, that is less explicit, causes more arguments to be passed, and is repetitive when there is more than one constructor:
+**대안**: 생성자의 기본 인자를 사용해서 부분적으로 이득을 얻을 수 있으며, 오래된 코드에서 일반적이다. 그러나 덜 명시적이고, 더 많은 인자를 넘겨야 하며 생성자가 하나 이상일 때 반복적인 작업이 필요하다:
+
+> **Alternative**: We can get part of the benefits from default arguments to constructors, and that is not uncommon in older code. However, that is less explicit, causes more arguments to be passed, and is repetitive when there is more than one constructor:
 
 	class X3 {	// BAD: inexplicit, argument passing overhead
 		int i;
@@ -1544,17 +1613,24 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 		// ...
 	};
 
-**Enforcement**:
-* (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
-* (Simple) Default arguments to constructors suggest an in-class initalizer may be more appropriate.
+**시행 하기**:
+* (단순함) 모든 생성자는 모든 멤버 변수를 초기화 하는 것이 좋다. (명시적으로 생성자 호출을 위임하거나 기본 생성자를 통해서)
+* (단순함) 생성자에서 기본 인자 보다 클래스 내부 초기화자를 제안하는 것이 더 적절한다.
+
+> * (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
+> * (Simple) Default arguments to constructors suggest an in-class initalizer may be more appropriate.
 
 
 <a name="Rc-initialize"></a>
-### C.49: Prefer initialization to assignment in constructors
+### C.49: 생성자에서 할당 보다는 초기화를 선호하라
 
-**Reason**: An initialization explicitly states that initialization, rather than assignment, is done and can be more elegant and efficient. Prevents "use before set" errors.
+> ### C.49: Prefer initialization to assignment in constructors
 
-**Example; good**:
+**근거**: 할당보다 명시적으로 초기화가 수행된다는 것을 기술하고, 더 우하하고 효율적일 수 있다. "값을 넣기 전에 사용하는" 에러를 방지한다.
+
+> **Reason**: An initialization explicitly states that initialization, rather than assignment, is done and can be more elegant and efficient. Prevents "use before set" errors.
+
+**좋은 예**:
 
 	class A {		// Good
 	    string s1;
@@ -1563,7 +1639,7 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 		// ...
 	};
 
-**Example; bad**:
+**잘못된 예**:
 
 	class B {		// BAD
     	string s1;
@@ -1582,12 +1658,16 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 
 
 <a name="Rc-factory"></a>
-### C.50: Use a factory function if you need "virtual behavior" during initialization
+### C.50: 초기화 하는 동안 "가상함수 처리" 가 필요하다면 팩토리 함수를 사용하라
 
-**Reason**: If the state of a base class object must depend on the state of a derived part of the object,
- we need to use a virtual function (or equivalent) while minimizing the window of opportunity to misuse an imperfectly constructed object.
+> ### C.50: Use a factory function if you need "virtual behavior" during initialization
 
-**Example; bad**:
+**근거**: 기본 클래스의 상태가 객체의 파생된 일부의 상태에 의존해야 한다면, 불완전하게 생성된 객체를 잘못 사용할 가능성을 줄이면서 가상함수(혹은 동등한)를 사용할 필요가 있다.
+
+> **Reason**: If the state of a base class object must depend on the state of a derived part of the object,
+> we need to use a virtual function (or equivalent) while minimizing the window of opportunity to misuse an imperfectly constructed object.
+
+**잘못된 예**:
 
 	class B {
 	public:
@@ -1603,7 +1683,7 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 	    // ...
 	};
 
-**Example*:
+**예*:
 
 	class B {
 	private:
@@ -1632,12 +1712,19 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 
 	shared_ptr<D> p = D::Create<D>();		// creating a D object
 
-By making the constructor `private` we avoid an incompletely constructed object escaping into the wild.
-By providing the factory function `Create()`, we make construction (on the free store) convenient.
+생성자를 `private`으로 선언함으로써 완벽하게 생성되지 않은 객체를 노출하는 것을 피할 수 있다.
+팩토리 함수 `Create()`를 제공함으로써, (힙에)생성을 편하게 만든다.
 
-**Note**: Conventional factory functions allocate on the free store, rather than on the stack or in an enclosing object.
+> By making the constructor `private` we avoid an incompletely constructed object escaping into the wild.
+> By providing the factory function `Create()`, we make construction (on the free store) convenient.
 
-**See also**: [Discussion](#Sd factory)
+**참고 사항**: 관습적으로 팩토리 함수는 스택이나 둘러싼 객체안쪽 보다 힙에 할당한다
+
+> **Note**: Conventional factory functions allocate on the free store, rather than on the stack or in an enclosing object.
+
+**참고**: [토론](#Sd factory)
+
+> **See also**: [Discussion](#Sd factory)
 
 
 <a name="Rc-delegating"></a>
