@@ -992,6 +992,7 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 	i = incr(i);
 
  
+**시행 하기**: 값을 저장하기 전에 읽지 않는 비상수 매개변수는 표시해 두세요. 그런 경우 단순희 값을 반환하기만 하면 됩니다. 
 **Enforcement**: Flag non-const reference parameters that are not read before being written to and are a type that could be cheaply returned.
 
 
@@ -1044,6 +1045,7 @@ C++11에서는 이렇게 쓸 수 있습니다, 결과값들을 이미 존재하�
 rather than using the generic `tuple`.
 
 **시행 하기**:
+
     * 출력 매개변수는 반환값으로 대체되어야 한다.
     출력 매개변수는 함수가 값을 저장하고 비상수 멤버 함수형으로 호출하거나, 비상수형으로 전달한다.
 
@@ -1054,14 +1056,18 @@ rather than using the generic `tuple`.
 
 
 <a name="Rf-return-ptr"></a>
-### F.42: Return a `T*` to indicate a position (only)
+### F.42: 메모리 주소의 위치를 나타나는 경우에만 `T*`를 반환하라
+>### F.42: Return a `T*` to indicate a position (only)
 
-**Reason**: That's what pointers are good for.
+**근거**: 메모리 주소의 위치를 반환하는 경우는 포인터가 가장 좋다.
+>**Reason**: That's what pointers are good for.
 Returning a `T*` to transfer ownership is a misuse.
 
-**Note**: Do not return a pointer to something that is not in the caller's scope.
+**주의 사항**: 호출자의 범위에 있지 않은 포인터는 반환하지 마세요.
+>**Note**: Do not return a pointer to something that is not in the caller's scope.
 
-**Example**:
+**예**:
+>**Example**:
 
 		Node* find(Node* t, const string& s)	// find s in a binary tree of Nodes
 		{
@@ -1071,12 +1077,16 @@ Returning a `T*` to transfer ownership is a misuse.
 			return nullptr;
 		}
 
-If it isn't the `nullptr`, the pointer returned by `find` indicates a `Node` holding `s`.
+만약 `nullptr`가 아니라면 `find`가 반환하는 포인터는 `s`를 가지는 `node`를 가리킨다. 
+중요한점은 이것은 객체를 가리키는 포인터의 소유권이 호출자까지 전달되지 않는다는 것이다.
+>If it isn't the `nullptr`, the pointer returned by `find` indicates a `Node` holding `s`.
 Importantly, that does not imply a transfer of ownership of the pointed-to object to the caller.
 
-**Note**: Positions can also be transferred by iterators, indices, and references.
+**주의 사항**: 메모리 주소의 위치는 이터레이터나 인덱스, 참조형으로 전달될 수 있다.
+>**Note**: Positions can also be transferred by iterators, indices, and references.
 
-**Example, bad**:
+**나쁜 예**:
+>**Example, bad**:
 
 	int* f()
 	{
@@ -1085,7 +1095,8 @@ Importantly, that does not imply a transfer of ownership of the pointed-to objec
 		return &x;		// Bad: returns pointer to object that is about to be destroyed
 	}
 
-This applies to references as well:
+참조에도 똑같이 적용된다.
+>This applies to references as well:
 
 	int& f()
 	{
@@ -1094,12 +1105,18 @@ This applies to references as well:
 		return x;	// Bad: returns refence to object that is about to be destroyed
 	}
 
-**See also**: [discussion of dangling pointer prevention](#???).
 
-**Enforcement**: A slightly diffent variant of the problem is placing pointers in a container that outlives the objects pointed to.
+**더 보기**: [discussion of dangling pointer prevention](#???).
+>**See also**: [discussion of dangling pointer prevention](#???).
 
-* Compilers tend to catch return of reference to locals and could in many cases catch return of pointers to locals.
-* Static analysis can catch most (all?) common patterns of the use of pointers indicating positions (thus eliminating dangling pointers)
+**시행 하기**: 문제의 약간 다른 변형은 가리키고 있는 객체보다 더 오래 살아 있는 컨테이너에 위치한 포인터 입니다.
+>**Enforcement**: A slightly diffent variant of the problem is placing pointers in a container that outlives the objects pointed to.
+
+* 컴파일러는 지역범위로 반환되는 참조형을 잡아내는 경향이 있고 많은 경우에 있어서 지역범위로 반환되는 포인터를 잡아 낼 수 있습니다.
+* 정적분석은 대부분의(거의?) 포인터 사용 패턴을 잡아 냅니다(댕글링 포인터 같은)
+
+>* Compilers tend to catch return of reference to locals and could in many cases catch return of pointers to locals.
+>* Static analysis can catch most (all?) common patterns of the use of pointers indicating positions (thus eliminating dangling pointers)
 
 
 <a name="Rf-dangle"></a>
@@ -1188,18 +1205,25 @@ It can be detected/prevented with similar techniques.
 
 
 <a name="Rf-return-ref"></a>
-### F.44: Return a `T&` when "returning no object" isn't an option
+### F.44: "비객체를 반환하기"가 선택사항이 아니라면 `T&`를 반환하라
+>### F.44: Return a `T&` when "returning no object" isn't an option
 
-**Reason**: The language guarantees that a `T&` refers to an object, so that testing for `nullptr` isn't necessary.
+**근거**: 언어가 `T&`는 객체를 가리키고 있다는 것을 보장하기 때문에 `nullptr`인지 시험하는 것은 필요없다.
+>**Reason**: The language guarantees that a `T&` refers to an object, so that testing for `nullptr` isn't necessary.
 
-**See also**: The return of a reference must not imply transfer of ownership:
+**더 보기**: 참조형을 반환하는 것은 소유권 이전을 의미하지 않는다.
 [discussion of dangling pointer prevention](#???) and [discussion of ownership](#???).
 
-**Example**:
+>**See also**: The return of a reference must not imply transfer of ownership:
+>[discussion of dangling pointer prevention](#???) and [discussion of ownership](#???).
+
+**예**:
+>**Example**:
 
 	???
 
-**Enforcement**: ???
+**시행 하기**: ???
+>**Enforcement**: ???
 
 
 <a name="Rf-return-ref-ref"></a>
