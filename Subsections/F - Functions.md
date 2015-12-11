@@ -409,7 +409,7 @@ An inline function is part of the ABI.
 **예외 사항**: 템플릿 함수(템플릿 멤버 함수 포함)는 헤더에 정의 되어야 합니다. 따라서 인라인 함수가 됩니다.
 >**Exception**: Template functions (incl. template member functions) must be in headers and therefore inline.
 
-**시행 하기**: `inline`함수가 3줄이상 된다면 표시해 두세요. (추가번역 필요)
+**수행하기**: `inline`함수가 3줄이상 된다면 표시해 두세요. (추가번역 필요)
 >**Enforcement**: Flag `inline` functions that are more than three statements and could have been declared out of line (such as class member functions).
 To fix: Declare the function out of line. [[NM: Certainly possible, but size-based metrics can be very annoying.]]
 
@@ -672,7 +672,7 @@ For example, `not_null<T*>` makes it obvious to a reader (human or machine) that
 **더 보기**:  [Support library](#S-support).
 >**See also**: [Support library](#S-support).
 
-**시행 하기**:
+**수행하기**:
 >**Enforcement**:
 
 * (단순) ((범위)) 포인터로 산술연산을 하면 포인터 변수의 타입의 값으로 연산이 되는 것에 주의하세요. 
@@ -702,7 +702,7 @@ For example, `not_null<T*>` makes it obvious to a reader (human or machine) that
 **참고 사항**: `not_null`은 내장형 포인터 타입에만 사용되는 것은 아닙니다. `array_view`, `string_view`, `unique_ptr`, `shared_ptr`, 그리고 다른 포인터 형에도 사용 됩니다.
 >**Note**: `not_null` is not just for built-in pointers. It works for `array_view`, `string_view`, `unique_ptr`, `shared_ptr`, and other pointer-like types.
 
-**시행 하기**:
+**수행하기**:
 >**Enforcement**:
 
 * (단순) 함수 내에서 `nullptr`를 검사하지 않고 포인터를 역참조 한다면 경고하세요. `not_null`로 선언하도록 제안하세요.
@@ -792,7 +792,7 @@ Functions are inconsistent in their use of `nullptr` and we must be more explici
 There in no (legitimate) "null reference."
 If you need the notion of an optional value, use a pointer, `std::optional`, or a special value used to denote "no value."
 
-**수행 하기**:
+**시행하기**:
 >**Enforcement**:
 
 * (단순) ((기초)) 매개변수에 `4*sizeof(int)`보다 큰 객체가 값으로 전달 된다면 경고 하세요.
@@ -820,7 +820,7 @@ For small objects (up to two or three words) is is also faster than alternatives
 
 	void fct(int& x);		// OK, but means something else; use only for an "out parameter"
 
-**시행 하기**:
+**수행하기**:
 >**Enforcement**:
 
 * (단순) ((기초)) `3*sizeof(int)`보다 작은 크기의 객체가 `const` 참조형 매개변수로 전달된다면 경고하세요. 대신 값형으로 전달 할 것을 제안 하세요.
@@ -992,7 +992,7 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 	i = incr(i);
 
  
-**시행 하기**: 값을 저장하기 전에 읽지 않는 비상수 매개변수는 표시해 두세요. 그런 경우 단순희 값을 반환하기만 하면 됩니다. 
+**수행하기**: 값을 저장하기 전에 읽지 않는 비상수 매개변수는 표시해 두세요. 그런 경우 단순희 값을 반환하기만 하면 됩니다. 
 **Enforcement**: Flag non-const reference parameters that are not read before being written to and are a type that could be cheaply returned.
 
 
@@ -1044,7 +1044,7 @@ C++11에서는 이렇게 쓸 수 있습니다, 결과값들을 이미 존재하�
 >**Note**: In some cases it may be useful to return a specific, user-defined `Value_or_error` type along the lines of `variant<T,error_code>`,
 rather than using the generic `tuple`.
 
-**시행 하기**:
+**수행하기**:
 
     * 출력 매개변수는 반환값으로 대체되어야 한다.
     출력 매개변수는 함수가 값을 저장하고 비상수 멤버 함수형으로 호출하거나, 비상수형으로 전달한다.
@@ -1109,7 +1109,7 @@ Importantly, that does not imply a transfer of ownership of the pointed-to objec
 **더 보기**: [discussion of dangling pointer prevention](#???).
 >**See also**: [discussion of dangling pointer prevention](#???).
 
-**시행 하기**: 문제의 약간 다른 변형은 가리키고 있는 객체보다 더 오래 살아 있는 컨테이너에 위치한 포인터 입니다.
+**수행하기**: 문제의 약간 다른 변형은 가리키고 있는 객체보다 더 오래 살아 있는 컨테이너에 위치한 포인터 입니다.
 >**Enforcement**: A slightly diffent variant of the problem is placing pointers in a container that outlives the objects pointed to.
 
 * 컴파일러는 지역범위로 반환되는 참조형을 잡아내는 경향이 있고 많은 경우에 있어서 지역범위로 반환되는 포인터를 잡아 낼 수 있습니다.
@@ -1222,7 +1222,7 @@ It can be detected/prevented with similar techniques.
 
 	???
 
-**시행 하기**: ???
+**수행하기**: ???
 >**Enforcement**: ???
 
 
@@ -1288,12 +1288,17 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 
 
 <a name="Rf-default-args"></a>
-### F.51: Prefer overloading over default arguments for virtual functions
-??? possibly other situations?
+### F.51: 가상함수의 기본인자도 오버로딩하라.
+>### F.51: Prefer overloading over default arguments for virtual functions
 
-**Reason**: Virtual function overrides do not inherit default arguments, leading to surprises.
+혹시 다른 상황이 뭐가 있을까?
+>??? possibly other situations?
 
-**Example; bad**:
+**근거**: 가상함수 오버라이드는 기본인자를 상속하지 않기 때문에 예상치 못한 결과를 만들어 낸다.
+>**Reason**: Virtual function overrides do not inherit default arguments, leading to surprises.
+
+**나쁜 예**:
+>**Example; bad**:
 
 	class base {
 	public:
@@ -1311,15 +1316,19 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	b.multiply(10);	// these two calls will call the same function but
 	d.multiply(10); // with different arguments and so different results
 
-**Enforcement**: Flag all uses of default arguments in virtual functions.
+**수행하기**: 기본인자를 사용하는 가상함수는 표시를 해두세요.
+>**Enforcement**: Flag all uses of default arguments in virtual functions.
 
 
 <a name="Rf-reference-capture"></a>
-### F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms
+### F.52: 지역범위에서 사용되는 변수는(알고리즘에 전달 되는것을 포함) 참조에 의한 캡쳐를 사용하라.
+>### F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms
 
-**Reason**: For efficiency and correctness, you nearly always want to capture by reference when using the lambda locally. This includes when writing or calling parallel algorithms that are local because they join before returning.
+**근거**: 효율성과 정확도를 위해서 지역범위에서 람다를 사용할 때 참조에 의한 캡쳐를 원할 겁니다. 이 방법은 지역범위에서 병렬알고리즘을 호출 할 때도 해당됩니다.
+>**Reason**: For efficiency and correctness, you nearly always want to capture by reference when using the lambda locally. This includes when writing or calling parallel algorithms that are local because they join before returning.
 
-**Example**: This is a simple three-stage parallel pipeline. Each `stage` object encapsulates a worker thread and a queue, has a `process` function to enqueue work, and in its destructor automatically blocks waiting for the queue to empty before ending the thread.
+**예**: 아래 예는 간단한 3단계 병렬 파이프라인 입니다. 각 `stage` 객체는 작업 쓰레드와 큐를 캡슐화 하고 큐를 사용하는  `process` 함수, 그리고 소멸자는 쓰레드가 종료되기 전에 큐가 비어질 때까지 대기 합니다.  
+>**Example**: This is a simple three-stage parallel pipeline. Each `stage` object encapsulates a worker thread and a queue, has a `process` function to enqueue work, and in its destructor automatically blocks waiting for the queue to empty before ending the thread.
 
 	void send_packets( buffers& bufs ) {
 	    stage encryptor  ([] (buffer& b){ encrypt(b); });
@@ -1328,15 +1337,20 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	    for (auto& b : bufs) { decorator.process(b); }
 	} // automatically blocks waiting for pipeline to finish
 
-**Enforcement**: ???
+**수행하기** ???
+>**Enforcement**: ???
 
 
 <a name="Rf-value-capture"></a>
-### F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread
+### F.53: 람다에서는 지역범위에서 사용되지 않는 변수를(반환값, 힙에 할당된 값 그리고 다른 쓰레드로 전달되는 값을 포함하여) 참조에 의한 캡쳐를 해서는 안된다. 
+>### F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread
 
-**Reason**: Pointers and references to locals shouldn't outlive their scope. Lambdas that capture by reference are just another place to store a reference to a local object, and shouldn't do so if they (or a copy) outlive the scope.
+**근거**: 지역범위에 있는 포인터와 참조는 범위를 넘어서면 더 이상 존재하지 않는다.
+참조의한 캡쳐를 가진 람다는 지역 객체의 참조를 저장하는 또 다른 공간일 뿐이고 지역범위를 넘어서면 더 이상 존재하지 않는다. 
+>**Reason**: Pointers and references to locals shouldn't outlive their scope. Lambdas that capture by reference are just another place to store a reference to a local object, and shouldn't do so if they (or a copy) outlive the scope.
 
-**Example**:
+**예**:
+>**Example**:
 
 	{
 		// ...
@@ -1345,5 +1359,6 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 		background_thread.queue_work([=]{ process(a,b,c); });	// want copies of a, b, and c
 	}
 
-**Enforcement**: ???
+**수행하기**: ???
+>**Enforcement**: ???
 
