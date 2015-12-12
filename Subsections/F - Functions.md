@@ -829,15 +829,20 @@ For small objects (up to two or three words) is is also faster than alternatives
 
 
 <a name="Rf-T-ref"></a>
-### F.22: Use a `T&` for an in-out-parameter
+### F.22: 입출력 매개변수는 `T&`를 사용하라
+>### F.22: Use a `T&` for an in-out-parameter
 
-**Reason**: A called function can write to a non-`const` reference argument, so assume that it does.
+**근거**: 함수는 비상수 참조 인자에 값을 쓸 수 있고 그렇게 할 것이라고 가정하세요. 
+>**Reason**: A called function can write to a non-`const` reference argument, so assume that it does.
 
+**예**:
 **Example**:
 
 	void update(Record& r);	// assume that update writes to r
 	
-**Note**: A `T&` argument can pass information into a function as well as well as out of it.
+**예외사항**: 함수는 `T&` 인자로  정보를 전달할 수도 있지만 내보낼 수도 있습니다.
+그러므로 `T&`는 입출력 매개변수가 됩니다. 그래서 그 자체로 문제가 되거나 에러의 원인이 되기도 합니다. 
+>**Note**: A `T&` argument can pass information into a function as well as well as out of it.
 Thus `T&` could be and in-out-parameter. That can in itself be a problem and a source of errors:
 
 	void f(string& s)
@@ -852,13 +857,19 @@ Thus `T&` could be and in-out-parameter. That can in itself be a problem and a s
 		// ...
 	}
 	
-Here, the writer of `g()` is supplying a buffer for `f()` to fill,
+여기서, `g()` 작성자는  `f()`에게 버퍼를 제공하고 있습니다. 그러나 `f()`는 버퍼를 덮어쓰기하고 있습니다 (문자들을 단순히 복사하는 것보다 비용이 조금 더는 곳에).
+`g()` 작성자가 `버퍼`의 크기를 미리 가정해 놓고 사용한다면 잘못된 로직이 에러를 유발시킬 수 있다.  
+>Here, the writer of `g()` is supplying a buffer for `f()` to fill,
 but `f()` simply replaces it (at a somewhat higher cost than a simple copy of the characters).
 If the writer of `g()` makes an assumption about the size of `buffer` a bad logic error can happen.
 
-**Enforcement**:
+**수행하기**:
+>**Enforcement**:
 
-* (Moderate) ((Foundation)) Warn about functions with non-`const` reference arguments that do *not* write to them.
+* (제한) ((기본)) 쓰기를 하지 않는 비상수 참조 인자를 가진 함수는 경고하세요.
+* `T&`를 취하는 함수는 표시해두고 `T`로 대체하세요.
+
+>* (Moderate) ((Foundation)) Warn about functions with non-`const` reference arguments that do *not* write to them.
 * Flag functions that take a `T&` and replace the `T` referred to, rather what the contents of that `T`
 
 
@@ -1205,7 +1216,7 @@ It can be detected/prevented with similar techniques.
 
 
 <a name="Rf-return-ref"></a>
-### F.44: "비객체를 반환하기"가 선택사항이 아니라면 `T&`를 반환하라
+### F.44: "객체를 반환하지 않기"가 선택사항이 아니라면 `T&`를 반환하라
 >### F.44: Return a `T&` when "returning no object" isn't an option
 
 **근거**: 언어가 `T&`는 객체를 가리키고 있다는 것을 보장하기 때문에 `nullptr`인지 시험하는 것은 필요없다.
@@ -1227,13 +1238,17 @@ It can be detected/prevented with similar techniques.
 
 
 <a name="Rf-return-ref-ref"></a>
-### F.45: Don't return a `T&&`
+### F.45: `T&&`를 반환하지 마라
+>### F.45: Don't return a `T&&`
 
-**Reason**: It's asking to return a reference to a destroyed temporary object. A `&&` is a magnet for temporary objects. This is fine when the reference to the temporary is being passed "downward" to a callee, because the temporary is guaranteed to outlive the function call. (See [F.24](#RF-pass-ref-ref) and [F.25](#Rf-pass-ref-move).) However, it's not fine when passing such a reference "upward" to a larger caller scope. See also [F54](#Rf-local-ref-ref).
+**근거**: 이것은 소멸된 임시 객체의 참조를 반환하라고 요청하는 것입니다. `&&`는 임시 객체에 붙는 자석 입니다. 임시 객체를 가리키는 참조는 함수호출보다 오래 살아 있기 때문에 피호줄자로 '하향이동' 시키는 편이 낫습니다. ([F.24](#RF-pass-ref-ref) 와 [F.25](#Rf-pass-ref-move)를 참조 하세요.) 그러나 임시객체의 참조를 호출자 범위로 '상향이동' 시키는 것은 좋지 않습니다. [F54](#Rf-local-ref-ref)를 보세요.
+>**Reason**: It's asking to return a reference to a destroyed temporary object. A `&&` is a magnet for temporary objects. This is fine when the reference to the temporary is being passed "downward" to a callee, because the temporary is guaranteed to outlive the function call. (See [F.24](#RF-pass-ref-ref) and [F.25](#Rf-pass-ref-move).) However, it's not fine when passing such a reference "upward" to a larger caller scope. See also [F54](#Rf-local-ref-ref).
 
-For passthrough functions that pass in parameters (by ordinary reference or by perfect forwarding) and want to return values, use simple `auto` return type deduction (not `auto&&`).
+(참조 또는 퍼펙트 포워딩을 통하여)함수에 매개변수를 전달하고 값을 반환하려면 간단하게 `auto`를 반환형으로 사용하세요. 
+>For passthrough functions that pass in parameters (by ordinary reference or by perfect forwarding) and want to return values, use simple `auto` return type deduction (not `auto&&`).
 
-**Example; bad**: If `F` returns by value, this function returns a reference to a temporary.
+**나쁜 예**: `F`가 값을 반환한다면, 함수는 임시변수의 참조를 반환하게 됩니다.
+>**Example; bad**: If `F` returns by value, this function returns a reference to a temporary.
 
 	template<class F>
 	auto&& wrapper(F f) {
@@ -1241,7 +1256,8 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	    return f();
 	}
 
-**Example; good**: Better:
+**좋은 예**: 더 나은:
+>**Example; good**: Better:
 	
 	template<class F>
 	auto wrapper(F f) {
@@ -1249,17 +1265,22 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	    return f();
 	}
 
-**Exception**: `std::move` and `std::forward` do return `&&`, but they are just casts -- used by convention only in expression contexts where a reference to a temporary object is passed along within the same expression before the temporary is destroyed. We don't know of any other good examples of returning `&&`.
+**예외사항**: `std::move` 와 `std::forward`는 `&&`를 반환하지만 형변환일 뿐이다. -- used by convention only in expression contexts where a reference to a temporary object is passed along within the same expression before the temporary is destroyed. 우리는 `&&`를 반환하는 다른 좋은 예제를 모릅니다. 
+>**Exception**: `std::move` and `std::forward` do return `&&`, but they are just casts -- used by convention only in expression contexts where a reference to a temporary object is passed along within the same expression before the temporary is destroyed. We don't know of any other good examples of returning `&&`.
 
-**Enforcement**: Flag any use of `&&` as a return type, except in `std::move` and `std::forward`.
+**수행하기**: `std::move` 와 `std::forward`를 제외하고 `&&`를 반환한다면 표시를 해 두세요.
+>**Enforcement**: Flag any use of `&&` as a return type, except in `std::move` and `std::forward`.
 
 
 <a name="Rf-capture-vs-overload"></a>
-### F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)
+### F.50: 함수로 할 수 없을 때 람다를 사용하라 (지역변수를 캡쳐하거나 지역함수를 구현하기 위해서)
+>### F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)
 
-**Reason**: Functions can't capture local variables or be declared at local scope; if you need those things, prefer a lambda where possible, and a handwritten function object where not. On the other hand, lambdas and function objects don't overload; if you need to overload, prefer a function (the workarounds to make lambdas overload are ornate). If either will work, prefer writing a function; use the simplest tool necessary.
+**근거**: 함수는 지역변수를 캡쳐할 수 없고, 지역범위로 선언될 수도 없습니다. 이런 기능이 필요하다면 가능한 곳에서 람다를 사용하고, 그렇지 않는 곳에서는 함수객체를 사용하세요. 한편 람다와 함수객체는 오버로드 할 수 없습니다; 만약 로버로드가 필요하다면 함수를 사용하세요(람다를 오버로드하면 굉장히 복잡한 문제를 발생시킵니다). 만약 둘다 사용할 수 있다면 함수를 사용하세요; 가장 단순한 툴을 사용하세요.
+>**Reason**: Functions can't capture local variables or be declared at local scope; if you need those things, prefer a lambda where possible, and a handwritten function object where not. On the other hand, lambdas and function objects don't overload; if you need to overload, prefer a function (the workarounds to make lambdas overload are ornate). If either will work, prefer writing a function; use the simplest tool necessary.
 
-**Example**:
+**예**:
+>**Example**:
 
 	// writing a function that should only take an int or a string -- overloading is natural
 	void f(int);
@@ -1279,8 +1300,10 @@ For passthrough functions that pass in parameters (by ordinary reference or by p
 	}
 	pool.join();
 
-**Exception**: Generic lambdas offer a concise way to write function templates and so can be useful even when a normal function template would do equally well with a little more syntax. This advantage will probably disappear in the future once all functions gain the ability to have Concept parameters.
+**예외사항**: 제네릭 람다는 함수 템플릿을 구현하는 간결한 방법을 제공하기 때문에 더 적은 문법으로 일반 함수 템플릿과 같은 기능을 할 수 있습니다. 그렇지만 앞으로 함수가 컨셉 매개변수를 가지게되면 이 장점은 사라질 것입니다.
+>**Exception**: Generic lambdas offer a concise way to write function templates and so can be useful even when a normal function template would do equally well with a little more syntax. This advantage will probably disappear in the future once all functions gain the ability to have Concept parameters.
 
+**수행하기**:
 **Enforcement**:
 
     * Warn on use of a named non-generic lambda (e.g., `auto x = [](int i){ /*...*/; };`) that captures nothing and appears at global scope. Write an ordinary function instead.
