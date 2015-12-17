@@ -874,11 +874,14 @@ If the writer of `g()` makes an assumption about the size of `buffer` a bad logi
 
 
 <a name="Rf-T-return-out"></a>
-### F.23: Use `T&` for an out-parameter that is expensive to move (only)
+### F.23: 값을 이동하는데 비용이 많이 드는 출력 매개변수는 `T&`를 사용하라
+>### F.23: Use `T&` for an out-parameter that is expensive to move (only)
 
-**Reason**: A return value is harder to miss and harder to miuse than a `T&` (an in-out parameter); [see also](#Rf-return); [see also](#Rf-T-multi).
+**근거**: 값을 반환하는 것은 `T&`(입출력 매개변수)보다 놓치는 경우가  거의 없고 잘못 사용하는 경우도 드물다; [더 보기](#Rf-return); [see also](#Rf-T-multi).
+>**Reason**: A return value is harder to miss and harder to miuse than a `T&` (an in-out parameter); [see also](#Rf-return); [see also](#Rf-T-multi).
 
-**Example**:
+**예**:
+>**Example**:
 
 	struct Package {
 		char header[16];
@@ -891,7 +894,8 @@ If the writer of `g()` makes an assumption about the size of `buffer` a bad logi
 	int val();				// OK
 	val(int&);				// Bad: Is val reading its argument
 
-**Enforcement**: Hard to choose a cutover value for the size of the value returned.
+**수행하기**: 반환되는 값의 크기의 상한값을 정하는 것은 어렵습니다. 
+>**Enforcement**: Hard to choose a cutover value for the size of the value returned.
 
 
 <a name="Rf-pass-ref-ref"></a>
@@ -937,11 +941,14 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 
 
 <a name="Rf-unique_ptr"></a>
-### F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed
+### F.26: 포인터의 소유권을 이동해야 할 때는 `unique_ptr<T>`을 사용하라
+>### F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed
 
-**Reason**: Using `unique_ptr` is the cheapest way to pass a pointer safely.
+**근거**: 가장 저렴한 비용으로 안전하게 포인터의 소유권을 이동시키는 방법은 `unique_ptr`을 사용하는 것이다.
+>**Reason**: Using `unique_ptr` is the cheapest way to pass a pointer safely.
 
-**Example**:
+**예**:
+>**Example**:
 
 	unique_ptr<Shape> get_shape(istream& is)	// assemble shape from input stream
 	{
@@ -954,16 +961,21 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 		// ...
 	}
 
-**Note**: You need to pass a pointer rather than an object if what you are transferring is an object from a class hierarchy that is to be used through an interface (base class).
+**주의사항**: 인터페이스로써 클래스 상속 관계에 있는 객체를 이동시키는 것이라면 포인터를 전달하는 것이 낫다.
+>**Note**: You need to pass a pointer rather than an object if what you are transferring is an object from a class hierarchy that is to be used through an interface (base class).
 
-**Enforcement**: (Simple) Warn if a function returns a locally-allocated raw pointer. Suggest using either `unique_ptr` or `shared_ptr` instead.
+**수행하기**: (간단) 함수가 지역범위 내에서 할당한 포인터를 반환한다면 경고하세요. 대신 `unique_ptr` 나 `shared_ptr`를 사용하도록 권장하세요.
+>**Enforcement**: (Simple) Warn if a function returns a locally-allocated raw pointer. Suggest using either `unique_ptr` or `shared_ptr` instead.
 
 
 <a name="Rf-shared_ptr"></a>
-### F.27: Use a `shared_ptr<T>` to share ownership
+### F.27: 소유권을 공유 할 때는 `shared_ptr<T>` 사용하라
+>### F.27: Use a `shared_ptr<T>` to share ownership
 
-**Reason**: Using `std::shared_ptr` is the standard way to represent shared ownership. That is, the last owner deletes the object.
+**근거**: `std::shared_ptr`를 사용하여 소유권을 공유하는 방법은 표준 입니다. 마지막 소유자가 객체를 소멸 시킵니다.
+>**Reason**: Using `std::shared_ptr` is the standard way to represent shared ownership. That is, the last owner deletes the object.
 
+**예**:
 **Example**:
 
 	shared_ptr<Image> im { read_image(somewhere); };
@@ -976,13 +988,16 @@ If you have performance justification to optimize for rvalues, overload on `&&` 
 	// detach treads
 	// last thread to finish deletes the image
 
-
-**Note**: Prefer a `unique_ptr` over a `shared_ptr` if there is never more than one owner at a time.
+**주의사항**: 소유자가 단 하나인경우 `shared_ptr`보다는 `unique_ptr`을 사용하세요.
+`shared_ptr`는 소유권을 공유할 때 사용 합니다. 
+>**Note**: Prefer a `unique_ptr` over a `shared_ptr` if there is never more than one owner at a time.
 `shared_ptr` is for shared ownership.
 
-**Alternative**: Have a single object own the shared object (e.g. a scoped object) and destroy that (preferably implicitly) when all users have completd.
+**대안**: 공유된 객체를 소유하고 있는 하나의 객체를 만들고 모든 사용자가 사용을 마치면 (아마도 암시적인 방법으로)소멸 시키세요.
+>**Alternative**: Have a single object own the shared object (e.g. a scoped object) and destroy that (preferably implicitly) when all users have completd.
 
-**Enforcement**: (Not enforceable) This is a too complex pattern to reliably detect.
+**수행하기**: (강요할 수 없음) 이것은 검출해 내기에 매우 복잡한 패턴입니다.
+>**Enforcement**: (Not enforceable) This is a too complex pattern to reliably detect.
 
 
 <a name="Rf-T-return"></a>
