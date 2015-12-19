@@ -15,14 +15,14 @@ Functions are the most critical part in most interfaces, so see the interface ru
 함수 정의 규칙:
 >Function definition rules:
 
-* [F.1: "패키지" meaningful operations as carefully named functions](#Rf-package)
-* [F.2: 함수는 하나의 동작만 수행해야 한다](#Rf-logical)
+* [F.1: 의미있는 동작들을 모아서 주의깊게 함수 이름을 지어라](#Rf-package)
+* [F.2: 함수는 하나의 논리적 수행만 행해야 한다](#Rf-logical)
 * [F.3: 함수를 간결하고 단순하게 유지시켜야 한다](#Rf-single)
-* [F.4: 만약 함수가 컴파일 시간에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
-* [F.5: 만약 함수가 매우 작고 성능이 중요하다면 인라인으로 선언하라](#Rf-inline)
-* [F.6: 만약 함수가 예외를 발생시키지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
-* [F.7: 일반적으로 사용되는 함수라면 스마트 포인터 보다는 `T*`를 인자로 받아라](#Rf-smart)
-* [F.8: Prefer pure functions](#Rf-pure)
+* [F.4: 함수가 컴파일 타임에 평가되어야 한다면  `constexpr`로 선언하라](#Rf-constexpr)
+* [F.5: 만약 함수가 매우 짧고 수행시간이 중요하다면 `inline`으로 선언하라](#Rf-inline)
+* [F.6: 만약 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
+* [F.7: 범용으로 사용하려면 스마트포인터 대신에 `T*`형 인자를 사용하라](#Rf-smart)
+* [F.8: 간결한 함수를 선호하라](#Rf-pure)
 
 >* [F.1: "Package" meaningful operations as carefully named functions](#Rf-package)
 >* [F.2: A function should perform a single logical operation](#Rf-logical)
@@ -37,19 +37,19 @@ Functions are the most critical part in most interfaces, so see the interface ru
 인자 전달 규칙:
 >Argument passing rules:
 
-* [F.15: 정보를 전달 할 때 단순하고 전통적인 방식을 선호하라](#Rf-conventional)
-* [F.16: 객체 하나를 지정 할 때는 `T*` 나 `owner<T*>` 또는 스마트 포인터를 사용하라](#Rf-ptr)
-* [F.17: "null"이 유효하지 않는 값을 의미할 때는 `not_null<T>`를 사용하라](#Rf-nullptr)
+* [F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라](#Rf-conventional)
+* [F.16: 객체 하나를 가리킬 때는 `T*`또는 `owner<T*>`를 사용하라](#Rf-ptr)
+* [F.17: "널"이 유효하지 않은 값을 의미한다면 `not_null<T>`을 사용하세요](#Rf-nullptr)
 * [F.18: 반 개방 범위를 나타날 때는 `array_view<T>` 또는 `array_view_p<T>`를 사용하라](#Rf-range)
-* [F.19: C언어 형 문자열을 지정 할 때는 `zstring` 또는 `not_null<zstring>`을 사용하라](#Rf-string)
-* [F.20: 크기가 큰 객체를 매개변수로 사용 할 때는 `const T&`를 사용하라](#Rf-const-T-ref)
+* [F.19: C언어 형식의 문자열을 가리킬 때는 `zstring`또는 `not_null<zstring>`을 사용하라](#Rf-string)
+* [F.20: 크기가 큰 객체는 `const T&`형 매개변수를 사용하라](#Rf-const-T-ref)
 * [F.21: 크기가 작은 객체를 매개변수로 사용 할 때는 `T`를 사용하라](#Rf-T)
 * [F.22: 입출력 매개변수는 `T&`를 사용하라](#Rf-T-re)
 * [F.23: 값을 이동하는데 비용이 많이 드는 출력 매개변수는 `T&`를 사용하라 (only)](#Rf-T-return-out)
-* [F.24: Use a `TP&&` parameter when forwarding (only)](#Rf-pass-ref-ref)
+* [F.24: 포워딩 할 때는 `TP&&`를 사용하라](#Rf-pass-ref-ref)
 * [F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities](#Rf-pass-ref-move)
-* [F.26: 포인터가 필요한 곳에서 소유권을 이동 시킬 때는 `unique_ptr<T>`를 사용하라](#Rf-unique_ptr)
-* [F.27: 소유권을 공유 할 때는 `shared_ptr<T>`을 사용하라](#Rf-shared_ptr)
+* [F.26: 포인터의 소유권을 이동해야 할 때는 `unique_ptr<T>`을 사용하라](#Rf-unique_ptr)
+* [F.27: 소유권을 공유 할 때는 `shared_ptr<T>` 사용하라](#Rf-shared_ptr)
 
 >* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
 >* [F.16: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
@@ -68,20 +68,27 @@ Functions are the most critical part in most interfaces, so see the interface ru
 값 전달 규칙:
 >Value return rules:
 
-* [F.40: Prefer return values to out-parameters](#Rf-T-return)
-* [F.41: Prefer to return tuples to multiple out-parameters](#Rf-T-multi)
-* [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
+* [F.40: 값 반환을 선호하라](#Rf-T-return)
+* [F.41: 다수의 출력 매개변수는 tuple을 사용하라](#Rf-T-multi)
+* [F.42: 메모리 주소의 위치를 나타나는 경우에만 `T*`를 반환하라](#Rf-return-ptr)
 * [F.43: Never (directly or indirectly) return a pointer to a local object](#Rf-dangle)
-* [F.44: Return a `T&` when "returning no object" isn't an option](#Rf-return-ref)
-* [F.45: Don't return a `T&&`](#Rf-return-ref-ref)
+* [F.44: "객체를 반환하지 않기"가 선택사항이 아니라면 `T&`를 반환하라](#Rf-return-ref)
+* [F.45: `T&&`를 반환하지 마라](#Rf-return-ref-ref)
+
+>* [F.40: Prefer return values to out-parameters](#Rf-T-return)
+>* [F.41: Prefer to return tuples to multiple out-parameters](#Rf-T-multi)
+>* [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
+>* [F.43: Never (directly or indirectly) return a pointer to a local object](#Rf-dangle)
+>* [F.44: Return a `T&` when "returning no object" isn't an option](#Rf-return-ref)
+>* [F.45: Don't return a `T&&`](#Rf-return-ref-ref)
 
 기타 규칙:
 >Other function rules:
 
-* [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
-* [F.51: Prefer overloading over default arguments for virtual functions](#Rf-default-arg)
-* [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
-* [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
+* [F.50: 함수로 할 수 없을 때 람다를 사용하라 (지역변수를 캡쳐하거나 지역함수를 구현하기 위해서)](#Rf-capture-vs-overload)
+* [F.51: 가상함수의 기본인자도 오버로딩하라](#Rf-default-arg)
+* [F.52: 지역범위에서 사용되는 변수는(알고리즘에 전달 되는것을 포함) 참조에 의한 캡쳐를 사용하라](#Rf-reference-capture)
+* [F.53: 람다에서는 지역범위에서 사용되지 않는 변수를(반환값, 힙에 할당된 값 그리고 다른 쓰레드로 전달되는 값을 포함하여) 참조에 의한 캡쳐를 해서는 안된다](#Rf-value-capture)
 
 함수는 람다와 함수 객체와 매우 비슷합니다. 다음 섹션을 참조 하세요.
 >Functions have strong similarities to lambdas and function objects so see also Section ???.
@@ -96,7 +103,7 @@ Functions are the most critical part in most interfaces, so see the interface ru
 
 
 <a name="Rf-package"></a>
-### F.1: "패키지" 
+### F.1: 의미있는 동작들을 모아서 주의깊게 함수 이름을 지어라
 >### F.1: "Package" meaningful operations as carefully named functions
 
 **근거**: 공용코드를 분해해 보면 코드를 더 읽기 쉽게 만들고 재사용률을 높이고 복잡한 코드에서 에러를 줄일 수 있습니다.
@@ -235,7 +242,7 @@ mess could become hard to understand.
 
 
 <a name="Rf-single"></a>
-### F.3: 함수를 단순하고 간결하게 유지하라
+### F.3: 함수를 간결하고 단순하고 유지하라
 >### F.3: Keep functions short and simple
 
 **근거**: 긴 함수는 읽기 어렵고 복잡하고, 변수는 최소범위를 넘어서서 사용되고 있을지 모른다. 복잡한 제어구조를 가진 함수는 더 길고 논리적 오류가 숨겨져 있을지도 모른다. 
@@ -527,7 +534,7 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
 
 
 <a name="Rf-conventional"></a>
-### 규칙 F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라
+### F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라
 >### Rule F.15: Prefer simple and conventional ways of passing information
 
 **근거**: "별나면서 교묘한" 기법은 깜짝놀랄만한 버그를 만들어내거나, 다른 프로그래머가 코드를 이해하는데 어렵게 만든다. 
@@ -715,7 +722,8 @@ For example, `not_null<T*>` makes it obvious to a reader (human or machine) that
 
 
 <a name="Rf-range"></a>
-### F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence
+### F.18: 반 개방 범위를 나타날 때는 `array_view<T>` 또는 `array_view_p<T>`를 사용하라
+>### F.18: Use an `array_view<T>` or an `array_view_p<T>` to designate a half-open sequence
 
 **Reason**: Informal/non-explicit ranges are a source of errors
 
@@ -874,7 +882,7 @@ If the writer of `g()` makes an assumption about the size of `buffer` a bad logi
 
 
 <a name="Rf-T-return-out"></a>
-### F.23: 값을 이동하는데 비용이 많이 드는 출력 매개변수는 `T&`를 사용하라
+### F.23: 값을 이동하는데 비용이 많이드는 출력 매개변수는 `T&`를 사용하라
 >### F.23: Use `T&` for an out-parameter that is expensive to move (only)
 
 **근거**: 값을 반환하는 것은 `T&`(입출력 매개변수)보다 놓치는 경우가  거의 없고 잘못 사용하는 경우도 드물다; [더 보기](#Rf-return); [see also](#Rf-T-multi).
@@ -899,18 +907,22 @@ If the writer of `g()` makes an assumption about the size of `buffer` a bad logi
 
 
 <a name="Rf-pass-ref-ref"></a>
-### F.24: Use a `TP&&` parameter when forwarding (only)
+### F.24: 포워딩 할 때는 `TP&&`를 사용하라 
+>### F.24: Use a `TP&&` parameter when forwarding (only)
 
-**Reason**: When `TP` is a template type parameter, `TP&&` is a forwarding reference -- it both *ignores* and *preserves* const-ness and rvalue-ness. Therefore any code that uses a `T&&` is implicitly declaring that it itself doesn't care about the variable's const-ness and rvalue-ness (because it is ignored), but that intends to pass the value onward to other code that does care about const-ness and rvalue-ness (because it is preserved). When used as a parameter `TP&&` is safe because any temporary objects passed from the caller will live for the duration of the function call. A parameter of type `TP&&` should essentially always be passed onward via `std::forward` in the body of the function.
+**근거**: `TP`가 템플릿형 매개변수면 `TP&&`는 포워딩 참조가 된다 -- 이 때 상수 속성과 rvalue 속성은 *무시* 되기도하고 *보존* 되기도 한다. 그래서 `T&&`를 사용하는 코드는 변수의 상수 속성과 rvalue 속성에 게의치 않는다는 의미를 내포하지만 (어차피 무시되기 때문에), 값을 전달하는 코드에서는 상수 속성과 rvalue 속성을 신경쓴다 (보존이 되기 때문에). 
+>**Reason**: When `TP` is a template type parameter, `TP&&` is a forwarding reference -- it both *ignores* and *preserves* const-ness and rvalue-ness. Therefore any code that uses a `T&&` is implicitly declaring that it itself doesn't care about the variable's const-ness and rvalue-ness (because it is ignored), but that intends to pass the value onward to other code that does care about const-ness and rvalue-ness (because it is preserved). When used as a parameter `TP&&` is safe because any temporary objects passed from the caller will live for the duration of the function call. A parameter of type `TP&&` should essentially always be passed onward via `std::forward` in the body of the function.
 
-**Example**:
+**예**:
+>**Example**:
 
 	template <class F, class... Args>
     inline auto invoke(F&& f, Args&&... args) {
         return forward<F>(f)(forward<Args>(args)...);
     }
 
-**Enforcement**: Flag a function that takes a `TP&&` parameter (where `TP` is a template type parameter name) and uses it without `std::forward`.
+**수행하기**: `std::forward`없이 (템플릿 매개변수로서) `TP&&`형 매개변수를 받는 함수가 있다면 표시해 두세요.
+>**Enforcement**: Flag a function that takes a `TP&&` parameter (where `TP` is a template type parameter name) and uses it without `std::forward`.
 
 
 <a name ="Rf-pass-ref-move"></a>
