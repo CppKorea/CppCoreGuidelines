@@ -910,7 +910,7 @@ If the writer of `g()` makes an assumption about the size of `buffer` a bad logi
 ### F.24: 포워딩 할 때는 `TP&&`를 사용하라 
 >### F.24: Use a `TP&&` parameter when forwarding (only)
 
-**근거**: `TP`가 템플릿형 매개변수면 `TP&&`는 포워딩 참조가 된다 -- 이 때 상수 속성과 rvalue 속성은 *무시* 되기도하고 *보존* 되기도 한다. 그래서 `T&&`를 사용하는 코드는 변수의 상수 속성과 rvalue 속성에 게의치 않는다는 의미를 내포하지만 (어차피 무시되기 때문에), 값을 전달하는 코드에서는 상수 속성과 rvalue 속성을 신경쓴다 (보존이 되기 때문에). 
+**근거**: `TP`가 템플릿형 매개변수면 `TP&&`는 포워딩 참조가 된다 -- 이 때 상수 속성과 rvalue 속성은 *무시* 되기도하고 *보존* 되기도 한다. 그래서 `T&&`를 사용하는 코드는 변수의 상수 속성과 rvalue 속성에 게의치 않는다는 의미를 내포하지만 (어차피 무시되기 때문에), 값을 전달하는 코드에서는 상수 속성과 rvalue 속성을 신경쓴다 (보존이 되기 때문에). `TP&&`형 매개변수에 임시객체가 전달되면 함수가 실행되는 동안에는 유효하기 때문에 안전하다. `TP&&`형 매개변수는 항상 `std::forward`를 이용하여 함수의 몸체에서 전달되어야 한다.
 >**Reason**: When `TP` is a template type parameter, `TP&&` is a forwarding reference -- it both *ignores* and *preserves* const-ness and rvalue-ness. Therefore any code that uses a `T&&` is implicitly declaring that it itself doesn't care about the variable's const-ness and rvalue-ness (because it is ignored), but that intends to pass the value onward to other code that does care about const-ness and rvalue-ness (because it is preserved). When used as a parameter `TP&&` is safe because any temporary objects passed from the caller will live for the duration of the function call. A parameter of type `TP&&` should essentially always be passed onward via `std::forward` in the body of the function.
 
 **예**:
@@ -926,8 +926,10 @@ If the writer of `g()` makes an assumption about the size of `buffer` a bad logi
 
 
 <a name ="Rf-pass-ref-move"></a>
-### F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities
+### F.25: 드물기는 하지만 최적화가 필요할 때 `T&&` 매개변수와 `move`를 사용하라
+>### F.25: Use a `T&&` parameter together with `move` for rare optimization opportunities
 
+**근거**: 
 **Reason**: Moving from an object leaves an object in its moved-from state behind.
 In general, moved-from objects are dangerous. The only guaranteed operation is destruction (more generally, member functions without preconditions).
 The standard library additionally requires that a moved-from object can be assigned to.
