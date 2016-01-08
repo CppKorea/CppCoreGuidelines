@@ -47,7 +47,7 @@
 - E - Error Handling (100%)
 - Enum - Enumerations (100%)
 - ES - Expressions and Statements (80%)
-- F - Functions (70%)
+- F - Functions (80%)
 - GSL - Guideline support library (100%)
 - I - Interfaces (100%)
 - In - Introduction (100%)
