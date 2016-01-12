@@ -486,19 +486,30 @@ Copy and move rules:
 * [C.66: Make move operations `noexcept`](#Rc-move-noexcept)
 * [C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired](#Rc-copy-virtual)
 
-Other default operations rules:
+다른 기본 연산들에 대한 규칙 :
+> Other default operations rules: 
 
-* [C.80: Use `=default` if you have to be explicit about using the default semantics](#Rc-=default)
-* [C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)](#Rc-=delete)
-* [C.82: Don't call virtual functions in constructors and destructors](#Rc-ctor-virtual)
-* [C.83: For value-like types, consider providing a `noexcept` swap function](#Rc-swap)
-* [C.84: A `swap` may not fail](#Rc-swap-fail)
-* [C.85: Make `swap` `noexcept`](#Rc-swap-noexcept)
-* [C.86: Make `==` symmetric with respect of operand types and `noexcept`](#Rc-eq)
-* [C.87: Beware of `==` on base classes](#Rc-eq-base)
-* [C.88: Make `<` symmetric with respect of operand types and `noexcept`](#Rc-lt)
-* [C.89: Make a `hash` `noexcept`](#Rc-hash)
+* [C.80: 기본 문맥(의미론)을 명시적으로 사용하려면 `=default` 키워드를 사용하라](#Rc-=default)
+* [C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라](#Rc-=delete)
+* [C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라](#Rc-ctor-virtual)
+* [C.83: 값 형식 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라](#Rc-swap)
+* [C.84: `swap`연산은 실패하지 않도록 한다](#Rc-swap-fail)
+* [C.85: `swap`연산은 `noexcept`로 작성하라](#Rc-swap-noexcept)
+* [C.86: `==`연산자는 피연산자 타입들에 대칭적이고, `noexcept`로 만들어라](#Rc-eq)
+* [C.87: 기본 클래스에 있는 `==`에 주의하라](#Rc-eq-base)
+* [C.88: `<` 연산자는 피연산자 타입에 대칭적으로 동작하고, `noexcept`로 작성하라](#Rc-lt)
+* [C.89: `hash`는 `noexcept`로 작성하라 ](#Rc-hash)  
 
+> * [C.80: Use `=default` if you have to be explicit about using the default semantics](#Rc-=default)
+> * [C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)](#Rc-=delete)
+> * [C.82: Don't call virtual functions in constructors and destructors](#Rc-ctor-virtual)
+> * [C.83: For value-like types, consider providing a `noexcept` swap function](#Rc-swap)
+> * [C.84: A `swap` may not fail](#Rc-swap-fail)
+> * [C.85: Make `swap` `noexcept`](#Rc-swap-noexcept)
+> * [C.86: Make `==` symmetric with respect of operand types and `noexcept`](#Rc-eq)
+> * [C.87: Beware of `==` on base classes](#Rc-eq-base)
+> * [C.88: Make `<` symmetric with respect of operand types and `noexcept`](#Rc-lt)
+> * [C.89: Make a `hash` `noexcept`](#Rc-hash)
 
 <a name="SS-defop"></a>
 
@@ -2186,63 +2197,138 @@ This `Vector2` is not just inefficient, but since a vector copy requires allocat
 
 
 
-## C.other: Other default operations
+## C.other: 다른 기본 연산들
+> ## C.other: Other default operations
 
-???
 
 <a name="Rc-=default"></a>
+### C.80: 기본 문맥(의미론)을 명시적으로 사용하려면 `=default` 키워드를 사용하라 
+
+**근거**: 컴파일러가 더 정확한 기본 의미론을 알고 있으며, 이보다 나은 코드를 작성할 수 없다. 
+
+**예**:
+```
+class Tracer {
+	string message;
+public:
+	Tracer(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
+	~Tracer() { cerr << "exiting " << message <<'\n'; }
+
+	Tracer(const Tracer&) = default;
+	Tracer& operator=(const Tracer&) = default;
+	Tracer(Tracer&&) = default;
+	Tracer& operator=(Tracer&&) = default;
+};
+```
+소멸자를 정의했기 때문에, 우리는 복사, 이동 연산들을 정의해야만 한다. 이를 위해선 `=default`가 가장 간단한 최선의 방법이다.  
+
+**잘못된 예**:
+```
+class Tracer2 {
+	string message;
+public:
+	Tracer2(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
+	~Tracer2() { cerr << "exiting " << message <<'\n'; }
+
+	Tracer2(const Tracer2& a) : message{a.message} {}
+	Tracer2& operator=(const Tracer2& a) { message=a.message; }
+	Tracer2(Tracer2&& a) :message{a.message} {}
+	Tracer2& operator=(Tracer2&& a) { message=a.message; }
+};
+```
+복사와 이동 연산들의 함수 본체를 작성하는 것은 번거롭고, 지루하며, 에러에 취약하다. 컴파일러가 이 작업을 더 잘 할수있다.
+
+**시행하기**: (Moderate) 특별한 연산들은 중복성을 피하기 위해 컴파일러가 만든 버전과 같은 접근성, 의미론을 가져서는 안된다.  
+
+> <a name="Rc-=default"></a>
 ### C.80: Use `=default` if you have to be explicit about using the default semantics
-
-**Reason**: The compiler is more likely to get the default semantics right and you cannot implement these function better than the compiler.
-
-**Example**:
-
+> **Reason**: The compiler is more likely to get the default semantics right and you cannot implement these function better than the compiler.  
+> **Example**:
+>
 	class Tracer {
 		string message;
 	public:
 		Tracer(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-		~Tracer() { cerr << "exiting " << message <<'\n'; }
-
+		~Tracer() { 
+			cerr << "exiting " << message <<'\n'; }
 		Tracer(const Tracer&) = default;
 		Tracer& operator=(const Tracer&) = default;
 		Tracer(Tracer&&) = default;
 		Tracer& operator=(Tracer&&) = default;
 	};
-
-Because we defined the destructor, we must define the copy and move operations. The `=default` is the best and simplest way of doing that.
-
-**Example, bad**:
-
+> Because we defined the destructor, we must define the copy and move operations. The `=default` is the best and simplest way of doing that.  
+> **Example, bad**:
+>
 	class Tracer2 {
 		string message;
 	public:
 		Tracer2(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-		~Tracer2() { cerr << "exiting " << message <<'\n'; }
-
+		~Tracer2() { 
+			cerr << "exiting " << message <<'\n'; }
 		Tracer2(const Tracer2& a) : message{a.message} {}
 		Tracer2& operator=(const Tracer2& a) { message=a.message; }
 		Tracer2(Tracer2&& a) :message{a.message} {}
 		Tracer2& operator=(Tracer2&& a) { message=a.message; }
 	};
+> Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.  
+> **Enforcement**: (Moderate) The body of a special operation should not have the same accessibility and semantics as the compiler-generated version, because that would be redundant
 
-Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.
-
-**Enforcement**: (Moderate) The body of a special operation should not have the same accessibility and semantics as the compiler-generated version, because that would be redundant
 
 
 <a name="Rc-=delete"></a>
+### C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라
+
+**근거**: 몇몇 경우에, 기본 연산들이 바람직하지 않기도 하다.
+
+**예**:
+```
+class Immortal {
+public:
+	~Immortal() = delete;	// do not allow destruction
+	// ...
+};
+void use()
+{
+	Immortal ugh;	// error: ugh cannot be destroyed
+	Immortal* p = new Immortal{};
+	delete p;		// error: cannot destroy *p
+}
+```
+**예**: `unique_ptr`는 이동 가능하지만, 복사는 불가능하다. 이 클래스의 복사를 막기 위해, 복사 연산들은 삭제된다. l-value로부터 복사 연산을 막기 위해 `=delete`가 필요하다.
+```
+template <class T, class D = default_delete<T>> class unique_ptr {
+public:
+	// ...
+	constexpr unique_ptr() noexcept;
+	explicit unique_ptr(pointer p) noexcept;
+	// ...
+	unique_ptr(unique_ptr&& u) noexcept;	// move constructor
+	// ...
+	unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
+	// ...
+};
+
+unique_ptr<int> make();	// make "something" and return it by moving
+
+void f()
+{
+	unique_ptr<int> pi {};
+	auto pi2 {pi};		// error: no move constructor from lvalue
+	auto pi3 {make()};	// OK, move: the result of make() is an rvalue
+}
+```
+**시행하기**: 기본 연산을 제거하는 것은 해당 클래스에 부합하는 근거가 있어야 한다. 의심하라. 하지만 사람이 보기에 문맥적으로 정확하다고 단정할 수 있도록 유지하라.   
+
+> <a name="Rc-=delete"></a>
 ### C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)
-
-**Reason**: In a few cases, a default operation is not desirable.
-
-**Example**:
-
+> **Reason**: In a few cases, a default operation is not desirable.  
+> **Example**:
+>
 	class Immortal {
 	public:
 		~Immortal() = delete;	// do not allow destruction
 		// ...
 	};
-
 	void use()
 	{
 		Immortal ugh;	// error: ugh cannot be destroyed
@@ -2250,8 +2336,8 @@ Writing out the bodies of the copy and move operations is verbose, tedious, and 
 		delete p;		// error: cannot destroy *p
 	}
 
-**Example**: A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
-
+> **Example**: A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
+>
 	template <class T, class D = default_delete<T>> class unique_ptr {
 	public:
 		// ...
@@ -2263,62 +2349,129 @@ Writing out the bodies of the copy and move operations is verbose, tedious, and 
 		unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
 		// ...
 	};
-
 	unique_ptr<int> make();	// make "something" and return it by moving
-
 	void f()
 	{
 		unique_ptr<int> pi {};
 		auto pi2 {pi};		// error: no move constructor from lvalue
 		auto pi3 {make()};	// OK, move: the result of make() is an rvalue
 	}
+> **Enforcement**: The elimination of a default operation is (should be) based on the desired semantics of the class. Consider such classes suspect, but maintain a "positive list" of classes where a human has asserted that the semantics is correct.
 
-**Enforcement**: The elimination of a default operation is (should be) based on the desired semantics of the class. Consider such classes suspect, but maintain a "positive list" of classes where a human has asserted that the semantics is correct.
+
+
 
 <a name="Rc-ctor-virtual"></a>
+### C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라.
+
+**근거**: 호출된 함수는 파생 클래스에서 오버라이드 하는 함수가 아니라, 생성된 객체의 함수이다. 이러한 동작은 혼란을 일으킬 수 있다. 나쁘게는, 생성자와 소멸자 내부에서 발생하는 구현되지 않은 순수 가상 함수에 대한 직접 또는 간접호출이 비정의된 동작을 일으킨다.  
+
+**잘못된 예**:
+```
+class base {
+public:
+    virtual void f() = 0;   // not implemented
+    virtual void g();       // implemented with base version
+    virtual void h();       // implemented with base version
+};
+
+class derived : public base {
+public:
+	void g() override;      // provide derived implementation
+	void h() final;         // provide derived implementation
+
+	derived()
+	{
+	    f();                // BAD: attempt to call an unimplemented virtual function
+
+		g();                // BAD: will call derived::g, not dispatch further virtually
+		derived::g();       // GOOD: explicitly state intent to call only the visible version
+			
+		h();                // ok, no qualification needed, h is final
+    }
+};
+```
+특정하게 명시적으로 한정된 함수는 `virtual`로 선언되었다고 하더라도 가상호출이 발생하지 않음을 기억하라.
+
+**참고** 정의되지 않은 동작의 위험이 없이 파생 클래스의 함수를 호출하는 효과를 얻기 위해서는 [팩토리 함수들](#Rc-factory) 참고하라. 
+
+> <a name="Rc-ctor-virtual"></a>
 ### C.82: Don't call virtual functions in constructors and destructors
 
-**Reason**: The function called will be that of the object constructed so far, rather than a possibly overriding function in a derived class.
+> **Reason**: The function called will be that of the object constructed so far, rather than a possibly overriding function in a derived class.
 This can be most confusing.
 Worse, a direct or indirect call to an unimplemented pure virtual function from a constructor or destructor results in undefined behavior.
 
-**Example; bad**:
-
+> **Example; bad**:
+>
 	class base {
 	public:
 	    virtual void f() = 0;   // not implemented
 	    virtual void g();       // implemented with base version
 	    virtual void h();       // implemented with base version
 	};
-
+>
 	class derived : public base {
 	public:
 		void g() override;      // provide derived implementation
 	    void h() final;         // provide derived implementation
-
+>
 	    derived()
 		{
 	        f();                // BAD: attempt to call an unimplemented virtual function
-
+>
 			g();                // BAD: will call derived::g, not dispatch further virtually
 			derived::g();       // GOOD: explicitly state intent to call only the visible version
-
+>
 			h();                // ok, no qualification needed, h is final
 	    }
 	};
+> Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
 
-Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
+> **See also** [factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
 
-**See also** [factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
 
 
 <a name="Rc-swap"></a>
+### C.83: 값 형식 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라.
+
+**근거**: `swap`함수는  
+객체 대입을 구현할 때 원활하게 객체를 이동하는 것에서, 에러가 발생하지 않는 것을 보장하는 함수를 제공하는 것까지 몇몇 함수들(idioms)을 구현하는데 유용하다. 
+swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [소멸자, 자원해제, 그리고 swap은 실패해선 안된다]("#Re-never-fail)를 확인하라.
+
+**잘못된 예**:
+```
+class Foo {
+	// ...
+public:
+	void swap(Foo& rhs) noexcept
+	{
+        m1.swap(rhs.m1);
+        std::swap(m2, rhs.m2);
+    }
+private:
+    Bar m1;
+    int m2;
+};
+```
+호출자들의 편의를 위해서 같은 네임스페이스에 비 멤버 `swap`함수를 제공하라.
+```
+void swap(Foo& a, Foo& b)
+{
+	a.swap(b);
+}
+```
+**시행하기**:
+* 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다. 
+
+* 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다.
+
+> <a name="Rc-swap"></a>
 ### C.83: For value-like types, consider providing a `noexcept` swap function
 
-**Reason**: A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail]("#Re-never-fail).
-
-**Example; good**:
-
+> **Reason**: A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail]("#Re-never-fail).  
+> **Example; good**:
+> 
     class Foo {
 		// ...
     public:
@@ -2331,100 +2484,198 @@ Note that calling a specific explicitly qualified function is not a virtual call
         Bar m1;
         int m2;
     };
-
-Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
-
+> Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
+> 
     void swap(Foo& a, Foo& b)
 	{
 		a.swap(b);
 	}
+> **Enforcement**:
+> * (Simple) A class without virtual functions should have a `swap` member function declared.
+> * (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
-**Enforcement**:
-* (Simple) A class without virtual functions should have a `swap` member function declared.
-* (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+
+
 
 <a name="Rc-swap-fail"></a>
+### C.84: `swap`연산은 실패하지 않도록 한다
+
+**근거**: `swap`연산은 많은 경우 실패하지 않을 것으로 전제하고 사용된다. 또한 실패 가능성이 있는 `swap`연산으로는 정확하게 동작하도록 프로그램이 작성되기 어렵다. 표준 라이브러리의 컨테이너들과 알고리즘들은 swap연산의 타입이 실패하면 정확하게 동작하지 않을 것이다.  
+
+**잘못된 예**:
+```
+void swap(My_vector& x, My_vector& y)
+{
+	auto tmp = x;	// copy elements
+	x = y;
+	y = tmp;
+}
+```
+이 경우는 느릴 뿐만 아니라, `tmp`내의 원소들에 메모리 할당이 발생하면, 이 `swap` 연산은 예외를 던지고 이를 사용하는 STL 알고리즘들이 실패할 수 있다. 
+
+**시행하기**: 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.   
+
+
+> <a name="Rc-swap-fail"></a>
 ### C.84: A `swap` function may not fail
-
-**Reason**: `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The The standard-library containers and algorithms will not work correctly if a swap of an element type fails.
-
-**Example, bad**:
-
+> **Reason**: `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The The standard-library containers and algorithms will not work correctly if a swap of an element type fails.  
+> **Example, bad**:
+>
 	void swap(My_vector& x, My_vector& y)
 	{
 		auto tmp = x;	// copy elements
 		x = y;
 		y = tmp;
 	}
-
-This is not just slow, but if a memory allocation occur for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail is used with them.
-
-**Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+> This is not just slow, but if a memory allocation occur for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail is used with them.  
+> **Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
 
 <a name="Rc-swap-noexcept"></a>
+### C.85: `swap`연산은 `noexcept`로 작성하라
+
+**근거**: [`swap`연산은 실패하지 않도록 한다](#Rc-swap-fail).
+만약 `swap`연산이 예외를 던지면서 종료하면, 그것은 좋지 않은 설계 오류이며 프로그램을 종료하는게 낫다.
+
+**시행하기**: 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.   
+
+> <a name="Rc-swap-noexcept"></a>
 ### C.85: Make `swap` `noexcept`
+> **Reason**: [A `swap` may not fail](#Rc-swap-fail).
+If a `swap` tries to exit with an exception, it's a bad design error and the program had better terminate.  
+> **Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
-**Reason**: [A `swap` may not fail](#Rc-swap-fail).
-If a `swap` tries to exit with an exception, it's a bad design error and the program had better terminate.
-
-**Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
 
 <a name="Rc-eq"></a>
+### C.86: `==`연산자는 피연산자 타입들에 대칭적이고, `noexcept`로 만들어라.  
+
+**근거**: 피연산자들에 비대칭적인 처리는 기대에 부합하지 않고, 형변환이 가능한 경우 에러를 유발할 수 있다. 
+`==`는 기본적인 연산이며 프로그래머들이 이 연산을 사용할 때 연산 실패에 대한 고민이 없어야 한다.
+
+**예**:
+```
+class X {
+	string name;
+	int number;
+};
+
+bool operator==(const X& a, const X& b) noexcept {
+	 return a.name==b.name 
+	 	&& a.number==b.number; }
+```
+**잘못된 예**:
+```
+class B {
+	string name;
+	int number;
+	bool operator==(const B& a) const { 
+		return name==a.name 
+			&& number==a.number; }
+	// ...
+};
+```
+`B`의 비교 연산은 두번째 피연산자에 대해 형변환을 용인하지만, 첫번째 피연산자에 대해서는 그렇지 않다.
+
+**참고 사항**: 만약 클래스가 `double`타입의 `NaN`처럼 실패 상태를 가진다면, 실패 상태와의 비교에서 예외를 던지도록 하는 것도 적합할 수 있다.
+다른 방법으로는 실패 상태끼리의 비교는 동등하게 보고, 적합한 상태와 실패 상태의 비교에서는 거짓으로 판정할 수 있다.    
+
+**시행하기**: ???
+
+
+> <a name="Rc-eq"></a>
 ### C.86: Make `==` symmetric with respect to operand types and `noexcept`
 
-**Reason**: Assymetric treatment of operands is surprising and a source of errors where conversions are possible.
-`==` is a fundamental operations and programmers should be able to use it without fear of failure.
+> **Reason**: Assymetric treatment of operands is surprising and a source of errors where conversions are possible.
+> `==` is a fundamental operations and programmers should be able to use it without fear of failure.
 
-**Example**:
-
+> **Example**:
+>
 	class X {
 		string name;
 		int number;
 	};
-
+>
 	bool operator==(const X& a, const X& b) noexcept { return a.name==b.name && a.number==b.number; }
-
-**Example, bad**:
-
+> **Example, bad**:
+>
 	class B {
 		string name;
 		int number;
 		bool operator==(const B& a) const { return name==a.name && number==a.number; }
 		// ...
 	};
+> `B`'s comparison accpts conversions for its second operand, but not its first.
+> **Note**: If a class has a failure state, like `double`'s `NaN`, there is a temptation to make a comparison against the failure state throw.
+The alternative is to make two failure states compare equal and any valid state compare false against the failure state.  
+> **Enforcement**: ???
 
-`B`'s comparison accpts conversions for its second operand, but not its first.
 
-**Note**: If a class has a failure state, like `double`'s `NaN`, there is a temptation to make a comparison against the failure state throw.
-The alternative is to make two failure states compare equal and any valid state compare false against the failure state.
-
-**Enforcement**: ???
 
 
 <a name="Rc-eq-base"></a>
-### C.87: Beware of `==` on base classes
+### C.87: 기본 클래스에 있는 `==`에 주의하라
 
-**Reason**: It is really hard to write a foolproof and useful `==` for a hierarchy.
+**근거**: 계층 구조에서 잘못 사용하기 어렵고 유용한  `==`를 작성하는 것은 어려운 일이다. 
 
-**Example, bad**:
-
-	class B {
-		string name;
-		int number;
-		virtual bool operator==(const B& a) const { return name==a.name && number==a.number; }
-		// ...
-	};
+**잘못된 예**:
+```
+class B {
+	string name;
+	int number;
+	virtual bool operator==(const B& a) const {
+		return name==a.name 
+		&& number==a.number; }
+	// ...
+};
 
 // `B`'s comparison accpts conversions for its second operand, but not its first.
 
-	class D :B {
-		char character;
-		virtual bool operator==(const D& a) const { return name==a.name && number==a.number && character==a.character; }
+class D :B {
+	char character;
+	virtual bool operator==(const D& a) const { 
+		return name==a.name 
+			&& number==a.number 
+			&& character==a.character; }
+	// ...
+};
+
+B b = ...
+D d = ...
+b==d;	// compares name and number, ignores d's character
+d==b;	// error: no == defined
+D d2;
+d==d2;	// compares name, number, and character
+B& b2 = d2;
+b2==d;	// compares name and number, ignores d2's and d's character
+```
+물론 계층 구조 안에서 `==`가 동작하도록 하는 방법들이 있지만, 고지식한 방법들은 고려하지 말아라.  
+
+**시행하기**: ???
+
+><a name="Rc-eq-base"></a>
+### C.87: Beware of `==` on base classes
+> **Reason**: It is really hard to write a foolproof and useful `==` for a hierarchy.  
+> **Example, bad**:
+>
+	class B {
+		string name;
+		int number;
+		virtual bool operator==(const B& a) const { 
+			return name==a.name 
+				&& number==a.number; }
 		// ...
 	};
-
+> // `B`'s comparison accpts conversions for its second operand, but not its first.
+>
+	class D :B {
+		char character;
+		virtual bool operator==(const D& a) const { 
+			return name==a.name 
+				&& number==a.number 
+				&& character==a.character; }
+		// ...
+	};
 	B b = ...
 	D d = ...
 	b==d;	// compares name and number, ignores d's character
@@ -2433,43 +2684,73 @@ The alternative is to make two failure states compare equal and any valid state 
 	d==d2;	// compares name, number, and character
 	B& b2 = d2;
 	b2==d;	// compares name and number, ignores d2's and d's character
+> Of course there are way of making `==` work in a hierarchy, but the naive approaches do not scale
+> **Enforcement**: ???
 
-Of course there are way of making `==` work in a hierarchy, but the naive approaches do not scale
-
-**Enforcement**: ???
 
 
 <a name="Rc-lt"></a>
-### C.88: Make `<` symmetric with respect to operand types and `noexcept`
+### C.88: `<` 연산자는 피연산자 타입에 대칭적으로 동작하고, `noexcept`로 작성하라
 
-**Reason**: ???
-
-**Example**:
-
+**근거**: ???  
+**예**:
+```
 	???
+```
+**시행하기**: ???
 
-**Enforcement**: ???
+> <a name="Rc-lt"></a>
+### C.88: Make `<` symmetric with respect to operand types and `noexcept`
+> **Reason**: ???  
+> **Example**:  
+> 
+	???
+> **Enforcement**: ???
+
 
 
 <a name="Rc-hash"></a>
+### C.89: `hash`는 `noexcept`로 작성하라  
+**근거**: ???  
+**예**:
+```
+???
+```
+**시행하기**: ???
+
+> <a name="Rc-hash"></a>
 ### C.89: Make a `hash` `noexcept`
-
-**Reason**: ???
-
-**Example**:
-
+> **Reason**: ???  
+> **Example**:  
+>
 	???
+> **Enforcement**: ???
 
-**Enforcement**: ???
 
-<a name="SS-containers"</a>
-## C.con: Containers and other resource handles
+<a name="SS-containers"></a>
+## C.con: 컨테이너와 다른 리소스 핸들   
+> ## C.con: Containers and other resource handles
 
-A container is an object holding a sequence of objects of some type; `std::vector` is the archetypical container.
-A resource handle is a class that owns a resource; `std::vector` is the typical resource handle; it's resource is its sequence of elements.
+컨테이너는 어떤 타입의 객체들을 보유하는 객체를 의미한다; `std::vector`가 대표적인 컨테이너이다.   
+리소스 핸들은 리소스를 소유한하는 클래스를 의미한다. `std::vector`는 리소스 핸들에 속한다; 여기서 리소스는 벡터가 보유한 원소들의 시퀀스이다. 
 
-Summary of container rules:
 
+> A container is an object holding a sequence of objects of some type; `std::vector` is the archetypical container.   
+> A resource handle is a class that owns a resource; `std::vector` is the typical resource handle; it's resource is its sequence of elements.
+
+
+컨테이너 규칙 요약
+* [C.100: 컨테이너를 정의할때는 STL을 따르라](#Rcon-stl)
+* [C.101: 값 문맥을 적용하라](#Rcon-val)
+* [C.102: move 연산을 제공하라](#Rcon-move)
+* [C.103: 초기화 리스트 생성자를 지원하라](#Rcon-init)
+* [C.104: 공백 값으로 설정하는 기본 생성자를 지원하라](#Rcon-empty)
+* [C.105: 생성자와 '확장' 생성자를 지원하라](#Rcon-val)
+* ???
+* [C.109: 포인터 문맥을 따를 경우에는, `*` 과 `->` 연산자를 제공하라](#rcon-ptr)
+
+> Summary of container rules:
+>
 * [C.100: Follow the STL when defining a container](#Rcon-stl)
 * [C.101: Give a container value semantics](#Rcon-val)
 * [C.102: Give a container move operations](#Rcon-move)
@@ -2479,17 +2760,33 @@ Summary of container rules:
 * ???
 * [C.109: If a resource handle has pointer semantics, provide `*` and `->`](#rcon-ptr)
 
-**See also**: [Resources](#SS-resources)
+**참고** : [Resources](#SS-resources)
+>**See also**: [Resources](#SS-resources)
+
 
 
 <a name="SS-lambdas"></a>
-## C.lambdas: Function objects and lambdas
+## C.lambdas: 함수 객체와 람다   
 
-A function object is an object supplying an overloaded `()` so that you can call it.
-A lambda expression (colloquially often shortened to "a lambda") is a notation for generating a function object.
+함수 객체는 호출할 수 있도록 재정의된 `()`를 지원하는 객체이다.   
+람다 표현식(보통 "람다"라고 축약해 부른다)은 함수 객체를 생성하는 방법이다.
 
-Summary:
 
+> ## C.lambdas: Function objects and lambdas
+
+> A function object is an object supplying an overloaded `()` so that you can call it.  
+> A lambda expression (colloquially often shortened to "a lambda") is a notation for generating a function object. 
+
+요약 :
+
+* [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
+* [F.52: 지역적으로 사용되면 참조 캡쳐를 선호하라.(알고리즘으로의 전달)](#Rf-reference-capture)
+* [F.53: 비-지역적으로 사용될 경우 참조 캡쳐를 지양하라.(비-지역적 사용, Heap 영역에 저장, 다른 스레드로의 전달)](#Rf-value-capture)
+* [ES.28: 복잡한 초기화에, 특히 상수 변수들에 람다를 사용하라.](#Res-lambda-init)
+
+
+> Summary:  
+>
 * [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
 * [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
 * [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
@@ -2498,26 +2795,55 @@ Summary:
 
 
 <a name="SS-hier"></a>
-## C.hier: Class hierarchies (OOP)
 
-A class hierarchy is constructed to represent a set of hierarchically organized concepts (only).
-Typically base classes act as interfaces.
-There are two major uses for hierarchies, often named implementation inheritance and interface inheritance.
+## C.hier: 클래스 계층 구조 (OOP)
 
-Class hierarchy rule summary:
+클래스 계층은 계층적으로 조직된 개념들의 집합을 표현하면서 생성된다.  
+일반적으로 기본 클래스들은 인터페이스로서 동작한다.  
+계층 구조는 크게 2가지 용도로 사용되는데, 종종 구현 상속과 인터페이스 상속으로 명명된다.
 
+> ## C.hier: Class hierarchies (OOP)
+> A class hierarchy is constructed to represent a set of hierarchically organized concepts (only).  
+> Typically base classes act as interfaces.  
+> There are two major uses for hierarchies, often named implementation inheritance and interface inheritance.  
+
+클래스 계층 구조 규칙 요약
+
+* [C.120: 클래스 계층은 상속 계층 구조의 개념을 표현하는데 사용하라](#Rh-domain)
+* [C.121: 만약 기본 클래스가 인터페이스로써 사용되면, 순수 추상 클래스로 만들어라](#Rh-abstract)
+* [C.122: 인터페이스와 구현의 분리가 필요하면, 추상 클래스를 인터페이스로 사용하라.](#Rh-separation)
+
+  
+> Class hierarchy rule summary:
+>
 * [C.120: Use class hierarchies to represent concepts with inherent hierarchical structure](#Rh-domain)
 * [C.121: If a base class is used as an interface, make it a pure abstract class](#Rh-abstract)
 * [C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed](#Rh-separation)
 
-Designing rules for classes in a hierarchy summary:
+클래스 계층 구조에서 설계 규칙 요약 : 
 
+* [C.126: 추상클래스는 일반적으로 생성자가 필요하지 않다](#Rh-abstract-ctor)
+* [C.127: 가상 함수를 가진 클래스는 가상 소멸자를 가져야 한다](#Rh-dtor)
+* [C.128: 클래스 계층구조가 클 경우에는 `override`를 명시하라](#Rh-override)
+* [C.129: 클래스 계층구조를 설계할 때는, 인터페이스 상속과 구현의 상속을 구분하라](#Rh-kind)
+* [C.130: 기본 클래스의 복사를 재정의하거나 금지하라; 대신 가상 `clone`함수를 사용하라](#Rh-copy)
+
+* [C.131: 사소한 getter나 setter는 지양하라.](#Rh-get)
+* [C.132: 가상함수로 만들때는 이유가 있어야 한다.](#Rh-virtual)
+* [C.133: `protected`데이터를 지양하라.](#Rh-protected)
+* [C.134: 모든 데이터 멤버들이 같은 접근 레벨에 있도록 하라.](#Rh-public)
+* [C.135: 다중 상속을 다수의 인터페이스를 표현하기 위해 사용하라.](#Rh-mi-interface)
+* [C.136: 다중 상속을 구현 속성들의 합집합(union)을 표현하기 위해 사용하라.](#Rh-mi-implementation)
+* [C.137: 가상 기본 클래스는 과도하게 일반적인 기본 클래스들을 피하기 위해 사용하라.](#Rh-vbase)
+* [C.138: `using`을 사용해서 파생 클래스와 기본 클래스의 Overload 집합을 만들어라.](#Rh-using)
+
+> Designing rules for classes in a hierarchy summary:
+>
 * [C.126: An abstract class typically doesn't need a constructor](#Rh-abstract-ctor)
 * [C.127: A class with a virtual function should have a virtual destructor](#Rh-dtor)
 * [C.128: Use `override` to make overriding explicit in large class hierarchies](#Rh-override)
 * [C.129: When designing a class hierarchy, distinguish between implementation inheritance and interface inheritance](#Rh-kind)
 * [C.130: Redefine or prohibit copying for a base class; prefer a virtual `clone` function instead](#Rh-copy)
-
 * [C.131: Avoid trivial getters and setters](#Rh-get)
 * [C.132: Don't make a function `virtual` without reason](#Rh-virtual)
 * [C.133: Avoid `protected` data](#Rh-protected)
@@ -2527,8 +2853,19 @@ Designing rules for classes in a hierarchy summary:
 * [C.137: Use `virtual` bases to avoid overly general base classes](#Rh-vbase)
 * [C.138: Create an overload set for a derived class and its bases with `using`](#Rh-using)
 
-Accessing objects in a hierarchy rule summary:
+계층 구조에서 객체 접근 규칙 요약 :
 
+* [C.145: 다형성을 지닌 객체는 포인터나 참조자를 사용해서 접근하라](#Rh-poly)
+* [C.146: `dynamic_cast`는 클래스 계층 구조에서 탐색이 불가피할때 사용하라](#Rh-dynamic_cast)
+* [C.147: 필요한 타입을 찾는 데 실패하는 것이 에러로 간주될 때는, `dynamic_cast`를 참조자 타입에 사용하라](#Rh-ptr-cast)
+* [C.148: 필요한 클래스를 찾는데 실패하는 것이 허용가능 하다면, `dynamic_cast`를 포인터 타입에 사용하라.](#Rh-ref-cast)
+* [C.149: `new`를 사용해서 생성한 객체를 `delete`하지 않는 것을 예방하기 위해, `unique_ptr` 또는 `shared_ptr`를 사용하라.](#Rh-smart)
+* [C.150: `unique_ptr`나 다른 스마트포인터가 소유하는 객체를 생성하기 위해선 `make_unique()`를 사용하라.](#Rh-make_unique)
+* [C.151: `shared_ptr`들에 의해 소유되는 객체를 생성하기 위해서는 `make_shared()`를 사용하라.](#Rh-make_shared)
+* [C.152: 파생 클래스 객체들의 포인터 배열에 기본 클래스의 포인터를 할당해서는 절대로 안된다.](#Rh-array)
+
+> Accessing objects in a hierarchy rule summary:
+>
 * [C.145: Access polymorphic objects through pointers and references](#Rh-poly)
 * [C.146: Use `dynamic_cast` where class hierarchy navigation is unavoidable](#Rh-dynamic_cast)
 * [C.147: Use `dynamic_cast` to a reference type when failure to find the required class is considered an error](#Rh-ptr-cast)
@@ -2539,140 +2876,279 @@ Accessing objects in a hierarchy rule summary:
 * [C.152: Never assign a pointer to an array of derived class objects to a pointer to its base](#Rh-array)
 
 
+
 <a name="Rh-domain"></a>
-### C.120: Use class hierarchies to represent concepts with inherent hierarchical structure (only)
+### C.120: 클래스 계층은 상속 계층 구조의 개념을 표현하는데 사용하라 (only)
 
-**Reason**: Direct representation of ideas in code eases comprehension and maintenance. Make sure the idea represented in the base class exactly matches all derived types and there is not a better way to express it than using the tight coupling of inheritance.
+**근거**:   
+코드에 생각이 직접적으로 표현되는것은 이해와 유지보수를 쉽게 한다. 기본 클래스에 표현된 생각들이 모든 파생 타입들에서도 일치하도록 하라. 그리고 그것을 표현하는데는 상속을 이용한 밀접한 커플링보다 나은 방법은 없다. 
 
-Do *not* use inheritance when simply having a data member will do. Usually this means that the derived type needs to override a base virtual function or needs access to a protected member.
+단지 데이터멤버를 가진것 만으로 상속을 사용해서는 안된다. 보통 이것은 파생된 타입이 기본 클래스의 가상 함수를 오버라이드 하거나 `protected` 멤버에 접근하는 것이 필요함을 의미한다.
 
-**Example**:
+**예**:   
+??? (추가 예시 없음)
 
-	??? Good old Shape example?
+**잘못된 예**:   
+계층적이지 않은 영역(domain)의 개념을 클래스 계층으로 표현해서는 안된다.
 
-**Example, bad**:
+```
+template<typename T>
+class Container {
+public:
+	// list operations:
+	virtual T& get() = 0;
+	virtual void put(T&) = 0;
+	virtual void insert(Position) = 0;
+	// ...
+	// vector operations:
+	virtual T& operator[](int) = 0;
+	virtual void sort() = 0;
+	// ...
+	// tree operations:
+	virtual void balance() = 0;
+	// ...
+};
+```
+
+여기서 오버라이드 하는 클래스들은 인터페이스가 요구하는 함수들의 대부분을 구현할 수 없다. 그렇게 되면 기본 클래스는 가상함수들을 구현할 부담을 떠안게 된다. 더해서, `Container`를 사용자는 실제로 의미있고, 타당하며, 효율적인 연산을 수행하는데 멤버함수에 의존할 수 없게된다;  
+멤버함수가 연산 대신 예외를 던질수도 있으며, 그로 인해 사용자는 실행시간 검사에 의존하거나 이 (과도하게)일반적인 인터페이스를 사용하지 않고, 실행시간 타입 검사로 찾아낸 특정한 인터페이스를 사용하게 된다.(e.g., `dynamic_cast`).
+
+**시행하기**:  
+* 아무것도 하지 않고 throw만 하는 멤버를 많이 가진 클래스들을 확인하라.
+* 파생 클래스가 가상함수를 오버라이드 하지 않거나 protected 기본 멤버에 접근하는 non-public 기본 클래스의 사용을 표시하라.
+
+
+><a name="Rh-domain"></a>
+### C.120: Use class hierarchies to represent concepts with inherent hierarchical structure (only) 
+ 
+>**Reason**: Direct representation of ideas in code eases comprehension and maintenance. Make sure the idea represented in the base class exactly matches all derived types and there is not a better way to express it than using the tight coupling of inheritance.  
+>Do *not* use inheritance when simply having a data member will do. Usually this means that the derived type needs to override a base virtual function or needs access to a protected member.
+
+>**Example**:  
+??? Good old Shape example?  
+>**Example, bad**:   
 Do *not* represent non-hierarchical domain concepts as class hierarchies.
+> 
+```
+template<typename T>
+class Container {
+public:
+	// list operations:
+	virtual T& get() = 0;
+	virtual void put(T&) = 0;
+	virtual void insert(Position) = 0;
+	// ...
+	// vector operations:
+	virtual T& operator[](int) = 0;
+	virtual void sort() = 0;
+	// ...
+	// tree operations:
+	virtual void balance() = 0;
+	// ...
+};
+```
 
-	template<typename T>
-	class Container {
-	public:
-		// list operations:
-		virtual T& get() = 0;
-		virtual void put(T&) = 0;
-		virtual void insert(Position) = 0;
-		// ...
-		// vector operations:
-		virtual T& operator[](int) = 0;
-		virtual void sort() = 0;
-		// ...
-		// tree operations:
-		virtual void balance() = 0;
-		// ...
-	};
-
-Here most overriding classes cannot implement most of the functions required in the interface well.
+>Here most overriding classes cannot implement most of the functions required in the interface well.
 Thus the base class becomes an implementation burden.
-Furthermore, the user of `Container` cannot rely on the member functions actually performing a meaningful operations reasonably efficiently;
-it may throw an exception instead.
+Furthermore, the user of `Container` cannot rely on the member functions actually performing a meaningful operations reasonably efficiently; it may throw an exception instead.
 Thus users have to resort to run-time checking and/or
 not using this (over)general interface in favor of a particular interface found by a run-time type inquiry (e.g., a `dynamic_cast`).
 
-**Enforcement**:
+> **Enforcement**:
+> * Look for classes with lots of members that do nothing but throw.
+> * Flag every use of a nonpublic base class where the derived class does not override a virtual function or access a protected base member.
 
-* Look for classes with lots of members that do nothing but throw.
-* Flag every use of a nonpublic base class where the derived class does not override a virtual function or access a protected base member.
+
 
 
 <a name="Rh-abstract"></a>
+### C.121: 만약 기본 클래스가 인터페이스로써 사용되면, 순수 추상 클래스로 만들어라
+
+**근거**: 클래스는 데이터를 보유하지 않게 되면 더 안정적이게(깨지지 않게) 된다. 인터페이스들은 일반적으로 public한 순수 가상함수들로 작성되어야 한다.  
+
+**예**:
+```
+	???
+```
+**시행하기**:  
+* 데이터 멤버를 포함하거나 오버라이드할 수 있는(`final`이 아닌) 가상 함수들을 포함하는 클래스에 대해서는 경고하라.  
+
+
+> <a name="Rh-abstract"></a>
 ### C.121: If a base class is used as an interface, make it a pure abstract class
 
-**Reason**: A class is more stable (less brittle) if it does not contain data. Interfaces should normally be composed entirely of public pure virtual functions.
+>**Reason**: A class is more stable (less brittle) if it does not contain data. Interfaces should normally be composed entirely of public pure virtual functions.
 
-**Example**:
-
+>**Example**:  
+>  
 	???
-
-**Enforcement**:
-
-* Warn on any class that contains data members and also has an overridable (non-`final`) virtual function.
+> **Enforcement**:
+> * Warn on any class that contains data members and also has an overridable (non-`final`) virtual function.
 
 
-<a name="Rh-separation"></a?
-### C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed
 
-**Reason**: Such as on an ABI (link) boundary.
 
-**Example**:
+<a name="Rh-separation"></a>
+### C.122: 인터페이스와 구현의 완전한 분리가 필요하면, 추상 클래스를 인터페이스로 사용하라.
 
+**근거**: ABI(<a>링크</a>)와 같은 경우.
+
+**예**:
+```
 	???
+```
+**시행하기**: ???
 
-**Enforcement**: ???
+
+> <a name="Rh-separation"></a>
+### C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed  
+>**Reason**: Such as on an ABI (link) boundary.  
+>**Example**:
+> 
+	???
+>**Enforcement**: ???
 
 
-
-## C.hierclass: Designing classes in a hierarchy:
+## C.hierclass: 계층 안에 있는 클래스들의 설계:
+> ## C.hierclass: Designing classes in a hierarchy:
 
 
 <a name="Rh-abstract-ctor"></a>
+### C.126: 추상 클래스는 일반적으로 생성자가 필요하지 않다. 
+
+**근거**: 추상 클래스는 일반적으로 초기화 할 데이터를 가지지 않는다.  
+
+**예**:
+```
+	???
+```
+
+**예외 사항**:
+* 기본 클래스의 생성자가 어떤 작업을 수행하는 경우, 가령 생성된 객체를 어딘가에 기록할 경우, 생성자가 필요할 수 있다.
+* 극도로 드문 경우지만, 추상 클래스가 파생 클래스들에 의해 공유되는 데이터를 보유할 이유를 찾을 수도 있다.
+(e.g., 정적인 데이터, 디버깅 정보 등등..); 그러한 클래스는 생성자를 가진다. 하지만, 주의하라. 그러한 클래스들은 가상 상속을 사용할 때 취약하기도 하다.
+
+**시행하기**: 생성자를 가지는 추상 클래스에는 표시를 하라.
+
+
+> <a name="Rh-abstract-ctor"></a>
 ### C.126: An abstract class typically doesn't need a constructor
 
-**Reason**: An abstract class typically does not have any data for a constructor to initialize.
+>**Reason**: An abstract class typically does not have any data for a constructor to initialize.
 
-**Example**:
-
+>**Example**:
+>
 	???
 
-**Exceptions**:
-* A base class constructor that does work, such as registering an object somewhere, may need a constructor.
-* In extremely rare cases, you might find a reasonable for an abstract class to have a bit of data shared by all derived classes
+> **Exceptions**:
+> * A base class constructor that does work, such as registering an object somewhere, may need a constructor.
+> * In extremely rare cases, you might find a reasonable for an abstract class to have a bit of data shared by all derived classes
 (e.g., use statistics data, debug information, etc.); such classes tend to have constructors. But be warned: Such classes also tend to be prone to requiring virtual inheritance.
 
-**Enforcement**: Flag abstract classes with constructors.
+> **Enforcement**: Flag abstract classes with constructors.
+
+
 
 
 <a name="Rh-dtor"></a>
+### C.127: 가상함수를 가진 크래스는 가상 소멸자를 가져야 한다.
+
+**근거**: 가상 함수를 가진 클래스는 일반적으로 기본 클래스에 대한 포인터나 스마트 포인터를 통해서 사용된다. 사용자는 기본 클래스에 대한 포인터에 `delete`를 호출하는 경우를 포함한다.  
+
+**잘못된 예**:
+```
+struct B {
+	// ... no destructor ...
+};
+
+stuct D : B {		
+	// bad: class with a resource 
+	// derived from a class without a virtual destructor
+	string s {"default"};
+};
+
+void use()
+{
+	B* p = new B;
+	delete p;	// leak the string
+}
+```
+
+**참고 사항**: `shared_ptr`: `std::shared_ptr<B> p = std::make_shared<D>(args);`를 통해서만 클래스를 사용하도록 계획한 경우 이 지침을 따르지 않을 수 있다. 이 경우, 공유 포인터가 개체의 소멸을 담당할 때, 기본 클래스에 대한 부적합한 `delete`호출로 인한 누수가 발생하지 않을 것이다. 일관적으로 이런 코드를 작성하는 사람이라면 따르지 않아도 좋다.(false positive) 하지만 이 지침 자체는 중요하다. -- 만약 `make_unique`를 통해서 객체가 할당된다면? `B`의 작성자가 절대로 오용되지 않는다고, 가령 팩토리 함수를 사용해 `make_shared`를 강제하여 할당하는 것처럼, 확신하지 않는다면 안전하지 않다.
+
+**시행하기**:
+* 가상 함수를 가지지만 가상 소멸자를 가지지 않는 클래스에는 표시를 남겨라. 이 지침은 오직 첫번째 기본 클래스에만 필요하다. 파생 클래스들은 필요한 것들을 자동적으로 상속받게 된다. 이 표시를 통해 문제가 발생하는 지점을 알 수 있다. 하지만 따르지 않을 수도 있다.
+* 가상 함수를 가지지만 가상 소멸자를 가지지 않는 클래스를 `delete`할때는 표시를 남겨라.
+
+
+> <a name="Rh-dtor"></a>
 ### C.127: A class with a virtual function should have a virtual destructor
 
-**Reason**: A class with a virtual function is usually (and in general) used via a pointer to base, including that the last user has to call delete on a pointer to base, often via a smart pointer to base.
+> **Reason**: A class with a virtual function is usually (and in general) used via a pointer to base, including that the last user has to call delete on a pointer to base, often via a smart pointer to base.
 
-**Example, bad**:
-
+> **Example, bad**:
+>
 	struct B {
 		// ... no destructor ...
 	};
-
-	stuct D : B {		// bad: class with a resource derived from a class without a virtual destructor
+	stuct D : B {		
+		// bad: class with a resource 
+		// derived from a class without a virtual destructor
 		string s {"default"};
 	};
-
 	void use()
 	{
 		B* p = new B;
 		delete p;	// leak the string
 	}
 
-**Note**: There are people who don't follow this rule because they plan to use a class only through a `shared_ptr`: `std::shared_ptr<B> p = std::make_shared<D>(args);` Here, the shared pointer will take care of deletion, so no leak will occur from and inappropriate `delete` of the base. People who do this consistently can get a false positive, but the rule is important -- what if one was allocated using `make_unique`? It's not safe unless the author of `B` ensures that it can never be misused, such as by making all constructors private and providing a factory functions to enforce the allocation with `make_shared`.
+> **Note**: There are people who don't follow this rule because they plan to use a class only through a `shared_ptr`: `std::shared_ptr<B> p = std::make_shared<D>(args);` Here, the shared pointer will take care of deletion, so no leak will occur from and inappropriate `delete` of the base. People who do this consistently can get a false positive, but the rule is important -- what if one was allocated using `make_unique`? It's not safe unless the author of `B` ensures that it can never be misused, such as by making all constructors private and providing a factory functions to enforce the allocation with `make_shared`.
 
-**Enforcement**:
+> **Enforcement**:  
+> * Flag a class with a virtual function and no virtual destructor. Note that this rule needs only be enforced for the first (base) class in which it occurs, derived classes inherit what they need. This flags the place where the problem arises, but can give false positives.
+> * Flag `delete` of a class with a virtual function but no virtual destructor.
 
-* Flag a class with a virtual function and no virtual destructor. Note that this rule needs only be enforced for the first (base) class in which it occurs, derived classes inherit what they need. This flags the place where the problem arises, but can give false positives.
-* Flag `delete` of a class with a virtual function but no virtual destructor.
+
 
 
 <a name="Rh-override"></a>
+### C.128: 클래스 계층구조가 클 경우에는 `override`를 명시하라.
+
+**근거**: 가독성. 실수들의 확인. 명시적인 `override`는 컴파일러가 기본 클래스와 파생 클래스 사이의 타입/이름들의 불일치를 잡아낼 수 있도록 한다.
+
+**잘못된 예**:
+```
+struct B {
+	void f1(int);
+	virtual void f2(int);
+	virtual void f3(int);
+	// ...
+};
+
+struct D : B {
+	void f1(int);		// warn: D::f1() hides B::f1()
+	void f2(int);		// warn: no explicit override
+	void f3(double);	// warn: D::f3() hides B::f3()
+	// ...
+};
+```
+**시행하기**:
+* 기본 클래스와 파생 클래스의 이름들을 비교하고 같은 이름을 사용하지만 오버라이드 하지 않는 경우에는 표시를 남겨라.
+* `override`키워드를 사용하지 않은 오버라이드 함수들에는 표시를 남겨라.
+
+
+> <a name="Rh-override"></a>
 ### C.128: Use `override` to make overriding explicit in large class hierarchies
 
-**Reason**: Readability. Detection of mistakes. Explicit `override` allows the compiler to catch mismatch of types and/or names between base and derived classes.
-
-**Example, bad**:
-
+> **Reason**: Readability. Detection of mistakes. Explicit `override` allows the compiler to catch mismatch of types and/or names between base and derived classes.  
+> **Example, bad**:
+> 
 	struct B {
 		void f1(int);
 		virtual void f2(int);
 		virtual void f3(int);
 		// ...
-	};
-
+	}; 
 	struct D : B {
 		void f1(int);		// warn: D::f1() hides B::f1()
 		void f2(int);		// warn: no explicit override
@@ -2680,245 +3156,509 @@ not using this (over)general interface in favor of a particular interface found 
 		// ...
 	};
 
-**Enforcement**:
+> **Enforcement**:
+> * Compare names in base and derived classes and flag uses of the same name that does not override.
+> * Flag overrides without `override`.
 
-* Compare names in base and derived classes and flag uses of the same name that does not override.
-* Flag overrides without `override`.
 
 
-<a name="Rh-kind"><a>
+
+<a name="Rh-kind"></a>
+### C.129: 클래스 계층구조를 설계할 때는, 인터페이스 상속과, 구현의 상속을 구분하라.  
+
+**근거**: ???  
+Herb: 구현 상속은 별로 좋지 않은 것 같습니다. -- 대부분 안티패턴으로 보입니다. 이에 대한 타당한 예시들이 있을까요?
+
+**예**:
+```
+	???
+```
+**시행하기**: ???
+
+
+> <a name="Rh-kind"></a>
 ### C.129: When designing a class hierarchy, distinguish between implementation inheritance and interface inheritance
 
-**Reason**: ??? Herb: I've become a non-fan of implementation inheritance -- seems most often an antipattern. Are there reasonable examples of it?
+> **Reason**: ??? Herb: I've become a non-fan of implementation inheritance -- seems most often an antipattern. Are there reasonable examples of it?  
 
-**Example**:
-
+> **Example**:
+> 
 	???
+	
+> **Enforcement**: ???
 
-**Enforcement**: ???
 
 
+ 
 <a name="Rh-copy"></a>
+### C.130: 기본 클래스의 복사를 재정의하거나 금지하라; 대신 가상 `clone`함수를 사용하라.
+
+**근거**: 기본클래스를 복사하는 것은 일반적으로 슬라이싱(slicing)이다. 만약 복사 문맥(의미론)이 필요하면, 깊은 복사를 하라: 가상 `clone`함수를 제공하여 실제로 가장 파생된 타입을 복사하도록 하라. 그리고 파생된 클래스들은 파생 타입을 반환하도록 하라.(covariant(자신과 동일한?) 반환 타입을 사용하라.) 
+
+**예**:
+```
+class base {
+public:
+    virtual base* clone() =0;
+};
+
+class derived : public base {
+public:
+    derived* clone() override;
+};
+```
+언어 규칙에 의해서, covariant 반환 타입은 스마트 포인터가 될 수 없다.
+
+**시행하기**:
+* 가상 함수와 사용자가 정의하지 않은 복사 연산을 가진 클래스에 표시를 남겨라.
+* 기본 클래스 객체들의 복사 대입에 표시를 남겨라. (파생 클래스들의 객체들) 
+
+
+> <a name="Rh-copy"></a>
 ### C.130: Redefine or prohibit copying for a base class; prefer a virtual `clone` function instead
 
-**Reason**: Copying a base is usually slicing. If you really need copy semantics, copy deeply: Provide a virtual `clone` function that will copy the actual most-derived type, and in derived classes return the derived type (use a covariant return type).
+> **Reason**: Copying a base is usually slicing. If you really need copy semantics, copy deeply: Provide a virtual `clone` function that will copy the actual most-derived type, and in derived classes return the derived type (use a covariant return type).
 
-**Example**:
-
+> **Example**:
+> 
 	class base {
 	public:
 	    virtual base* clone() =0;
 	};
-
 	class derived : public base {
 	public:
 	    derived* clone() override;
 	};
+> Note that because of language rules, the covariant return type cannot be a smart pointer.
 
-Note that because of language rules, the covariant return type cannot be a smart pointer.
+> **Enforcement**:
+> * Flag a class with a virtual function and a non-user-defined copy operation.
+> * Flag an assignment of base class objects (objects of a class from which another has been derived).
 
-**Enforcement**:
 
-* Flag a class with a virtual function and a non-user-defined copy operation.
-* Flag an assignment of base class objects (objects of a class from which another has been derived).
 
 
 <a name="Rh-get"></a>
+### C.131: 사소한 getter나 setter는 지양하라.
+
+**근거**: 사소한 getter나 setter는 문맥적인 가치를 가지지 않는다; 데이터가 `public`이 될수도 있다.
+
+**예**:
+```
+class point {
+    int x;
+	int y;
+public:
+    point(int xx, int yy) : x{xx}, y{yy} { }
+    int get_x() { return x; }
+	void set_x(int xx) { x = xx; }
+    int get_y() { return y; }
+	void set_y(int yy) { y = yy; }
+	// no behavioral member functions
+};
+```
+클래스를 `struct`로 만드는 것을 생각해보라. -- 즉, 동작이 없는 변수들의 덩어리, 모든 데이터들이 public하고 멤버함수가 없도록 만드는 것을 생각해보라.
+```
+struct point {
+	int x = 0;
+	int y = 0;
+};
+```
+**참고 사항**: 내부 타입에서 인터페이스 타입으로 전환하는 setter와 getter는 사소하지 않다.(이 경우는 정보 은닉을 제공하는 것이므로)
+
+**시행하기**: 다수의 `get`과 `set` 멤버 함수가 별다른 문맥 없이 멤버에 접근할 경우 표시를 남겨라.
+
+
+><a name="Rh-get"></a>
 ### C.131: Avoid trivial getters and setters
 
-**Reason**: A trivial getter or setter adds no semantic value; the data item could just as well be `public`.
-
-**Example**:
-
+> **Reason**: A trivial getter or setter adds no semantic value; the data item could just as well be `public`.  
+> **Example**:
+> 
 	class point {
-	    int x;
+    	int x;
 		int y;
 	public:
-	    point(int xx, int yy) : x{xx}, y{yy} { }
-	    int get_x() { return x; }
+    	point(int xx, int yy) : x{xx}, y{yy} { }
+    	int get_x() { return x; }
 		void set_x(int xx) { x = xx; }
-	    int get_y() { return y; }
+    	int get_y() { return y; }
 		void set_y(int yy) { y = yy; }
 		// no behavioral member functions
 	};
-
-Consider making such a class a `struct` -- that is, a behaviorless bunch of variables, all public data and no member functions.
-
+> Consider making such a class a `struct` -- that is, a behaviorless bunch of variables, all public data and no member functions.
+> 
 	struct point {
 		int x = 0;
 		int y = 0;
 	};
 
-**Note**: A getter or a setter that converts from an internal type to an interface type is not trivial (it provides a form of information hiding).
+> **Note**: A getter or a setter that converts from an internal type to an interface type is not trivial (it provides a form of information hiding).
 
-**Enforcement**: Flag multiple `get` and `set` member functions that simply access a member without additional semantics.
+> **Enforcement**: Flag multiple `get` and `set` member functions that simply access a member without additional semantics.
+
+
 
 
 <a name="Rh-virtual"></a>
 ### C.132: Don't make a function `virtual` without reason
 
-**Reason**: Redundant `virtual` increases run-time and object-code size.
-A virtual function can be overridden and is thus open to mistakes in a derived class.
-A virtual function ensures code replication in a templated hierarchy.
+**근거**: 중첩된 `virtual`는 실행 시간과 객체의 코드 크기를 증가시킨다.
+가상 함수는 오버라이드 될 수 있고, 그렇기 때문에 파생 클래스에서의 실수에 노출되어있다. 
+가상 함수는 템플릿화 된 계층구조에서 코드 복제를 야기한다.
 
-**Example, bad**:
+**잘못된 예**:
+```
+template<class T>
+class Vector {
+public:
+	// ...
+	virtual int size() const { return sz; }	
+	// bad: what good could a derived class do?
+private:
+	T* elem;	// the elements
+	int sz; 	// number of elements
+};
+```
+이러한 형태의 "vector"는 기본 클래스로 사용되는 것을 전혀 의도하지 않았다.
 
+**시행하기**:
+* 가상 함수를 가지지만 파생 클래스가 없으면 표시를 남겨라.
+* 모든 멤버 함수가 가상 함수이고 구현을 가지고 있으면 표시를 남겨라.
+
+
+> <a name="Rh-virtual"></a>
+### C.132: Don't make a function `virtual` without reason
+
+> **Reason**: Redundant `virtual` increases run-time and object-code size. A virtual function can be overridden and is thus open to mistakes in a derived class. A virtual function ensures code replication in a templated hierarchy.
+
+> **Example, bad**:
+> 
 	template<class T>
 	class Vector {
 	public:
 		// ...
-		virtual int size() const { return sz; }	// bad: what good could a derived class do?
+		virtual int size() const { return sz; }	
+		// bad: what good could a derived class do?
 	private:
 		T* elem;	// the elements
 		int sz; 	// number of elements
 	};
+> This kind of "vector" isn't meant to be used as a base class at all.
 
-This kind of "vector" isn't meant to be used as a base class at all.
+> **Enforcement**:
+> * Flag a class with virtual functions but no derived classes.
+> * Flag a class where all member functions are virtual and have implementations.
 
-**Enforcement**:
 
-* Flag a class with virtual functions but no derived classes.
-* Flag a class where all member functions are virtual and have implementations.
 
 
 <a name="Rh-protected"></a>
+### C.133: `protected` 데이터를 지양하라.
+
+**근거**:  
+`protected` 데이터는 복잡성과 에러의 원인이다.
+`protected` 데이터는 불변조건의 구문을 복잡하게 만든다.
+`protected` 데이터는 근본적으로 데이터를 기본 클래스에 넣고 
+data inherently violates the guidance against putting data in base classes, which usually leads to having to deal virtual inheritance as well.  
+
+**예**:
+``` 
+	???
+```
+**참고 사항**: Protected 멤버 함수는 허용된다.
+
+**시행하기**: `protected` 데이터를 지닌 클래스들에 표시를 남겨라.
+
+
+> <a name="Rh-protected"></a>
 ### C.133: Avoid `protected` data
 
-**Reason**: `protected` data is a source of complexity and errors.
-`protected` data complicated the statement of invariants.
-`protected` data inherently violates the guidance against putting data in base classes, which usually leads to having to deal virtual inheritance as well.
+> **Reason**: `protected` data is a source of complexity and errors.
+> `protected` data complicated the statement of invariants.
+> `protected` data inherently violates the guidance against putting data in base classes, which usually leads to having to deal virtual inheritance as well.
 
-**Example**:
-
+> **Example**:
+> 
 	???
 
-**Note**: Protected member function can be just fine.
+> **Note**: Protected member function can be just fine.
 
-**Enforcement**: Flag classes with `protected` data.
+> **Enforcement**: Flag classes with `protected` data.
 
 
+
+ 
 <a name="Rh-public"></a>
+### C.134: 모든 데이터 멤버들이 같은 접근 레벨에 있도록 하라.
+
+**근거**: 만약 모든 데이터 멤버들이 같은 접근 레벨에 있지 않으면, 그 타입은 무엇을 시도하는 것인지 혼란을 가져올 수 있다.   
+오직 타입이 실제로 추상화가 아니고, 편의를 위한 독립 변수들의 모임(행동이 없는 변수들의 덩어리)일 경우에만 모든 데이터 멤버들을 `public`으로 만들고 함수들을 제공하지 말아라.  
+그렇지 않은 경우, 그 타입은 추상화이므로, 모든 데이터멤버를 `private`으로 만들고 `public`과 혼용하지 말아라.
+
+**예**:
+```
+	???
+```
+**시행하기**: 다른 접근레벨을 가진 데이터 멤버가 있는 클래스는 표시를 남겨라.
+
+
+> <a name="Rh-public"></a>
 ### C.134: Ensure all data members have the same access level
 
-**Reason**: If they don't, the type is confused about what it's trying to do. Only if the type is not really an abstraction, but just a convenience bundle to group individual variables with no larger behavior (a behaviorless bunch of variables), make all data members `public` and don't provide functions with behavior. Otherwise, the type is an abstraction, so make all its data members `private`. Don't mix `public` and `private` data.
+> **Reason**: If they don't, the type is confused about what it's trying to do. > Only if the type is not really an abstraction, but just a convenience bundle to group individual variables with no larger behavior (a behaviorless bunch of variables), make all data members `public` and don't provide functions with behavior. Otherwise, the type is an abstraction, so make all its data members `private`. Don't mix `public` and `private` data.  
 
-**Example**:
-
+> **Example**:
+> 
 	???
+> **Enforcement**: Flag any class that has data members with different access levels.
 
-**Enforcement**: Flag any class that has data members with different access levels.
+
 
 
 <a name="Rh-mi-interface"></a>
+### C.135: 다중 상속을 다수의 인터페이스를 표현하기 위해 사용하라
+
+**근거**: 
+모든 클래스들이 모든 인터페이스들을 지원하지는 않을 것이다. 그리고 모든 호출자(caller)들이 모든 연산들을 사용하길 원하지도 않을 것이다. (다중상속은) 특별히 단일한(monolitic) 인터페이스들을 파생 클래스가 지원하는 동작의 측면들로 나눌때 사용하라. 
+
+**예**:
+```
+	???
+```
+**참고 사항**: 다중상속의 이용은 매우 일반적인데, 이는 다수의 다른 인터페이스들이 구현될 필요가 있는 경우가 일반적이기 때문이다. 그리고 이런 인터페이스들은 종종 쉽게, 또는 자연적으로 단일 상속 구조에서는 조직되지 않는다. 
+
+**참고 사항**: 이런 인터페이스들은 일반적으로 추상 클래스들이다.
+
+**시행하기**: ???
+
+
+> <a name="Rh-mi-interface"></a>
 ### C.135: Use multiple inheritance to represent multiple distinct interfaces
 
-**Reason**: Not all classes will necessarily support all interfaces, and not all callers will necessarily want to deal with all operations. Especially to break apart monolithic interfaces into "aspects" of behavior supported by a given derived class.
+> **Reason**: Not all classes will necessarily support all interfaces, and not all callers will necessarily want to deal with all operations. Especially to break apart monolithic interfaces into "aspects" of behavior supported by a given derived class.
 
-**Example**:
-
+> **Example**:
+> 
 	???
 
-**Note**: This is a very common use of inheritance because the need for multiple different interfaces to an implementation is common
-and such interfaces are often not easily or naturally organized into a single-rooted hierarchy.
+> **Note**: This is a very common use of inheritance because the need for multiple different interfaces to an implementation is common
+and such interfaces are often not easily or naturally organized into a single-rooted hierarchy.  
+> **Note**: Such interfaces are typically abstract classes.
+  
+> **Enforcement**: ???
 
-**Note**: Such interfaces are typically abstract classes.
-
-**Enforcement**: ???
 
 
+ 
 <a name="Rh-mi-implementation"></a>
+### C.136: 다중 상속을 구현 속성들의 합집합(union)을 표현하기 위해 사용하라.
+
+**근거**: ???   
+Herb: 여기서 구현 상속에 대한 두번째 언급이 있군요. 전 매우 부정적입니다. 하나의 구현 상속마저도요. 다수의 구현 상속은 절대 생각하지 마세요. -- 저는 정책 기반의(policy-based) 설계라도 정말로 정책 타입들을 상속할 필요가 있다고 생각하지 않습니다.
+제가 좋은 예시들을 놓치고 있는 걸까요, 아니면 이것을 안티패턴으로 보고 제외시키는 것을 고려해야 할까요? 
+
+**예**:
+```
+	???
+```
+**참고 사항**: 이것은 상대적으로 드문 경우인데, 구현은 종종 단일루트(single-root) 계층으로 조직화될 수 있기 때문입니다.
+
+**시행하기**: ??? 
+Herb: 정반대의 시행하기: 2개 이상의 (데이터 멤버가 있는)기본 클래스를 상속하는 타입에는 표시를 남겨라?  
+
+
+> <a name="Rh-mi-implementation"></a>
 ### C.136: Use multiple inheritance to represent the union of implementation attributes
 
-**Reason**: ??? Herb: Here's the second mention of implementation inheritance. I'm very skeptical, even of single implementation inheritance, never mind multiple implementation inheritance which just seems frightening -- I don't think that even policy-based design really needs to inherit from the policy types. Am I missing some good examples, or could we consider discouraging this as an anti-pattern?
+> **Reason**: ??? Herb: Here's the second mention of implementation inheritance. I'm very skeptical, even of single implementation inheritance, never mind multiple implementation inheritance which just seems frightening -- I don't think that even policy-based design really needs to inherit from the policy types. Am I missing some good examples, or could we consider discouraging this as an anti-pattern?
 
-**Example**:
-
+> **Example**:
+> 
 	???
 
-**Note**: This a relatively rare use because implementation can often be organized into a single-rooted hierarchy.
+> **Note**: This a relatively rare use because implementation can often be organized into a single-rooted hierarchy.
 
-**Enforcement**: ??? Herb: How about opposite enforcement: Flag any type that inherits from more than one non-empty base class?
+> **Enforcement**: ??? Herb: How about opposite enforcement: Flag any type that inherits from more than one non-empty base class?
+
+
 
 
 <a name="Rh-vbase"></a>
+### C.137: 가상 기본 클래스는 과도하게 일반적인 기본 클래스들을 피하기 위해 사용하라.
+
+**근거**: ???
+
+**예**:
+```
+	???
+```
+**참고 사항**: ???
+
+**시행하기**: ???
+
+> <a name="Rh-vbase"></a>
 ### C.137: Use `virtual` bases to avoid overly general base classes
 
-**Reason**: ???
-
-**Example**:
-
+> **Reason**: ???  
+> **Example**:
+> 
 	???
+> **Note**: ???  
+> **Enforcement**: ???
 
-**Note**: ???
 
-**Enforcement**: ???
+
 
 <a name="Rh-using"></a>
+### C.138: `using`을 사용해서 파생 클래스와 기본 클래스의 Overload 집합을 만들어라
+
+**근거**: ???
+
+**예**:
+```
+	???
+```
+
+
+> <a name="Rh-using"></a>
 ### C.138: Create an overload set for a derived class and its bases with `using`
 
-**Reason**: ???
+> **Reason**: ???
 
-**Example**:
-
+> **Example**:
+> 
 	???
 
 
-## C.hier-access: Accessing objects in a hierarchy
+
+## C.hier-access: 계층 구조에서 객체 접근
+> ## C.hier-access: Accessing objects in a hierarchy
 
 
 <a name="Rh-poly"></a>
+### C.145: 다형성을 지닌 객체는 포인터나 참조자를 사용해서 접근하라
+
+**근거**: 가상 함수를 가진 클래스가 있다면, 당신은 (일반적으로) 어떤 클래스가 실행될 함수를 제공할지 알 수 없다.
+
+**예**:
+```
+struct B { int a; virtual f(); };
+struct D { int b; override f(); };
+
+void use(B b)
+{
+	D d;
+	B b2 = d;	// slice
+	B b3 = b;
+}
+
+void use2()
+{
+	D d;
+	use(b);	// slice
+}
+```
+use와 use2 양쪽의 `d` 모두 절단(slice)된다.  
+
+**예외 사항**: 당신은 객체의 정의 범위 안의 이름이 있는 다형적 객체에 안전하게 접근할 수 있다. 단지 그것을 절단하지는 말아라.
+```
+void use3()
+{
+	D d;
+	d.f();	// OK
+}
+```
+**시행하기**: 모든 절단(slicing)에 표시를 남겨라.
+
+
+> <a name="Rh-poly"></a>
 ### C.145: Access polymorphic objects through pointers and references
 
-**Reason**: If you have a class with a virtual function, you don't (in general) know which class provided the function to be used.
+> **Reason**: If you have a class with a virtual function, you don't (in general) know which class provided the function to be used.
 
-**Example**:
-
+> **Example**:
+> 
 	struct B { int a; virtual f(); };
 	struct D { int b; override f(); };
-
 	void use(B b)
 	{
 		D d;
 		B b2 = d;	// slice
 		B b3 = b;
 	}
-
 	void use2()
 	{
 		D d;
 		use(b);	// slice
 	}
 
-Both `d`s are sliced.
-
-**Exeption**: You can safely access a named polymorphic object in the scope of its definition, just don't slice it.
-
+> Both `d`s are sliced.
+  
+> **Exeption**: You can safely access a named polymorphic object in the scope of its definition, just don't slice it.
+> 
 	void use3()
 	{
 		D d;
 		d.f();	// OK
 	}
+	
+> **Enforcement**: Flag all slicing.
 
-**Enforcement**: Flag all slicing.
 
 
 <a name="Rh-dynamic_cast"></a>
+### C.146: `dynamic_cast`는 클래스 계층 구조에서 탐색이 불가피할때 사용하라
+
+**근거**: `dynamic_cast`는 실행시간에 검사된다.
+
+**예**:
+```
+struct B {	// an interface
+	virtual void f();
+	virtual void g();
+};
+
+struct D : B {	// a wider interface
+	void f() override;
+	virtual void h();
+};
+
+void user(B* pb)
+{
+	if (D* pd = dynamic_cast<D*>(pb)) {
+		// ... use D's interface ...
+	}
+	else {
+		// .. make do with B's interface ...
+	}
+}
+```
+**참고사항**: 다른 모든 캐스팅처럼, `dynamic_cast`는 너무 자주 사용된다.
+[캐스팅 보다는 가상 함수들을 사용하라](#???).
+가능한 한 클래스 계층을 탐색하는 것보다 [정적 다형성](#???)을 선호하라. (이렇게 하면 실행시간 실행시간 결정이 필요없다. 그리고 충분히 편리하다.)
+
+**예외 사항**: 만약 당신의 구현 코드에 정말로 느린 `dynamic_cast`가 있다면, 대안을 찾아야 할 것이다. 
+하지만, 정적으로 클래스를 결정할 수 없는 모든 대안은 명시적 캐스팅(일반적으로 `static_cast`)을 포함하고, 에러에 취약하다.  
+당신만의 특별한 `dynamic_cast`를 만들수도 있을 것이다. 그러니, `dynamic_cast`가 정말로 당신이 생각하는 것 만큼 느리다는 것을 확실시하라. (근거 없는 루머들이 꽤 있다.) 그리고 `dynamic_cast`의 사용이 정말로 성능에 치명적이라는 것 또한 확실시 하라. 
+
+**시행하기**: 하향식 캐스팅(C언어 스타일을 포함해서)에 사용되는 `static_cast`에 표시를 남겨라. 
+
+> <a name="Rh-dynamic_cast"></a>
 ### C.146: Use `dynamic_cast` where class hierarchy navigation is unavoidable
 
-**Reason**: `dynamic_cast` is checked at run time.
+> **Reason**: `dynamic_cast` is checked at run time.
 
-**Example**:
-
+> **Example**:
+> 
 	struct B {	// an interface
 		virtual void f();
 		virtual void g();
 	};
-
 	struct D : B {	// a wider interface
 		void f() override;
 		virtual void h();
 	};
-
 	void user(B* pb)
 	{
 		if (D* pd = dynamic_cast<D*>(pb)) {
@@ -2929,122 +3669,221 @@ Both `d`s are sliced.
 		}
 	}
 
-**Note**: Like other casts, `dynamic_cast` is overused.
-[Prefer virtual functions to casting](#???).
-Prefer [static polymorphism](#???) to hierarchy navigation where it is possible (no run-time resolution necessary)
-and reasonably convenient.
+> **Note**: Like other casts, `dynamic_cast` is overused.
+> [Prefer virtual functions to casting](#???).
+> Prefer [static polymorphism](#???) to hierarchy navigation where it is possible (no run-time resolution necessary) and reasonably convenient.
 
-**Exception**: If your implementation provided a really slow `dynamic_cast`, you may have to use a workaround.
-However, all workarounds that cannot be statically resolved involve explicit casting (typically `static_cast`) and are error-prone.
-You will basically be crafting your own special-purpose `dynamic_cast`.
-So, first make sure that your `dynamic_cast` really is as slow as you think it is (there are a fair number of unsupported rumors about)
-and that your use of `dynamic_cast` is really performance critical.
+> **Exception**: If your implementation provided a really slow `dynamic_cast`, you may have to use a workaround.
+> However, all workarounds that cannot be statically resolved involve explicit casting (typically `static_cast`) and are error-prone.
+> You will basically be crafting your own special-purpose `dynamic_cast`.
+> So, first make sure that your `dynamic_cast` really is as slow as you think it is (there are a fair number of unsupported rumors about) and that your use of `dynamic_cast` is really performance critical.
 
-**Enforcement**: Flag all uses of `static_cast` for downcasts, including C-style casts that perform a `static_cast`.
+> **Enforcement**: Flag all uses of `static_cast` for downcasts, including C-style casts that perform a `static_cast`.
+
+
 
 
 <a name="Rh-ptr-cast"></a>
+### C.147: 필요한 타입을 찾는 데 실패하는 것이 에러로 간주될 때는, `dynamic_cast`를 참조자 타입에 사용하라. 
+
+**근거**: 
+참조자에 대한 캐스팅은 당신이 정상적인 객체를 얻는 것을 의도했음을 표현한다. 따라서 캐스팅은 반드시 성공해야만 한다. `dynamic_cast`는 만약 실패한다면 예외를 던질 것이다.
+
+**예**:
+```
+	???
+```
+**시행하기**: ???
+
+
+> <a name="Rh-ptr-cast"></a>
 ### C.147: Use `dynamic_cast` to a reference type when failure to find the required class is considered an error
 
-**Reason**: Casting to a reference expresses that you intend to end up with a valid object, so the cast must succeed. `dynamic_cast` will then throw if it does not succeed.
-
-**Example**:
-
+> **Reason**: Casting to a reference expresses that you intend to end up with a valid object, so the cast must succeed. `dynamic_cast` will then throw if it does not succeed.  
+> **Example**:
+> 
 	???
+> **Enforcement**: ???
 
-**Enforcement**: ???
+
 
 
 <a name="Rh-ref-cast"></a>
+### C.148: 필요한 클래스를 찾는데 실패하는 것이 허용가능 하다면, `dynamic_cast`를 포인터 타입에 사용하라.
+
+**근거**: ???
+
+**예**:
+```
+	???
+```
+**시행하기**: ???
+
+
+> <a name="Rh-ref-cast"></a>
 ### C.148: Use `dynamic_cast` to a pointer type when failure to find the required class is considered a valid alternative
 
-**Reason**: ???
-
-**Example**:
-
+> **Reason**: ???  
+> **Example**:
+> 
 	???
+> **Enforcement**: ???
 
-**Enforcement**: ???
+
 
 
 <a name="Rh-smart"></a>
+### C.149: `new`를 사용해서 생성한 객체를 `delete`하지 않는 것을 예방하기 위해, `unique_ptr` 또는 `shared_ptr`를 사용하라
+
+**근거**: 자원 누수를 방지한다.
+
+**예**:
+```
+void use(int i)
+{
+	auto p = new int {7};			// bad: initialize local pointers with new
+	auto q = make_unique<int>(9);	// ok: guarantee the release of the memory allocated for 9
+	if(0 < i) return;	// maybe return and leak
+	delete p;		// too late
+}
+```
+**시행하기**:
+* `new`를 사용한 naked 포인터의 초기화에 표시를 남겨라. 
+* 지역 변수의 `delete`처리에 표시를 남겨라. 
+
+
+> <a name="Rh-smart"></a>
 ### C.149: Use `unique_ptr` or `shared_ptr` to avoid forgetting to `delete` objects created using `new`
 
-**Reason**: Avoid resource leaks.
-
-**Example**:
-
-	void use(int i)
-	{
-		auto p = new int {7};			// bad: initialize local pointers with new
-		auto q = make_unique<int>(9);	// ok: guarantee the release of the memory allocated for 9
-		if(0<i) return;	// maybe return and leak
-		delete p;		// too late
-	}
-
-**Enforcement**:
-
-* Flag initialization of a naked pointer with the result of a `new`
-* Flag `delete` of local variable
+> **Reason**: Avoid resource leaks.  
+> **Example**:
+```
+void use(int i)
+{
+	auto p = new int {7};			// bad: initialize local pointers with new
+	auto q = make_unique<int>(9);	// ok: guarantee the release of the memory allocated for 9
+	if(0<i) return;	// maybe return and leak
+	delete p;		// too late
+}
+```
+> **Enforcement**:  
+> * Flag initialization of a naked pointer with the result of a `new`
+> * Flag `delete` of local variable
 
 
+
+ 
 <a name="Rh-make_unique"></a>
+### C.150: unique_ptr나 다른 스마트포인터가 소유하는 객체를 생성하기 위해선 make_unique()를 사용하라
+
+**근거**: `make_unique`는 생성 구문을 보다 간결하게 만든다.
+
+**예**:
+```
+unique_ptr<Foo> p {new<Foo>{7});	// OK: but repetitive
+
+auto q = make_unique<Foo>(7);		// Better: no repetition of Foo
+```
+**시행하기**:
+* 템플릿 전문화(specialization) 리스트 `<Foo>`의 반복적인 사용에 표시를 남겨라.
+* `unique_ptr<Foo>`로 선언된 변수에 표시를 남겨라. 
+
+
+> <a name="Rh-make_unique"></a>
 ### C.150: Use `make_unique()` to construct objects owne by `unique_ptr`s or other smart pointers
 
-**Reason**: `make_unique` gives a more concise statement of the construction.
-
-**Example**:
-
+> **Reason**: `make_unique` gives a more concise statement of the construction.  
+> **Example**:  
+>
 	unique_ptr<Foo> p {new<Foo>{7});	// OK: but repetitive
-
 	auto q = make_unique<Foo>(7);		// Better: no repetition of Foo
 
-**Enforcement**:
+> **Enforcement**
+> * Flag the repetitive usage of template specialization list `<Foo>`
+> * Flag variables declared to be `unique_ptr<Foo>`
 
-* Flag the repetitive usage of template specialization list `<Foo>`
-* Flag variables declared to be `unique_ptr<Foo>`
+
 
 
 <a name="Rh-make_shared"></a>
-### C.151: Use `make_shared()` to construct objects owned by `shared_ptr`s
+### C.151: shared_ptr들에 의해 소유되는 객체를 생성하기 위해서는 make_shared()를 사용하라
 
-**Reason**: `make_shared` gives a more concise statement of the construction.
-It also gives an opportunity to eliminate a separate allocation for the reference counts, by placing the `shared_ptr`'s use counts next to its object.
+**근거**: `make_shared`는 생성 구문을 더 간결하게 만들어준다.
+또한 `make_shared`는 객체 옆에 `shared_ptr`의 사용횟수를 배치하면서, 멀리 떨어져 표기되지 않도록 해준다.
 
-**Example**:
-
+**예**:
+```
 	shared_ptr<Foo> p {new<Foo>{7});	// OK: but repetitive; and separate allocations for the Foo and shared_ptr's use count
 
 	auto q = make_shared<Foo>(7);		// Better: no repetition of Foo; one object
+```
+**시행하기**:
+* 반복적인 템플릿 전문화 리스트 `<Foo>`의 사용에 표시를 남겨라. 
+* `shared_ptr<Foo>`로 선언된 변수들에 표시를 남겨라. 
 
-**Enforcement**:
 
-* Flag the repetive usage of template specialization list`<Foo>`
-* Flag variables declared to be `shared_ptr<Foo>`
+> <a name="Rh-make_shared"></a>
+### C.151: Use `make_shared()` to construct objects owned by `shared_ptr`s
+
+> **Reason**: `make_shared` gives a more concise statement of the construction.
+> It also gives an opportunity to eliminate a separate allocation for the reference counts, by placing the `shared_ptr`'s use counts next to its object.
+
+> **Example**:
+> 
+	shared_ptr<Foo> p {new<Foo>{7});	// OK: but repetitive; and separate allocations for the Foo and shared_ptr's use count
+	auto q = make_shared<Foo>(7);		// Better: no repetition of Foo; one object
+
+> **Enforcement**:
+> * Flag the repetive usage of template specialization list`<Foo>`
+> * Flag variables declared to be `shared_ptr<Foo>`
+
+
 
 
 <a name="Rh-array"></a>
+### C.152: 파생 클래스 객체들의 포인터 배열에 기본 클래스의 포인터를 할당해서는 절대로 안된다
+
+**근거**: 기본 자료형의 포인터를 기록하는 것은 부당한 객체 접근과 메모리 손상을 야기할 수 있다. 
+
+**예**:
+```
+struct B { int x; };
+struct D : B { int y; };
+
+void use(B*);
+
+D a[] = { {1,2}, {3,4}, {5,6} };
+B* p = a;	// bad: a decays to &a[0] which is converted to a B*
+p[1].x = 7;	// overwrite D[0].y
+
+use(a);		// bad: a decays to &a[0] which is converted to a B*
+```
+**시행하기**:
+* 모든 종류의 배열 해제와 기본 타입에서 파생 타입으로의 형변환에 표시를 남겨라. 
+* 배열을 포인터 보다는 `array_view`로 전달하라, 그리고 `array_view`로 전달하기 전 파생클래스에서 기본클래스로의 변환이 없도록 하라.   
+
+> <a name="Rh-array"></a>
 ### C.152: Never assign a pointer to an array of derived class objects to a pointer to its base
 
-**Reason**: Subscripting the resulting base pointer will lead to invalid object access and probably to memory corruption.
+> **Reason**: Subscripting the resulting base pointer will lead to invalid object access and probably to memory corruption.
 
-**Example**:
-
+> **Example**:
+>  
 	struct B { int x; };
 	struct D : B { int y; };
-
+>	
 	void use(B*);
-
+>
 	D a[] = { {1,2}, {3,4}, {5,6} };
 	B* p = a;	// bad: a decays to &a[0] which is converted to a B*
 	p[1].x = 7;	// overwrite D[0].y
-
+>	
 	use(a);		// bad: a decays to &a[0] which is converted to a B*
 
-**Enforcement**:
+> **Enforcement**:
+> * Flag all combinations of array decay and base to derived conversions.
+> * Pass an array as an `array_view` rather than as a pointer, and don't let the array name suffer a derived-to-base conversion before getting into the `array_view`
 
-* Flag all combinations of array decay and base to derived conversions.
-* Pass an array as an `array_view` rather than as a pointer, and don't let the array name suffer a derived-to-base conversion before getting into the `array_view`
 
 
 <a name="SS-overload"></a>
@@ -3055,6 +3894,21 @@ You cannot overload function objects.
 
 Overload rule summary:
 
+* [C.160: 연산자를 정의할때는 관례적인 사용을 모방하라](#Ro-conventional)
+* [C.161: 대칭적인 연산자들에는 비멤버 함수들을 사용하라](#Ro-symmetric)
+* [C.162: 거의 동등한 연산들을 오버로드하라](#Ro-equivalent)
+* [C.163: 거의 동등한 연산들만 오버로드하라](#Ro-equivalent-2)
+* [C.164: 형변환 연산자들을 정의하지 말아라](#Ro-conversion)
+* [C.170: 람다를 오버로딩하는 기분이 든다면, 제네릭 람다를 사용하라](#Ro-lambda)
+
+
+> <a name="SS-overload"></a>
+# C.over: Overloading and overloaded operators
+> You can overload ordinary functions, template functions, and operators.
+You cannot overload function objects.
+
+> Overload rule summary:
+> 
 * [C.160: Define operators primarily to mimic conventional usage](#Ro-conventional)
 * [C.161: Use nonmember functions for symmetric operators](#Ro-symmetric)
 * [C.162: Overload operations that are roughly equivalent](#Ro-equivalent)
@@ -3062,90 +3916,190 @@ Overload rule summary:
 * [C.164: Avoid conversion operators](#Ro-conversion)
 * [C.170: If you feel like overloading a lambda, use a generic lambda](#Ro-lambda)
 
+
+
 <a name="Ro-conventional"></a>
-### C.140: Define operators primarily to mimic conventional usage
+### C.160: 연산자를 정의할때는 관례적인 사용을 모방하라
 
-**Reason**: Minimize surprises.
+**근거**: 뜻밖의 의미가 없도록 한다.
 
-**Example, bad**:
+**잘못된 예**:
+```
+X operator+(X a, X b) { return a.v-b.v; }	// bad: makes + subtract
+```
+???. 비멤버 연산자들: (전통적인?) 네임스페이스 레벨 정의 또는 `friend` 정의(boost.operator에서 사용되고 ADL(Argument-Dependent Lookup)만으로 제한되는)  
 
+**시행하기**: 거의 불가능하다.
+
+> <a name="Ro-conventional"></a>
+### C.160: Define operators primarily to mimic conventional usage
+> **Reason**: Minimize surprises.  
+> **Example, bad**:
+>
 	X operator+(X a, X b) { return a.v-b.v; }	// bad: makes + subtract
+> ???. Non-member operators: namespace-level definition (traditional?) vs friend definition (as used by boost.operator, limits lookup to ADL only)  
 
-???. Non-member operators: namespace-level definition (traditional?) vs friend definition (as used by boost.operator, limits lookup to ADL only)
+> **Enforcement**: Possibly impossible.
 
-**Enforcement**: Possibly impossible.
+
 
 
 <a name="Ro-symmetric"></a>
-### C.141: Use nonmember functions for symmetric operators
+### C.161: 대칭적인 연산자들에는 비멤버 함수들을 사용하라
 
-**Reason**: If you use member functions, you need two.
-Unless you use a non-member function for (say) `==`, `a==b` and `b==a` will be subtly different.
+**근거**: 만약 멤버 함수로 정의하게 되면, 비 멤버 함수를 쓰지 않는 한 2개의 함수가 필요하게 된다. 가령  `==`, `a==b` 그리고 `b==a` 는 미묘하게 다른 함수가 된다.
 
-**Example**:
+**예**:
+```
+bool operator==(Point a, Point b) { return a.x==b.x && a.y==b.y; }
+```
+**시행하기**: 멤버 연산자 함수들에는 표시를 남겨라.
 
+> <a name="Ro-symmetric"></a>
+### C.161: Use nonmember functions for symmetric operators
+> **Reason**: If you use member functions, you need two.
+Unless you use a non-member function for (say) `==`, `a==b` and `b==a` will be subtly different.  
+> **Example**:
+>
 	bool operator==(Point a, Point b) { return a.x==b.x && a.y==b.y; }
 
-**Enforcement**: Flag member operator functions.
+> **Enforcement**: Flag member operator functions.
+
+
 
 
 <a name="Ro-equivalent"></a>
-### C.142: Overload operations that are roughly equivalent
+### C.162: `동등한` 연산들을 오버로드하라
 
-**Reason**: Having different names for logically equivalent operations on different argument types is confusing, leads to encoding type information in function names, and inhibits generic programming.
+**근거**: 다른 인자타입을 지니는 논리적으로 동등한 연산에 제각기 다른 이름을 붙이는 것은 혼란을 야기한다. 또한 함수 이름에 타입정보를 넣는 것은 제네릭 프로그래밍을 방해한다.  
 
-**Example**: Consider
+**예**: 고려 중(consider)
+```
+void print(int a);
+void print(int a, int base);
+void print(const string&);
+```
+이 세 함수들은 모두 인자들을 출력한다. 반대로, 
+```
+void print_int(int a);
+void print_based(int a, int base);
+void print_string(const string&);
+```
+이 세 함수들은 모두 인자들을 출력하지만, 함수 이름을 길게 만들면서 일반화된 코드가 되지 못하게 한다.
 
+**시행하기**: ???
+
+
+> <a name="Ro-equivalent"></a>
+### C.162: Overload operations that are roughly equivalent
+
+> **Reason**: Having different names for logically equivalent operations on different argument types is confusing, leads to encoding type information in function names, and inhibits generic programming.
+
+> **Example**: Consider
+>
 	void print(int a);
 	void print(int a, int base);
 	void print(const string&);
-
-These three functions all prints their arguments (appropriately). Conversely
-
+> These three functions all prints their arguments (appropriately). Conversely
+> 
 	void print_int(int a);
 	void print_based(int a, int base);
 	void print_string(const string&);
+> These three functions all prints their arguments (appropriately). Adding to the name just introduced verbosity and inhibits generic code.
 
-These three functions all prints their arguments (appropriately). Adding to the name just introduced verbosity and inhibits generic code.
+> **Enforcement**: ???
 
-**Enforcement**: ???
+
 
 
 <a name="Ro-equivalent-2"></a>
-### C.143: Overload only for operations that are roughly equivalent
+### C.163: 거의 동등한 연산들'만' 오버로드하라
 
-**Reason**: Having the same name for logically different functions is confusing and leads to errors when using generic programming.
+**근거**: 논리적으로 다른 함수들이 같은 이름을 가지는 것은 혼란을 야기하며, 제네릭 프로그래밍을 사용할 때 에러로 이어진다. 
 
-**Example**: Consider
+**예**: 고려 중(Consider)
+```
+void open_gate(Gate& g);	// remove obstacle from garage exit lane
+void fopen(const char*name, const char* mode);	// open file
+```
+두 연산은 근본적으로 다르다(그리고 연관성이 없다). 따라서 서로 함수명이 다른 것은 타당하다. 반대로,  
+```
+void open(Gate& g);	// remove obstacle from garage exit lane
+void open(const char*name, const char* mode ="r");	// open file
+```
+이 두 연산은 여전히 근본적으로 다르고 연관성이 없지만, 이름이 혼란을 가져올 가능성이 있도록 축약되었다. 
+다행히도, 타입 시스템이 혼란으로 인한 많은 잘못된 사용들을 잡아낼 것이다.
 
+**참고 사항**: 가령 `open`, `move`, `+`, 그리고 `==` 같은 연산들처럼 일반적이고 자주 사용되는 이름에는 특히 신중하라. 
+
+**시행하기**: ???
+
+
+> <a name="Ro-equivalent-2"></a>
+### C.163: Overload only for operations that are roughly equivalent
+
+> **Reason**: Having the same name for logically different functions is confusing and leads to errors when using generic programming.
+
+> **Example**: Consider
+>
 	void open_gate(Gate& g);	// remove obstacle from garage exit lane
 	void fopen(const char*name, const char* mode);	// open file
-
-The two operations are fundamentally different (and unrelated) so it is good that their names differ. Conversely:
-
+> The two operations are fundamentally different (and unrelated) so it is good that their names differ. Conversely:
+>
 	void open(Gate& g);	// remove obstacle from garage exit lane
 	void open(const char*name, const char* mode ="r");	// open file
+> The two operations are still fundamentally different (and unrelated) but the names have been reduced to their (common) minimum, opening opportunities for confusion.  
+> Fortunately, the type system will catch many such mistakes.
+  
+> **Note**: be particularly careful about common and popular names, such as `open`, `move`, `+`, and `==`.
 
-The two operations are still fundamentally different (and unrelated) but the names have been reduced to their (common) minimum, opening opportunities for confusion.
- Fortunately, the type system will catch many such mistakes.
+> **Enforcement**: ???
 
-**Note**: be particularly careful about common and popular names, such as `open`, `move`, `+`, and `==`.
-
-**Enforcement**: ???
 
 
 <a name="Ro-conversion"></a>
-### C.144: Avoid conversion operators
+### C.164: 형변환 연산자들을 정의하지 말아라
 
-**Reason**: Implicit conversions can be essential (e.g., `double` to '`int`) but often cause surprises (e.g., `String` to C-style string).
+**근거**: 암묵적 형변환은 필수적일 수도 있다. (`double` 에서 `int`로의 변환) 하지만 종종 기대밖의 동작이 일어난다. (`String` 에서 C-스타일 문자열로 변환) 
 
-**Note**: Prefer explicitly named conversions until a serious need is demonstracted.
-By "serious need" we mean a reason that is fundamental in the application domain (such as an integer to complex number conversion)
-and frequently needed. Do not introduce implicit conversions (through conversion operators or non-`explicit` constructors)
-just to gain a minor convenience.
+**참고 사항**: 중대한 필요가 발생하지 않는 한, 명시적으로 변환하는 것을 지향하라. 여기서 중대한 필요는 응용프로그램 안에서 필수적이거나 자주 사용되는 등의 이유를 의미한다.
+(가령 정수에서 복소수로의 변환)  
+암묵적 형변환을 제공하지 말아라. (형변환 연산자 또는 `explicit`을 명기하지 않은 생성자들) 약간의 불편함만 있을 뿐이다.
 
-**Example, bad**:
+**잘못된 예**:
+```
+class String {	// handle ownership and access to a sequence of characters
+	// ...
+	String(czstring p); // copy from *p to *(this->elem)
+	// ...
+	operator zstring() { return elem; }
+	// ...
+};
 
+void user(zstring p)
+{
+	if (*p=="") {
+		String s {"Trouble ahead!"};
+		// ...
+		p = s;
+	}
+	// use p
+}
+```
+`s`에 할당되고 `p`에 대입된 문자열이 사용될 수 있게 되기 전에 파괴된다.
+
+**시행하기**: 모든 형변환 연산자에 표시를 남겨라.
+
+> <a name="Ro-conversion"></a>
+### C.164: Avoid conversion operators
+> **Reason**: Implicit conversions can be essential (e.g., `double` to '`int`) but often cause surprises (e.g., `String` to C-style string).  
+> **Note**: Prefer explicitly named conversions until a serious need is demonstracted.  
+
+> By "serious need" we mean a reason that is fundamental in the application domain (such as an integer to complex number conversion)
+> and frequently needed. Do not introduce implicit conversions (through conversion operators or non-`explicit` constructors) just to gain a minor convenience.
+
+> **Example, bad**:
+> 
 	class String {	// handle ownership and access to a sequence of characters
 		// ...
 		String(czstring p); // copy from *p to *(this->elem)
@@ -3153,7 +4107,7 @@ just to gain a minor convenience.
 		operator zstring() { return elem; }
 		// ...
 	};
-
+>
 	void user(zstring p)
 	{
 		if (*p=="") {
@@ -3163,82 +4117,145 @@ just to gain a minor convenience.
 		}
 		// use p
 	}
+> The string allocated for `s` and assigned to `p` is destroyed before it can be used.
 
-The string allocated for `s` and assigned to `p` is destroyed before it can be used.
+> **Enforcement**: Flag all conversion operators.
 
-**Enforcement**: Flag all conversion operators.
+
+
 
 <a name="Ro-lambda"></a>
+### C.170: 람다를 오버로딩하는 기분이 든다면, 제네릭 람다를 사용하라
+
+**근거**: 같은 이름으로 다른 람다 함수를 오버로드 할 수 있다. 
+
+**예**:
+```
+void f(int);
+void f(double);
+auto f = [](char);	// error: cannot overload variable and function
+
+auto g = [](int) { /* ... */ };
+auto g = [](double) { /* ... */ };	// error: cannot overload variables
+
+auto h = [](auto) { /* ... */ };	// OK
+```
+**시행하기**: 컴파일러가 람다 함수에 대한 오버로드를 잡아낸다. 
+
+
+> <a name="Ro-lambda"></a>
 ### C.170: If you feel like overloading a lambda, use a generic lambda
 
-**Reason**: You can overload by defining two different lambdas with the same name
-
-**Example**:
-
+> **Reason**: You can overload by defining two different lambdas with the same name  
+> **Example**:
+> 
 	void f(int);
 	void f(double);
 	auto f = [](char);	// error: cannot overload variable and function
-
+>
 	auto g = [](int) { /* ... */ };
 	auto g = [](double) { /* ... */ };	// error: cannot overload variables
-
+>
 	auto h = [](auto) { /* ... */ };	// OK
 
-**Enforcement**: The compiler catches attempt to overload a lambda.
+> **Enforcement**: The compiler catches attempt to overload a lambda.
+
 
 
 <a name="SS-union"></a>
-## C.union: Unions
+## C.union: 공용체
 
-???
+공용체 규칙 요약:
 
-Union rule summary:
-
-* [C.180: Use `union`s to ???](#Ru-union)
-* [C.181: Avoid "naked" `union`s](#Ru-naked)
-* [C.182: Use anonymous `union`s to implement tagged unions](#Ru-anonymous)
+* [C.180: ???에는 `union`을 이용하라](#Ru-union)
+* [C.181: "naked" `union`를 지양하라](#Ru-naked)
+* [C.182: 익명 공용체 `union`들은 tagged(중첩된?) 공용체를 구현하기 위해 사용하라](#Ru-anonymous)
 * ???
+
+> <a name="SS-union"></a>
+## C.union: Unions
+> ???  
+> Union rule summary:
+> * [C.180: Use `union`s to ???](#Ru-union)
+> * [C.181: Avoid "naked" `union`s](#Ru-naked)
+> * [C.182: Use anonymous `union`s to implement tagged unions](#Ru-anonymous)
+> * ???
+
 
 
 <a name="Ru-union"></a>
+### C.180: ???에는 `union`을 사용하라
+
+??? : 공용체는 언제 사용되어야 할까요? 어떤 방법이 POD(Plain-Old-Data) 객체 표현을 더 장래성있게(future-proof) 재해석하는 방법일까요?  
+??? : 변형(variant)
+
+**근거**: ???  
+**예**:
+```
+	???
+```
+**시행하기**: ???
+
+
+> <a name="Ru-union"></a>
 ### C.180: Use `union`s to ???
 
-??? When should unions be used, if at all? What's a good future-proof way to re-interpret object representations of PODs?
-??? variant
+> ??? When should unions be used, if at all? What's a good future-proof way to re-interpret object representations of PODs?
+> ??? variant
 
-**Reason**: ???
-
-**Example**:
-
+> **Reason**: ???  
+> **Example**:  
+> 
 	???
+> **Enforcement**: ???
 
-**Enforcement**: ???
+
 
 
 <a name="Ru-naked"></a>
+### C.181: "naked" `union`을 지양하라.
+
+**근거**: Naked 공용체들은 타입 에러의 원인이다.  
+**대안**: 타입 필드와 함께 클래스로 감싸라.  
+**대안**: `variant`를 사용하라.  
+
+**예**:
+```
+	???
+```
+**시행하기**: ???
+
+
+> <a name="Ru-naked"></a>
 ### C.181: Avoid "naked" `union`s
 
-**Reason**: Naked unions are a source of type errors.
-
-**Alternative**: Wrap them in a class together with a type field.
-
-**Alternative**: Use `variant`.
-
-**Example**:
-
+> **Reason**: Naked unions are a source of type errors.  
+> **Alternative**: Wrap them in a class together with a type field.  
+> **Alternative**: Use `variant`.  
+> **Example**:
+> 
 	???
+> **Enforcement**: ???  
 
-**Enforcement**: ???
 
 
 
 <a name="Ru-anonymous"></a>
-### C.182: Use anonymous `union`s to implement tagged unions
+### C.182: 익명 공용체 `union`들은 tagged(중첩된?) 공용체를 구현하기 위해 사용하라.
 
-**Reason**: ???
+**근거**: ???  
 
-**Example**:
-
+**예시**:
+```
 	???
+```
+**시행하기**: ???
 
-**Enforcement**: ???
+
+> <a name="Ru-anonymous"></a>
+### C.182: Use anonymous `union`s to implement tagged unions  
+> **Reason**: ???  
+> **Example**:
+> 
+	???
+> **Enforcement**: ???
