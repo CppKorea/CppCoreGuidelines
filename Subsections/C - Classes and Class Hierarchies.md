@@ -486,19 +486,30 @@ Copy and move rules:
 * [C.66: Make move operations `noexcept`](#Rc-move-noexcept)
 * [C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired](#Rc-copy-virtual)
 
-Other default operations rules:
+다른 기본 연산들에 대한 규칙 :
+> Other default operations rules: 
 
-* [C.80: Use `=default` if you have to be explicit about using the default semantics](#Rc-=default)
-* [C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)](#Rc-=delete)
-* [C.82: Don't call virtual functions in constructors and destructors](#Rc-ctor-virtual)
-* [C.83: For value-like types, consider providing a `noexcept` swap function](#Rc-swap)
-* [C.84: A `swap` may not fail](#Rc-swap-fail)
-* [C.85: Make `swap` `noexcept`](#Rc-swap-noexcept)
-* [C.86: Make `==` symmetric with respect of operand types and `noexcept`](#Rc-eq)
-* [C.87: Beware of `==` on base classes](#Rc-eq-base)
-* [C.88: Make `<` symmetric with respect of operand types and `noexcept`](#Rc-lt)
-* [C.89: Make a `hash` `noexcept`](#Rc-hash)
+* [C.80: 기본 문맥(의미론)을 명시적으로 사용하려면 `=default` 키워드를 사용하라](#Rc-=default)
+* [C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라](#Rc-=delete)
+* [C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라](#Rc-ctor-virtual)
+* [C.83: 값 형식 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라](#Rc-swap)
+* [C.84: `swap`연산은 실패하지 않도록 한다](#Rc-swap-fail)
+* [C.85: `swap`연산은 `noexcept`로 작성하라](#Rc-swap-noexcept)
+* [C.86: `==`연산자는 피연산자 타입들에 대칭적이고, `noexcept`로 만들어라](#Rc-eq)
+* [C.87: 기본 클래스에 있는 `==`에 주의하라](#Rc-eq-base)
+* [C.88: `<` 연산자는 피연산자 타입에 대칭적으로 동작하고, `noexcept`로 작성하라](#Rc-lt)
+* [C.89: `hash`는 `noexcept`로 작성하라 ](#Rc-hash)  
 
+> * [C.80: Use `=default` if you have to be explicit about using the default semantics](#Rc-=default)
+> * [C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)](#Rc-=delete)
+> * [C.82: Don't call virtual functions in constructors and destructors](#Rc-ctor-virtual)
+> * [C.83: For value-like types, consider providing a `noexcept` swap function](#Rc-swap)
+> * [C.84: A `swap` may not fail](#Rc-swap-fail)
+> * [C.85: Make `swap` `noexcept`](#Rc-swap-noexcept)
+> * [C.86: Make `==` symmetric with respect of operand types and `noexcept`](#Rc-eq)
+> * [C.87: Beware of `==` on base classes](#Rc-eq-base)
+> * [C.88: Make `<` symmetric with respect of operand types and `noexcept`](#Rc-lt)
+> * [C.89: Make a `hash` `noexcept`](#Rc-hash)
 
 <a name="SS-defop"></a>
 
@@ -2186,63 +2197,138 @@ This `Vector2` is not just inefficient, but since a vector copy requires allocat
 
 
 
-## C.other: Other default operations
+## C.other: 다른 기본 연산들
+> ## C.other: Other default operations
 
-???
 
 <a name="Rc-=default"></a>
+### C.80: 기본 문맥(의미론)을 명시적으로 사용하려면 `=default` 키워드를 사용하라 
+
+**근거**: 컴파일러가 더 정확한 기본 의미론을 알고 있으며, 이보다 나은 코드를 작성할 수 없다. 
+
+**예**:
+```
+class Tracer {
+	string message;
+public:
+	Tracer(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
+	~Tracer() { cerr << "exiting " << message <<'\n'; }
+
+	Tracer(const Tracer&) = default;
+	Tracer& operator=(const Tracer&) = default;
+	Tracer(Tracer&&) = default;
+	Tracer& operator=(Tracer&&) = default;
+};
+```
+소멸자를 정의했기 때문에, 우리는 복사, 이동 연산들을 정의해야만 한다. 이를 위해선 `=default`가 가장 간단한 최선의 방법이다.  
+
+**잘못된 예**:
+```
+class Tracer2 {
+	string message;
+public:
+	Tracer2(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
+	~Tracer2() { cerr << "exiting " << message <<'\n'; }
+
+	Tracer2(const Tracer2& a) : message{a.message} {}
+	Tracer2& operator=(const Tracer2& a) { message=a.message; }
+	Tracer2(Tracer2&& a) :message{a.message} {}
+	Tracer2& operator=(Tracer2&& a) { message=a.message; }
+};
+```
+복사와 이동 연산들의 함수 본체를 작성하는 것은 번거롭고, 지루하며, 에러에 취약하다. 컴파일러가 이 작업을 더 잘 할수있다.
+
+**시행하기**: (Moderate) 특별한 연산들은 중복성을 피하기 위해 컴파일러가 만든 버전과 같은 접근성, 의미론을 가져서는 안된다.  
+
+> <a name="Rc-=default"></a>
 ### C.80: Use `=default` if you have to be explicit about using the default semantics
-
-**Reason**: The compiler is more likely to get the default semantics right and you cannot implement these function better than the compiler.
-
-**Example**:
-
+> **Reason**: The compiler is more likely to get the default semantics right and you cannot implement these function better than the compiler.  
+> **Example**:
+>
 	class Tracer {
 		string message;
 	public:
 		Tracer(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-		~Tracer() { cerr << "exiting " << message <<'\n'; }
-
+		~Tracer() { 
+			cerr << "exiting " << message <<'\n'; }
 		Tracer(const Tracer&) = default;
 		Tracer& operator=(const Tracer&) = default;
 		Tracer(Tracer&&) = default;
 		Tracer& operator=(Tracer&&) = default;
 	};
-
-Because we defined the destructor, we must define the copy and move operations. The `=default` is the best and simplest way of doing that.
-
-**Example, bad**:
-
+> Because we defined the destructor, we must define the copy and move operations. The `=default` is the best and simplest way of doing that.  
+> **Example, bad**:
+>
 	class Tracer2 {
 		string message;
 	public:
 		Tracer2(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-		~Tracer2() { cerr << "exiting " << message <<'\n'; }
-
+		~Tracer2() { 
+			cerr << "exiting " << message <<'\n'; }
 		Tracer2(const Tracer2& a) : message{a.message} {}
 		Tracer2& operator=(const Tracer2& a) { message=a.message; }
 		Tracer2(Tracer2&& a) :message{a.message} {}
 		Tracer2& operator=(Tracer2&& a) { message=a.message; }
 	};
+> Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.  
+> **Enforcement**: (Moderate) The body of a special operation should not have the same accessibility and semantics as the compiler-generated version, because that would be redundant
 
-Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.
-
-**Enforcement**: (Moderate) The body of a special operation should not have the same accessibility and semantics as the compiler-generated version, because that would be redundant
 
 
 <a name="Rc-=delete"></a>
+### C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라
+
+**근거**: 몇몇 경우에, 기본 연산들이 바람직하지 않기도 하다.
+
+**예**:
+```
+class Immortal {
+public:
+	~Immortal() = delete;	// do not allow destruction
+	// ...
+};
+void use()
+{
+	Immortal ugh;	// error: ugh cannot be destroyed
+	Immortal* p = new Immortal{};
+	delete p;		// error: cannot destroy *p
+}
+```
+**예**: `unique_ptr`는 이동 가능하지만, 복사는 불가능하다. 이 클래스의 복사를 막기 위해, 복사 연산들은 삭제된다. l-value로부터 복사 연산을 막기 위해 `=delete`가 필요하다.
+```
+template <class T, class D = default_delete<T>> class unique_ptr {
+public:
+	// ...
+	constexpr unique_ptr() noexcept;
+	explicit unique_ptr(pointer p) noexcept;
+	// ...
+	unique_ptr(unique_ptr&& u) noexcept;	// move constructor
+	// ...
+	unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
+	// ...
+};
+
+unique_ptr<int> make();	// make "something" and return it by moving
+
+void f()
+{
+	unique_ptr<int> pi {};
+	auto pi2 {pi};		// error: no move constructor from lvalue
+	auto pi3 {make()};	// OK, move: the result of make() is an rvalue
+}
+```
+**시행하기**: 기본 연산을 제거하는 것은 해당 클래스에 부합하는 근거가 있어야 한다. 의심하라. 하지만 사람이 보기에 문맥적으로 정확하다고 단정할 수 있도록 유지하라.   
+
+> <a name="Rc-=delete"></a>
 ### C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)
-
-**Reason**: In a few cases, a default operation is not desirable.
-
-**Example**:
-
+> **Reason**: In a few cases, a default operation is not desirable.  
+> **Example**:
+>
 	class Immortal {
 	public:
 		~Immortal() = delete;	// do not allow destruction
 		// ...
 	};
-
 	void use()
 	{
 		Immortal ugh;	// error: ugh cannot be destroyed
@@ -2250,8 +2336,8 @@ Writing out the bodies of the copy and move operations is verbose, tedious, and 
 		delete p;		// error: cannot destroy *p
 	}
 
-**Example**: A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
-
+> **Example**: A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
+>
 	template <class T, class D = default_delete<T>> class unique_ptr {
 	public:
 		// ...
@@ -2263,62 +2349,129 @@ Writing out the bodies of the copy and move operations is verbose, tedious, and 
 		unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
 		// ...
 	};
-
 	unique_ptr<int> make();	// make "something" and return it by moving
-
 	void f()
 	{
 		unique_ptr<int> pi {};
 		auto pi2 {pi};		// error: no move constructor from lvalue
 		auto pi3 {make()};	// OK, move: the result of make() is an rvalue
 	}
+> **Enforcement**: The elimination of a default operation is (should be) based on the desired semantics of the class. Consider such classes suspect, but maintain a "positive list" of classes where a human has asserted that the semantics is correct.
 
-**Enforcement**: The elimination of a default operation is (should be) based on the desired semantics of the class. Consider such classes suspect, but maintain a "positive list" of classes where a human has asserted that the semantics is correct.
+
+
 
 <a name="Rc-ctor-virtual"></a>
+### C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라.
+
+**근거**: 호출된 함수는 파생 클래스에서 오버라이드 하는 함수가 아니라, 생성된 객체의 함수이다. 이러한 동작은 혼란을 일으킬 수 있다. 나쁘게는, 생성자와 소멸자 내부에서 발생하는 구현되지 않은 순수 가상 함수에 대한 직접 또는 간접호출이 비정의된 동작을 일으킨다.  
+
+**잘못된 예**:
+```
+class base {
+public:
+    virtual void f() = 0;   // not implemented
+    virtual void g();       // implemented with base version
+    virtual void h();       // implemented with base version
+};
+
+class derived : public base {
+public:
+	void g() override;      // provide derived implementation
+	void h() final;         // provide derived implementation
+
+	derived()
+	{
+	    f();                // BAD: attempt to call an unimplemented virtual function
+
+		g();                // BAD: will call derived::g, not dispatch further virtually
+		derived::g();       // GOOD: explicitly state intent to call only the visible version
+			
+		h();                // ok, no qualification needed, h is final
+    }
+};
+```
+특정하게 명시적으로 한정된 함수는 `virtual`로 선언되었다고 하더라도 가상호출이 발생하지 않음을 기억하라.
+
+**참고** 정의되지 않은 동작의 위험이 없이 파생 클래스의 함수를 호출하는 효과를 얻기 위해서는 [팩토리 함수들](#Rc-factory) 참고하라. 
+
+> <a name="Rc-ctor-virtual"></a>
 ### C.82: Don't call virtual functions in constructors and destructors
 
-**Reason**: The function called will be that of the object constructed so far, rather than a possibly overriding function in a derived class.
+> **Reason**: The function called will be that of the object constructed so far, rather than a possibly overriding function in a derived class.
 This can be most confusing.
 Worse, a direct or indirect call to an unimplemented pure virtual function from a constructor or destructor results in undefined behavior.
 
-**Example; bad**:
-
+> **Example; bad**:
+>
 	class base {
 	public:
 	    virtual void f() = 0;   // not implemented
 	    virtual void g();       // implemented with base version
 	    virtual void h();       // implemented with base version
 	};
-
+>
 	class derived : public base {
 	public:
 		void g() override;      // provide derived implementation
 	    void h() final;         // provide derived implementation
-
+>
 	    derived()
 		{
 	        f();                // BAD: attempt to call an unimplemented virtual function
-
+>
 			g();                // BAD: will call derived::g, not dispatch further virtually
 			derived::g();       // GOOD: explicitly state intent to call only the visible version
-
+>
 			h();                // ok, no qualification needed, h is final
 	    }
 	};
+> Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
 
-Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
+> **See also** [factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
 
-**See also** [factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
 
 
 <a name="Rc-swap"></a>
+### C.83: 값 형식 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라.
+
+**근거**: `swap`함수는  
+객체 대입을 구현할 때 원활하게 객체를 이동하는 것에서, 에러가 발생하지 않는 것을 보장하는 함수를 제공하는 것까지 몇몇 함수들(idioms)을 구현하는데 유용하다. 
+swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [소멸자, 자원해제, 그리고 swap은 실패해선 안된다]("#Re-never-fail)를 확인하라.
+
+**잘못된 예**:
+```
+class Foo {
+	// ...
+public:
+	void swap(Foo& rhs) noexcept
+	{
+        m1.swap(rhs.m1);
+        std::swap(m2, rhs.m2);
+    }
+private:
+    Bar m1;
+    int m2;
+};
+```
+호출자들의 편의를 위해서 같은 네임스페이스에 비 멤버 `swap`함수를 제공하라.
+```
+void swap(Foo& a, Foo& b)
+{
+	a.swap(b);
+}
+```
+**시행하기**:
+* 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다. 
+
+* 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다.
+
+> <a name="Rc-swap"></a>
 ### C.83: For value-like types, consider providing a `noexcept` swap function
 
-**Reason**: A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail]("#Re-never-fail).
-
-**Example; good**:
-
+> **Reason**: A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail]("#Re-never-fail).  
+> **Example; good**:
+> 
     class Foo {
 		// ...
     public:
@@ -2331,100 +2484,198 @@ Note that calling a specific explicitly qualified function is not a virtual call
         Bar m1;
         int m2;
     };
-
-Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
-
+> Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
+> 
     void swap(Foo& a, Foo& b)
 	{
 		a.swap(b);
 	}
+> **Enforcement**:
+> * (Simple) A class without virtual functions should have a `swap` member function declared.
+> * (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
-**Enforcement**:
-* (Simple) A class without virtual functions should have a `swap` member function declared.
-* (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+
+
 
 <a name="Rc-swap-fail"></a>
+### C.84: `swap`연산은 실패하지 않도록 한다
+
+**근거**: `swap`연산은 많은 경우 실패하지 않을 것으로 전제하고 사용된다. 또한 실패 가능성이 있는 `swap`연산으로는 정확하게 동작하도록 프로그램이 작성되기 어렵다. 표준 라이브러리의 컨테이너들과 알고리즘들은 swap연산의 타입이 실패하면 정확하게 동작하지 않을 것이다.  
+
+**잘못된 예**:
+```
+void swap(My_vector& x, My_vector& y)
+{
+	auto tmp = x;	// copy elements
+	x = y;
+	y = tmp;
+}
+```
+이 경우는 느릴 뿐만 아니라, `tmp`내의 원소들에 메모리 할당이 발생하면, 이 `swap` 연산은 예외를 던지고 이를 사용하는 STL 알고리즘들이 실패할 수 있다. 
+
+**시행하기**: 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.   
+
+
+> <a name="Rc-swap-fail"></a>
 ### C.84: A `swap` function may not fail
-
-**Reason**: `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The The standard-library containers and algorithms will not work correctly if a swap of an element type fails.
-
-**Example, bad**:
-
+> **Reason**: `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The The standard-library containers and algorithms will not work correctly if a swap of an element type fails.  
+> **Example, bad**:
+>
 	void swap(My_vector& x, My_vector& y)
 	{
 		auto tmp = x;	// copy elements
 		x = y;
 		y = tmp;
 	}
-
-This is not just slow, but if a memory allocation occur for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail is used with them.
-
-**Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+> This is not just slow, but if a memory allocation occur for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail is used with them.  
+> **Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
 
 <a name="Rc-swap-noexcept"></a>
+### C.85: `swap`연산은 `noexcept`로 작성하라
+
+**근거**: [`swap`연산은 실패하지 않도록 한다](#Rc-swap-fail).
+만약 `swap`연산이 예외를 던지면서 종료하면, 그것은 좋지 않은 설계 오류이며 프로그램을 종료하는게 낫다.
+
+**시행하기**: 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.   
+
+> <a name="Rc-swap-noexcept"></a>
 ### C.85: Make `swap` `noexcept`
+> **Reason**: [A `swap` may not fail](#Rc-swap-fail).
+If a `swap` tries to exit with an exception, it's a bad design error and the program had better terminate.  
+> **Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
-**Reason**: [A `swap` may not fail](#Rc-swap-fail).
-If a `swap` tries to exit with an exception, it's a bad design error and the program had better terminate.
-
-**Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
 
 <a name="Rc-eq"></a>
+### C.86: `==`연산자는 피연산자 타입들에 대칭적이고, `noexcept`로 만들어라.  
+
+**근거**: 피연산자들에 비대칭적인 처리는 기대에 부합하지 않고, 형변환이 가능한 경우 에러를 유발할 수 있다. 
+`==`는 기본적인 연산이며 프로그래머들이 이 연산을 사용할 때 연산 실패에 대한 고민이 없어야 한다.
+
+**예**:
+```
+class X {
+	string name;
+	int number;
+};
+
+bool operator==(const X& a, const X& b) noexcept {
+	 return a.name==b.name 
+	 	&& a.number==b.number; }
+```
+**잘못된 예**:
+```
+class B {
+	string name;
+	int number;
+	bool operator==(const B& a) const { 
+		return name==a.name 
+			&& number==a.number; }
+	// ...
+};
+```
+`B`의 비교 연산은 두번째 피연산자에 대해 형변환을 용인하지만, 첫번째 피연산자에 대해서는 그렇지 않다.
+
+**참고 사항**: 만약 클래스가 `double`타입의 `NaN`처럼 실패 상태를 가진다면, 실패 상태와의 비교에서 예외를 던지도록 하는 것도 적합할 수 있다.
+다른 방법으로는 실패 상태끼리의 비교는 동등하게 보고, 적합한 상태와 실패 상태의 비교에서는 거짓으로 판정할 수 있다.    
+
+**시행하기**: ???
+
+
+> <a name="Rc-eq"></a>
 ### C.86: Make `==` symmetric with respect to operand types and `noexcept`
 
-**Reason**: Assymetric treatment of operands is surprising and a source of errors where conversions are possible.
-`==` is a fundamental operations and programmers should be able to use it without fear of failure.
+> **Reason**: Assymetric treatment of operands is surprising and a source of errors where conversions are possible.
+> `==` is a fundamental operations and programmers should be able to use it without fear of failure.
 
-**Example**:
-
+> **Example**:
+>
 	class X {
 		string name;
 		int number;
 	};
-
+>
 	bool operator==(const X& a, const X& b) noexcept { return a.name==b.name && a.number==b.number; }
-
-**Example, bad**:
-
+> **Example, bad**:
+>
 	class B {
 		string name;
 		int number;
 		bool operator==(const B& a) const { return name==a.name && number==a.number; }
 		// ...
 	};
+> `B`'s comparison accpts conversions for its second operand, but not its first.
+> **Note**: If a class has a failure state, like `double`'s `NaN`, there is a temptation to make a comparison against the failure state throw.
+The alternative is to make two failure states compare equal and any valid state compare false against the failure state.  
+> **Enforcement**: ???
 
-`B`'s comparison accpts conversions for its second operand, but not its first.
 
-**Note**: If a class has a failure state, like `double`'s `NaN`, there is a temptation to make a comparison against the failure state throw.
-The alternative is to make two failure states compare equal and any valid state compare false against the failure state.
-
-**Enforcement**: ???
 
 
 <a name="Rc-eq-base"></a>
-### C.87: Beware of `==` on base classes
+### C.87: 기본 클래스에 있는 `==`에 주의하라
 
-**Reason**: It is really hard to write a foolproof and useful `==` for a hierarchy.
+**근거**: 계층 구조에서 잘못 사용하기 어렵고 유용한  `==`를 작성하는 것은 어려운 일이다. 
 
-**Example, bad**:
-
-	class B {
-		string name;
-		int number;
-		virtual bool operator==(const B& a) const { return name==a.name && number==a.number; }
-		// ...
-	};
+**잘못된 예**:
+```
+class B {
+	string name;
+	int number;
+	virtual bool operator==(const B& a) const {
+		return name==a.name 
+		&& number==a.number; }
+	// ...
+};
 
 // `B`'s comparison accpts conversions for its second operand, but not its first.
 
-	class D :B {
-		char character;
-		virtual bool operator==(const D& a) const { return name==a.name && number==a.number && character==a.character; }
+class D :B {
+	char character;
+	virtual bool operator==(const D& a) const { 
+		return name==a.name 
+			&& number==a.number 
+			&& character==a.character; }
+	// ...
+};
+
+B b = ...
+D d = ...
+b==d;	// compares name and number, ignores d's character
+d==b;	// error: no == defined
+D d2;
+d==d2;	// compares name, number, and character
+B& b2 = d2;
+b2==d;	// compares name and number, ignores d2's and d's character
+```
+물론 계층 구조 안에서 `==`가 동작하도록 하는 방법들이 있지만, 고지식한 방법들은 고려하지 말아라.  
+
+**시행하기**: ???
+
+><a name="Rc-eq-base"></a>
+### C.87: Beware of `==` on base classes
+> **Reason**: It is really hard to write a foolproof and useful `==` for a hierarchy.  
+> **Example, bad**:
+>
+	class B {
+		string name;
+		int number;
+		virtual bool operator==(const B& a) const { 
+			return name==a.name 
+				&& number==a.number; }
 		// ...
 	};
-
+> // `B`'s comparison accpts conversions for its second operand, but not its first.
+>
+	class D :B {
+		char character;
+		virtual bool operator==(const D& a) const { 
+			return name==a.name 
+				&& number==a.number 
+				&& character==a.character; }
+		// ...
+	};
 	B b = ...
 	D d = ...
 	b==d;	// compares name and number, ignores d's character
@@ -2433,78 +2684,56 @@ The alternative is to make two failure states compare equal and any valid state 
 	d==d2;	// compares name, number, and character
 	B& b2 = d2;
 	b2==d;	// compares name and number, ignores d2's and d's character
+> Of course there are way of making `==` work in a hierarchy, but the naive approaches do not scale
+> **Enforcement**: ???
 
-Of course there are way of making `==` work in a hierarchy, but the naive approaches do not scale
-
-**Enforcement**: ???
 
 
 <a name="Rc-lt"></a>
-### C.88: Make `<` symmetric with respect to operand types and `noexcept`
+### C.88: `<` 연산자는 피연산자 타입에 대칭적으로 동작하고, `noexcept`로 작성하라
 
-**Reason**: ???
-
-**Example**:
-
+**근거**: ???  
+**예**:
+```
 	???
+```
+**시행하기**: ???
 
-**Enforcement**: ???
+> <a name="Rc-lt"></a>
+### C.88: Make `<` symmetric with respect to operand types and `noexcept`
+> **Reason**: ???  
+> **Example**:  
+> 
+	???
+> **Enforcement**: ???
+
 
 
 <a name="Rc-hash"></a>
+### C.89: `hash`는 `noexcept`로 작성하라  
+**근거**: ???  
+**예**:
+```
+???
+```
+**시행하기**: ???
+
+> <a name="Rc-hash"></a>
 ### C.89: Make a `hash` `noexcept`
-
-**Reason**: ???
-
-**Example**:
-
+> **Reason**: ???  
+> **Example**:  
+>
 	???
+> **Enforcement**: ???
 
-**Enforcement**: ???
-
-<a name="SS-containers"</a>
-## C.con: Containers and other resource handles
-
-A container is an object holding a sequence of objects of some type; `std::vector` is the archetypical container.
-A resource handle is a class that owns a resource; `std::vector` is the typical resource handle; it's resource is its sequence of elements.
-
-Summary of container rules:
-
-* [C.100: Follow the STL when defining a container](#Rcon-stl)
-* [C.101: Give a container value semantics](#Rcon-val)
-* [C.102: Give a container move operations](#Rcon-move)
-* [C.103: Give a container an initializer list constructor](#Rcon-init)
-* [C.104: Give a container a default constructor that sets it to empty](#Rcon-empty)
-* [C.105: Give a constructor and `Extent` constructor](#Rcon-val)
-* ???
-* [C.109: If a resource handle has pointer semantics, provide `*` and `->`](#rcon-ptr)
-
-**See also**: [Resources](#SS-resources)
-
-
-<a name="SS-lambdas"></a>
-## C.lambdas: Function objects and lambdas
-
-A function object is an object supplying an overloaded `()` so that you can call it.
-A lambda expression (colloquially often shortened to "a lambda") is a notation for generating a function object.
-
-Summary:
-
-* [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
-* [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
-* [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
-* [ES.28: Use lambdas for complex initialization, especially of `const` variables](#Res-lambda-init)
-
-
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 <a name="SS-containers"></a>
 ## C.con: 컨테이너와 다른 리소스 핸들   
+> ## C.con: Containers and other resource handles
 
-컨테이너는 어떤 타입의 객체들을 보유하는 객체를 의미합니다; `std::vector`는 전형적인 컨테이너 입니다.   
-리소스 핸들은 리소스를 소유한 클래스를 의미합니다. `std::vector`는 리소스 핸들에 속합니다; 여기서 리소스는 벡터가 보유한 원소들의 시퀀스입니다. 
+컨테이너는 어떤 타입의 객체들을 보유하는 객체를 의미한다; `std::vector`가 대표적인 컨테이너이다.   
+리소스 핸들은 리소스를 소유한하는 클래스를 의미한다. `std::vector`는 리소스 핸들에 속한다; 여기서 리소스는 벡터가 보유한 원소들의 시퀀스이다. 
 
-> ## C.con: Containers and other resource handles    
 
 > A container is an object holding a sequence of objects of some type; `std::vector` is the archetypical container.   
 > A resource handle is a class that owns a resource; `std::vector` is the typical resource handle; it's resource is its sequence of elements.
@@ -2535,7 +2764,6 @@ Summary:
 >**See also**: [Resources](#SS-resources)
 
 
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 <a name="SS-lambdas"></a>
 ## C.lambdas: 함수 객체와 람다   
@@ -2565,7 +2793,6 @@ Summary:
 * [ES.28: Use lambdas for complex initialization, especially of `const` variables](#Res-lambda-init)
 
 
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 <a name="SS-hier"></a>
 
@@ -2649,7 +2876,6 @@ Summary:
 * [C.152: Never assign a pointer to an array of derived class objects to a pointer to its base](#Rh-array)
 
 
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 <a name="Rh-domain"></a>
 ### C.120: 클래스 계층은 상속 계층 구조의 개념을 표현하는데 사용하라 (only)
@@ -2782,7 +3008,6 @@ not using this (over)general interface in favor of a particular interface found 
 	???
 >**Enforcement**: ???
 
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 ## C.hierclass: 계층 안에 있는 클래스들의 설계:
 > ## C.hierclass: Designing classes in a hierarchy:
@@ -3307,8 +3532,6 @@ Herb: 정반대의 시행하기: 2개 이상의 (데이터 멤버가 있는)기�
 
 
 
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-
 ## C.hier-access: 계층 구조에서 객체 접근
 > ## C.hier-access: Accessing objects in a hierarchy
 
@@ -3384,7 +3607,6 @@ void use3()
 
 
 
-<작성 중> 
 <a name="Rh-dynamic_cast"></a>
 ### C.146: `dynamic_cast`는 클래스 계층 구조에서 탐색이 불가피할때 사용하라
 
@@ -3413,20 +3635,14 @@ void user(B* pb)
 }
 ```
 **참고사항**: 다른 모든 캐스팅처럼, `dynamic_cast`는 너무 자주 사용된다.
-[Prefer virtual functions to casting](#???).
+[캐스팅 보다는 가상 함수들을 사용하라](#???).
 가능한 한 클래스 계층을 탐색하는 것보다 [정적 다형성](#???)을 선호하라. (이렇게 하면 실행시간 실행시간 결정이 필요없다. 그리고 충분히 편리하다.)
 
-**예외 사항**: 만약 당신의 구현에 정말로 느린 `dynamic_cast`가 있다면, 대안을 찾아야 할 것이다. 
+**예외 사항**: 만약 당신의 구현 코드에 정말로 느린 `dynamic_cast`가 있다면, 대안을 찾아야 할 것이다. 
+하지만, 정적으로 클래스를 결정할 수 없는 모든 대안은 명시적 캐스팅(일반적으로 `static_cast`)을 포함하고, 에러에 취약하다.  
+당신만의 특별한 `dynamic_cast`를 만들수도 있을 것이다. 그러니, `dynamic_cast`가 정말로 당신이 생각하는 것 만큼 느리다는 것을 확실시하라. (근거 없는 루머들이 꽤 있다.) 그리고 `dynamic_cast`의 사용이 정말로 성능에 치명적이라는 것 또한 확실시 하라. 
 
-하지만, 명시적 캐스팅(일반적으로 `static_cast`)을 포함해 정적으로 클래스를 결정할 수 없는 모든 대안은 에러에 취약하다.
-
-However, all workarounds that cannot be statically resolved involve explicit casting (typically `static_cast`) and are error-prone.
-
-You will basically be crafting your own special-purpose `dynamic_cast`.
-So, first make sure that your `dynamic_cast` really is as slow as you think it is (there are a fair number of unsupported rumors about)
-and that your use of `dynamic_cast` is really performance critical.
-
-**시행하기**: Flag all uses of `static_cast` for downcasts, including C-style casts that perform a `static_cast`.
+**시행하기**: 하향식 캐스팅(C언어 스타일을 포함해서)에 사용되는 `static_cast`에 표시를 남겨라. 
 
 > <a name="Rh-dynamic_cast"></a>
 ### C.146: Use `dynamic_cast` where class hierarchy navigation is unavoidable
@@ -3588,12 +3804,12 @@ auto q = make_unique<Foo>(7);		// Better: no repetition of Foo
 
 
 
- <작성 중>
+
 <a name="Rh-make_shared"></a>
 ### C.151: shared_ptr들에 의해 소유되는 객체를 생성하기 위해서는 make_shared()를 사용하라
 
 **근거**: `make_shared`는 생성 구문을 더 간결하게 만들어준다.
-It also gives an opportunity to eliminate a separate allocation for the reference counts, by placing the `shared_ptr`'s use counts next to its object.
+또한 `make_shared`는 객체 옆에 `shared_ptr`의 사용횟수를 배치하면서, 멀리 떨어져 표기되지 않도록 해준다.
 
 **예**:
 ```
@@ -3602,8 +3818,8 @@ It also gives an opportunity to eliminate a separate allocation for the referenc
 	auto q = make_shared<Foo>(7);		// Better: no repetition of Foo; one object
 ```
 **시행하기**:
-* Flag the repetive usage of template specialization list`<Foo>`
-* Flag variables declared to be `shared_ptr<Foo>`
+* 반복적인 템플릿 전문화 리스트 `<Foo>`의 사용에 표시를 남겨라. 
+* `shared_ptr<Foo>`로 선언된 변수들에 표시를 남겨라. 
 
 
 > <a name="Rh-make_shared"></a>
@@ -3623,7 +3839,7 @@ It also gives an opportunity to eliminate a separate allocation for the referenc
 
 
 
-<작성 중>
+
 <a name="Rh-array"></a>
 ### C.152: 파생 클래스 객체들의 포인터 배열에 기본 클래스의 포인터를 할당해서는 절대로 안된다
 
@@ -3644,7 +3860,7 @@ use(a);		// bad: a decays to &a[0] which is converted to a B*
 ```
 **시행하기**:
 * 모든 종류의 배열 해제와 기본 타입에서 파생 타입으로의 형변환에 표시를 남겨라. 
-* 배열을 포인터 보다는 `array_view`로 전달하라, and don't let the array name suffer a derived-to-base conversion before getting into the `array_view`
+* 배열을 포인터 보다는 `array_view`로 전달하라, 그리고 `array_view`로 전달하기 전 파생클래스에서 기본클래스로의 변환이 없도록 하라.   
 
 > <a name="Rh-array"></a>
 ### C.152: Never assign a pointer to an array of derived class objects to a pointer to its base
@@ -3669,7 +3885,6 @@ use(a);		// bad: a decays to &a[0] which is converted to a B*
 > * Pass an array as an `array_view` rather than as a pointer, and don't let the array name suffer a derived-to-base conversion before getting into the `array_view`
 
 
------
 
 <a name="SS-overload"></a>
 # C.over: Overloading and overloaded operators
@@ -3702,19 +3917,19 @@ You cannot overload function objects.
 * [C.170: If you feel like overloading a lambda, use a generic lambda](#Ro-lambda)
 
 
-<작성 중>
+
 <a name="Ro-conventional"></a>
 ### C.160: 연산자를 정의할때는 관례적인 사용을 모방하라
 
-**근거**: Minimize surprises.
+**근거**: 뜻밖의 의미가 없도록 한다.
 
 **잘못된 예**:
 ```
 X operator+(X a, X b) { return a.v-b.v; }	// bad: makes + subtract
 ```
-???. Non-member operators: namespace-level definition (traditional?) vs friend definition (as used by boost.operator, limits lookup to ADL only)
+???. 비멤버 연산자들: (전통적인?) 네임스페이스 레벨 정의 또는 `friend` 정의(boost.operator에서 사용되고 ADL(Argument-Dependent Lookup)만으로 제한되는)  
 
-**시행하기**: Possibly impossible.
+**시행하기**: 거의 불가능하다.
 
 > <a name="Ro-conventional"></a>
 ### C.160: Define operators primarily to mimic conventional usage
@@ -3728,18 +3943,17 @@ X operator+(X a, X b) { return a.v-b.v; }	// bad: makes + subtract
 
 
 
-<작성 중>
+
 <a name="Ro-symmetric"></a>
 ### C.161: 대칭적인 연산자들에는 비멤버 함수들을 사용하라
 
-**근거**: If you use member functions, you need two.
-Unless you use a non-member function for (say) `==`, `a==b` and `b==a` will be subtly different.
+**근거**: 만약 멤버 함수로 정의하게 되면, 비 멤버 함수를 쓰지 않는 한 2개의 함수가 필요하게 된다. 가령  `==`, `a==b` 그리고 `b==a` 는 미묘하게 다른 함수가 된다.
 
 **예**:
 ```
 bool operator==(Point a, Point b) { return a.x==b.x && a.y==b.y; }
 ```
-**시행하기**: Flag member operator functions.
+**시행하기**: 멤버 연산자 함수들에는 표시를 남겨라.
 
 > <a name="Ro-symmetric"></a>
 ### C.161: Use nonmember functions for symmetric operators
@@ -3753,11 +3967,11 @@ Unless you use a non-member function for (say) `==`, `a==b` and `b==a` will be s
 
 
 
-<작성 중>
-<a name="Ro-equivalent"></a>
-### C.162: 거의 동등한 연산들을 오버로드하라
 
-**근거**: Having different names for logically equivalent operations on different argument types is confusing, leads to encoding type information in function names, and inhibits generic programming.
+<a name="Ro-equivalent"></a>
+### C.162: `동등한` 연산들을 오버로드하라
+
+**근거**: 다른 인자타입을 지니는 논리적으로 동등한 연산에 제각기 다른 이름을 붙이는 것은 혼란을 야기한다. 또한 함수 이름에 타입정보를 넣는 것은 제네릭 프로그래밍을 방해한다.  
 
 **예**: 고려 중(consider)
 ```
@@ -3765,13 +3979,13 @@ void print(int a);
 void print(int a, int base);
 void print(const string&);
 ```
-These three functions all prints their arguments (appropriately). Conversely
+이 세 함수들은 모두 인자들을 출력한다. 반대로, 
 ```
 void print_int(int a);
 void print_based(int a, int base);
 void print_string(const string&);
 ```
-These three functions all prints their arguments (appropriately). Adding to the name just introduced verbosity and inhibits generic code.
+이 세 함수들은 모두 인자들을 출력하지만, 함수 이름을 길게 만들면서 일반화된 코드가 되지 못하게 한다.
 
 **시행하기**: ???
 
@@ -3798,26 +4012,25 @@ These three functions all prints their arguments (appropriately). Adding to the 
 
 
 
-<작성 중>
 <a name="Ro-equivalent-2"></a>
-### C.163: 거의 동등한 연산들만 오버로드하라
+### C.163: 거의 동등한 연산들'만' 오버로드하라
 
-**근거**: Having the same name for logically different functions is confusing and leads to errors when using generic programming.
+**근거**: 논리적으로 다른 함수들이 같은 이름을 가지는 것은 혼란을 야기하며, 제네릭 프로그래밍을 사용할 때 에러로 이어진다. 
 
 **예**: 고려 중(Consider)
 ```
 void open_gate(Gate& g);	// remove obstacle from garage exit lane
 void fopen(const char*name, const char* mode);	// open file
 ```
-The two operations are fundamentally different (and unrelated) so it is good that their names differ. Conversely:
+두 연산은 근본적으로 다르다(그리고 연관성이 없다). 따라서 서로 함수명이 다른 것은 타당하다. 반대로,  
 ```
 void open(Gate& g);	// remove obstacle from garage exit lane
 void open(const char*name, const char* mode ="r");	// open file
 ```
-The two operations are still fundamentally different (and unrelated) but the names have been reduced to their (common) minimum, opening opportunities for confusion.
-Fortunately, the type system will catch many such mistakes.
+이 두 연산은 여전히 근본적으로 다르고 연관성이 없지만, 이름이 혼란을 가져올 가능성이 있도록 축약되었다. 
+다행히도, 타입 시스템이 혼란으로 인한 많은 잘못된 사용들을 잡아낼 것이다.
 
-**참고 사항**: be particularly careful about common and popular names, such as `open`, `move`, `+`, and `==`.
+**참고 사항**: 가령 `open`, `move`, `+`, 그리고 `==` 같은 연산들처럼 일반적이고 자주 사용되는 이름에는 특히 신중하라. 
 
 **시행하기**: ???
 
@@ -3844,17 +4057,14 @@ Fortunately, the type system will catch many such mistakes.
 
 
 
-
-작성 중 
 <a name="Ro-conversion"></a>
 ### C.164: 형변환 연산자들을 정의하지 말아라
 
-**근거**: Implicit conversions can be essential (e.g., `double` to '`int`) but often cause surprises (e.g., `String` to C-style string).
+**근거**: 암묵적 형변환은 필수적일 수도 있다. (`double` 에서 `int`로의 변환) 하지만 종종 기대밖의 동작이 일어난다. (`String` 에서 C-스타일 문자열로 변환) 
 
-**참고 사항**: Prefer explicitly named conversions until a serious need is demonstracted.
-By "serious need" we mean a reason that is fundamental in the application domain (such as an integer to complex number conversion)
-and frequently needed. Do not introduce implicit conversions (through conversion operators or non-`explicit` constructors)
-just to gain a minor convenience.
+**참고 사항**: 중대한 필요가 발생하지 않는 한, 명시적으로 변환하는 것을 지향하라. 여기서 중대한 필요는 응용프로그램 안에서 필수적이거나 자주 사용되는 등의 이유를 의미한다.
+(가령 정수에서 복소수로의 변환)  
+암묵적 형변환을 제공하지 말아라. (형변환 연산자 또는 `explicit`을 명기하지 않은 생성자들) 약간의 불편함만 있을 뿐이다.
 
 **잘못된 예**:
 ```
@@ -3876,9 +4086,9 @@ void user(zstring p)
 	// use p
 }
 ```
-The string allocated for `s` and assigned to `p` is destroyed before it can be used.
+`s`에 할당되고 `p`에 대입된 문자열이 사용될 수 있게 되기 전에 파괴된다.
 
-**시행하기**: Flag all conversion operators.
+**시행하기**: 모든 형변환 연산자에 표시를 남겨라.
 
 > <a name="Ro-conversion"></a>
 ### C.164: Avoid conversion operators
@@ -3914,11 +4124,10 @@ The string allocated for `s` and assigned to `p` is destroyed before it can be u
 
 
 
-작성 중 
 <a name="Ro-lambda"></a>
 ### C.170: 람다를 오버로딩하는 기분이 든다면, 제네릭 람다를 사용하라
 
-**근거**: You can overload by defining two different lambdas with the same name
+**근거**: 같은 이름으로 다른 람다 함수를 오버로드 할 수 있다. 
 
 **예**:
 ```
@@ -3931,7 +4140,7 @@ auto g = [](double) { /* ... */ };	// error: cannot overload variables
 
 auto h = [](auto) { /* ... */ };	// OK
 ```
-**시행하기**: The compiler catches attempt to overload a lambda.
+**시행하기**: 컴파일러가 람다 함수에 대한 오버로드를 잡아낸다. 
 
 
 > <a name="Ro-lambda"></a>
@@ -3951,7 +4160,7 @@ auto h = [](auto) { /* ... */ };	// OK
 
 > **Enforcement**: The compiler catches attempt to overload a lambda.
 
- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
 
 <a name="SS-union"></a>
 ## C.union: 공용체
@@ -3971,7 +4180,6 @@ auto h = [](auto) { /* ... */ };	// OK
 > * [C.181: Avoid "naked" `union`s](#Ru-naked)
 > * [C.182: Use anonymous `union`s to implement tagged unions](#Ru-anonymous)
 > * ???
-
 
 
 
