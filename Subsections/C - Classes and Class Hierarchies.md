@@ -475,16 +475,26 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 > * [C.51: Use delegating constructors to represent common actions for all constructors of a class](#Rc-delegating)
 > * [C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization](#Rc-inheriting)
 
-Copy and move rules:
+복사와 이동 규칙들 : 
+> Copy and move rules:
 
-* [C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`](#Rc-copy-assignment)
-* [C.61: A copy operation should copy](#Rc-copy-semantic)
-* [C.62: Make copy assignment safe for self-assignment](#Rc-move-self)
-* [C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const&`](#Rc-move-assignment)
-* [C.64: A move operation should move and leave its source in a valid state](#Rc-move-semantic)
-* [C.65: Make move assignment safe for self-assignment](#Rc-copy-self)
-* [C.66: Make move operations `noexcept`](#Rc-move-noexcept)
-* [C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired](#Rc-copy-virtual)
+* [C.60: 복사연산을 `virtual`로 만들지 말아라. 매개변수는 `const&`로 받고, 비-`const&`로 반환하라](#Rc-copy-assignment)
+* [C.61: 복사 연산은 복사를 수행해야 한다](#Rc-copy-semantic)
+* [C.62: 복사 연산은 자기 대입에 안전하게 작성하라](#Rc-move-self)
+* [C.63: 이동 연산은 `virtual`로 만들지 말아라, 매개변수는 `&&`를 사용하고, 비-`const&`로 반환하라](#Rc-move-assignment)
+* [C.64: 이동 연산은 이동을 수행해야 하며, 원본 객체를 안전한(Valid) 상태로 남겨둬야 한다](#Rc-move-semantic)
+* [C.65: 이동 연산은 자기 대입에 안전하게 작성하라](#Rc-copy-self)
+* [C.66: 이동 연산은 `noexcept`로 만들어라](#Rc-move-noexcept)
+* [C.67: 기본 클래스는 복사를 감추는게 낫다. 대신 복사가 요구된다면 가상 `clone`함수를 제공하라](#Rc-copy-virtual)
+
+> * [C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`](#Rc-copy-assignment)
+> * [C.61: A copy operation should copy](#Rc-copy-semantic)
+> * [C.62: Make copy assignment safe for self-assignment](#Rc-move-self)
+> * [C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const&`](#Rc-move-assignment)
+> * [C.64: A move operation should move and leave its source in a valid state](#Rc-move-semantic)
+> * [C.65: Make move assignment safe for self-assignment](#Rc-copy-self)
+> * [C.66: Make move operations `noexcept`](#Rc-move-noexcept)
+> * [C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired](#Rc-copy-virtual)
 
 다른 기본 연산들에 대한 규칙 :
 > Other default operations rules: 
@@ -651,10 +661,10 @@ Copy and move rules:
 * (복잡함) 복사/이동 생성자는 멤버 변수에 대해 깊은 복사를 수행하고 나서, 소멸자는 멤버 변수를 수정하는 것이 좋다.
 * (복잡함) 소멸자가 멤버 변수를 변경하면, 그 멤버 변수들은 복사/이동 생성자 혹은 할당 연산자에서 쓰여지는 것이 좋다.
 
-* (Complex) A copy/move constructor and the corresponding copy/move assignment operator should write to the same member variables at the same level of dereference.
-* (Complex) Any member variables written in a copy/move constructor should also be initialized by all other constructors.
-* (Complex) If a copy/move constructor performs a deep copy of a member variable, then the destructor should modify the member variable.
-* (Complex) If a destructor is modifying a member variable, that member variable should be written in any copy/move constructors or assignment operators.
+> * (Complex) A copy/move constructor and the corresponding copy/move assignment operator should write to the same member variables at the same level of dereference.
+> * (Complex) Any member variables written in a copy/move constructor should also be initialized by all other constructors.
+> * (Complex) If a copy/move constructor performs a deep copy of a member variable, then the destructor should modify the member variable.
+> * (Complex) If a destructor is modifying a member variable, that member variable should be written in any copy/move constructors or assignment operators.
 
 
 
@@ -1694,7 +1704,7 @@ In general, the writer of a base class does not know the appropriate action to b
 	    // ...
 	};
 
-**예*:
+**예**:
 
 	class B {
 	private:
@@ -1738,13 +1748,55 @@ In general, the writer of a base class does not know the appropriate action to b
 > **See also**: [Discussion](#Sd factory)
 
 
+
+
 <a name="Rc-delegating"></a>
-### C.51: Use delegating constructors to represent common actions for all constructors of a class
+### C.51: 클래스의 모든 생성자들의 일반적인 동작을 표현하려면 위임 생성자를 사용하라
 
-**Reason**: To avoid repetition and accidental differences
+**근거**: 중복을 피하고 우연히 발생할 수 있는 잘못된 표기를 방지한다.
 
-**Example; bad**:
+**잘못된 예**:
+```
+class Date {	// BAD: repettive
+	int d;
+	Month m;
+	int y;
+public:
+	Date(int ii, Month mm, year yy)
+		:i{ii}, m{mm} y{yy}
+		{ if (!valid(i,m,y)) throw Bad_date{}; }
+	Date(int ii, Month mm)
+		:i{ii}, m{mm} y{current_year()}
+		{ if (!valid(i,m,y)) throw Bad_date{}; }
+	// ...
+};
+```
+일반적인 동작은 작성하기 지루하며, 뜻하지 않게 일반적이지 않을 수도 있다.  
 
+**예**:
+```
+class Date2 {
+	int d;
+	Month m;
+	int y;
+public:
+	Date2(int ii, Month mm, year yy)
+		:i{ii}, m{mm} y{yy}
+		{ if (!valid(i,m,y)) throw Bad_date{}; }
+	Date2(int ii, Month mm)
+		:Date2{ii,mm,current_year{}} {}
+	// ...
+};
+```
+**참고**: 만약 "반복된 동작"이 단순한 초기화라면, [생성자에서 항상 동일하게 초기화 되는 멤버는 클래스내 초기화자를 선호하라](#Rc-in-class initializer)를 고려하라. 
+
+**시행하기**: (Moderate) 비슷한 생성자 내용을 찾아보라.
+
+> <a name="Rc-delegating"></a>
+> ### C.51: Use delegating constructors to represent common actions for all constructors of a class
+> **Reason**: To avoid repetition and accidental differences  
+> **Example; bad**:
+>
 	class Date {	// BAD: repettive
 		int d;
 		Month m;
@@ -1753,18 +1805,14 @@ In general, the writer of a base class does not know the appropriate action to b
 		Date(int ii, Month mm, year yy)
 			:i{ii}, m{mm} y{yy}
 			{ if (!valid(i,m,y)) throw Bad_date{}; }
-
 		Date(int ii, Month mm)
 			:i{ii}, m{mm} y{current_year()}
 			{ if (!valid(i,m,y)) throw Bad_date{}; }
 		// ...
 	};
-
-The common action gets tedious to write and may accidentally not be common.
-
-**Example**:
-
-
+> The common action gets tedious to write and may accidentally not be common.  
+> **Example**:
+>
 	class Date2 {
 		int d;
 		Month m;
@@ -1773,64 +1821,156 @@ The common action gets tedious to write and may accidentally not be common.
 		Date2(int ii, Month mm, year yy)
 			:i{ii}, m{mm} y{yy}
 			{ if (!valid(i,m,y)) throw Bad_date{}; }
-
 		Date2(int ii, Month mm)
 			:Date2{ii,mm,current_year{}} {}
 		// ...
 	};
-
-**See also**: If the "repeated action" is a simple initialization, consider [an in-class member initializer](#Rc-in-class initializer).
-
-**Enforcement**: (Moderate) Look for similar constructor bodies.
+> **See also**: If the "repeated action" is a simple initialization, consider [an in-class member initializer](#Rc-in-class initializer).
+> **Enforcement**: (Moderate) Look for similar constructor bodies.
 
 
 <a name="Rc-inheriting"></a>
-### C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization
+### C.52: 명시적인 초기화를 필요로 하지 않는 파생 클래스에선, 상속 받는 생성자들을 사용하라.
 
-**Reason**: If you need those constructors for a derived class, re-implementeing them is tedious and error prone.
+**근거**: 파생 클래스를 위해서 생성자가 필요하다면, 그 생성자들을 다시 작성하는 것은 지루하며 에러에 취약하다.  
 
-**Example**: `std::vector` has a lot of tricky constructors, so it I want my own `vector`, I don't want to reimplement them:
+**예**: `std::vector`는 교묘한 생성자들을 많가지고 있다. 자신만의 `vector`를 원한다면, 그 많은 생성자들을 다시 구현하고 싶진 않을 것이다.
+```
+class Rec {
+	// ... 데이터와 많은 좋은 생성자들 ...
+};
 
+class Oper : public Rec {
+	using Rec::Rec;
+	// ... 데이터 멤버는 없고 ...
+	// ... 많은 보조 함수들만 있다 ...
+};
+```
+**잘못된 예**:
+```
+struct Rec2 : public Rec {
+	int x;
+	using Rec::Rec;
+};
+
+Rec2 r {"foo", 7};
+int val = r.x;	// 초기화 되지 않았다
+```
+**시행하기**: 파생된 클래스의 모든 멤버들이 반드시 초기화 되도록 하라. 
+
+> <a name="Rc-inheriting"></a>
+> ### C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization
+> **Reason**: If you need those constructors for a derived class, re-implementeing them is tedious and error prone.
+> **Example**: `std::vector` has a lot of tricky constructors, so it I want my own `vector`, I don't want to reimplement them:
+>
 	class Rec {
 		// ... data and lots of nice constructors ...
 	};
-
 	class Oper : public Rec {
 		using Rec::Rec;
 		// ... no data members ...
 		// ... lots of nice utility functions ...
 	};
-
-**Example; bad**:
-
+> **Example; bad**:
+>
 	struct Rec2 : public Rec {
 		int x;
 		using Rec::Rec;
 	};
-
 	Rec2 r {"foo", 7};
 	int val = r.x;	// uninitialized
-
-
-**Enforcement**: Make sure that every member of the derived class is initialized.
+> **Enforcement**: Make sure that every member of the derived class is initialized.
 
 
 
 <a name="SS-copy"></a>
-## C.copy: Copy and move
+## C.copy: 복사와 이동
+값 타입들은 일반적으로 복사 가능해야 한다. 하지만 클래스 계층에서의 인터페이스들은 그렇지 않아야 한다.  
+리소스 핸들의 경우, 복사가 가능할 수도, 그렇지 않을 수도 있다.  
+타입들은 논리적인 또는 성능 상의 이유로 이동하도록 정의될 수 있다. 
 
+> <a name="SS-copy"></a>
+> ## C.copy: Copy and move
 Value type should generally be copyable, but interfaces in a class hierarchy should not.
 Resource handles, may or may not be copyable.
 Types can be defined to move for logical as well as performance reasons.
 
 
+
+
 <a name="Rc-copy-assignment"></a>
-### C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`
+### C.60: 복사 대입은 `virtual`로 만들지 마라, 매개변수는 `const&`로 받고, 반환은 비-`const&`로 하라. 
 
-**Reason**: It is simple and efficient. If you want to optimize for rvalues, provide an overload that takes a `&&` (see [F.24](#Rf-pass-ref-ref)).
+**근거**: 이렇게 하는 것이 간단하고 효율적이다. r-value를 위해 최적화하길 원한다면, `&&`를 받는 대입 연산을 오버로드하여 제공하라. ([F.24](#Rf-pass-ref-ref)를 참조하라)
 
-**Example**:
+**예**:
+```
+class Foo {
+public:
+	Foo& operator=(const Foo& x)
+	{
+		auto tmp = x;	// GOOD: 자기 대입을 위한 검사를 할 필요가 없다.(성능 말고는)
+		std::swap(*this,tmp);
+		return *this;
+	}
+	// ...
+};
 
+Foo a;
+Foo b;
+Foo f();
+
+a = b;  	// l-value 대입 : 복사
+a = f();	// r-value 대입 : 이동일 수도 있다
+```
+**참고 사항**: `swap`함수의 구현은 [강한 예외 보장](???)을 가능하게 한다.
+
+**예**: 하지만 만약 임시 사본을 만들지 않음으로써 굉장히 나은 성능을 얻을 수 있다면 어떨까? 
+큰고 같은 크기의 `Vector`들의 대입이 빈번한 영역을 위한 간단한 `Vector`를 생각해보라.  
+이 경우, `swap`구현 기법에 의한 원소들의 사본은 대규모의 비용을야기할 수 있다.
+```
+template<typename T>
+class Vector {
+public:
+	Vector& operator=(const Vector&);
+	// ...
+private:
+	T* elem;
+	int sz;
+};
+
+Vector& Vector::operator=(const Vector& a)
+{
+	if (a.sz>sz)
+	{
+		// ... swap함수 기법을 사용한다. 이러면 최상의 구현이 된다 ...
+		*return *this
+	}
+	// ... *a.elem으로부터 elem으로 sz만큼 원소들을 복사한다 ...
+	if (a.sz<sz) {
+		// ... destroy the surplus elements in *this* and adjust size ...
+	}
+	return *this*
+}
+```
+대상 원소들에 직접 쓰기 연산을 함으로써, `swap`기법이 제공하는 강한 예외 보장 대신 [기본적인 예외 보장](#???)만 얻게 될 것이다. 
+[자기 대입](#Rc-copy-self)에 주의하라.
+
+**대안**: 만약 당신이 `virtual` 대입 연산자가 필요하다고 생각한다면, 그리고 어째서 그것이 문제를 야기할 수 있는지 이해한다면, 그 함수는 `operator=`라고 부르지 마라. 이름을 부여해서 `virtual void assign(const Foo&)`로 만들어라. 
+[복사 생성 vs. `clone()`](#Rc-copy-virtual)를 참조하라. 
+
+**시행하기**:  
+* (Simple) 대입 연산자는 가상함수여서는 안된다. 드래곤들만큼 위험하다!
+* (Simple) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 객체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
+* (Moderate) 대입 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 대입 연산자를 호출해야 한다.  
+해당 타입이 포인터 문맥이나 값 문맥을 가지는지 확인하기 위해 소멸자를 확인하라. 
+
+
+> <a name="Rc-copy-assignment"></a>
+> ### C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`
+> **Reason**: It is simple and efficient. If you want to optimize for rvalues, provide an overload that takes a `&&` (see [F.24](#Rf-pass-ref-ref)).  
+> **Example**:
+>
 	class Foo {
 	public:
 		Foo& operator=(const Foo& x)
@@ -1841,18 +1981,17 @@ Types can be defined to move for logical as well as performance reasons.
 		}
 		// ...
 	};
-
+>
 	Foo a;
 	Foo b;
 	Foo f();
-
+>
 	a = b;		// assign lvalue: copy
 	a = f();	// assign rvalue: potentially move
 
-**Note**: The `swap` implementation technique offers the [strong guarantee](???).
-
-**Example**: But what if you can get significant better performance by not making a temporary copy? Consider a simple `Vector` intended for a domain where assignment of large, equal-sized `Vector`s is common. In this case, the copy of elements implied by the `swap` implementation technique could cause an order of magnitude increase in cost:
-
+> **Note**: The `swap` implementation technique offers the [strong guarantee](???).  
+> **Example**: But what if you can get significant better performance by not making a temporary copy? Consider a simple `Vector` intended for a domain where assignment of large, equal-sized `Vector`s is common. In this case, the copy of elements implied by the `swap` implementation technique could cause an order of magnitude increase in cost:
+>
 	template<typename T>
 	class Vector {
 	public:
@@ -1862,7 +2001,7 @@ Types can be defined to move for logical as well as performance reasons.
 		T* elem;
 		int sz;
 	};
-
+>
 	Vector& Vector::operator=(const Vector& a)
 	{
 		if (a.sz>sz)
@@ -1876,33 +2015,32 @@ Types can be defined to move for logical as well as performance reasons.
 		}
 		return *this*
 	}
-
-By writing directly to the target elements, we will get only [the basic guarantee](#???) rather than the strong guaranteed offered by the `swap` technique. Beware of [self assignment](#Rc-copy-self).
-
-**Alternatives**: If you think you need a `virtual` assignment operator, and understand why that's deeply problematic, don't call it `operator=`. Make it a named function like `virtual void assign(const Foo&)`.
+> By writing directly to the target elements, we will get only [the basic guarantee](#???) rather than the strong guaranteed offered by the `swap` technique. Beware of [self assignment](#Rc-copy-self).
+> **Alternatives**: If you think you need a `virtual` assignment operator, and understand why that's deeply problematic, don't call it `operator=`. Make it a named function like `virtual void assign(const Foo&)`.
 See [copy constructor vs. `clone()`](#Rc-copy-virtual).
 
-**Enforcement**:
-
+> **Enforcement**:
+>
 * (Simple) An assignment operator should not be virtual. Here be dragons!
 * (Simple) An assignment operator should return `T&` to enable chaining, not alternatives like `const T&` which interfere with composability and putting objects in containers.
 * (Moderate) An assignment operator should (implicitly or explicitly) invoke all base and member assignment operators.
 Look at the destructor to determine if the type has pointer semantics or value semantics.
 
 
+
 <a name="Rc-copy-semantic"></a>
-### C.61: A copy operation should copy
+### C.61: 복사 연산은 복사를 수행해야 한다.
 
-**Reason**: That is the generally assumed semantics. After `x=y`, we should have `x==y`.
-After a copy `x` and `y` can be independent objects (value semantics, the way non-pointer built-in types and the standard-library types work) or refer to a shared object (pointer semantics, the way pointers work).
+**근거**: 그렇게 하는 것이 일반적으로 생각되는 의미론이다. `x=y`가 수행된 후에는, `x==y`인 결과를 가져야 한다.
+복사 후에는 `x`와 `y`가 독립적인 객체들일 수 있다. (값 의미론, 비-포인터 빌트인 타입들과 표준 라이브러리 타입들의 동작하는 방식) 또는 공유된 객체를 참조한다.(포인터 의미론, 포인터들이 동작하는 방식) 
 
-**Example**:
-
-	class X {	// OK: value sementics
+**예**:
+```
+	class X {	// OK: 값 의미론
 	public:
 		X();
-		X(const X&);	// copy X
-		void modify();	// change the value of X
+		X(const X&);	// X를 복사한다.
+		void modify();	// X의 값을 변경한다.
 		// ...
 		~X() { delete[] p; }
 	private:
@@ -1925,16 +2063,16 @@ After a copy `x` and `y` can be independent objects (value semantics, the way no
 	X y = x;
 	if (x!=y) throw Bad{};
 	x.modify();
-	if (x==y) throw Bad{};	// assume value semantics
-
-**Example**:
-
-	class X2 {	// OK: pointer semantics
+	if (x==y) throw Bad{};	// 값 의미론으로 가정한다.
+```
+**예**:
+```
+	class X2 {	// OK: 포인터 의미론
 	public:
 		X2();
-		X2(const X&) = default;	// shallow copy
+		X2(const X&) = default;	// 얕은 복사
 		~X2() = default;
-		void modify();			// change the value of X
+		void modify();			// X의 값을 변경한다.
 		// ...
 	private:
 		T* p;
@@ -1950,11 +2088,72 @@ After a copy `x` and `y` can be independent objects (value semantics, the way no
 	X2 y = x;
 	if (x!=y) throw Bad{};
 	x.modify();
+	if (x!=y) throw Bad{};	// 포인터 의미론으로 가정한다.
+```
+**참고 사항**: "스마트 포인터"를 만들고 있지 않다면 복사 의미론을 선호하라. 값 의미론은 가장 간단하며, 표준 라이브러리의 기능들이 기대하는 것이다.   
+
+**시행하기**: (강요할 수는 없다).
+
+> <a name="Rc-copy-semantic"></a>
+> ### C.61: A copy operation should copy
+> **Reason**: That is the generally assumed semantics. After `x=y`, we should have `x==y`.  
+> After a copy `x` and `y` can be independent objects (value semantics, the way non-pointer built-in types and the standard-library types work) or refer to a shared object (pointer semantics, the way pointers work).  
+> **Example**:
+>
+	class X {	// OK: value sementics
+	public:
+		X();
+		X(const X&);	// copy X
+		void modify();	// change the value of X
+		// ...
+		~X() { delete[] p; }
+	private:
+		T* p;
+		int sz;
+	};
+>
+	bool operator==(const X& a, const X& b)
+	{
+		return sz==a.sz && equal(p,p+sz,a.p,a.p+sz);
+	}
+>
+	X::X(const X& a)
+		:p{new T}, sz{a.sz}
+	{
+		copy(a.p,a.p+sz,a.p);
+	}
+>
+	X x;
+	X y = x;
+	if (x!=y) throw Bad{};
+	x.modify();
+	if (x==y) throw Bad{};	// assume value semantics
+> **Example**:
+>
+	class X2 {	// OK: pointer semantics
+	public:
+		X2();
+		X2(const X&) = default;	// shallow copy
+		~X2() = default;
+		void modify();			// change the value of X
+		// ...
+	private:
+		T* p;
+		int sz;
+	};
+>
+	bool operator==(const X2& a, const X2& b)
+	{
+		return sz==a.sz && p==a.p;
+	}
+>
+	X2 x;
+	X2 y = x;
+	if (x!=y) throw Bad{};
+	x.modify();
 	if (x!=y) throw Bad{};	// assume pointer semantics
-
-**Note**: Prefer copy semantics unless you are building a "smart pointer". Value semantics is the simplest to reason about and what the standard library facilities expect.
-
-**Enforcement**: (Not enforceable).
+> **Note**: Prefer copy semantics unless you are building a "smart pointer". Value semantics is the simplest to reason about and what the standard library facilities expect.  
+> **Enforcement**: (Not enforceable).
 
 
 <a name="Rc-copy-self"></a>
@@ -2194,6 +2393,7 @@ This `Vector2` is not just inefficient, but since a vector copy requires allocat
 **Note**: It's good to return a smart pointer, but unlike with raw pointers the return type cannot be covariant (for example, `D::clone` can't return a `unique_ptr<D>`. Don't let this tempt you into returning an owning raw pointer; this is a minor drawback compared to the major robustness benefit delivered by the owning smart pointer.
 
 **Enforcement**: A class with any virtual function should not have a copy constructor or copy assignment operator (compiler-generated or handwritten).
+
 
 
 
