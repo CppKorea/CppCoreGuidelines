@@ -1,16 +1,9 @@
-# C: 클래스와 클래스 계층 구조
-
-># C: Classes and Class Hierarchies
+# <a name="S-class"></a> C: 클래스와 클래스 계층 구조
 
 클래스는 사용자 정의 타입으로써, 프로그래머가 표현과 동작, 인터페이스를 정의할 수 있다.
 클래스 계층 구조는 관련된 클래스들을 계층 구조로 구조화 할 때 사용된다.
 
-> A class is a user-defined type, for which a programmer can define the representation, operations, and  interfaces.
-> Class hierarchies are used to organize related classes into hierarchical structures.
-
 클래스 규칙 요약:
-
-> Class rule summary:
 
 * [C.1: 관련된 데이터를 구조를 사용해서 조직화 하라 (`struct`s or `class`es)](#Rc-org)
 * [C.2: 클래스가 invariant 하다면 `class` 를 사용하고; 데이터 멤버가 독립적으로 달라질 수 있으면 `struct` 를 사용하라](#Rc-struct)
@@ -19,16 +12,7 @@
 * [C.5: 헬퍼 함수들은 그들이 도와주는 클래스와 같은 네임스페이스에 두어라](#Rc-member)
 * [C.6: 객체의 상태를 수정하지 않는 멤버 함수는 `const` 로 선언하라](#Rc-const)
 
-> * [C.1: Organize related data into structures (`struct`s or `class`es)](#Rc-org)
-> * [C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently](#Rc-struct)
-> * [C.3: Represent the distinction between an interface and an implementation using a class](#Rc-interface)
-> * [C.4: Make a function a member only if it needs direct access to the representation of a class](#Rc-member)
-> * [C.5: Place helper functions in the same namespace as the class they support](#Rc-member)
-> * [C.6: Declare a member function that does not modify the state of its object `const`](#Rc-const)
-
 하위 영역:
-
-> Subsections:
 
 * [C.concrete: 구체적인 타입](#SS-concrete)
 * [C.ctor: 생성자, 할당, 소멸자](#SS-ctor)
@@ -38,24 +22,38 @@
 * [C.over: 오버로딩과 오버로딩된 연산자](#SS-overload)
 * [C.union: 유니온](#SS-union)
 
-> * [C.concrete: Concrete types](#SS-concrete)
-> * [C.ctor: Constructors, assignments, and destructors](#SS-ctor)
-> * [C.con: Containers and other resource handles](#SS-containers)
-> * [C.lambdas: Function objects and lambdas](#SS-lambdas)
-> * [C.hier: Class hierarchies (OOP)](SS-hier)
-> * [C.over: Overloading and overloaded operators](#SS-overload)
-> * [C.union: Unions](#SS-union)
+> # <a name="S-class"></a>C: Classes and Class Hierarchies
+>
+A class is a user-defined type, for which a programmer can define the representation, operations, and interfaces.
+Class hierarchies are used to organize related classes into hierarchical structures.
+>
+Class rule summary:
+>
+* [C.1: Organize related data into structures (`struct`s or `class`es)](#Rc-org)
+* [C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently](#Rc-struct)
+* [C.3: Represent the distinction between an interface and an implementation using a class](#Rc-interface)
+* [C.4: Make a function a member only if it needs direct access to the representation of a class](#Rc-member)
+* [C.5: Place helper functions in the same namespace as the class they support](#Rc-helper)
+* [C.7: Don't define a class or enum and declare a variable of its type in the same statement](#Rc-standalone)
+* [C.8: use `class` rather that `struct` if any member is non-public](#Rc-class)
+* [C.9: minimize exposure of members](#Rc-private)
+>
+Subsections:
+>
+* [C.concrete: Concrete types](#SS-concrete)
+* [C.ctor: Constructors, assignments, and destructors](#S-ctor)
+* [C.con: Containers and other resource handles](#SS-containers)
+* [C.lambdas: Function objects and lambdas](#SS-lambdas)
+* [C.hier: Class hierarchies (OOP)](#SS-hier)
+* [C.over: Overloading and overloaded operators](#SS-overload)
+* [C.union: Unions](#SS-union)
 
 
-<a name="Rc-org"></a>
 
-### C.1: 관련된 데이터를 구조를 사용해서 조직화 하라 (`struct`s or `class`es)
 
-> ### C.1: Organize related data into structures (`struct`s or `class`es)
+### <a name="Rc-org"></a> C.1: 관련된 데이터를 구조를 사용해서 조직화 하라 (`struct`s or `class`es)
 
 **근거**: 이해하기 쉽다. 근본적인 이유로 데이터가 관련이 있다면, 코드에 반영되어야 한다.
-
-> **Reason**: Ease of comprehension. If data is related (for fundamental reasons), that fact should be reflected in code.
 
 **예**:
 
@@ -64,30 +62,39 @@
 
 **참고 사항**: 가상 함수가 없는 간단한 클래스는 공간, 시간적인 오버헤드가 없다는 것을 의미한다.
 
-> **Note**: A simple class without virtual functions implies no space or time overhead.
-
 **참고 사항**: 언어적인 관점에서 볼 때 `class` 와 `struct` 는 멤버의 기본적인 가시성만 다르다.
-
-> **Note**: From a language perspective `class` and `struct` differ only in the default visibility of their members.
 
 **시행하기**: 아마도 불가능하다. 데이터 항목들에 대한 경험적인 관점을 함께 사용하는 것은 가능할 것이다.
 
-> **Enforcement**: Probably impossible. Maybe a heuristic looking for date items used together is possible.
+
+> ### <a name="Rc-org"></a> C.1: Organize related data into structures (`struct`s or `class`es)
+>
+##### Reason
+Ease of comprehension. If data is related (for fundamental reasons), that fact should be reflected in code.
+>
+##### Example
+```
+    void draw(int x, int y, int x2, int y2);  // BAD: unnecessary implicit relationships
+    void draw(Point from, Point to);          // better
+```
+>
+##### Note
+A simple class without virtual functions implies no space or time overhead.
+>
+##### Note
+From a language perspective `class` and `struct` differ only in the default visibility of their members.
+>
+##### Enforcement
+Probably impossible. Maybe a heuristic looking for data items used together is possible.
 
 
-<a name="Rc-struct"></a>
 
-### C.2: 클래스가 invariant 하다면 `class` 를 사용하고; 데이터 멤버가 독립적으로 달라질 수 있으면 `struct` 를 사용하라
 
-> ### C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently
+### <a name="Rc-struct"></a> C.2: 클래스가 invariant 하다면 `class` 를 사용하고; 데이터 멤버가 독립적으로 달라질 수 있으면 `struct` 를 사용하라
 
 **근거**: 이해하기 쉽다. 프로그래머가 `class` 를 사용함으로써, invariant 가 필요하다는 것을 알게 된다.
 
-> **Reason**: Ease of comprehension. The use of `class` alerts the programmer to the need for an invariant
-
 **참고 사항**: invariant 는 객체 멤버들의 논리적인 상태로써, 공개 멤버 함수들이 가정할 수 있도록 생성자가 설정 해 주어야 한다. invariant 가 설정된 후에 (일반적으로 생성자에 의해) 모든 멤버 함수는 객체를 통해 호출될 수 있다. invariant 는 형식에 구애받지 않고 (예. 주석) 기술될 수 있으며, 더 형식을 갖춘다면 `Expects` 를 사용한다.
-
-> **Note**: An invariant is logical condition for the members of an object that a constructor must establish for the public member functions to assume. After the invariant is established (typically by a constructor) every member function can be called for the object. An invariant can be stated informally (e.g., in a comment) or more formally using `Expects`.
 
 **예**:
 
@@ -110,18 +117,60 @@ but
 
 **시행하기**: 모든 데이터가 비공개인 `struct` 와 모든 멤버가 공개인 `class` 들을 찾아보라.
 
-> **Enforcement**: Look for `struct`s with all data private and `class`es with public members.
+
+> ### <a name="Rc-struct"></a>C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently
+>
+##### Reason
+Readability.
+Ease of comprehension.
+The use of `class` alerts the programmer to the need for an invariant.
+This is a useful convention.
+>
+##### Note
+An invariant is a logical condition for the members of an object that a constructor must establish for the public member functions to assume.
+After the invariant is established (typically by a constructor) every member function can be called for the object.
+An invariant can be stated informally (e.g., in a comment) or more formally using `Expects`.
+If all data members can vary independently of each other, no invariant is possible.
+>
+##### Example
+```
+    struct Pair {  // the members can vary independently
+        string name;
+        int volume;
+    };
+```
+>
+but:
+```
+    class Date {
+    public:
+        Date(int yy, Month mm, char dd);    // validate that {yy, mm, dd} is a valid date and initialize
+        // ...
+    private:
+        int y;
+        Month m;
+        char d;    // day
+    };
+```
+>   
+##### Note
+If a class has any `private` data, a user cannot completely initialize an object without the use of a constructor.
+Hence, the class definer will provide a constructor and must specify its meaning.
+This effectively means the definer need to define an invariant.
+* See also [define a class with private data as `class`](#Rc-class).
+* See also [Prefer to place the interface first in a class](#Rl-order).
+* See also [minimize exposure of members](#Rc-private).
+* See also [Avoid `protected` data](#Rh-protected).
+>
+##### Enforcement
+Look for `struct`s with all data private and `class`es with public members.
 
 
-<a name="Rc-interface"></a>
 
-### C.3: 클래스를 사용할 때 인터페이스 인지 구현인지 분명하게 표현하라
 
-> ### C.3: Represent the distinction between an interface and an implementation using a class
+### <a name="Rc-interface"></a> C.3: 클래스를 사용할 때 인터페이스 인지 구현인지 분명하게 표현하라
 
 **근거**: 인터페이스와 구현에 대한 명시적인 구분은 가독성을 더 좋게 하고, 유지 보수를 단순하게 한다.
-
-> **Reason**: an explicit distinction between interface and implementation improves readability and simplifies maintenance.
 
 **예**:
 
@@ -138,32 +187,50 @@ but
 
 예를 들면, 이제 사용자에게 영향을 주지 않고 `Date` 에 대한 표현을 변경할 수 있다. (비록 다시 컴파일 해야 할지라도)
 
-> For example, we can now change the representation of a `Date` without affecting its users (recompilation is likely, though).
-
 **참고 사항**: 인터페이스와 구현간의 구분을 표현하기 위해 클래스를 사용하는 것이 유일한 방법은 아니다.
 예를 들면, 인터페이스를 표현하기 위한 개념으로 네임스페이스 안에 독립적인 함수들이나 추상 기본 클래스 혹은 템플릿 함수들을 선언해서 사용할 수 있다.
 가장 중요한 이슈는 명시적으로 인터페이스와 그것들의 "상세한" 구현을 구분하는 것이다.
 이상적으로, 그리고 전형적으로 인터페이스는 그 구현보다 훨씬 더 안정적이다.
 
-> **Note**: Using a class in this way to represent the distinction between interface and implementation is of course not the only way.
-> For example, we can use a set of declarations of freestandanding functions in a namespace,
-> an abstract base class,
-> or a template fuction with concepts to represent an interface.
-> The most important issue is to explicitly distinguish between an interface and its implementation "details."
-> Ideally, and typically, an interface is far more stable than its implementation(s).
-
 **시행하기**: ???
 
 
-<a name="Rc-member"></a>
+> ### <a name="Rc-interface"></a>C.3: Represent the distinction between an interface and an implementation using a class
+>
+##### Reason
+An explicit distinction between interface and implementation improves readability and simplifies maintenance.
+>
+##### Example
+```
+    class Date {
+        // ... some representation ...
+    public:
+        Date();
+        Date(int yy, Month mm, char dd);    // validate that {yy, mm, dd} is a valid date and initialize
+>
+        int day() const;
+        Month month() const;
+        // ...
+    };
+```
+>
+For example, we can now change the representation of a `Date` without affecting its users (recompilation is likely, though).
+>
+##### Note
+Using a class in this way to represent the distinction between interface and implementation is of course not the only way.
+For example, we can use a set of declarations of freestanding functions in a namespace, an abstract base class, or a template function with concepts to represent an interface.
+The most important issue is to explicitly distinguish between an interface and its implementation "details."
+Ideally, and typically, an interface is far more stable than its implementation(s).
+>
+##### Enforcement
+???
 
-### C.4: 클래스의 표현에 직접 접근 할 필요가 있는 경우만 함수를 멤버로 만들어라
 
-> ### C.4: Make a function a member only if it needs direct access to the representation of a class
+
+
+### <a name="Rc-member"></a> C.4: 클래스의 표현에 직접 접근 할 필요가 있는 경우만 함수를 멤버로 만들어라
 
 **근거**: 멤버 함수간 커플링을 작게하고, 객체 상태 변경에 의해 문제가 생기는 함수를 줄이고, 표현이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
-
-> **Reason**: Less coupling than with member functions, fewer functions that can cause trouble by modifying object state, reduces the number of functions that needs to be modified after a change in representation.
 
 **예**:
 
@@ -177,30 +244,42 @@ but
 
 "헬퍼 함수"는 `Date` 의 표현에 직접 접근 할 필요가 없다.
 
-> The "helper functions" have no need for direct access to the representation of a `Date`.
-
 **참고 사항**: 이 규칙은 C++17 에서 "uniform function call" 이 들어오면 더 좋아질 것이다. ???
-
-> **Note**: This rule becomes even better if C++17 gets "uniform function call." ???
 
 **시행하기**: 데이터 멤버를 직접 건드리지 않는 멤버 함수를 찾아보라. 문제는 데이터 멤버를 직접 건드릴 필요가 없는 많은 멤버 함수들이 실제로 그렇게 한다는 것이다.
 
-> **Enforcement**: Look for member function that do not touch data members directly.
+
+> ### <a name="Rc-member"></a>C.4: Make a function a member only if it needs direct access to the representation of a class
+>
+##### Reason
+Less coupling than with member functions, fewer functions that can cause trouble by modifying object state, reduces the number of functions that needs to be modified after a change in representation.
+>
+##### Example
+```
+    class Date {
+        // ... relatively small interface ...
+    };
+>
+    // helper functions:
+    Date next_weekday(Date);
+    bool operator==(Date, Date);
+```
+The "helper functions" have no need for direct access to the representation of a `Date`.
+>
+##### Note
+This rule becomes even better if C++17 gets "uniform function call." ???
+>
+##### Enforcement
+Look for member function that do not touch data members directly.
 The snag is that many member functions that do not need to touch data members directly do.
 
 
-<a name="Rc-member"></a>
 
-### C.5: 헬퍼 함수들은 그들이 도와주는 클래스와 같은 네임스페이스에 두어라
 
-> ### C.5: Place helper functions in the same namespace as the class they support
+### <a name="Rc-member"></a> C.5: 헬퍼 함수들은 그들이 도와주는 클래스와 같은 네임스페이스에 두어라
 
 **근거**: 헬퍼 함수는 (보통 클래스 작성자가 제공하는) 클래스의 표현에 직접 접근할 필요가 없는 함수이며, 클래스에 대한 유용한 인터페이스 중에 하나로 볼 수 있다.
 헬퍼 함수들을 같은 네임스페이스에 넣으면 클래스에 대한 관계가 명확해지고, 인자 종속적인 검색에서 발견 할 수 있게 된다.
-
-> **Reason**: A helper function is a function (usually supplied by the writer of a class) that does not need direct access to the representation of the class,
-> yet is seen as part of the useful interface to the class.
-> Placing them in the same namespace as the class makes their relationship to the class obvious and allows them to be found by argument dependent lookup.
 
 **예**:
 
@@ -216,40 +295,114 @@ The snag is that many member functions that do not need to touch data members di
 	}
 
 **시행하기**:
-
 * 하나의 네임스페이스에서 인자 타입을 취하는 전역함수들을 표시해 두어라.
 
-> * Flag global functions taking argument types from a single namespace.
+
+> ### <a name="Rc-helper"></a> C.5: Place helper functions in the same namespace as the class they support
+>
+##### Reason
+A helper function is a function (usually supplied by the writer of a class) that does not need direct access to the representation of the class, yet is seen as part of the useful interface to the class.
+Placing them in the same namespace as the class makes their relationship to the class obvious and allows them to be found by argument dependent lookup.
+>
+##### Example
+```
+    namespace Chrono { // here we keep time-related services
+>
+        class Time { /* ... */ };
+        class Date { /* ... */ };
+>
+        // helper functions:
+        bool operator==(Date, Date);
+        Date next_weekday(Date);
+        // ...
+    }
+```
+>   
+##### Note
+This is expecially important for [overloaded operators](#Ro-namespace).
+>
+##### Enforcement
+* Flag global functions taking argument types from a single namespace.
 
 
-<a name="Rc-const"></a>
-
-### C.6: 객체의 상태를 수정하지 않는 멤버 함수는 `const` 로 선언하라
-
-> ### C.6: Declare a member function that does not modify the state of its object `const`
-
-**근거**: 더 정확한 디자인 의도에 대한 기술, 더 좋은 가독성, 컴파일러에 의해 더 많은 에러가 찾아짐, 더 많은 최적화 기회.
-
-> **Reason**: More precise statement of design intent, better readability, more errors caught by the compiler, more optimization opportunities.
-
-**예**:
-
-	int Date::day() const { return d; }
-
-**참고 사항**: [`const` 를 멀리하지 말라](#Res-casts-const).
-
-> **Note**: [Do not cast away `const`](#Res-casts-const).
-
-**시행하기**: 겍체를 수정하지 않는 `const`가 아닌 멤버 함수들을 표시해 보라.
-
-> **Enforcement**: Flag non-`const` member functions that do not write to their objects
 
 
-<a name="SS-concrete"></a>
+### <a name="Rc-standalone"></a>C.7: Don't define a class or enum and declare a variable of its type in the same statement
 
-## C.concrete: 구체적인 타입
+##### Reason
+Mixing a type definition and the definition of another entity in the same declaration is confusing and unnecessary.
 
-> ## C.concrete: Concrete types
+##### Example; bad
+```
+    struct Data { /*...*/ } data{ /*...*/ };
+```
+##### Example; good
+```
+    struct Data { /*...*/ };
+    Data data{ /*...*/ };
+```
+##### Enforcement
+* Flag if the `}` of a class or enumeration definition is not followed by a `;`. The `;` is missing.
+
+
+
+
+### <a name="Rc-class"></a>C.8: use `class` rather that `struct` if any member is non-public
+
+##### Reason
+Readability.
+To make it clear that something is being hidden/abstracted.
+This is a useful convention.
+
+##### Example, bad
+```
+    struct Date {
+        int d,m;
+
+        Date(int i, Month m);
+        // ... lots of functions ...
+    private:
+        int y;  // year
+    };
+```
+There is nothing wrong with this code as far as the C++ language rules are concerned,
+but nearly everything is wrong from a design perspective.
+The private data is hidden far from the public data.
+The data is split in different parts of the class declaration.
+Different parts of the data has difference access.
+All of this decreases readability and complicates maintenance.
+
+##### Note
+Prefer to place the interface first in a class [see](#Rl-order).
+
+##### Enforcement
+Flag classes declared with `struct` if there is a `private` or `public` member.
+
+
+
+
+### <a name="Rc-private"></a>C.9: minimize exposure of members
+
+##### Reason
+Encapsulation.
+Information hiding.
+Minimize the chance of untended access.
+This simplifies maintenance.
+
+##### Example
+```
+    ???
+```
+##### Note
+Prefer the order `public` members before `protected` members before `private` members [see](#Rl-order).
+
+##### Enforcement
+???
+
+
+
+
+## <a name="SS-concrete"></a> C.concrete: 구체적인 타입
 
 이상적인 클래스는 기본 타입이 되는 것이다.
 대략 "`int` 처럼 동작하는 것"을 의미한다. 구체적인 타입은 가장 간단한 종류의 클래스이다.
@@ -259,37 +412,34 @@ The snag is that many member functions that do not need to touch data members di
 C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스인 `string`, `vector`, `map` 도 그렇다.
 구체적인 타입들은 계층구조의 일부로 사용되는 클래스와 구분하기 위해 종종 값 타입으로 언급되기도 한다.
 
-> One ideal for a class is to be a regular type.
-> That means roughly "behaves like an `int`." A concrete type is the simplest kind of class.
-> A value of regular type can be copied and the result of a copy is an independent object with the same value as the original.
-> If a concrete type has both `=` and `==`, `a=b` should result in `a==b` being `true`.
-> Concrete classes without assignment and equality can be defined, but they are (and should be) rare.
-> The C++ built-in types are regular, and so are standard-library classes, such as `string`, `vector`, and `map`.
-> Concrete types are also often referred to as value types to distinguish them from types uses as part of a hierarchy.
-
 구체적인 타입 규칙 요약:
-
-> Concrete type rule summary:
 
 * [C.10: 복잡한 클래스들 보다는 구체적인 타입을 선호하라](#Rc-concrete)
 * [C.11: 구체적인 타입을 기본 타입처럼 동작하도록 하라](#Rc-regular)
 
-> * [C.10: Prefer a concrete type over more complicated classes](#Rc-concrete)
-> * [C.11: Make a concrete types regular](#Rc-regular)
+
+> ## <a name="SS-concrete"></a>C.concrete: Concrete types
+>
+One ideal for a class is to be a regular type.
+That means roughly "behaves like an `int`." A concrete type is the simplest kind of class.
+A value of regular type can be copied and the result of a copy is an independent object with the same value as the original.
+If a concrete type has both `=` and `==`, `a=b` should result in `a == b` being `true`.
+Concrete classes without assignment and equality can be defined, but they are (and should be) rare.
+The C++ built-in types are regular, and so are standard-library classes, such as `string`, `vector`, and `map`.
+Concrete types are also often referred to as value types to distinguish them from types uses as part of a hierarchy.
+>
+Concrete type rule summary:
+>
+* [C.10: Prefer a concrete type over more complicated classes](#Rc-concrete)
+* [C.11: Make concrete types regular](#Rc-regular)
 
 
-<a name="Rc-concrete"></a>
 
-### C.10 복잡한 클래스들 보다는 구체적인 타입을 선호하라
 
-> ### C.10 Prefer a concrete type over more complicated classes
+### <a name="Rc-concrete"></a> C.10 복잡한 클래스들 보다는 구체적인 타입을 선호하라
 
 **근거**: 구체적인 타입은 근본적으로 계층구조 보다 단순하다:
 디자인이 더 쉽고, 구현이 더 쉽고, 사용하기가 더 쉬우며, 추론하기 더 쉽다. 더 작고 더 빠르기도 하다.
-
-> **Reason**: A concrete type is fundamentally simpler than a hierarchy:
-> easier to design, easier to implement, easier to use, easier to reason about, smaller, and faster.
-> You need a reason (use cases) for using a hierarchy.
 
 **예**
 
@@ -319,34 +469,69 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 클래스가 계층구조의 일부가 될 수 있다면, (실제 코드에서 작은 예들에서는 필연적이지 않다면) 포인터나 레퍼런스로 객체를 다루어야 한다.
 이것으로 인한 간접처리를 위해 더 많은 메모리를 사용하게 되고, 더 많은 할당과 해제, 실행시간 추가비용이 발생하게 된다.
 
-> If a class can be part of a hierarchy, we (in real code if not necessarily in small examples) must manipulate it's objects through pointers or references.
-> That implies more memory overhead, more allocations and deallocations, and more run-time overhead to perform the resulting indiretions.
-
 **참고 사항**: 구체적인 타입은 스택에 할당 될 수 있고, 다른 클래스의 멤버가 될 수 있다.
-
-> **Note**: Concrete types can be stack allocated and be members of other classes.
 
 **참고 사항**: 실행시간 다형적 인터페이스를 위해 간접처리는 필수적이다.
 할당과 해제의 추가비용은 그렇지 않다. (단지 가장 흔한 사례일 뿐이다)
 패생 클래스의 scoped object 에 대한 인터페이스로 베이스 클래스를 사용할 수 있다.
 동적 할당을 할 수 없으며, 플러그인과 같은 것들에게 안정적인 인터페이스를 제공하고자 할 때 이렇게 할 수 있다. (예, 하드 리얼타임)
 
-> **Note**: The use of indirection is fundamental for run-time polymorphic interfaces.
-> The allocation/deallocation overhead is not (that's just the most common case).
-> We can use a base class as the interface of a scoped object of a derived class.
-> This is done where dynamic allocation is prohibited (e.g. hard real-time) and to provide a stable interface to some kinds of plug-ins.
-
 **시행하기**: ???
+
+
+> ### <a name="Rc-concrete"></a>C.10 Prefer a concrete type over more complicated classes
+>
+##### Reason
+A concrete type is fundamentally simpler than a hierarchy:
+easier to design, easier to implement, easier to use, easier to reason about, smaller, and faster.
+You need a reason (use cases) for using a hierarchy.
+
+> 
+##### Example
+```
+    class Point1 {
+        int x, y;
+        // ... operations ...
+        // ... no virtual functions ...
+    };
+>
+    class Point2 {
+        int x, y;
+        // ... operations, some virtual ...
+        virtual ~Point2();
+    };
+>
+    void use()
+    {
+        Point1 p11 {1, 2};   // make an object on the stack
+        Point1 p12 {p11};    // a copy
+>
+        auto p21 = make_unique<Point2>(1, 2);   // make an object on the free store
+        auto p22 = p21.clone();                 // make a copy
+        // ...
+    }
+```
+>
+If a class can be part of a hierarchy, we (in real code if not necessarily in small examples) must manipulate its objects through pointers or references.
+That implies more memory overhead, more allocations and deallocations, and more run-time overhead to perform the resulting indirections.
+>
+##### Note
+Concrete types can be stack allocated and be members of other classes.
+>
+##### Note
+The use of indirection is fundamental for run-time polymorphic interfaces.
+The allocation/deallocation overhead is not (that's just the most common case).
+We can use a base class as the interface of a scoped object of a derived class.
+This is done where dynamic allocation is prohibited (e.g. hard real-time) and to provide a stable interface to some kinds of plug-ins.
+>
+##### Enforcement
+???
 
 
 <a name="Rc-regular"></a>
 ### C.11: 구체적인 타입을 기본 타입처럼 동작하도록 하라]
 
-> ### C.11: Make a concrete types regular
-
 **근거**: 기본 타입은 그렇지 못한 타입보다 이해하거나 추론하기 쉽다 (변칙적인 것들은 이해하고 사용하는데 추가적인 노력을 필요로 한다)
-
-> **Reason**: Regular types are easier to understand and reason about than types that are not regular (irregularities requires extra effort to understand and use).
 
 **예**:
 
@@ -365,25 +550,44 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 
 특히, 구체적인 타입이 할당 연산을 갖는 다면, 동등 연산자도 만들어서 `a=b` 할 경우 `a==b` 를 의미하도록 하라.
 
-> In particular, if a concrete type has an assignment also give it an equals operator so that `a=b` implies `a==b`.
-
 **시행하기**: ???
 
 
-<a name="SS-ctor"></a>
-## C.ctor: 생성자, 할당, 소멸자
+> ### <a name="Rc-regular"></a>C.11: Make concrete types regular
+>
+##### Reason
+Regular types are easier to understand and reason about than types that are not regular (irregularities requires extra effort to understand and use).
+>
+##### Example
+```
+    struct Bundle {
+        string name;
+        vector<Record> vr;
+    };
+>
+    bool operator==(const Bundle& a, const Bundle& b) { return a.name == b.name && a.vr == b.vr; }
+>
+    Bundle b1 { "my bundle", {r1, r2, r3}};
+    Bundle b2 = b1;
+    if (!(b1 == b2)) error("impossible!");
+    b2.name = "the other bundle";
+    if (b1 == b2) error("No!");
+```
+>
+In particular, if a concrete type has an assignment also give it an equals operator so that `a=b` implies `a == b`.
+>
+##### Enforcement
+???
 
-> ## C.ctor: Constructors, assignments, and destructors
+
+
+
+## <a name="SS-ctor"></a> C.ctor: 생성자, 할당, 소멸자
 
 이 함수들은 객체의 생명주기를 제어 한다: 생성, 복사, 이동, 그리고 파괴
 생성자를 정의해서 클래스의 초기화를 보장하고 단순화 하라.
 
-> These functions control the lifecycle of objects: creation, copy, move, and destruction.
-> Define constructors to guarantee and simplify initialization of classes.
-
 *기본적으로 있는 연산들*:
-
-> These are *default operations*:
 
 * 기본 생성자: `X()`
 * 복사 생성자: `X(const X&)`
@@ -392,39 +596,43 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 * 이동 할당자: `operator=(X&&)`
 * 소멸자: `~X()`
 
-> * a default constructor: `X()`
-> * a copy constructor: `X(const X&)`
-> * a copy assignment: `operator=(const X&)`
-> * a move constructor: `X(X&&)`
-> * a a move assignment: `operator=(X&&)`
-> * a destructor: `~X()`
-
 각 연산들이 사용될 경우 컴파일러가 정의 해주는데, 컴파일러가 생성하지 않도록 할 수도 있다.
-
-> By default, the compiler defines each of these operations if it is used, but the default can be suppressed.
 
 컴파일러가 생성하는 기본 연산들은 객체의 생명주기를 의미하는 연산들의 집합이다.
 기본적으로, C++은 클래스를 값과 같은 타입으로 다루지만 모든 타입이 값 타입은 아니다.
 
-> The default operations are a set of related operations that together implement the lifecycle semantics of an object.
-> By default, C++ treats classes as value-like types, but not all types are value-like.
+
+> ## <a name="S-ctor"></a>C.ctor: Constructors, assignments, and destructors
+>
+These functions control the lifecycle of objects: creation, copy, move, and destruction.
+Define constructors to guarantee and simplify initialization of classes.
+>
+These are *default operations*:
+* a default constructor: `X()`
+* a copy constructor: `X(const X&)`
+* a copy assignment: `operator=(const X&)`
+* a move constructor: `X(X&&)`
+* a move assignment: `operator=(X&&)`
+* a destructor: `~X()`
+>
+By default, the compiler defines each of these operations if it is used, but the default can be suppressed.  
+The default operations are a set of related operations that together implement the lifecycle semantics of an object.  
+By default, C++ treats classes as value-like types, but not all types are value-like.  
+
 
 기본 연산들의 규칙들:
-
-> Set of default operations rules:
-
 * [C.20: 기본 연산을 정의하지 않아도 되면 그렇게 하라](#Rc-zero)
 * [C.21: 기본 연산을 정의 하거나 `=delete` 로 선언 한다면, 모두 정의하거나 모두 `=delete` 로 선언하라](#Rc-five)
 * [C.22: 기본 연산들을 일관성 있도록 하라](#Rc-matched)
 
-> * [C.20: If you can avoid defining any default operations, do](#Rc-zero)
-> * [C.21: If you define or `=delete` any default operation, define or `=delete` them all](#Rc-five)
-> * [C.22: Make default operations consistent](#Rc-matched)
+>
+Set of default operations rules:
+* [C.20: If you can avoid defining any default operations, do](#Rc-zero)
+* [C.21: If you define or `=delete` any default operation, define or `=delete` them all](#Rc-five)
+* [C.22: Make default operations consistent](#Rc-matched)
+
 
 소멸자 규칙들:
-
-> Destructor rules:
-
 * [C.30: 객체가 없어질 때, 명시적인 동작이 필요할 경우 소멸자를 정의하라](#Rc-dtor)
 * [C.31: 클래스에 의해 얻어진 모든 리로스는 소멸자에서 해제되어야 한다](#Rc-dtor-release)
 * [C.32: 클래스가 포인터(`T*`)나 참조(`T&`)를 갖고 있을 때, 소유하고 있는 것인지 고려해 보라](#Rc-dtor-ptr)
@@ -434,19 +642,19 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 * [C.36: 소멸자는 실패하지 않을 것이다](#Rc-dtor-fail)
 * [C.37: 소멸자를 `noexcept`로 하라](#Rc-dtor-noexcept)
 
-> * [C.30: Define a destructor if a class needs an explicit action at object destruction](#Rc-dtor)
-> * [C.31: All resources acquired by a class must be released by the class's destructor](#Rc-dtor-release)
-> * [C.32: If a class has a raw pointer (`T*`) or reference (`T&`), consider whether it might be owning](#Rc-dtor-ptr)
-> * [C.33: If a class has an owning pointer member, define or `=delete` a destructor](#Rc-dtor-ptr)
-> * [C.34: If a class has an owning reference member, define or `=delete` a destructor](#Rc-dtor-ref)
-> * [C.35: A base class with a virtual function needs a virtual destructor](#Rc-dtor-virtual)
-> * [C.36: A destructor may not fail](#Rc-dtor-fail)
-> * [C.37: Make destructors `noexcept`](#Rc-dtor-noexcept)
+>
+Destructor rules:
+* [C.30: Define a destructor if a class needs an explicit action at object destruction](#Rc-dtor)
+* [C.31: All resources acquired by a class must be released by the class's destructor](#Rc-dtor-release)
+* [C.32: If a class has a raw pointer (`T*`) or reference (`T&`), consider whether it might be owning](#Rc-dtor-ptr)
+* [C.33: If a class has an owning pointer member, define or `=delete` a destructor](#Rc-dtor-ptr2)
+* [C.34: If a class has an owning reference member, define or `=delete` a destructor](#Rc-dtor-ref)
+* [C.35: A base class with a virtual function needs a virtual destructor](#Rc-dtor-virtual)
+* [C.36: A destructor may not fail](#Rc-dtor-fail)
+* [C.37: Make destructors `noexcept`](#Rc-dtor-noexcept)
+
 
 생성자 규칙들:
-
-> Constructor rules:
-
 * [C.40: 클래스가 불변조건이면 생성자를 정의하라](#Rc-ctor)
 * [C.41: 생성자는 완전히 초기화된 객체를 생성하는 것이 좋다](#Rc-complete)
 * [C.42: 생성자가 유효한 객체를 생성하지 못한다면, 예외를 던지도록 하라](#Rc-throw)
@@ -461,23 +669,24 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 * [C.51: Use delegating constructors to represent common actions for all constructors of a class](#Rc-delegating)
 * [C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization](#Rc-inheriting)
 
-> * [C.40: Define a constructor if a class has an invariant](#Rc-ctor)
-> * [C.41: A constructor should create a fully initialized object](#Rc-complete)
-> * [C.42: If a constructor cannot construct a valid object, throw an exception](#Rc-throw)
-> * [C.43: Give a class a default constructor](#Rc-default0)
-> * [C.44: Prefer default constructors to be simple and non-throwing](#Rc-default00)
-> * [C.45: Don't define a default constructor that only initializes data members; use member initializers instead](#Rc-default)
-> * [C.46: By default, declare single-argument constructors `explicit`](#Rc-explicit)
-> * [C.47: Define and initialize member variables in the order of member declaration](#Rc-order)
-> * [C.48: Prefer in-class initializers to member initializers in constructors for constant initializers](#Rc-in-class-initializer)
-> * [C.49: Prefer initialization to assignment in constructors](#Rc-initialize)
-> * [C.50: Use a factory function if you need "virtual behavior" during initialization](#Rc-factory)
-> * [C.51: Use delegating constructors to represent common actions for all constructors of a class](#Rc-delegating)
-> * [C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization](#Rc-inheriting)
+>
+Constructor rules:
+* [C.40: Define a constructor if a class has an invariant](#Rc-ctor)
+* [C.41: A constructor should create a fully initialized object](#Rc-complete)
+* [C.42: If a constructor cannot construct a valid object, throw an exception](#Rc-throw)
+* [C.43: Ensure that a class has a default constructor](#Rc-default0)
+* [C.44: Prefer default constructors to be simple and non-throwing](#Rc-default00)
+* [C.45: Don't define a default constructor that only initializes data members; use member initializers instead](#Rc-default)
+* [C.46: By default, declare single-argument constructors `explicit`](#Rc-explicit)
+* [C.47: Define and initialize member variables in the order of member declaration](#Rc-order)
+* [C.48: Prefer in-class initializers to member initializers in constructors for constant initializers](#Rc-in-class-initializer)
+* [C.49: Prefer initialization to assignment in constructors](#Rc-initialize)
+* [C.50: Use a factory function if you need "virtual behavior" during initialization](#Rc-factory)
+* [C.51: Use delegating constructors to represent common actions for all constructors of a class](#Rc-delegating)
+* [C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization](#Rc-inheriting)
+
 
 복사와 이동 규칙들 : 
-> Copy and move rules:
-
 * [C.60: 복사연산을 `virtual`로 만들지 말아라. 매개변수는 `const&`로 받고, 비-`const&`로 반환하라](#Rc-copy-assignment)
 * [C.61: 복사 연산은 복사를 수행해야 한다](#Rc-copy-semantic)
 * [C.62: 복사 연산은 자기 대입에 안전하게 작성하라](#Rc-move-self)
@@ -487,18 +696,19 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 * [C.66: 이동 연산은 `noexcept`로 만들어라](#Rc-move-noexcept)
 * [C.67: 기본 클래스는 복사를 감추는게 낫다. 대신 복사가 요구된다면 가상 `clone`함수를 제공하라](#Rc-copy-virtual)
 
-> * [C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`](#Rc-copy-assignment)
-> * [C.61: A copy operation should copy](#Rc-copy-semantic)
-> * [C.62: Make copy assignment safe for self-assignment](#Rc-move-self)
-> * [C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const&`](#Rc-move-assignment)
-> * [C.64: A move operation should move and leave its source in a valid state](#Rc-move-semantic)
-> * [C.65: Make move assignment safe for self-assignment](#Rc-copy-self)
-> * [C.66: Make move operations `noexcept`](#Rc-move-noexcept)
-> * [C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired](#Rc-copy-virtual)
+>
+Copy and move rules:
+* [C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`](#Rc-copy-assignment)
+* [C.61: A copy operation should copy](#Rc-copy-semantic)
+* [C.62: Make copy assignment safe for self-assignment](#Rc-move-self)
+* [C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const&`](#Rc-move-assignment)
+* [C.64: A move operation should move and leave its source in a valid state](#Rc-move-semantic)
+* [C.65: Make move assignment safe for self-assignment](#Rc-copy-self)
+* [C.66: Make move operations `noexcept`](#Rc-move-noexcept)
+* [C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired](#Rc-copy-virtual)
+
 
 다른 기본 연산들에 대한 규칙 :
-> Other default operations rules: 
-
 * [C.80: 기본 문맥(의미론)을 명시적으로 사용하려면 `=default` 키워드를 사용하라](#Rc-=default)
 * [C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라](#Rc-=delete)
 * [C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라](#Rc-ctor-virtual)
@@ -510,38 +720,39 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 * [C.88: `<` 연산자는 피연산자 타입에 대칭적으로 동작하고, `noexcept`로 작성하라](#Rc-lt)
 * [C.89: `hash`는 `noexcept`로 작성하라 ](#Rc-hash)  
 
-> * [C.80: Use `=default` if you have to be explicit about using the default semantics](#Rc-=default)
-> * [C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)](#Rc-=delete)
-> * [C.82: Don't call virtual functions in constructors and destructors](#Rc-ctor-virtual)
-> * [C.83: For value-like types, consider providing a `noexcept` swap function](#Rc-swap)
-> * [C.84: A `swap` may not fail](#Rc-swap-fail)
-> * [C.85: Make `swap` `noexcept`](#Rc-swap-noexcept)
-> * [C.86: Make `==` symmetric with respect of operand types and `noexcept`](#Rc-eq)
-> * [C.87: Beware of `==` on base classes](#Rc-eq-base)
-> * [C.88: Make `<` symmetric with respect of operand types and `noexcept`](#Rc-lt)
-> * [C.89: Make a `hash` `noexcept`](#Rc-hash)
+>
+Other default operations rules:
+* [C.80: Use `=default` if you have to be explicit about using the default semantics](#Rc-default)
+* [C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)](#Rc-delete)
+* [C.82: Don't call virtual functions in constructors and destructors](#Rc-ctor-virtual)
+* [C.83: For value-like types, consider providing a `noexcept` swap function](#Rc-swap)
+* [C.84: A `swap` may not fail](#Rc-swap-fail)
+* [C.85: Make `swap` `noexcept`](#Rc-swap-noexcept)
+* [C.86: Make `==` symmetric with respect of operand types and `noexcept`](#Rc-eq)
+* [C.87: Beware of `==` on base classes](#Rc-eq-base)
+* [C.89: Make a `hash` `noexcept`](#Rc-hash)
 
-<a name="SS-defop"></a>
 
-## C.defop: 기본 연산들
 
-> ## C.defop: Default Operations
+
+
+
+## <a name="SS-defop"></a> C.defop: 기본 연산들
 
 기본적으로, 언어에서 기본적인 의미를 담는 기본 연산들을 제공한다.
 그러나, 프로그래머는 기본적으로 제공되는 것들을 막거나 바꿀 수 있다.
 
-> By default, the language supply the default operations with their default semantics.
-> However, a programmer can disalble or replace these defaults.
+> ## <a name="SS-defop"></a>C.defop: Default Operations
+>
+By default, the language supply the default operations with their default semantics.
+However, a programmer can disable or replace these defaults.
 
-<a name="Rc-zero"></a>
 
-### C.20: 기본 연산을 정의하지 않아도 되면 그렇게 하라
 
-> ### C.20: If you can avoid defining default operations, do
+
+### <a name="Rc-zero"></a> C.20: 기본 연산을 정의하지 않아도 되면 그렇게 하라
 
 **근거**: 가장 단순하고, 가장 명료한 의미를 준다.
-
-> **Reason**: It's the simplest and gives the cleanest semantics.
 
 **예**:
 
@@ -558,27 +769,46 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 
 `std::map` 과 `string` 은 모든 특수한 함수들을 갖고 있다, 추가적인 작업이 필요없다.
 
-> Since `std::map` and `string` have all the special functions, not further work is needed.
-
 **참고 사항**: "0의 규칙"으로 알려져 있다.
-
-> **Note**: This is known as "the rule of zero".
 
 **시행하기**: 시행할 수 없더라도, 좋은 정적 분석기는 이 규칙에 맞는 가능한 개선사항들을 가르키는 패턴들을 찾을 수 있다.
 예를 들면, 포인터와 크기를 멤버로 갖는 클래스가 있고 소멸자에서 그 포인터를 `delete` 한다면 아마도 `vector` 로 바꿀 수 있을 것이다.
 
-> **Enforcement**: (Not enforceable) While not enforceable, a good static analyzer can detect patterns that indicate a possible improvement to meet this rule.
-> For example, a class with a (pointer,size) pair of member and a destructor that `delete`s the pointer could probably be converted to a `vector`.
+
+> ### <a name="Rc-zero"></a>C.20: If you can avoid defining default operations, do
+>
+##### Reason
+It's the simplest and gives the cleanest semantics.
+>
+##### Example
+```
+    struct Named_map {
+    public:
+        // ... no default operations declared ...
+    private:
+        string name;
+        map<int, int> rep;
+    };
+>
+    Named_map nm;        // default construct
+    Named_map nm2 {nm};  // copy construct
+```
+>
+Since `std::map` and `string` have all the special functions, no further work is needed.
+>
+##### Note
+This is known as "the rule of zero".
+>
+##### Enforcement
+(Not enforceable) While not enforceable, a good static analyzer can detect patterns that indicate a possible improvement to meet this rule.
+For example, a class with a (pointer, size) pair of member and a destructor that `delete`s the pointer could probably be converted to a `vector`.
 
 
-<a name="Rc-five"></a>
-### C.21: 기본 연산을 정의 하거나 `=delete` 로 선언 한다면, 모두 정의하거나 모두 `=delete` 로 선언하라
 
-> ### C.21: If you define or `=delete` any default operation, define or `=delete` them all
+
+### <a name="Rc-five"></a> C.21: 기본 연산을 정의 하거나 `=delete` 로 선언 한다면, 모두 정의하거나 모두 `=delete` 로 선언하라
 
 **근거**: 특별한 함수들의 의미는 아주 밀접하게 연관되어 있으며, 하나가 기본 제공 함수가 아니여야 한다면, 다른 것들도 수정이 필요하다.
-
-> **Reason**: The semantics of the special functions are closely related, so it one needs to be non-default, the odds are that other need modification.
 
 **잘못된 예**:
 
@@ -602,40 +832,69 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 
 소멸자(여기서는, 할당해제)에 대한 "특별한 주의"가 필요하다고 한다면, 복사와 이동 할당(둘 다 묵시적으로 객체를 소멸할 것이다)이 정확하게 동작할 가능성은 적다. (여기서는, 두번 삭제를 시도할 것이다)
 
-> Given that "special attention" was needed for the destructor (here, to deallocate), the likelihood that copy and move assignment (both will implicitly destroy an object) are correct is low (here, we would get double deletion).
-
 **참고 사항**: 기본 생성자를 중요하게 생각하는지에 달려있는데, 이것은 "다섯의 규칙" 혹은 "여섯의 규칙" 이라고 알려져 있다.
-
-> **Note**: This is known as "the rule of five" or "the rule of six", depending on whether you count the default constructor.
 
 **참고 사항**: 다른 것은 정의 하더라도 기본 연산의 기본 구현이 필요하다면, `=default` 을 사용하여 해당 함수에 대한 의도를 표현하라.
 
-> **Note**: If you want a default implementation of a default operation (while defining another), write `=default` to show you're doing so intentionally for that function.
-> If you don't want a default operation, suppress it with `=delete`.
-
 **참고 사항**: 컴파일러는 이 규칙 대체적으로 시행하고, 이상적으로는 위반하는 것을 경고 해준다.
-
-> **Note:** Compilers enforce much of this rule and ideally warn about any violation.
 
 **참고 사항**: 클래스에 묵시적으로 생성된 복사 연산에 의존하는 것은 더 이상 사용되지 않는다.
 
-> **Note**: Relying on an implicitly generated copy operation in a class with a destructor is deprecated.
-
 **시행 하기**: (간단함) 클래스는 특별한 함수들에 대한 선언(`=delete` 도 포함하여)을 모두 갖거나 갖지 말아야 한다.
 
-> **Enforcement**: (Simple) A class should have a declaration (even a `=delete` one) for either all or none of the special functions.
+
+> ### <a name="Rc-five"></a>C.21: If you define or `=delete` any default operation, define or `=delete` them all
+>
+##### Reason
+The semantics of the special functions are closely related, so if one needs to be non-default, the odds are that others need modification too.
+>
+##### Example, bad
+```
+    struct M2 {   // bad: incomplete set of default operations
+    public:
+        // ...
+        // ... no copy or move operations ...
+        ~M2() { delete[] rep; }
+    private:
+        pair<int, int>* rep;  // zero-terminated set of pairs
+    };
+>
+    void use()
+    {
+        M2 x;
+        M2 y;
+        // ...
+        x = y;   // the default assignment
+        // ...
+    }
+```
+>
+Given that "special attention" was needed for the destructor (here, to deallocate), the likelihood that copy and move assignment (both will implicitly destroy an object) are correct is low (here, we would get double deletion).
+>
+##### Note
+This is known as "the rule of five" or "the rule of six", depending on whether you count the default constructor.
+>
+##### Note
+If you want a default implementation of a default operation (while defining another), write `=default` to show you're doing so intentionally for that function.
+If you don't want a default operation, suppress it with `=delete`.
+>
+##### Note
+Compilers enforce much of this rule and ideally warn about any violation.
+>
+##### Note
+Relying on an implicitly generated copy operation in a class with a destructor is deprecated.
+>
+##### Enforcement
+(Simple) A class should have a declaration (even a `=delete` one) for either all or none of the special functions.
+
+
 
 
 <a name="Rc-matched"></a>
 ### C.22: 기본 연산들을 일관성 있도록 하라
 
-> ### C.22: Make default operations consistent
-
 **근거**: 기본 연산들은 개념적으로 맞춰져 있다. 그들의 의미는 내부적으로 연관 되어 있다.
 사용자는 복사/이동 생성과 복사/이동 할당이 논리적으로 동일하고, 생성자와 소멸자가 리소스 관리에 대해 일관적으로 동작하며, 복사와 이동이 생성자와 소멸자가 동작하는 방식을 반영한다는 것을 기대 할 것이다.
-
-> **Reason**: The default operations are conceptually a matched set. Their semantics is interrelated.
-> Users will be surprised if copy/move construction and copy/move assignment do logically different things. Users will be surprised if constructors and destructors do not provide a consistent view of resource management. Users will be surprised if copy and move doesn't reflect the way constructors and destructors work.
 
 **잘못된 예**:
 
@@ -652,20 +911,43 @@ C++ 의 내장 타입들은 규칙적이며, 표준 라이브러리의 클래스
 
 이 연산들은 복사 연산에 대한 의미가 일치하지 않는다. 이것은 혼란을 야기하고 버그를 만들 것이다.
 
-> These operations disagree about copy semantics. This will lead to confusion and bugs.
-
 **시행하기**:
-
 * (복잡함) 복사/이동 생성자와 이에 대응하는 복사/이동 할당 연산자는 동일한 레벨에서 동일한 멤버 변수를 변경하는 것이 좋다.
 * (복잡함) 복사/이동 생성자에서 변경하는 멤버 변수들은 다른 생성자들에서도 초기화 하는 것이 좋다.
 * (복잡함) 복사/이동 생성자는 멤버 변수에 대해 깊은 복사를 수행하고 나서, 소멸자는 멤버 변수를 수정하는 것이 좋다.
 * (복잡함) 소멸자가 멤버 변수를 변경하면, 그 멤버 변수들은 복사/이동 생성자 혹은 할당 연산자에서 쓰여지는 것이 좋다.
 
-> * (Complex) A copy/move constructor and the corresponding copy/move assignment operator should write to the same member variables at the same level of dereference.
-> * (Complex) Any member variables written in a copy/move constructor should also be initialized by all other constructors.
-> * (Complex) If a copy/move constructor performs a deep copy of a member variable, then the destructor should modify the member variable.
-> * (Complex) If a destructor is modifying a member variable, that member variable should be written in any copy/move constructors or assignment operators.
 
+> ### <a name="Rc-matched"></a>C.22: Make default operations consistent
+>
+##### Reason
+The default operations are conceptually a matched set. Their semantics are interrelated.
+Users will be surprised if copy/move construction and copy/move assignment do logically different things. Users will be surprised if constructors and destructors do not provide a consistent view of resource management. Users will be surprised if copy and move don't reflect the way constructors and destructors work.
+>
+##### Example, bad
+```
+    class Silly {   // BAD: Inconsistent copy operations
+        class Impl {
+            // ...
+        };
+        shared_ptr<Impl> p;
+    public:
+        Silly(const Silly& a) : p{a.p} { *p = *a.p; }   // deep copy
+        Silly& operator=(const Silly& a) { p = a.p; }   // shallow copy
+        // ...
+    };
+```
+>
+These operations disagree about copy semantics. This will lead to confusion and bugs.
+>
+##### Enforcement
+* (Complex) A copy/move constructor and the corresponding copy/move assignment operator should write to the same member variables at the same level of dereference.
+* (Complex) Any member variables written in a copy/move constructor should also be initialized by all other constructors.
+* (Complex) If a copy/move constructor performs a deep copy of a member variable, then the destructor should modify the member variable.
+* (Complex) If a destructor is modifying a member variable, that member variable should be written in any copy/move constructors or assignment operators.
+
+
+-----
 
 
 <a name="SS-dtor"></a>
