@@ -700,14 +700,14 @@ Constructor rules:
 
 
 복사와 이동 규칙들 : 
-* [C.60: 복사연산을 `virtual`로 만들지 말아라. 매개변수는 `const&`로 받고, 비-`const&`로 반환하라](#Rc-copy-assignment)
+* [C.60: 복사연산을 `virtual`로 만들지 말아라. 매개변수는 `const&`로 받고, `const&`로 반환하지 말아라](#Rc-copy-assignment)
 * [C.61: 복사 연산은 복사를 수행해야 한다](#Rc-copy-semantic)
 * [C.62: 복사 연산은 자기 대입에 안전하게 작성하라](#Rc-move-self)
-* [C.63: 이동 연산은 `virtual`로 만들지 말아라, 매개변수는 `&&`를 사용하고, 비-`const&`로 반환하라](#Rc-move-assignment)
-* [C.64: 이동 연산은 이동을 수행해야 하며, 원본 객체를 안전한(Valid) 상태로 남겨둬야 한다](#Rc-move-semantic)
+* [C.63: 이동 연산은 `virtual`로 만들지 말아라, 매개변수는 `&&`를 사용하고, `const&`로 반환하지 말아라](#Rc-move-assignment)
+* [C.64: 이동 연산은 이동을 수행해야 하며, 원본 객체를 유효한 상태로 남겨놓아야 한다.](#Rc-move-semantic)
 * [C.65: 이동 연산은 자기 대입에 안전하게 작성하라](#Rc-copy-self)
 * [C.66: 이동 연산은 `noexcept`로 만들어라](#Rc-move-noexcept)
-* [C.67: 기본 클래스는 복사를 감추는게 낫다. 대신 복사가 요구된다면 가상 `clone`함수를 제공하라](#Rc-copy-virtual)
+* [C.67: 기본 클래스가 복사를 제한해야 하는데 복사가 요구된다면 가상 `clone`함수를 대신 제공하라](#Rc-copy-virtual)
 
 >
 Copy and move rules:
@@ -2952,48 +2952,45 @@ If you need those constructors for a derived class, re-implementing them is tedi
 Make sure that every member of the derived class is initialized.
 
 
------
 
-<a name="SS-copy"></a>
-## C.copy: 복사와 이동
+## <a name="SS-copy"></a> C.copy: 복사와 이동
 값 타입들은 일반적으로 복사 가능해야 한다. 하지만 클래스 계층에서의 인터페이스들은 그렇지 않아야 한다.  
 리소스 핸들의 경우, 복사가 가능할 수도, 그렇지 않을 수도 있다.  
 타입들은 논리적인 또는 성능 상의 이유로 이동하도록 정의될 수 있다. 
 
-> <a name="SS-copy"></a>
-> ## C.copy: Copy and move
-Value type should generally be copyable, but interfaces in a class hierarchy should not.
-Resource handles, may or may not be copyable.
+> ## <a name="SS-copy"></a>C.copy: Copy and move
+Value types should generally be copyable, but interfaces in a class hierarchy should not.
+Resource handles may or may not be copyable.
 Types can be defined to move for logical as well as performance reasons.
 
 
 
 
 <a name="Rc-copy-assignment"></a>
-### C.60: 복사 대입은 `virtual`로 만들지 마라, 매개변수는 `const&`로 받고, 반환은 비-`const&`로 하라. 
+### C.60: 복사연산을 `virtual`로 만들지 말아라. 매개변수는 `const&`로 받고, `const&`로 반환하지 말아라
 
 ##### 근거: 
 이렇게 하는 것이 간단하고 효율적이다. r-value를 위해 최적화하길 원한다면, `&&`를 받는 대입 연산을 오버로드하여 제공하라. ([F.24](#Rf-pass-ref-ref)를 참조하라)
 
 ##### 예:
 ```
-class Foo {
-public:
-	Foo& operator=(const Foo& x)
-	{
-		auto tmp = x;	// GOOD: 자기 대입을 위한 검사를 할 필요가 없다.(성능 말고는)
-		std::swap(*this,tmp);
-		return *this;
-	}
-	// ...
-};
+   class Foo {
+    public:
+        Foo& operator=(const Foo& x)
+        {
+            auto tmp = x;   // GOOD: 자기대입 검사를 할 필요가 없다. (성능을 빼고는)
+            std::swap(*this, tmp);
+            return *this;
+        }
+        // ...
+    };
 
-Foo a;
-Foo b;
-Foo f();
+    Foo a;
+    Foo b;
+    Foo f();
 
-a = b;  	// l-value 대입 : 복사
-a = f();	// r-value 대입 : 이동일 수도 있다
+    a = b;    // l-value 대입 : 복사
+    a = f();  // r-value 대입 : 이동일수도 있다
 ```
 ##### 참고 사항: 
 `swap`함수의 구현은 [강한 예외 안전성 보장](???)을 가능하게 한다.
@@ -3003,29 +3000,29 @@ a = f();	// r-value 대입 : 이동일 수도 있다
 큰고 같은 크기의 `Vector`들의 대입이 빈번한 영역을 위한 간단한 `Vector`를 생각해보라.  
 이 경우, `swap`구현 기법에 의한 원소들의 사본은 대규모의 비용을야기할 수 있다.
 ```
-template<typename T>
-class Vector {
-public:
-	Vector& operator=(const Vector&);
-	// ...
-private:
-	T* elem;
-	int sz;
-};
+	template<typename T>
+	class Vector {
+	public:
+		Vector& operator=(const Vector&);
+		// ...
+	private:
+		T* elem;
+		int sz;
+	};
 
-Vector& Vector::operator=(const Vector& a)
-{
-	if (a.sz>sz)
+	Vector& Vector::operator=(const Vector& a)
 	{
-		// ... swap함수 기법을 사용한다. 이러면 최상의 구현이 된다 ...
-		*return *this
+		if (a.sz>sz)
+		{
+			// ... swap함수 기법을 사용한다. 이러면 최상의 구현이 된다 ...
+			*return *this
+		}
+		// ... *a.elem으로부터 elem으로 sz만큼 원소들을 복사한다 ...
+		if (a.sz<sz) {
+			// ... destroy the surplus elements in *this* and adjust size ...
+		}
+		return *this*
 	}
-	// ... *a.elem으로부터 elem으로 sz만큼 원소들을 복사한다 ...
-	if (a.sz<sz) {
-		// ... destroy the surplus elements in *this* and adjust size ...
-	}
-	return *this*
-}
 ```
 대상 원소들에 직접 쓰기 연산을 함으로써, `swap`기법이 제공하는 강한 예외 보장 대신 [기본적인 예외 보장](#???)만 얻게 될 것이다. 
 [자기 대입](#Rc-copy-self)에 주의하라.
@@ -3041,70 +3038,77 @@ Vector& Vector::operator=(const Vector& a)
 해당 타입이 포인터 문맥이나 값 문맥을 가지는지 확인하기 위해 소멸자를 확인하라. 
 
 
-> <a name="Rc-copy-assignment"></a>
-> ### C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`
-> **Reason**: It is simple and efficient. If you want to optimize for rvalues, provide an overload that takes a `&&` (see [F.24](#Rf-pass-ref-ref)).  
-> **Example**:
+> ### <a name="Rc-copy-assignment"></a>C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`
 >
-	class Foo {
-	public:
-		Foo& operator=(const Foo& x)
-		{
-            auto tmp = x;	// GOOD: no need to check for self-assignment (other than performance)
-			std::swap(*this,tmp);
-			return *this;
-		}
-		// ...
-	};
+##### Reason
+It is simple and efficient. If you want to optimize for rvalues, provide an overload that takes a `&&` (see [F.24](#Rf-pass-ref-ref)).
 >
-	Foo a;
-	Foo b;
-	Foo f();
+##### Example
+```
+    class Foo {
+    public:
+        Foo& operator=(const Foo& x)
+        {
+            auto tmp = x;   // GOOD: no need to check for self-assignment (other than performance)
+            std::swap(*this, tmp);
+            return *this;
+        }
+        // ...
+    };
 >
-	a = b;		// assign lvalue: copy
-	a = f();	// assign rvalue: potentially move
-
-> **Note**: The `swap` implementation technique offers the [strong guarantee](???).  
-> **Example**: But what if you can get significant better performance by not making a temporary copy? Consider a simple `Vector` intended for a domain where assignment of large, equal-sized `Vector`s is common. In this case, the copy of elements implied by the `swap` implementation technique could cause an order of magnitude increase in cost:
+    Foo a;
+    Foo b;
+    Foo f();
 >
-	template<typename T>
-	class Vector {
-	public:
-		Vector& operator=(const Vector&);
-		// ...
-	private:
-		T* elem;
-		int sz;
-	};
+    a = b;    // assign lvalue: copy
+    a = f();  // assign rvalue: potentially move
+```
 >
-	Vector& Vector::operator=(const Vector& a)
-	{
-		if (a.sz>sz)
-		{
-			// ... use the swap technique, it can't be bettered ...
-			*return *this
-		}
-		// ... copy sz elements from *a.elem to elem ...
-		if (a.sz<sz) {
-			// ... destroy the surplus elements in *this* and adjust size ...
-		}
-		return *this*
-	}
-> By writing directly to the target elements, we will get only [the basic guarantee](#???) rather than the strong guaranteed offered by the `swap` technique. Beware of [self assignment](#Rc-copy-self).
-> **Alternatives**: If you think you need a `virtual` assignment operator, and understand why that's deeply problematic, don't call it `operator=`. Make it a named function like `virtual void assign(const Foo&)`.
+##### Note
+The `swap` implementation technique offers the [strong guarantee](???).
+>
+##### Example
+But what if you can get significantly better performance by not making a temporary copy? Consider a simple `Vector` intended for a domain where assignment of large, equal-sized `Vector`s is common. In this case, the copy of elements implied by the `swap` implementation technique could cause an order of magnitude increase in cost:
+```
+    template<typename T>
+    class Vector {
+    public:
+        Vector& operator=(const Vector&);
+        // ...
+    private:
+        T* elem;
+        int sz;
+    };
+>
+    Vector& Vector::operator=(const Vector& a)
+    {
+        if (a.sz > sz) {
+            // ... use the swap technique, it can't be bettered ...
+            return *this
+        }
+        // ... copy sz elements from *a.elem to elem ...
+        if (a.sz < sz) {
+            // ... destroy the surplus elements in *this* and adjust size ...
+        }
+        return *this;
+    }
+```
+By writing directly to the target elements, we will get only [the basic guarantee](#???) rather than the strong guarantee offered by the `swap` technique. Beware of [self assignment](#Rc-copy-self).
+>
+##### Alternative : 
+If you think you need a `virtual` assignment operator, and understand why that's deeply problematic, don't call it `operator=`. Make it a named function like `virtual void assign(const Foo&)`.
 See [copy constructor vs. `clone()`](#Rc-copy-virtual).
-
-> **Enforcement**:
 >
+##### Enforcement
 * (Simple) An assignment operator should not be virtual. Here be dragons!
 * (Simple) An assignment operator should return `T&` to enable chaining, not alternatives like `const T&` which interfere with composability and putting objects in containers.
 * (Moderate) An assignment operator should (implicitly or explicitly) invoke all base and member assignment operators.
-Look at the destructor to determine if the type has pointer semantics or value semantics.
+  Look at the destructor to determine if the type has pointer semantics or value semantics.
 
 
 
-<a name="Rc-copy-semantic"></a>
-### C.61: 복사 연산은 복사를 수행해야 한다.
+
+### <a name="Rc-copy-semantic"></a> C.61: 복사 연산은 복사를 수행해야 한다.
 
 ##### 근거: 
 그렇게 하는 것이 일반적으로 생각되는 의미론이다. `x=y`가 수행된 후에는, `x==y`인 결과를 가져야 한다.
@@ -3141,6 +3145,7 @@ Look at the destructor to determine if the type has pointer semantics or value s
 	x.modify();
 	if (x==y) throw Bad{};	// 값 의미론으로 가정한다.
 ```
+
 ##### 예:
 ```
 	class X2 {	// OK: 포인터 의미론
@@ -3166,293 +3171,547 @@ Look at the destructor to determine if the type has pointer semantics or value s
 	x.modify();
 	if (x!=y) throw Bad{};	// 포인터 의미론으로 가정한다.
 ```
+
 ##### 참고 사항: 
 "스마트 포인터"를 만들고 있지 않다면 복사 의미론을 선호하라. 값 의미론은 가장 간단하며, 표준 라이브러리의 기능들이 기대하는 것이다.   
 
 ##### 시행하기: 
 (강요할 수는 없다).
 
-> <a name="Rc-copy-semantic"></a>
-> ### C.61: A copy operation should copy
-> **Reason**: That is the generally assumed semantics. After `x=y`, we should have `x==y`.  
-> After a copy `x` and `y` can be independent objects (value semantics, the way non-pointer built-in types and the standard-library types work) or refer to a shared object (pointer semantics, the way pointers work).  
-> **Example**:
+
+> ### <a name="Rc-copy-semantic"></a>C.61: A copy operation should copy
 >
-	class X {	// OK: value sementics
-	public:
-		X();
-		X(const X&);	// copy X
-		void modify();	// change the value of X
-		// ...
-		~X() { delete[] p; }
-	private:
-		T* p;
-		int sz;
-	};
+##### Reason
+That is the generally assumed semantics. After `x=y`, we should have `x == y`.
+After a copy `x` and `y` can be independent objects (value semantics, the way non-pointer built-in types and the standard-library types work) or refer to a shared object (pointer semantics, the way pointers work).
 >
-	bool operator==(const X& a, const X& b)
-	{
-		return sz==a.sz && equal(p,p+sz,a.p,a.p+sz);
-	}
+##### Example
+```
+    class X {   // OK: value semantics
+    public:
+        X();
+        X(const X&);     // copy X
+        void modify();   // change the value of X
+        // ...
+        ~X() { delete[] p; }
+    private:
+        T* p;
+        int sz;
+    };
 >
-	X::X(const X& a)
-		:p{new T}, sz{a.sz}
-	{
-		copy(a.p,a.p+sz,a.p);
-	}
+    bool operator==(const X& a, const X& b)
+    {
+        return a.sz == b.sz && equal(a.p, a.p + a.sz, b.p, b.p + b.sz);
+    }
 >
-	X x;
-	X y = x;
-	if (x!=y) throw Bad{};
-	x.modify();
-	if (x==y) throw Bad{};	// assume value semantics
-> **Example**:
+    X::X(const X& a)
+        :p{new T[a.sz]}, sz{a.sz}
+    {
+        copy(a.p, a.p + sz, a.p);
+    }
 >
-	class X2 {	// OK: pointer semantics
-	public:
-		X2();
-		X2(const X&) = default;	// shallow copy
-		~X2() = default;
-		void modify();			// change the value of X
-		// ...
-	private:
-		T* p;
-		int sz;
-	};
+    X x;
+    X y = x;
+    if (x != y) throw Bad{};
+    x.modify();
+    if (x == y) throw Bad{};   // assume value semantics
+```
 >
-	bool operator==(const X2& a, const X2& b)
-	{
-		return sz==a.sz && p==a.p;
-	}
+##### Example
+```
+    class X2 {  // OK: pointer semantics
+    public:
+        X2();
+        X2(const X&) = default; // shallow copy
+        ~X2() = default;
+        void modify();          // change the value of X
+        // ...
+    private:
+        T* p;
+        int sz;
+    };
 >
-	X2 x;
-	X2 y = x;
-	if (x!=y) throw Bad{};
-	x.modify();
-	if (x!=y) throw Bad{};	// assume pointer semantics
-> **Note**: Prefer copy semantics unless you are building a "smart pointer". Value semantics is the simplest to reason about and what the standard library facilities expect.  
-> **Enforcement**: (Not enforceable).
+    bool operator==(const X2& a, const X2& b)
+    {
+        return a.sz == b.sz && a.p == b.p;
+    }
+>
+    X2 x;
+    X2 y = x;
+    if (x != y) throw Bad{};
+    x.modify();
+    if (x != y) throw Bad{};  // assume pointer semantics
+```
+>
+##### Note
+Prefer copy semantics unless you are building a "smart pointer". Value semantics is the simplest to reason about and what the standard library facilities expect.
+>
+##### Enforcement
+(Not enforceable)
 
 
-<a name="Rc-copy-self"></a>
-### C.62: Make copy assignment safe for self-assignment
 
-**Reason**: If `x=x` changes the value of `x`, people will be surprised and bad errors will occur (often including leaks).
 
-**Example**: The standard-library containers handle self-assignment elegantly and efficiently:
+### <a name="Rc-copy-self"></a>C.62: 복사 연산은 자기 대입에 안전하게 작성하라
 
-	std::vector<int> v = {3,1,4,1,5,9};
-	v = v;
-	// the value of v is still {3,1,4,1,5,9}
+##### 근거
+`x=x`의 수행이 `x`의 값을 바꾼다면, 사람들은 놀랄 것이며 안좋은 에러들이 발생할 수 있다 (종종 자원 누수를 포함하기도 한다).
 
-**Note**: The default assignment generated from members that handle self-assignment correctly handles self-assignment.
+##### 예
+표준 라이브러리 컨테이너들은 자기 대입을 우아하고 효율적인 방법으로 처리한다.
+```
+    std::vector<int> v = {3, 1, 4, 1, 5, 9};
+    v = v;
+    // the value of v is still {3, 1, 4, 1, 5, 9}
+```
 
-	struct Bar {
-		vector<pair<int,int>> v;
-		map<string,int> m;
-		string s;
-	};
+##### 참고 사항
+멤버들로부터 생성된 기본 대입 연산은 자기 대입에 안전하다.
+```
+    struct Bar {
+        vector<pair<int, int>> v;
+        map<string, int> m;
+        string s;
+    };
 
-	Bar b;
-	// ...
-	b = b;	// correct and efficient
+    Bar b;
+    // ...
+    b = b;   // 정확하고, 효율적이다.
+```
 
-**Note**: You can handle self-assignment by explicitly testing for self-assignment, but often it is faster and more elegant to cope without such a test (e.g., [using `swap`](#Rc-swap)).
+##### 참고 사항
+자기 대입을 명시적으로 검사함으로써 처리할 수도 있을 것이다. 하지만 종종 그런 검사 없이도 우아하고 빠르게 동작하도록 할 수 있다 (에를 들자면, [`swap`이용하기](#Rc-swap)).
+```
+    class Foo {
+        string s;
+        int i;
+    public:
+        Foo& operator=(const Foo& a);
+        // ...
+    };
 
-	class Foo {
-		string s;
-		int i;
-	public:
-		Foo& operator=(const Foo& a);
-		// ...
-	};
+    Foo& Foo::operator=(const Foo& a)   // OK, 하지만 비용이 든다
+    {
+        if (this == &a) return *this;
+        s = a.s;
+        i = a.i;
+        return *this;
+    }
+```
+이 방법은 명백히 안전하고 효율적이다.
+하지만, 만약 백만번 마다 한번 씩 자기 대입을 한다면 어떻겠는가?
+그 말은 백만번이나 장황한 검사를해야 한다는 것과 같다 (하지만 자기 대입의 결과는 반드시 자신과 같아야 하기 때문에, 컴퓨터의 분기 예측은 매번 맞아떨어질 것이다.  
+이런 코드를 고려해보자 :
+```
+    Foo& Foo::operator=(const Foo& a)   // 간단하고, 아마도 훨씬 나을 것이다.
+    {
+        s = a.s;
+        i = a.i;
+        return *this;
+    }
+```
+`std::string`은 자기 대입에 안전하고, `int`역시 안전하다. (희소하게 발생하는) 자기 대입에 대해서만 비용이 발생하게 된다. 
 
-	Foo& Foo::operator=(const Foo& a)	// OK, but there is a cost
-	{
-		if (this==&a) return *this;
-		s = a.s;
-		i = a.i;
-		return *this;
-	}
+##### 시행하기
+(Simple) 대입 연산자들은 `if (this == &a) return *this;`과 같은 패턴이 있어선 안된다.  
+???
 
+
+> ### <a name="Rc-copy-self"></a>C.62: Make copy assignment safe for self-assignment
+>
+##### Reason
+If `x=x` changes the value of `x`, people will be surprised and bad errors will occur (often including leaks).
+>
+##### Example
+The standard-library containers handle self-assignment elegantly and efficiently:
+```
+    std::vector<int> v = {3, 1, 4, 1, 5, 9};
+    v = v;
+    // the value of v is still {3, 1, 4, 1, 5, 9}
+```
+>
+##### Note
+The default assignment generated from members that handle self-assignment correctly handles self-assignment.
+```
+    struct Bar {
+        vector<pair<int, int>> v;
+        map<string, int> m;
+        string s;
+    };
+>
+    Bar b;
+    // ...
+    b = b;   // correct and efficient
+```
+>
+##### Note
+You can handle self-assignment by explicitly testing for self-assignment, but often it is faster and more elegant to cope without such a test (e.g., [using `swap`](#Rc-swap)).
+```
+    class Foo {
+        string s;
+        int i;
+    public:
+        Foo& operator=(const Foo& a);
+        // ...
+    };
+>
+    Foo& Foo::operator=(const Foo& a)   // OK, but there is a cost
+    {
+        if (this == &a) return *this;
+        s = a.s;
+        i = a.i;
+        return *this;
+    }
+```
 This is obviously safe and apparently efficient.
 However, what if we do one self-assignment per million assignments?
 That's about a million redundant tests (but since the answer is essentially always the same, the computer's branch predictor will guess right essentially every time).
 Consider:
-
-	Foo& Foo::operator=(const Foo& a)	// simpler, and probably much better
-	{
-		s = a.s;
-		i = a.i;
-		return *this;
-	}
-
+```
+    Foo& Foo::operator=(const Foo& a)   // simpler, and probably much better
+    {
+        s = a.s;
+        i = a.i;
+        return *this;
+    }
+```
 `std::string` is safe for self-assignment and so are `int`. All the cost is carried by the (rare) case of self-assignment.
+>
+##### Enforcement
+(Simple) Assignment operators should not contain the pattern `if (this == &a) return *this;` ???
 
-**Enforcement**: (Simple) Assignment operators should not contain the pattern `if (this==&a) return *this;` ???
 
 
-<a name="Rc-move-assignment"></a>
-### C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const `&`
 
-**Reason**: It is simple and efficient.
+### <a name="Rc-move-assignment"></a> 이동 연산은 `virtual`로 만들지 말아라, 매개변수는 `&&`를 사용하고, `const&`로 반환하지 말아라
 
-**See**: [The rule for copy-assignment](#Rc-copy-assignment).
+##### 근거
+간단하고, 효율적이다. 
 
-**Enforcement**: Equivalent to what is done for [copy-assignment](#Rc-copy-assignment).
+##### 같이 보기: 
+[복사 대입을 위한 규칙들](#Rc-copy-assignment).
+
+##### 시행하기
+[복사 대입](#Rc-copy-assignment)에서와 동일하다.
+* (Simple) 대입 연산자는 가상 함수여서는 안된다. 드래곤들만큼 위험하다!
+* (Simple) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 객체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
+* (Moderate) 이동 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 이동 연산자를 호출해야 한다.  
+
+
+> ### <a name="Rc-move-assignment"></a> C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const &`
+>
+##### Reason
+It is simple and efficient.
+>
+##### See also
+[The rule for copy-assignment](#Rc-copy-assignment).
+>
+##### Enforcement
+Equivalent to what is done for [copy-assignment](#Rc-copy-assignment).
 * (Simple) An assignment operator should not be virtual. Here be dragons!
 * (Simple) An assignment operator should return `T&` to enable chaining, not alternatives like `const T&` which interfere with composability and putting objects in containers.
 * (Moderate) A move assignment operator should (implicitly or explicitly) invoke all base and member move assignment operators.
 
 
-<a name="Rc-move-semantic"></a>
-### C.64: A move operation should move and leave its source in valid state
-
-**Reason**: That is the generally assumed semantics. After `x=std::move(y)` the value of `x` should be the value `y` had and `y` should be in a valid state.
-
-**Example**:
-
-	class X {	// OK: value sementics
-	public:
-		X();
-		X(X&& a);		// move X
-		void modify();	// change the value of X
-		// ...
-		~X() { delete[] p; }
-	private:
-		T* p;
-		int sz;
-	};
 
 
-	X::X(X&& a)
-		:p{a.p}, sz{a.sz}	// steal representation
-	{
-		a.p = nullptr;		// set to "empty"
-		a.sz = 0;
-	}
+### <a name="Rc-move-semantic"></a> C.64: 이동 연산은 이동을 수행해야 하며, 원본 객체를 유효한 상태로 남겨놓아야 한다
 
-	void use()
-	{
-		X x{};
-		// ...
-		X y = std::move(x);
-		x = X{};	// OK
-	} // OK: x can be destroyed
+##### 근거
+그것이 일반적으로 기대되는 의미론이다.  `x=std::move(y)`를 수행한 후에는, `x`의 값은 `y`여야 하며, `y`는 유효한 상태여야 한다.
 
-**Note**: Ideally, that moved-from should be the default value of the type. Ensure that unless there is an exceptionally good reason not to. However, not all types have a default value and for some types establishing the default value can be expensive. The standard requires only that the moved-from object can be destroyed.
+##### 예
+```
+    template<typename T>
+    class X {   // OK: 값 의미론
+    public:
+        X();
+        X(X&& a);          // X를 이동한다
+        void modify();     // X의 값을 변경한다.
+        // ...
+        ~X() { delete[] p; }
+    private:
+        T* p;
+        int sz;
+    };
+
+
+    X::X(X&& a)
+        :p{a.p}, sz{a.sz}  // 값을 가져간다
+    {
+        a.p = nullptr;     // "empty"한 상태가 된다.
+        a.sz = 0;
+    }
+
+    void use()
+    {
+        X x{};
+        // ...
+        X y = std::move(x);
+        x = X{};   // OK
+    } // OK: x 는 소멸될 수 있다.
+```
+
+##### 참고 사항
+이상적으로는, 이동연산을 해준 객체는 해당 타입의 기본 값이어야 한다. 그렇지 않아야 하는 이유가 있지 않는한 기본 값을 가지도록 확실히 하라.  
+하지만, 모든 타입들이 기본 값을 가지는 것은 아니며, 또 일부 타입들에서는 기본 값을 만드는 것이 비싼 비용을 필요로 할 수도 있다. 표준에서 요구하는 것은, 이동연산을 해준 객체가 파괴될 수 있다는 것뿐이다.   
+종종, 쉽고 비용이 들지 않는 방법을 쓸수도 있다 : 표준 라이브러리는 객체로부터 이동을 받을 수 있다고 가정한다. 이동을 해주는 객체는 유효한 상태로 (필요하다면 명시하여) 남겨놓아라. 
+
+##### 참고 사항
+이 가이드라인을 적용하지 않아야 할 예외적인 이유가 있지 않는 한,   
+`x = std::move(y); y = z;`를 사용하라. 전통적인 의미론에 부합한다.
+
+##### 시행하기
+(강요할 수는 없음) 이동 연산에서 멤버들의 대입을 확인해보라. 기본 생성자가 있다면, 그 대입 연산들을 기본 생성자를 사용한 초기화와 비교해보라.  
+
+
+> ### <a name="Rc-move-semantic"></a> C.64: A move operation should move and leave its source in valid state
+>
+##### Reason
+That is the generally assumed semantics. After `x=std::move(y)` the value of `x` should be the value `y` had and `y` should be in a valid state.
+>
+##### Example
+```
+    template<typename T>
+    class X {   // OK: value semantics
+    public:
+        X();
+        X(X&& a);          // move X
+        void modify();     // change the value of X
+        // ...
+        ~X() { delete[] p; }
+    private:
+        T* p;
+        int sz;
+    };
+>
+    X::X(X&& a)
+        :p{a.p}, sz{a.sz}  // steal representation
+    {
+        a.p = nullptr;     // set to "empty"
+        a.sz = 0;
+    }
+>
+    void use()
+    {
+        X x{};
+        // ...
+        X y = std::move(x);
+        x = X{};   // OK
+    } // OK: x can be destroyed
+```
+>
+##### Note
+Ideally, that moved-from should be the default value of the type. Ensure that unless there is an exceptionally good reason not to. However, not all types have a default value and for some types establishing the default value can be expensive. The standard requires only that the moved-from object can be destroyed.
 Often, we can easily and cheaply do better: The standard library assumes that it it possible to assign to a moved-from object. Always leave the moved-from object in some (necessarily specified) valid state.
+>
+##### Note
+Unless there is an exceptionally strong reason not to, make `x = std::move(y); y = z;` work with the conventional semantics.
+>
+##### Enforcement
+(Not enforceable) Look for assignments to members in the move operation. If there is a default constructor, compare those assignments to the initializations in the default constructor.
 
-**Note**: Unless there is an exceptionally strong reason not to, make `x=std::move(y); y=z;` work with the conventional semantics.
-
-**Enforcement**: (Not enforceable) look for assignments to members in the move operation. If there is a default constructor, compare those assignments to the initializations in the default constructor.
 
 
-<a name="Rc-move-self"></a>
-### C.65: Make move assignment safe for self-assignment
 
-**Reason**: If `x=x` changes the value of `x`, people will be surprised and bad errors may occur. However, people don't usually directly write a self-assignment that turn into a move, but it can occur. However, `std::swap` is implemented using move operations so if you accidentally do `swap(a,b)` where `a` and `b` refer to the same object, failing to handle self-move could be a serious and subtle error.
+### <a name="Rc-move-self"></a> C.65: 이동 연산은 자기 대입에 안전하게 작성하라
 
-**Example**:
+##### 근거
+만약 `x = x`가 `x`의 값을 바꾼다면, 사람들은 놀랄 것이고 안좋은 에러들이 발생할 수 있다. 사람들은 주로 자기 대입을 이동연산으로 작성하지 않지만, 그럴 수도 있다. 가령, `std::swap`은 이동 연산들로 구현되었고 만약 당신이 우연히  `a`와 `b`가 같은 객체를 참조하는 상황에서 `swap(a, b)`를 사용한다면, 자기-이동의 실패는 심각하거나 미묘한 에러가 될 수 있다.
 
-	class Foo {
-		string s;
-		int i;
-	public:
-		Foo& operator=(Foo&& a);
-		// ...
-	};
+##### 예
+```
+    class Foo {
+        string s;
+        int i;
+    public:
+        Foo& operator=(Foo&& a);
+        // ...
+    };
 
-	Foo& Foo::operator=(Foo&& a)	// OK, but there is a cost
-	{
-		if (this==&a) return *this;	// this line is redundant
-		s = std::move(a.s);
-		i = a.i;
-		return *this;
-	}
+    Foo& Foo::operator=(Foo&& a)       // OK, 하지만 비용이 든다
+    {
+        if (this == &a) return *this;  // this line is redundant
+        s = std::move(a.s);
+        i = a.i;
+        return *this;
+    }
+```
+`if (this == &a) return *this;`에 대한 논쟁이 있다. [자기 대입](#Rc-copy-self)에서 논의한 검사에 대한 이야기는 자기 이동에 더 관련이 있다. 
 
-The one-in-a-million argument against `if (this==&a) return *this;` tests from the discussion of [self-assignment](#Rc-copy self) is even more relevant for self-move.
+##### 참고 사항
+`if (this == &a) return *this;`을 쓰지 않는 방법은 알려진 것이 없다. 이동 대입 연산에서 검사를 수행하고 정확한 결과를 얻으라.(가령, `x=x`를 수행한 뒤에 `x`가 변화하지 않는다.)  
 
-**Note**: There is no know general way of avoiding a `if (this==&a) return *this;` test for a move assignment and still get a correct answer (i.e., after `x=x` the value of `x` is unchanged).
+##### 참고 사항
+ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하지만 명시되지는 않은" 상태만을 보장한다. 이것은 10여년간의 실험적인 사용이나 상용 환경에서 문제가 되지 않았다. 만약 반례를 찾게 된다면 작성자에게 연락하라. 이 규칙은 주의를 필요로 하며 완전한 안전성을 요구한다. 
 
-**Note** The ISO standard guarantees only a "valid but unspecified" state for the standard library containers. Apparently this has not been a problem in about 10 years of experimental and production use. Please contact the editors if you find a counter example. The rule here is more caution and insists on complete safety.
+##### 예
+여기 검사 없이 포인터를 이동하는 방법이 있다.(마치 이동 대입을 구현한 코드라고 상상해보라.):
+```
+    // other.ptr에서 this->ptr로 이동한다.
+    T* temp = other.ptr;
+    other.ptr = nullptr;
+    delete ptr;
+    ptr = temp;
+```
+##### 시행하기
+* (Moderate) 이러한 자기 대입의 경우, 이동 대입 연산자는 대입 받는 객체의 포인터 멤버를 `delete`된 상태 또는 `nullptr`로 남겨놓아서는 안된다.
+* (Not enforceable) 표준 라이브러리 컨테이너들의 사용법을 보라. ( `string`을 포함한다) 그리고 일반적인(객체 수명에 민감하지 않은) 사용에 그 컨테이너들이 안전하다고 생각하라. 
 
-**Example**: Here is a way to move a pointer without a test (imagine it as code in the implementation a move assignment):
 
-	// move from other.oter to this->ptr
-	T* temp = other.ptr;
-	other.ptr = nullptr;
-	delete ptr;
-	ptr = temp;
-
-**Enforcement**:
-
+> ### <a name="Rc-move-self"></a> C.65: Make move assignment safe for self-assignment
+>
+##### Reason
+If `x = x` changes the value of `x`, people will be surprised and bad errors may occur. However, people don't usually directly write a self-assignment that turn into a move, but it can occur. However, `std::swap` is implemented using move operations so if you accidentally do `swap(a, b)` where `a` and `b` refer to the same object, failing to handle self-move could be a serious and subtle error.
+>
+##### Example
+```
+    class Foo {
+        string s;
+        int i;
+    public:
+        Foo& operator=(Foo&& a);
+        // ...
+    };
+>
+    Foo& Foo::operator=(Foo&& a)       // OK, but there is a cost
+    {
+        if (this == &a) return *this;  // this line is redundant
+        s = std::move(a.s);
+        i = a.i;
+        return *this;
+    }
+```
+The one-in-a-million argument against `if (this == &a) return *this;` tests from the discussion of [self-assignment](#Rc-copy-self) is even more relevant for self-move.
+>
+##### Note
+There is no know general way of avoiding a `if (this == &a) return *this;` test for a move assignment and still get a correct answer (i.e., after `x=x` the value of `x` is unchanged).
+>
+##### Note
+The ISO standard guarantees only a "valid but unspecified" state for the standard library containers. Apparently this has not been a problem in about 10 years of experimental and production use. Please contact the editors if you find a counter example. The rule here is more caution and insists on complete safety.
+>
+##### Example
+Here is a way to move a pointer without a test (imagine it as code in the implementation a move assignment):
+```
+    // move from other.ptr to this->ptr
+    T* temp = other.ptr;
+    other.ptr = nullptr;
+    delete ptr;
+    ptr = temp;
+```
+>
+##### Enforcement
 * (Moderate) In the case of self-assignment, a move assignment operator should not leave the object holding pointer members that have been `delete`d or set to nullptr.
 * (Not enforceable) Look at the use of standard-library container types (incl. `string`) and consider them safe for ordinary (not life-critical) uses.
 
 
-<a name="Rc-move-noexcept"></a>
-### C.66: Make move operations `noexcept`
 
-**Reason**: A throwing move violates most people's reasonably assumptions.
+
+### <a name="Rc-move-noexcept"></a> C.66: 이동 연산은 `noexcept`로 만들어라
+
+##### 근거
+예외를 던지는 이동 연산은 대다수의 사람들의 타당한 가정을 무너뜨린다.
+예외를 던지지 않는 이동은 표준 라이브러리와 언어 특징들에 의해 더 효율적으로 사용될 수 있다. 
+
+##### 예
+```
+    template<typename T>
+    class Vector {
+        // ...
+        Vector(Vector&& a) noexcept :elem{a.elem}, sz{a.sz} { a.sz = 0; a.elem = nullptr; }
+        Vector& operator=(Vector&& a) noexcept { elem = a.elem; sz = a.sz; a.sz = 0; a.elem = nullptr; }
+        // ...
+    public:
+        T* elem;
+        int sz;
+    };
+```
+이 복사 연산들은 예외를 던지지 않는다.
+
+##### 잘못된 예
+```
+    template<typename T>
+    class Vector2 {
+        // ...
+        Vector2(Vector2&& a) { *this = a; }             // 그냥 복사 연산을 사용한다.
+        Vector2& operator=(Vector2&& a) { *this = a; }  // 그냥 복사 연산을 사용한다.
+        // ...
+    public:
+        T* elem;
+        int sz;
+    };
+```
+이 `Vector2`는 비 효율적일 뿐만 아니라, 벡터가 메모리 할당을 요구하기 때문에 예외를 던질 수 있다. 
+
+##### 시행하기
+(simple) 이동연산은 `noexcept` 표시를 가져야 한다.
+
+
+> ### <a name="Rc-move-noexcept"></a> C.66: Make move operations `noexcept`
+>
+##### Reason
+A throwing move violates most people's reasonably assumptions.
 A non-throwing move will be used more efficiently by standard-library and language facilities.
-
-**Example**:
-
-	class Vector {
-		// ...
-		Vector(Vector&& a) noexcept :elem{a.elem}, sz{a.sz} { a.sz=0; a.elem=nullptr; }
-		Vector& operator=(Vector&& a) noexcept { elem=a.elem; sz=a.sz; a.sz=0; a.elem=nullptr; }
-		//...
-	public:
-		T* elem;
-		int sz;
-	};
-
+>
+##### Example
+```
+    template<typename T>
+    class Vector {
+        // ...
+        Vector(Vector&& a) noexcept :elem{a.elem}, sz{a.sz} { a.sz = 0; a.elem = nullptr; }
+        Vector& operator=(Vector&& a) noexcept { elem = a.elem; sz = a.sz; a.sz = 0; a.elem = nullptr; }
+        // ...
+    public:
+        T* elem;
+        int sz;
+    };
+```
 These copy operations do not throw.
-
-**Example, bad**:
-
-	class Vector2 {
-		// ...
-		Vector2(Vector2&& a) { *this = a; }				// just use the copy
-		Vector2& operator=(Vector2&& a) { *this = a; }	// just use the copy
-		//...
-	public:
-		T* elem;
-		int sz;
-	};
-
+>
+##### Example, bad
+```
+    template<typename T>
+    class Vector2 {
+        // ...
+        Vector2(Vector2&& a) { *this = a; }             // just use the copy
+        Vector2& operator=(Vector2&& a) { *this = a; }  // just use the copy
+        // ...
+    public:
+        T* elem;
+        int sz;
+    };
+```
 This `Vector2` is not just inefficient, but since a vector copy requires allocation, it can throw.
+>
+##### Enforcement
+(Simple) A move operation should be marked `noexcept`.
 
-**Enforcement**: (Simple) A move operation should be marked `noexcept`.
 
 
 
+### <a name="Rc-copy-virtual"></a> C.67: 기본 클래스가 복사를 제한해야 하는데 복사가 요구된다면 가상 `clone`함수를 대신 제공하라
 
-<a name="Rc-copy-virtual"></a>
-### C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired
+##### 근거
+복사손실(slicing)을 피하기 위함이다. 일반적인 복사 연산은 파생 클래스 객체에서 기본 클래스 부분만 복사할 것이다. 
 
-**Reason**: To prevent slicing, because the normal copy operations will copy only the base portion of a derived object.
-
-**Example; bad**:
-
-    class B { // BAD: base class doesn't suppress copying
+##### 잘못된 예
+```
+    class B { // BAD: 기본 클래스가 복사를 제한하지 않는다
         int data;
-        // ... nothing about copy operations, so uses default ...
+        // ... 복사 연산에 대한 동작이 없으므로, 기본 동작을 사용한다 ...
     };
 
     class D : public B {
-        string moredata; // add a data member
+        string moredata; // 데이터 멤버가 추가되었다
         // ...
     };
 
     auto d = make_unique<D>();
-    auto b = make_unique<B>(d); // oops, slices the object; gets only d.data but drops d.moredata
-
-**Example**:
-
-    class B { // GOOD: base class suppresses copying
+    auto b = make_unique<B>(d); // 이런, 객체가 절단된다; d.moredata를 잃어버리고 d.data만 가지게 된다.
+```
+##### 예
+```
+    class B { // GOOD: 기본 클래스가 복사를 제한한다
         B(const B&) =delete;
         B& operator=(const B&) =delete;
         virtual unique_ptr<B> clone() { return /* B object */; }
@@ -3460,23 +3719,85 @@ This `Vector2` is not just inefficient, but since a vector copy requires allocat
     };
 
     class D : public B {
-        string moredata; // add a data member
+        string moredata; // 데이터 멤버가 추가되었다
         unique_ptr<B> clone() override { return /* D object */; }
         // ...
     };
 
     auto d = make_unique<D>();
+    auto b = d.clone(); // ok, 제대로 복사가 일어났다
+```
+##### 참고 사항
+스마트 포인터를 반환하는 것이 좋다. 하지만  
+It's good to return a smart pointer, but unlike with raw pointers the return type cannot be covariant
+(예컨대, `D::clone`는 `unique_ptr<D>`를 반환할 수 없다. 
+(for example, `D::clone` can't return a `unique_ptr<D>`. Don't let this tempt you into returning an owning raw pointer; this is a minor drawback compared to the major robustness benefit delivered by the owning smart pointer.
+
+##### 예외 사항
+보다 축소된(covariant) 반환 타입이 필요하면, `owner<derived*>`를 반환하라. [C.130](#Rh-copy) 참조.
+
+##### 시행하기
+가상 함수를 가진 클래스는 복사 생성자나 복사 대입 연산자가 없어야 한다. (컴파일러가 생성하였거나 직접 작성한)
+
+
+> ### <a name="Rc-copy-virtual"></a> C.67: A base class should suppress copying, and provide a virtual `clone` instead if "copying" is desired
+>
+##### Reason
+To prevent slicing, because the normal copy operations will copy only the base portion of a derived object.
+>
+##### Example, bad
+```
+    class B { // BAD: base class doesn't suppress copying
+        int data;
+        // ... nothing about copy operations, so uses default ...
+    };
+>
+    class D : public B {
+        string moredata; // add a data member
+        // ...
+    };
+>
+    auto d = make_unique<D>();
+    auto b = make_unique<B>(d); // oops, slices the object; gets only d.data but drops d.moredata
+```
+##### Example
+```
+    class B { // GOOD: base class suppresses copying
+        B(const B&) =delete;
+        B& operator=(const B&) =delete;
+        virtual unique_ptr<B> clone() { return /* B object */; }
+        // ...
+    };
+>
+    class D : public B {
+        string moredata; // add a data member
+        unique_ptr<B> clone() override { return /* D object */; }
+        // ...
+    };
+>
+    auto d = make_unique<D>();
     auto b = d.clone(); // ok, deep clone
-
-**Note**: It's good to return a smart pointer, but unlike with raw pointers the return type cannot be covariant (for example, `D::clone` can't return a `unique_ptr<D>`. Don't let this tempt you into returning an owning raw pointer; this is a minor drawback compared to the major robustness benefit delivered by the owning smart pointer.
-
-**Enforcement**: A class with any virtual function should not have a copy constructor or copy assignment operator (compiler-generated or handwritten).
-
-
-
+```
+>
+##### Note
+It's good to return a smart pointer, but unlike with raw pointers the return type cannot be covariant (for example, `D::clone` can't return a `unique_ptr<D>`. Don't let this tempt you into returning an owning raw pointer; this is a minor drawback compared to the major robustness benefit delivered by the owning smart pointer.
+>
+##### Exceptions
+If you need covariant return types, return an `owner<derived*>`. See [C.130](#Rh-copy).
+>
+##### Enforcement
+A class with any virtual function should not have a copy constructor or copy assignment operator (compiler-generated or handwritten).
 
 ## C.other: 다른 기본 연산들
+언어가 제공하는 기본 구현 연산들에 더해서, 정의가 필요할 정도로 기본적인 몇몇 연산들이 있다 : 비교, `swap`, 그리고 `hash`
+
+
 > ## C.other: Other default operations
+In addition to the operations for which the language offer default implementations,
+there are a few operations that are so foundational that it rules for their definition are needed:
+comparisons, `swap`, and `hash`.
+
+
 
 
 <a name="Rc-=default"></a>
@@ -3487,71 +3808,80 @@ This `Vector2` is not just inefficient, but since a vector copy requires allocat
 
 ##### 예:
 ```
-class Tracer {
-	string message;
-public:
-	Tracer(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-	~Tracer() { cerr << "exiting " << message <<'\n'; }
+    class Tracer {
+        string message;
+    public:
+        Tracer(const string& m) : message{m} { cerr << "entering " << message << '\n'; }
+        ~Tracer() { cerr << "exiting " << message << '\n'; }
 
-	Tracer(const Tracer&) = default;
-	Tracer& operator=(const Tracer&) = default;
-	Tracer(Tracer&&) = default;
-	Tracer& operator=(Tracer&&) = default;
-};
+        Tracer(const Tracer&) = default;
+        Tracer& operator=(const Tracer&) = default;
+        Tracer(Tracer&&) = default;
+        Tracer& operator=(Tracer&&) = default;
+    };
 ```
 소멸자를 정의했기 때문에, 우리는 복사, 이동 연산들을 정의해야만 한다. 이를 위해선 `=default`가 가장 간단한 최선의 방법이다.  
 
 ##### 잘못된 예:
 ```
-class Tracer2 {
-	string message;
-public:
-	Tracer2(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-	~Tracer2() { cerr << "exiting " << message <<'\n'; }
+    class Tracer2 {
+        string message;
+    public:
+        Tracer2(const string& m) : message{m} { cerr << "entering " << message << '\n'; }
+        ~Tracer2() { cerr << "exiting " << message << '\n'; }
 
-	Tracer2(const Tracer2& a) : message{a.message} {}
-	Tracer2& operator=(const Tracer2& a) { message=a.message; }
-	Tracer2(Tracer2&& a) :message{a.message} {}
-	Tracer2& operator=(Tracer2&& a) { message=a.message; }
-};
+        Tracer2(const Tracer2& a) : message{a.message} {}
+        Tracer2& operator=(const Tracer2& a) { message = a.message; }
+        Tracer2(Tracer2&& a) :message{a.message} {}
+        Tracer2& operator=(Tracer2&& a) { message = a.message; }
+    };
 ```
 복사와 이동 연산들의 함수 본체를 작성하는 것은 번거롭고, 지루하며, 에러에 취약하다. 컴파일러가 이 작업을 더 잘 할수있다.
 
 ##### 시행하기: 
 (Moderate) 특별한 연산들은 중복성을 피하기 위해 컴파일러가 만든 버전과 같은 접근성, 의미론을 가져서는 안된다.  
 
-> <a name="Rc-=default"></a>
-### C.80: Use `=default` if you have to be explicit about using the default semantics
-> **Reason**: The compiler is more likely to get the default semantics right and you cannot implement these function better than the compiler.  
-> **Example**:
+
+> ### <a name="Rc-default"></a>C.80: Use `=default` if you have to be explicit about using the default semantics
 >
-	class Tracer {
-		string message;
-	public:
-		Tracer(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-		~Tracer() { 
-			cerr << "exiting " << message <<'\n'; }
-		Tracer(const Tracer&) = default;
-		Tracer& operator=(const Tracer&) = default;
-		Tracer(Tracer&&) = default;
-		Tracer& operator=(Tracer&&) = default;
-	};
-> Because we defined the destructor, we must define the copy and move operations. The `=default` is the best and simplest way of doing that.  
-> **Example, bad**:
+##### Reason
+The compiler is more likely to get the default semantics right and you cannot implement these function better than the compiler.
 >
-	class Tracer2 {
-		string message;
-	public:
-		Tracer2(const string& m) : message{m} { cerr << "entering " << message <<'\n'; }
-		~Tracer2() { 
-			cerr << "exiting " << message <<'\n'; }
-		Tracer2(const Tracer2& a) : message{a.message} {}
-		Tracer2& operator=(const Tracer2& a) { message=a.message; }
-		Tracer2(Tracer2&& a) :message{a.message} {}
-		Tracer2& operator=(Tracer2&& a) { message=a.message; }
-	};
-> Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.  
-> **Enforcement**: (Moderate) The body of a special operation should not have the same accessibility and semantics as the compiler-generated version, because that would be redundant
+##### Example
+```
+    class Tracer {
+        string message;
+    public:
+        Tracer(const string& m) : message{m} { cerr << "entering " << message << '\n'; }
+        ~Tracer() { cerr << "exiting " << message << '\n'; }
+>
+        Tracer(const Tracer&) = default;
+        Tracer& operator=(const Tracer&) = default;
+        Tracer(Tracer&&) = default;
+        Tracer& operator=(Tracer&&) = default;
+    };
+```
+Because we defined the destructor, we must define the copy and move operations. The `=default` is the best and simplest way of doing that.
+>
+##### Example, bad
+```
+    class Tracer2 {
+        string message;
+    public:
+        Tracer2(const string& m) : message{m} { cerr << "entering " << message << '\n'; }
+        ~Tracer2() { cerr << "exiting " << message << '\n'; }
+>
+        Tracer2(const Tracer2& a) : message{a.message} {}
+        Tracer2& operator=(const Tracer2& a) { message = a.message; }
+        Tracer2(Tracer2&& a) :message{a.message} {}
+        Tracer2& operator=(Tracer2&& a) { message = a.message; }
+    };
+```
+Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.
+>
+##### Enforcement
+(Moderate) The body of a special operation should not have the same accessibility and semantics as the compiler-generated version, because that would be redundant
+
 
 
 
@@ -3563,82 +3893,95 @@ public:
 
 ##### 예:
 ```
-class Immortal {
-public:
-	~Immortal() = delete;	// do not allow destruction
-	// ...
-};
-void use()
-{
-	Immortal ugh;	// error: ugh cannot be destroyed
-	Immortal* p = new Immortal{};
-	delete p;		// error: cannot destroy *p
-}
-```
-##### 예: `unique_ptr`는 이동 가능하지만, 복사는 불가능하다. 이 클래스의 복사를 막기 위해, 복사 연산들은 삭제된다. l-value로부터 복사 연산을 막기 위해 `=delete`가 필요하다.
-```
-template <class T, class D = default_delete<T>> class unique_ptr {
-public:
-	// ...
-	constexpr unique_ptr() noexcept;
-	explicit unique_ptr(pointer p) noexcept;
-	// ...
-	unique_ptr(unique_ptr&& u) noexcept;	// move constructor
-	// ...
-	unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
-	// ...
-};
+    class Immortal {
+    public:
+        ~Immortal() = delete;   // do not allow destruction
+        // ...
+    };
 
-unique_ptr<int> make();	// make "something" and return it by moving
+    void use()
+    {
+        Immortal ugh;   // error: ugh cannot be destroyed
+        Immortal* p = new Immortal{};
+        delete p;       // error: cannot destroy *p
+    }
+```
+##### 예: 
+`unique_ptr`는 이동 가능하지만, 복사는 불가능하다. 이 클래스의 복사를 막기 위해, 복사 연산들은 삭제된다. l-value로부터 복사 연산을 막기 위해 `=delete`가 필요하다.
+```
+   template <class T, class D = default_delete<T>> class unique_ptr {
+    public:
+        // ...
+        constexpr unique_ptr() noexcept;
+        explicit unique_ptr(pointer p) noexcept;
+        // ...
+        unique_ptr(unique_ptr&& u) noexcept;   // move constructor
+        // ...
+        unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
+        // ...
+    };
 
-void f()
-{
-	unique_ptr<int> pi {};
-	auto pi2 {pi};		// error: no move constructor from lvalue
-	auto pi3 {make()};	// OK, move: the result of make() is an rvalue
-}
+    unique_ptr<int> make();   // make "something" and return it by moving
+
+    void f()
+    {
+        unique_ptr<int> pi {};
+        auto pi2 {pi};      // error: no move constructor from lvalue
+        auto pi3 {make()};  // OK, move: the result of make() is an rvalue
+    }
 ```
 ##### 시행하기: 
 기본 연산을 제거하는 것은 해당 클래스에 부합하는 근거가 있어야 한다. 의심하라. 하지만 사람이 보기에 문맥적으로 정확하다고 단정할 수 있도록 유지하라.   
 
-> <a name="Rc-=delete"></a>
-### C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)
-> **Reason**: In a few cases, a default operation is not desirable.  
-> **Example**:
->
-	class Immortal {
-	public:
-		~Immortal() = delete;	// do not allow destruction
-		// ...
-	};
-	void use()
-	{
-		Immortal ugh;	// error: ugh cannot be destroyed
-		Immortal* p = new Immortal{};
-		delete p;		// error: cannot destroy *p
-	}
 
-> **Example**: A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
+> ### <a name="Rc-delete"></a>C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)
 >
-	template <class T, class D = default_delete<T>> class unique_ptr {
-	public:
-		// ...
-		constexpr unique_ptr() noexcept;
-		explicit unique_ptr(pointer p) noexcept;
-		// ...
-		unique_ptr(unique_ptr&& u) noexcept;	// move constructor
-		// ...
-		unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
-		// ...
-	};
-	unique_ptr<int> make();	// make "something" and return it by moving
-	void f()
-	{
-		unique_ptr<int> pi {};
-		auto pi2 {pi};		// error: no move constructor from lvalue
-		auto pi3 {make()};	// OK, move: the result of make() is an rvalue
-	}
-> **Enforcement**: The elimination of a default operation is (should be) based on the desired semantics of the class. Consider such classes suspect, but maintain a "positive list" of classes where a human has asserted that the semantics is correct.
+##### Reason
+In a few cases, a default operation is not desirable.
+>
+##### Example
+```
+    class Immortal {
+    public:
+        ~Immortal() = delete;   // do not allow destruction
+        // ...
+    };
+>
+    void use()
+    {
+        Immortal ugh;   // error: ugh cannot be destroyed
+        Immortal* p = new Immortal{};
+        delete p;       // error: cannot destroy *p
+    }
+```
+>
+##### Example
+A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
+```
+    template <class T, class D = default_delete<T>> class unique_ptr {
+    public:
+        // ...
+        constexpr unique_ptr() noexcept;
+        explicit unique_ptr(pointer p) noexcept;
+        // ...
+        unique_ptr(unique_ptr&& u) noexcept;   // move constructor
+        // ...
+        unique_ptr(const unique_ptr&) = delete; // disable copy from lvalue
+        // ...
+    };
+>
+    unique_ptr<int> make();   // make "something" and return it by moving
+>
+    void f()
+    {
+        unique_ptr<int> pi {};
+        auto pi2 {pi};      // error: no move constructor from lvalue
+        auto pi3 {make()};  // OK, move: the result of make() is an rvalue
+    }
+```
+>
+##### Enforcement
+The elimination of a default operation is (should be) based on the desired semantics of the class. Consider such classes suspect, but maintain a "positive list" of classes where a human has asserted that the semantics is correct.
 
 
 
@@ -3651,116 +3994,98 @@ void f()
 
 ##### 잘못된 예:
 ```
-class base {
-public:
-    virtual void f() = 0;   // not implemented
-    virtual void g();       // implemented with base version
-    virtual void h();       // implemented with base version
-};
+    class base {
+    public:
+        virtual void f() = 0;   // 구현되지 않았다.
+        virtual void g();       // 기본 버전을 구현하였다.
+        virtual void h();       // 기본 버전을 구현하였다.
+    };
 
-class derived : public base {
-public:
-	void g() override;      // provide derived implementation
-	void h() final;         // provide derived implementation
+    class derived : public base {
+    public:
+        void g() override;      // 파생 구현을 제공한다.
+        void h() final;         // 파생 구현을 제공한다.
 
-	derived()
-	{
-	    f();                // BAD: attempt to call an unimplemented virtual function
+        derived()
+        {
+            f();                // BAD: 구현되지 않을 가상 함수를 호출한다.
 
-		g();                // BAD: will call derived::g, not dispatch further virtually
-		derived::g();       // GOOD: explicitly state intent to call only the visible version
-			
-		h();                // ok, no qualification needed, h is final
-    }
-};
+            g();                // BAD: derived::g를 호출하지만, 해당 함수에 , not dispatch further virtually
+            derived::g();       // GOOD: 접근할 수 있는(visible) 함수를 명시적으로 호출한다.
+
+            h();                // ok, no qualification needed, h is final
+        }
+    };
+
 ```
 특정하게 명시적으로 한정된 함수는 `virtual`로 선언되었다고 하더라도 가상호출이 발생하지 않음을 기억하라.
 
-##### 참고 사항 정의되지 않은 동작의 위험이 없이 파생 클래스의 함수를 호출하는 효과를 얻기 위해서는 [팩토리 함수들](#Rc-factory) 참고하라. 
+##### 같이 보기 
+정의되지 않은 동작의 위험이 없이 파생 클래스의 함수를 호출하는 효과를 얻기 위해서는 [팩토리 함수들](#Rc-factory) 참고하라. 
 
-> <a name="Rc-ctor-virtual"></a>
-### C.82: Don't call virtual functions in constructors and destructors
 
-> **Reason**: The function called will be that of the object constructed so far, rather than a possibly overriding function in a derived class.
+> ### <a name="Rc-ctor-virtual"></a>C.82: Don't call virtual functions in constructors and destructors
+>
+##### Reason
+The function called will be that of the object constructed so far, rather than a possibly overriding function in a derived class.
 This can be most confusing.
 Worse, a direct or indirect call to an unimplemented pure virtual function from a constructor or destructor results in undefined behavior.
-
-> **Example; bad**:
 >
-	class base {
-	public:
-	    virtual void f() = 0;   // not implemented
-	    virtual void g();       // implemented with base version
-	    virtual void h();       // implemented with base version
-	};
+##### Example, bad
+```
+    class base {
+    public:
+        virtual void f() = 0;   // not implemented
+        virtual void g();       // implemented with base version
+        virtual void h();       // implemented with base version
+    };
 >
-	class derived : public base {
-	public:
-		void g() override;      // provide derived implementation
-	    void h() final;         // provide derived implementation
+    class derived : public base {
+    public:
+        void g() override;      // provide derived implementation
+        void h() final;         // provide derived implementation
 >
-	    derived()
-		{
-	        f();                // BAD: attempt to call an unimplemented virtual function
+        derived()
+        {
+            f();                // BAD: attempt to call an unimplemented virtual function
 >
-			g();                // BAD: will call derived::g, not dispatch further virtually
-			derived::g();       // GOOD: explicitly state intent to call only the visible version
+            g();                // BAD: will call derived::g, not dispatch further virtually
+            derived::g();       // GOOD: explicitly state intent to call only the visible version
 >
-			h();                // ok, no qualification needed, h is final
-	    }
-	};
-> Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
+            h();                // ok, no qualification needed, h is final
+        }
+    };
+```
+>
+Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
+>
+##### See also
+[factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
+>
+##### Note
+There is nothing inherently wrong with calling virtual functions constructors and destructors.
+The semantics of such calls is type safe.
+However, experience shows that such calls are rarely needed, easily confuse maintainers, and become a source of errors when used by novices.
+>
+##### Enforcement
+* Flag calls of virtual functions from constructors and destructors.
 
-> **See also** [factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
 
 
 
-<a name="Rc-swap"></a>
-### C.83: 값 형식 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라.
+### <a name="Rc-swap"></a> C.83: 값 형식 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라.
 
 ##### 근거: 
-`swap`함수는  
-객체 대입을 구현할 때 원활하게 객체를 이동하는 것에서, 에러가 발생하지 않는 것을 보장하는 함수를 제공하는 것까지 몇몇 함수들(idioms)을 구현하는데 유용하다. 
+`swap`함수는 객체 대입을 구현할 때 원활하게 객체를 이동하는 것에서, 에러가 발생하지 않는 것을 보장하는 함수를 제공하는 것까지 몇몇 함수들(idioms)을 구현하는데 유용하다. 
 swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [소멸자, 자원해제, 그리고 swap은 실패해선 안된다]("#Re-never-fail)를 확인하라.
 
-##### 잘못된 예:
+##### 예:
 ```
-class Foo {
-	// ...
-public:
-	void swap(Foo& rhs) noexcept
-	{
-        m1.swap(rhs.m1);
-        std::swap(m2, rhs.m2);
-    }
-private:
-    Bar m1;
-    int m2;
-};
-```
-호출자들의 편의를 위해서 같은 네임스페이스에 비 멤버 `swap`함수를 제공하라.
-```
-void swap(Foo& a, Foo& b)
-{
-	a.swap(b);
-}
-```
-##### 시행하기:
-* 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다. 
-
-* 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다.
-
-> <a name="Rc-swap"></a>
-### C.83: For value-like types, consider providing a `noexcept` swap function
-
-> **Reason**: A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail]("#Re-never-fail).  
-> **Example; good**:
-> 
     class Foo {
-		// ...
+        // ...
     public:
         void swap(Foo& rhs) noexcept
-		{
+        {
             m1.swap(rhs.m1);
             std::swap(m2, rhs.m2);
         }
@@ -3768,15 +4093,55 @@ void swap(Foo& a, Foo& b)
         Bar m1;
         int m2;
     };
-> Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
-> 
+
+```
+호출자들의 편의를 위해서 같은 네임스페이스에 비-멤버 `swap`함수를 제공하라.
+```
     void swap(Foo& a, Foo& b)
-	{
-		a.swap(b);
-	}
-> **Enforcement**:
-> * (Simple) A class without virtual functions should have a `swap` member function declared.
-> * (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+    {
+        a.swap(b);
+    }
+```
+
+##### 시행하기:
+* 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다. 
+* 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다.
+
+
+
+
+> ### <a name="Rc-swap"></a> C.83: For value-like types, consider providing a `noexcept` swap function
+>
+##### Reason
+A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail](#Re-never-fail).
+>
+##### Example, good
+```
+    class Foo {
+        // ...
+    public:
+        void swap(Foo& rhs) noexcept
+        {
+            m1.swap(rhs.m1);
+            std::swap(m2, rhs.m2);
+        }
+    private:
+        Bar m1;
+        int m2;
+    };
+```
+>
+Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
+```
+    void swap(Foo& a, Foo& b)
+    {
+        a.swap(b);
+    }
+```
+>
+##### Enforcement
+* (Simple) A class without virtual functions should have a `swap` member function declared.
+* (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
 
 
 
@@ -3789,12 +4154,12 @@ void swap(Foo& a, Foo& b)
 
 ##### 잘못된 예:
 ```
-void swap(My_vector& x, My_vector& y)
-{
-	auto tmp = x;	// copy elements
-	x = y;
-	y = tmp;
-}
+    void swap(My_vector& x, My_vector& y)
+    {
+        auto tmp = x;   // copy elements
+        x = y;
+        y = tmp;
+    }
 ```
 이 경우는 느릴 뿐만 아니라, `tmp`내의 원소들에 메모리 할당이 발생하면, 이 `swap` 연산은 예외를 던지고 이를 사용하는 STL 알고리즘들이 실패할 수 있다. 
 
@@ -3802,19 +4167,26 @@ void swap(My_vector& x, My_vector& y)
 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.   
 
 
-> <a name="Rc-swap-fail"></a>
-### C.84: A `swap` function may not fail
-> **Reason**: `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The The standard-library containers and algorithms will not work correctly if a swap of an element type fails.  
-> **Example, bad**:
+> ### <a name="Rc-swap-fail"></a>C.84: A `swap` function may not fail
 >
-	void swap(My_vector& x, My_vector& y)
-	{
-		auto tmp = x;	// copy elements
-		x = y;
-		y = tmp;
-	}
-> This is not just slow, but if a memory allocation occur for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail is used with them.  
-> **Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+##### Reason
+ `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The standard-library containers and algorithms will not work correctly if a swap of an element type fails.
+>
+##### Example, bad
+```
+    void swap(My_vector& x, My_vector& y)
+    {
+        auto tmp = x;   // copy elements
+        x = y;
+        y = tmp;
+    }
+```
+This is not just slow, but if a memory allocation occurs for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail if used with them.
+>
+##### Enforcement
+(Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+
+
 
 
 <a name="Rc-swap-noexcept"></a>
@@ -3827,11 +4199,16 @@ void swap(My_vector& x, My_vector& y)
 ##### 시행하기: 
 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.   
 
-> <a name="Rc-swap-noexcept"></a>
-### C.85: Make `swap` `noexcept`
-> **Reason**: [A `swap` may not fail](#Rc-swap-fail).
-If a `swap` tries to exit with an exception, it's a bad design error and the program had better terminate.  
-> **Enforcement**: (Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+
+> ### <a name="Rc-swap-noexcept"></a>C.85: Make `swap` `noexcept`
+>
+##### Reason
+ [A `swap` may not fail](#Rc-swap-fail).
+If a `swap` tries to exit with an exception, it's a bad design error and the program had better terminate.
+>
+##### Enforcement
+(Simple) When a class has a `swap` member function, it should be declared `noexcept`.
+
 
 
 
@@ -3844,25 +4221,21 @@ If a `swap` tries to exit with an exception, it's a bad design error and the pro
 
 ##### 예:
 ```
-class X {
-	string name;
-	int number;
-};
+    class X {
+        string name;
+        int number;
+    };
 
-bool operator==(const X& a, const X& b) noexcept {
-	 return a.name==b.name 
-	 	&& a.number==b.number; }
+    bool operator==(const X& a, const X& b) noexcept { return a.name == b.name && a.number == b.number; }
 ```
 ##### 잘못된 예:
 ```
-class B {
-	string name;
-	int number;
-	bool operator==(const B& a) const { 
-		return name==a.name 
-			&& number==a.number; }
-	// ...
-};
+    class B {
+        string name;
+        int number;
+        bool operator==(const B& a) const { return name == a.name && number == a.number; }
+        // ...
+    };
 ```
 `B`의 비교 연산은 두번째 피연산자에 대해 형변환을 용인하지만, 첫번째 피연산자에 대해서는 그렇지 않다.
 
@@ -3870,36 +4243,52 @@ class B {
 만약 클래스가 `double`타입의 `NaN`처럼 실패 상태를 가진다면, 실패 상태와의 비교에서 예외를 던지도록 하는 것도 적합할 수 있다.
 다른 방법으로는 실패 상태끼리의 비교는 동등하게 보고, 적합한 상태와 실패 상태의 비교에서는 거짓으로 판정할 수 있다.    
 
-##### 시행하기: 
-???
+#### 참고 사항
+이 규칙은 모든 일반 비교 연산자들에도 적용된다 : `!=`, `<`, `<=`, `>`, and `>=`.
+
+##### 시행하기
+* 인자의 타입이 다른 `operator==()`에는 표시를 남겨라. 다른 비교 연산자들도 마찬가지다 : `!=`, `<`, `<=`, `>`, and `>=`.
+* 멤버인  `operator==()`함수들에는 표시를 남겨라. 다른 비교 연산자들도 마찬가지다 : `!=`, `<`, `<=`, `>`, and `>=`.
 
 
-> <a name="Rc-eq"></a>
-### C.86: Make `==` symmetric with respect to operand types and `noexcept`
-
-> **Reason**: Assymetric treatment of operands is surprising and a source of errors where conversions are possible.
-> `==` is a fundamental operations and programmers should be able to use it without fear of failure.
-
-> **Example**:
+> ### <a name="Rc-eq"></a>C.86: Make `==` symmetric with respect to operand types and `noexcept`
 >
-	class X {
-		string name;
-		int number;
-	};
+##### Reason
+Asymmetric treatment of operands is surprising and a source of errors where conversions are possible.
+`==` is a fundamental operations and programmers should be able to use it without fear of failure.
 >
-	bool operator==(const X& a, const X& b) noexcept { return a.name==b.name && a.number==b.number; }
-> **Example, bad**:
+##### Example
+```
+    class X {
+        string name;
+        int number;
+    };
 >
-	class B {
-		string name;
-		int number;
-		bool operator==(const B& a) const { return name==a.name && number==a.number; }
-		// ...
-	};
-> `B`'s comparison accpts conversions for its second operand, but not its first.
-> **Note**: If a class has a failure state, like `double`'s `NaN`, there is a temptation to make a comparison against the failure state throw.
-The alternative is to make two failure states compare equal and any valid state compare false against the failure state.  
-> **Enforcement**: ???
+    bool operator==(const X& a, const X& b) noexcept { return a.name == b.name && a.number == b.number; }
+```
+>
+##### Example, bad
+```
+    class B {
+        string name;
+        int number;
+        bool operator==(const B& a) const { return name == a.name && number == a.number; }
+        // ...
+    };
+```
+>
+`B`'s comparison accepts conversions for its second operand, but not its first.
+>
+##### Note
+If a class has a failure state, like `double`'s `NaN`, there is a temptation to make a comparison against the failure state throw.
+The alternative is to make two failure states compare equal and any valid state compare false against the failure state.
+>
+#### Note
+This rule applies to all the usual comparison operators: `!=`, `<`, `<=`, `>`, and `>=`.
+>
+##### Enforcement
+* Flag an `operator==()` for which the argument types differ; same for other comparison operators: `!=`, `<`, `<=`, `>`, and `>=`.
+* Flag member `operator==()`s; same for other comparison operators: `!=`, `<`, `<=`, `>`, and `>=`.
 
 
 
@@ -3912,117 +4301,168 @@ The alternative is to make two failure states compare equal and any valid state 
 
 ##### 잘못된 예:
 ```
-class B {
-	string name;
-	int number;
-	virtual bool operator==(const B& a) const {
-		return name==a.name 
-		&& number==a.number; }
-	// ...
-};
+    class B {
+        string name;
+        int number;
+        virtual bool operator==(const B& a) const
+        {
+             return name == a.name && number == a.number;
+        }
+        // ...
+    };
+``` 
+`B`의 비교 연산은 두번째 피연산자에 대해서 타입 변환을 허용하지만, 첫번째 피연산자에 대해서는 허용하지 않는다.
+```
+    class D :B {
+        char character;
+        virtual bool operator==(const D& a) const
+        {
+            return name == a.name && number == a.number && character == a.character;
+        }
+        // ...
+    };
 
-// `B`'s comparison accpts conversions for its second operand, but not its first.
-
-class D :B {
-	char character;
-	virtual bool operator==(const D& a) const { 
-		return name==a.name 
-			&& number==a.number 
-			&& character==a.character; }
-	// ...
-};
-
-B b = ...
-D d = ...
-b==d;	// compares name and number, ignores d's character
-d==b;	// error: no == defined
-D d2;
-d==d2;	// compares name, number, and character
-B& b2 = d2;
-b2==d;	// compares name and number, ignores d2's and d's character
+    B b = ...
+    D d = ...
+    b == d;    // name과 number를 비교한다. d의 character는 무시한다.
+    d == b;    // error: no == defined
+    D d2;
+    d == d2;   // name과 number, character를 비교한다.
+    B& b2 = d2;
+    b2 == d;   // name과 number를 비교한다. d2와 d의 character는 무시한다.
 ```
 물론 계층 구조 안에서 `==`가 동작하도록 하는 방법들이 있지만, 고지식한 방법들은 고려하지 말아라.  
 
-##### 시행하기: 
-???
+##### 참고 사항
+이 규칙은 모든 일반 비교 연산자들에도 적용된다 : `!=`, `<`, `<=`, `>`, and `>=`.
 
-><a name="Rc-eq-base"></a>
-### C.87: Beware of `==` on base classes
-> **Reason**: It is really hard to write a foolproof and useful `==` for a hierarchy.  
-> **Example, bad**:
+##### 시행하기
+* 가상 함수인 `operator==()`에는 표시를 남겨라. 다른 비교 연산자들도 마찬가지다: `!=`, `<`, `<=`, `>`, and `>=`.
+
+
+> ### <a name="Rc-eq-base"></a>C.87: Beware of `==` on base classes
 >
-	class B {
-		string name;
-		int number;
-		virtual bool operator==(const B& a) const { 
-			return name==a.name 
-				&& number==a.number; }
-		// ...
-	};
-> // `B`'s comparison accpts conversions for its second operand, but not its first.
+##### Reason
+It is really hard to write a foolproof and useful `==` for a hierarchy.
 >
-	class D :B {
-		char character;
-		virtual bool operator==(const D& a) const { 
-			return name==a.name 
-				&& number==a.number 
-				&& character==a.character; }
-		// ...
-	};
-	B b = ...
-	D d = ...
-	b==d;	// compares name and number, ignores d's character
-	d==b;	// error: no == defined
-	D d2;
-	d==d2;	// compares name, number, and character
-	B& b2 = d2;
-	b2==d;	// compares name and number, ignores d2's and d's character
-> Of course there are way of making `==` work in a hierarchy, but the naive approaches do not scale
-> **Enforcement**: ???
-
-
-
-<a name="Rc-lt"></a>
-### C.88: `<` 연산자는 피연산자 타입에 대칭적으로 동작하고, `noexcept`로 작성하라
-
-##### 근거: 
-???  
-##### 예:
+##### Example, bad
 ```
-	???
+    class B {
+        string name;
+        int number;
+        virtual bool operator==(const B& a) const
+        {
+             return name == a.name && number == a.number;
+        }
+        // ...
+    };
 ```
-##### 시행하기: 
-???
-
-> <a name="Rc-lt"></a>
-### C.88: Make `<` symmetric with respect to operand types and `noexcept`
-> **Reason**: ???  
-> **Example**:  
-> 
-	???
-> **Enforcement**: ???
-
-
-
-<a name="Rc-hash"></a>
-### C.89: `hash`는 `noexcept`로 작성하라  
-##### 근거: 
-???  
-##### 예:
-```
-???
-```
-##### 시행하기: 
-???
-
-> <a name="Rc-hash"></a>
-### C.89: Make a `hash` `noexcept`
-> **Reason**: ???  
-> **Example**:  
 >
-	???
-> **Enforcement**: ???
+`B`'s comparison accepts conversions for its second operand, but not its first.
+```
+    class D :B {
+        char character;
+        virtual bool operator==(const D& a) const
+        {
+            return name == a.name && number == a.number && character == a.character;
+        }
+        // ...
+    };
+>
+    B b = ...
+    D d = ...
+    b == d;    // compares name and number, ignores d's character
+    d == b;    // error: no == defined
+    D d2;
+    d == d2;   // compares name, number, and character
+    B& b2 = d2;
+    b2 == d;   // compares name and number, ignores d2's and d's character
+```
+Of course there are ways of making `==` work in a hierarchy, but the naive approaches do not scale
+>
+#### Note
+This rule applies to all the usual comparison operators: `!=', `<, `<=`, `>`, and `>=`.
+>
+##### Enforcement
+* Flag a virtual `operator==()`; same for other comparison operators: `!=', `<, `<=`, `>`, and `>=`.
 
+
+
+
+### <a name="Rc-hash"></a>C.89: `hash`는 `noexcept`로 작성하라  
+
+##### 근거
+해시 컴테이너들의 사용자들은 hash를 간접적으로 사용하며, 단순한 접근이 throw하지 않을 것으로 기대한다.  
+표준 라이브러리의 요구사항이다.  
+
+##### 잘못된 예
+```
+    template<>
+    struct hash<My_type> {	// 정말정말 안좋은 해시 특수화
+	   using result_type = size_t;
+	   using argument_type = My_type;
+
+	   size_t operator() (const My_type & x) const
+	   {
+		  size_t xs = x.s.size();
+		  if (xs < 4) throw Bad_My_type{};    // 이런 이단 같으니!
+		  return hash<size_t>()(x.s.size()) ^ trim(x.s);
+	   }
+    };
+
+    int main()
+    {
+        unordered_map<My_type,int> m;
+	   My_type mt{ "asdfg" };
+	   m[mt] = 7;
+	   cout << m[My_type{ "asdfg" }] << '\n';
+    }
+```
+`hash` 특수화를 정의할 때는, 간단하게 `^` (xor)와 함께 표준 라이브러리의 `hash` 특수화와 통합되도록 하라.  
+That tends to work better than "cleverness" for non-specialists.
+
+##### 시행하기
+* 예외를 던지는 `hash`들에는 표시를 남겨라.
+
+
+> ### <a name="Rc-hash"></a>C.89: Make a `hash` `noexcept`
+>
+##### Reason
+Users of hashed containers use hash indirectly and don't expect simple access to throw.
+It's a standard-library requirement.
+>
+##### Example, bad
+```
+    template<>
+    struct hash<My_type> {	// thoroughly bad hash specialization
+	   using result_type = size_t;
+	   using argument_type = My_type;
+>
+	   size_t operator() (const My_type & x) const
+	   {
+		  size_t xs = x.s.size();
+		  if (xs < 4) throw Bad_My_type{};    // "Nobody expects the Spanish inquisition!"
+		  return hash<size_t>()(x.s.size()) ^ trim(x.s);
+	   }
+    };
+>
+    int main()
+    {
+        unordered_map<My_type,int> m;
+	   My_type mt{ "asdfg" };
+	   m[mt] = 7;
+	   cout << m[My_type{ "asdfg" }] << '\n';
+    }
+```   
+If you have to define a `hash` specialization, try simply to let it combine standard-library `hash` specializations with `^` (xor).
+That tends to work better than "cleverness" for non-specialists.
+>
+##### Enforcement
+* Flag throwing `hash`es.
+
+
+
+-----
 
 <a name="SS-containers"></a>
 ## C.con: 컨테이너와 다른 리소스 핸들   
@@ -4046,8 +4486,11 @@ b2==d;	// compares name and number, ignores d2's and d's character
 * ???
 * [C.109: 포인터 문맥을 따를 경우에는, `*` 과 `->` 연산자를 제공하라](#rcon-ptr)
 
-> Summary of container rules:
+##### 같이 보기 : 
+[Resources](#SS-resources)
+
 >
+Summary of container rules:
 * [C.100: Follow the STL when defining a container](#Rcon-stl)
 * [C.101: Give a container value semantics](#Rcon-val)
 * [C.102: Give a container move operations](#Rcon-move)
@@ -4056,9 +4499,9 @@ b2==d;	// compares name and number, ignores d2's and d's character
 * [C.105: Give a constructor and `Extent` constructor](#Rcon-val)
 * ???
 * [C.109: If a resource handle has pointer semantics, provide `*` and `->`](#rcon-ptr)
-
-##### 참고 사항 : [Resources](#SS-resources)
->**See also**: [Resources](#SS-resources)
+>
+##### See also: 
+[Resources](#SS-resources)
 
 
 
