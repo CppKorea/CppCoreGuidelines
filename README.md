@@ -42,6 +42,7 @@ C++ Core Guildlines 내용을 최신 버전으로 업데이트하고 남아 있�
 - Hyungtae Kim (cavecafe)
 - Junho Kim (h4wldev)
 - Incheol Kang(kangic)
+- DongHa Park(luncliff)
 
 ## C++ 핵심 가이드라인 1차 번역 진행 상황
 
@@ -50,7 +51,7 @@ C++ Core Guildlines 내용을 최신 버전으로 업데이트하고 남아 있�
 - A - Architectural Ideas (100%)
 - C - Classes and Class Hierarchies (40%)
 - Con - Constants and Immutability (100%)
-- CP - Concurrency and Parallelism (40%)
+- CP - Concurrency and Parallelism (80%)
 - CPL - C-Style programming (100%)
 - E - Error Handling (100%)
 - Enum - Enumerations (100%)
