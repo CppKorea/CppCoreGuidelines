@@ -1,26 +1,22 @@
+#[C++ 핵심 가이드라인](http://cppkorea.github.io/CppCoreGuidelines/CppCoreGuidelines)
+
 > "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)"
-> -- <cite>비야네 스트롭스트룹(Bjarne Stroustrup)</cite>
+> -- <cite>비야네 스트롭스트룹 (Bjarne Stroustrup)</cite>
 
 # C++ 핵심 가이드라인 한글화 프로젝트
 
-- 본 프로젝트는 C++ 표준위원회에서 제작한 C++ 핵심 가이드라인을 한글화하는 프로젝트입니다.
-- 번역을 시작하기 전에 번역하는 부분이 겹치지 않도록 Issue에 어떤 부분을 번역하는지 알려주시기 바랍니다. 또한 원본 문서가 수시로 변경되므로, 한글로 번역하신 내용 밑에 영어 원문을 인용 문구로 남겨주시기 바랍니다.
+- 본 프로젝트는 C++ 표준 위원회에서 제작한 C++ 핵심 가이드라인을 한글화하는 프로젝트입니다.
+- 번역을 시작하기 전에 번역하는 부분이 겹치지 않도록 Issue에 어떤 부분을 번역하는지 알려주시기 바랍니다.
+- 원본 문서가 수시로 변경되므로, 한글로 번역하신 내용 밑에 영어 원문을 인용 문구로 남겨주시기 바랍니다.
 - 모든 문서는 Markdown 포맷을 기본으로 합니다.
 - 원문의 의도만 바뀌지 않는다면 재밌게 의역해도 상관없습니다.
-- 번역이 완료된 이후에는 편집자분을 통해 편집 과정을 거치게 됩니다.
-- 참여를 원하시는 분께서는 Chris Ohk(utilForever)에게 연락주시기 바랍니다.
-
-## 공지사항
-
-중단되었던 C++ 핵심 가이드라인 한글화 프로젝트를 다시 재개합니다.
-
-C++ Core Guildlines 내용을 최신 버전으로 업데이트하고 남아 있는 부분과 새로 추가된 부분에 대해 번역 작업을 진행합니다. 
+- 참여를 원하시는 분께서는 Chris Ohk (utilForever)에게 [페이스북](http://www.facebook.com/utilForever)이나 [이메일](utilForever@gmail.com)로 연락주시기 바랍니다.
 
 ## 프로젝트 진행 계획
 
-- 1단계 : <B>1차 번역 작업 - C++ 핵심 가이드라인 (진행중)</B>
+- 1단계 : <B>1차 번역 작업 - C++ 핵심 가이드라인 (완료)</B>
 
-- 2단계 : <B>2차 번역 작업 - C++ 관련 문서 및 C++ 핵심 가이드라인 갱신 내용, 1차 교정 및 통합 문서 제작 (2016년 3월~)</B>
+- 2단계 : <B>2차 번역 작업 - C++ 관련 문서 및 C++ 핵심 가이드라인 갱신 내용, 1차 교정 및 통합 문서 제작 (진행중)</B>
 
 - 3단계 : 2차 교정 및 PDF 문서 제작 (TBD)
 
@@ -43,36 +39,9 @@ C++ Core Guildlines 내용을 최신 버전으로 업데이트하고 남아 있�
 - Junho Kim (h4wldev)
 - Incheol Kang(kangic)
 
-## C++ 핵심 가이드라인 1차 번역 진행 상황
+## C++ 핵심 가이드라인 한글화 진행 상황
 
-- Abstract (100%)
-- C++ Core Guildlines (100%)
-- A - Architectural Ideas (100%)
-- C - Classes and Class Hierarchies (40%)
-- Con - Constants and Immutability (100%)
-- CP - Concurrency and Parallelism (40%)
-- CPL - C-Style programming (100%)
-- E - Error Handling (100%)
-- Enum - Enumerations (100%)
-- ES - Expressions and Statements (80%)
-- F - Functions (80%)
-- GSL - Guideline support library (100%)
-- I - Interfaces (100%)
-- In - Introduction (100%)
-- N - Non-Rules and myths (100%)
-- NL - Naming and layout rules (100%)
-- P - Philosophy (100%)
-- PER - Performance (100%)
-- PRO - Profiles (100%)
-- R - Resource management (20%)
-- RF - References (100%)
-- SF - Source files (100%)
-- STL - The Standard Library (100%)
-- T - Templates and generic programming (100%)
-- To-do - Unclassified proto-rules (0%)
-- Appendix A - Libraries (100%)
-- Appendix B - Modernizing code (100%)
-- Appendix C - Discussion (5%)
+TBA
 
 ## 개요
 
