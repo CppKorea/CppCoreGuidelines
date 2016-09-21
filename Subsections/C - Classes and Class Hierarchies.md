@@ -11,13 +11,13 @@
 * [C.3: 클래스를 사용해 인터페이스와 구현을 분리하라](#Rc-interface)
 * [C.4: 클래스에 직접적으로 접근할 필요가 있는 경우에만 함수를 멤버함수로 작성하라](#Rc-member)
 * [C.5: 보조 함수들은 관련 클래스와 같은 namespace에 배치하라](#Rc-helper)
-* [C.7: Don't define a class or enum and declare a variable of its type in the same statement](#Rc-standalone)
+* [C.7: 클래스 또는 열거형에 대한 정의와 변수 선언을 같은 구문에 넣지 말아라](#Rc-standalone)
 * [C.8: non-public 멤버가 있다면 `struct`보단 `class`를 사용하라](#Rc-class)
 * [C.9: 멤버들의 노출을 최소화하라](#Rc-private)
 
 하위 영역:
 
-* [C.concrete: 구체적인 타입들](#SS-concrete)
+* [C.concrete: 개별적인 타입들](#SS-concrete)
 * [C.ctor: 생성자, 대입 연산자, 소멸자](#S-ctor)
 * [C.con: 컨테이너와 리소스 핸들](#SS-containers)
 * [C.lambdas: 함수 객체와 람다 표현식](#SS-lambdas)
@@ -32,7 +32,7 @@
 이해하기 쉽다. 근본적인 이유로 데이터가 관련이 있다면, 그 사실은 코드에 반영되어야 한다.
 
 ##### 예
-```
+```c++
     void draw(int x, int y, int x2, int y2);  // BAD: 암묵적인 관계를 지닌다
     void draw(Point from, Point to);          // 더 낫다.
 ```
@@ -61,7 +61,7 @@ invariant 는 형식에 구애받지 않고 (가령, 주석으로) 기술될 수
 만약 모든 데이터 멤버들이 상호독립적이라면, 불변조건은 존재할 수 없다. 
 
 ##### 예
-```
+```c++
     // 멤버들이 독립적으로 달라질 수 있다.
     struct Pair {  
         string name;
@@ -69,7 +69,7 @@ invariant 는 형식에 구애받지 않고 (가령, 주석으로) 기술될 수
     };
 ```
 하지만:
-```
+```c++
     class Date {
     public:
         // 생성자가 {yy, mm, dd}를 확인하고 초기화한다.
@@ -102,7 +102,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 인터페이스와 구현에 대한 분명한 구분은 가독성을 더 좋게 하고, 유지 보수를 단순하게 한다.
 
 ##### 예
-```
+```c++
     class Date {
         // ... some representation ...
     public:
@@ -133,7 +133,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 멤버 함수간 커플링을 줄이고, 객체 상태 변경에 의해 문제가 생기는 함수를 줄이고, representation이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
 
 ##### 예
-```
+```c++
     class Date {
         // ... 상대적으로 적은 인터페이스 ...
     };
@@ -160,7 +160,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 보조 함수들을 같은 네임스페이스에 넣으면 함수와 클래스의 관계가 명확해지고, 인자 종속적인 검색(Argument Dependent Lookup)에서 발견 할 수 있게 된다.
 
 ##### 예
-```
+```c++
     namespace Chrono { // here we keep time-related services
 
         class Time { /* ... */ };
@@ -185,11 +185,11 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 타입에 대한 정의와 다른 개체(entitiy)에 대한 정의를 같은 구문(statement)에 넣는 것은 혼동을 일으킬 수 있고, 불필요하다.
 
 ##### 잘못된 예
-```
+```c++
     struct Data { /*...*/ } data{ /*...*/ };
 ```
 ##### 좋은 예
-```
+```c++
     struct Data { /*...*/ };
     Data data{ /*...*/ };
 ```
@@ -206,7 +206,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 유익한 관습이다.
 
 ##### 잘못된 예
-```
+```c++
     struct Date {
         int d, m;
 
@@ -245,36 +245,36 @@ Flag classes declared with `struct` if there is a `private` or `public` member.
 
 
 
-## <a name="SS-concrete"></a>C.concrete: Concrete types
+## <a name="SS-concrete"></a>C.concrete: 개별적인 타입들(Concrete types)
 > [원문 링크](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#SS-concrete)
 
-클래스의 이상 중 하나는 기본 타입이 되는 것이다.
+이상적인 클래스는 기본 타입과 같아야 한다.
 
-쉽게 말하면 "`int` 처럼 동작하는 것"이다. Concrete type은 가장 간단한 종류의 클래스를 의미한다.
+쉽게 말하면 "`int` 처럼 동작하는 것"이다. 개별적인 타입(Concrete type)이란 가장 간단한 종류의 클래스를 의미한다.
 
 기본 타입의 값은 복사 될 수 있고, 복사의 결과는 원본과 같은 값을 갖는 독립적인 객체이다.
 타입이 `=` 와 `==` 를 모두 갖는다면, `a = b`를 실행한 이후에는 `a == b`에서 `true`가 반환되도록 해야 한다.
 
-대입과 동등 비교가 없는 Concrete classes들은 정의될 수는 있지만, 그런 경우는 드물다(드물어야 한다). 
+대입과 동등 비교가 없는 개별 타입들은 정의될 수는 있지만, 그런 경우는 드물다(드물어야 한다). 
 C++의 언어 내장(built-in) 타입들은 기본 타입들이고, `string`, `vector`, `map`같은 표준 라이브러리의 클래스들 또한 그렇다. 
 
-Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 구분하여 값 타입으로 언급된다.
+개별 타입은 종종 계층구조의 일부로 사용되는 타입들과 구분하여 값 타입으로 언급된다.
 
-구체적인 타입 규칙 요약:
+개별적인 타입 규칙 요약:
 
-* [C.10: 복잡한 클래스들 보다 Concrete type을 선호하라](#Rc-concrete)
-* [C.11: Concrete type은 일반적으로 만들어라](#Rc-regular)
+* [C.10: 복잡한 클래스들 보다 개별 타입들을 선호하라](#Rc-concrete)
+* [C.11: 개별 타입은 일반적으로 만들어라](#Rc-regular)
 
 
-### <a name="Rc-concrete"></a>C.10 복잡한 클래스들 보다 Concrete type을 선호하라
+### <a name="Rc-concrete"></a>C.10 복잡한 클래스들 보다 개별 타입들을 선호하라
 
 ##### 근거
-구체적인 타입은 근본적으로 계층구조 보다 단순하다:
+개별 타입은 근본적으로 계층구조 보다 단순하다:
 디자인이 더 쉽고, 구현이 더 쉽고, 사용하기가 더 쉬우며, 추론하기 더 쉽다. 더 작고 더 빠르기도 하다.  
 계층구조를 사용할 때는 마땅한 이유가 있어야 한다.
 
 ##### 예
-```
+```c++
     class Point1 {
         int x, y;
         // ... 연산들 ...
@@ -316,14 +316,14 @@ Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 �
 ???
 
 
-### <a name="Rc-regular"></a>C.11:Concrete type은 일반적으로 만들어라 
+### <a name="Rc-regular"></a>C.11:개별 타입은 일반적으로 만들어라 
 
 ##### 근거
 일반적인(regular) 타입은 이해하고 추론(reason)하기 쉽다. 
 (일반적이지 않은 타입들은 이해하고 사용하는데 추가적인 노력을 필요로 한다.)
 
 ##### 예
-```
+```c++
     struct Bundle {
         string name;
         vector<Record> vr;
@@ -395,13 +395,13 @@ Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 �
 * [C.42: 생성자가 유효한 객체를 생성하지 못한다면, 예외를 던지도록 하라](#Rc-throw)
 * [C.43: 클래스가 기본 생성자를 갖도록 하라](#Rc-default0)
 * [C.44: 기본 생성자는 되도록 단순하고 예외를 던지지 않도록 하라](#Rc-default00)
-* [C.45: 기본 생성자가 모든 멤버를 초기화하도록 하지 마라; 대신 멤버들이 스스로 초기화 하도록 하라](#Rc-default)
+* [C.45: 멤버를 초기화 하기만 하는 기본 생성자는 정의하지 마라; 대신 멤버들이 스스로 초기화 하도록 하라](#Rc-default)
 * [C.46: 단일 인자를 사용하는 생성자는 `explicit`으로 선언하라](#Rc-explicit)
 * [C.47: 멤버 변수들은 선언된 순서대로 초기화 하라](#Rc-order)
 * [C.48: 상수 초기화는 in-calss 멤버 초기화를 선호하라](#Rc-in-class-initializer)
 * [C.49: 생성자 안에서의 대입 보다는 초기화를 선호하라](#Rc-initialize)
 * [C.50: 초기화 과정에서 `virtual` 연산이 필요하다면, 팩토리 함수를 사용하라](#Rc-factory)
-* [C.51: Use delegating constructors to represent common actions for all constructors of a class](#Rc-delegating)
+* [C.51: 클래스의 모든 생성자들을 위한 일반적인 동작을 표현할 때는 대리 생성자를 사용하라](#Rc-delegating)
 * [C.52: 추가적인 초기화가 필요하지 않은 파생된 클래스에서 생성자를 사용할 때는 상속받은 생성자들을 사용하라](#Rc-inheriting)
 
 
@@ -443,7 +443,7 @@ Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 �
 가장 단순하고, 가장 명료한 의미를 준다.
 
 ##### 예
-```
+```c++
     struct Named_map {
     public:
         // ... no default operations declared ...
@@ -472,7 +472,7 @@ Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 �
 특별한 함수들의 의미론들은 밀접하게 연관되어 있다. 만약 한 함수가 기본 제공 함수가 아니어야 한다면(non-default), 다른 함수들도 수정이 필요하다.
 
 ##### 잘못된 예
-```
+```c++
     struct M2 {   // bad: incomplete set of default operations
     public:
         // ...
@@ -519,7 +519,7 @@ Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 �
 
 
 ##### 잘못된 예
-```
+```c++
     class Silly {   // BAD: Inconsistent copy operations
         class Impl {
             // ...
@@ -543,9 +543,11 @@ Concrete type들은 종종 계층구조의 일부로 사용되는 타입들과 �
 
 ## <a name="SS-dtor"></a>C.dtor: 소멸자
 "이 클래스에 소멸자가 필요할까?"라는 것은 설계 측면에서 굉장히 강력한 질문이다.
-For most classes the answer is "no" either because the class holds no resources or because destruction is handled by [the rule of zero](#Rc-zero);
-that is, its members can take care of themselves as concerns destruction.
-If the answer is "yes", much of the design of the class follows (see [the rule of five](#Rc-five)).
+
+대부분의 클래스들에 대해서 대답은 "no"인데, 그 이유는 해당 클래스가 자원들을 가지고 있지 않거나 소멸과정이 [the rule of zero](#Rc-zero)에 의해 처리되기 때문이다.
+
+요컨대, 클래스의 멤버들이 스스로의 소멸을 관리한다는 것이다.      
+만약 대답이 "yes"라면, 그 클래스 설계의 대부분은 [the rule of five](#Rc-five)를 따르게 된다. 
 
 ### <a name="Rc-dtor"></a>C.30: 객체가 없어질 때, 명시적인 동작이 필요할 경우 소멸자를 정의하라
 
@@ -555,7 +557,7 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 단순하게 멤버의 소멸자를 호출하는 것이 아닌 코드가 필요할 경우 소멸자를 정의하라.
 
 ##### 예
-```
+```c++
     template<typename A>
     struct final_action {   // 약간 단순화된 클래스
         A act;
@@ -579,6 +581,7 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
         // ...
     } // 여기서 소멸자를 통해 호출된다
 ```
+
 `Final_action` 의 목적은 소멸할 때 실행할 코드(보통 람다)를 얻는 것이다.
 
 
@@ -588,8 +591,8 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 * A class that exists primarily to execute an action upon destruction, such as a tracer or `final_action`.
 
 ##### 잘못된 예
-```
-    class Foo {   // bad; use the default destructor
+```c++
+    class Foo {   // 좋지 않다; 기본 소멸자를 사용하라
     public:
         // ...
         ~Foo() { s = ""; i = 0; vi.clear(); }  // clean up
@@ -612,26 +615,26 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 ### <a name="Rc-dtor-release"></a>C.31: 클래스에 의해 얻어진 모든 리소스는 소멸자에서 해제되어야 한다
 
 ##### 근거
-리소스 누수를 막는다, 특히 에러 상황에서.
+리소스 누수를 막는다, 특히 에러가 발생한 상황에서 그렇다.
 
 ##### 참고 사항
 클래스로 표현되는 리소스들이 기본 연산 집합을 갖고 있을 때 소멸자에서의 리소스 해제가 자동으로 발생한다.
 
 ##### 예
-```
+```c++
     class X {
-        ifstream f;   // may own a file
-        // ... no default operations defined or =deleted ...
+        ifstream f;   // 파일을 열었을 수도 있다.
+        // ... 다른 기본 연산은 정의되지 않았거나, = deleted 되었다 ...
     };
 ```
 `X`의 `ifstream` 은 `X`가 소멸될 때 묵시적으로 열었을 수 있는 파일을 닫는다.  
 
 
 ##### 잘못된 예
-```
-    class X2 {     // bad
-        FILE* f;   // may own a file
-        // ... no default operations defined or =deleted ...
+```c++
+    class X2 {     // 잘못되었다.
+        FILE* f;   // 파일을 가지고 있을 수도 있다.
+        // ... 다른 기본 연산은 정의되지 않았거나, = deleted 되었다 ...
     };
 ```
 `X2` 에서는 파일 핸들 누수가 생길 것이다.  
@@ -639,8 +642,9 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 ##### 참고 사항
 닫지 않은 소켓은 어떨까? 소멸자, 닫기, 정리 연산은 [실패하지 않는 것이 좋다](#Rc-dtor-fail).
 그럼에도 불구 하고 발생한다면, 정말 좋은 해결책을 찾기 힘든 문제를 만나는 것이다.
-초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리 거부"를 할 수 없는지 알지 못할 것이다.
-[discussion](#Sd-never-fail)을 보라.
+
+초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리 거부"를 할 수 없는지 알지 못할 것이다. 이에 대해서는 [discussion](#Sd-never-fail)을 보라.
+
 문제를 악화시키는 것은, 많은 "닫기/해제" 연산들이 재시도 할 수 없도록 되어있는 것이다.
 이 문제를 풀려는 시도는 많았지만, 일반적인 해결책은 알려지지 않았다.
 해결책이 없다면, 닫기/해제에 대한 실패를 디자인 오류로 간주하고 종료시키는 것을 고려해 보라.
@@ -649,7 +653,8 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 클래스가 소유하고 있지 않은 객체에 대한 포인터나 참조를 갖고 있을 수 있다.
 명백하게, 이 객체들은 클래스의 소멸자에서 `delete`되지 않아야 한다.
 예를 들면:
-```
+
+```c++
     Preprocessor pp { /* ... */ };
     Parser p { pp, /* ... */ };
     Type_checker tc { p, /* ... */ };
@@ -665,6 +670,8 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 
 ### <a name="Rc-dtor-ptr"></a>C.32: 클래스가 날 포인터(`T*`)나 참조(`T&`)를 갖고 있을 때, 소유하고 있는 것인지 고려해 보라
 
+> 역주 : 날 포인터(raw pointer) [관련 이슈](https://github.com/CppKorea/CppCoreGuidelines/issues/88)
+
 ##### 근거
 소유권에 대해서 상세하지 않은 코드는 많이 있다.
 
@@ -672,6 +679,7 @@ If the answer is "yes", much of the design of the class follows (see [the rule o
 ```
     ???
 ```
+
 ##### 참고 사항
 `T*` 혹은 `T&` 가 소유를 의미한다면, **소유한다는** 표시를 하라. `T*` 에 소유의 의미가 없다면 `ptr` 로 표시하는 것을 고려하라.
 이것은 문서화와 분석에 도움이 될 것이다.
@@ -688,57 +696,62 @@ Look at the initialization of raw member pointers and member references and see 
 소유된 객체는 그것을 소유한 객체가 소멸될 때 `삭제`되어야 한다.
 
 ##### 예
-포인터 멤버는 리소스일 것이다.
-[`T*`는 리소스가 아니어야 한다](#Rr-ptr), 오래된 코드에서는 일반적이다.
-`T*` 를 가능한 소유자라고 고려하고, 의심해보라.
-```
+포인터 멤버는 리소스일 것이다. [`T*`는 리소스가 아니어야 한다](#Rr-ptr), 이는 오래된 코드에서는 일반적이다.
+가능한 `T*`를 소유자라고 고려하고, 의심해보라.
+
+```c++
     template<typename T>
     class Smart_ptr {
-        T* p;   // BAD: vague about ownership of *p
+        T* p;   // BAD: *p 의 소유가 불분명하다
         // ...
     public:
-        // ... no user-defined default operations ...
+        // ... 사용자가 복사 연산을 정의하지 않았다 ...
     };
 
     void use(Smart_ptr<int> p1)
     {
-        // error: p2.p leaked (if not nullptr and not owned by some other code)
+        // error: p2.p 에 누수가 발생한다.
+        //      (nullptr가 아니거나 다른 코드에서 소유하지 않는다면)
         auto p2 = p1;
     }
 ```
+
 소멸자를 정의 한다면, [모든 기본 연산들](#Rc-five)을 정의하거나 삭제해야 한다.
-```
+
+```c++
     template<typename T>
     class Smart_ptr2 {
-        T* p;   // BAD: vague about ownership of *p
+        T* p;   // BAD: *p 의 소유가 불분명하다
         // ...
     public:
-        // ... no user-defined copy operations ...
-        ~Smart_ptr2() { delete p; }  // p is an owner!
+        // ... 사용자가 복사 연산을 정의하지 않았다 ...
+        ~Smart_ptr2() { delete p; }  // p 가 자원을 소유하고 있었다!
     };
 
     void use(Smart_ptr<int> p1)
     {
-        auto p2 = p1;   // error: double deletion
+        auto p2 = p1;   // error: 소멸자가 2번 호출된다.
     }
 ```
 기본 복사 연산은 단지 `p1.p` 를 `p2.p` 로 복사하고, `p1.p` 가 두번 소멸되게 만들 것이다. 소유권을 명시하라:
-```
+
+```c++
     template<typename T>
     class Smart_ptr3 {
-        owner<T>* p;   // OK: explicit about ownership of *p
+        owner<T>* p;   // OK: 명시적으로 *p 의 소유권을 가진다. 
         // ...
     public:
         // ...
-        // ... copy and move operations ...
+        // ... 복사와 이동 연산들 ...
         ~Smart_ptr3() { delete p; }
     };
 
     void use(Smart_ptr3<int> p1)
     {
-        auto p2 = p1;   // error: double deletion
+        auto p2 = p1;   // error: 소멸자가 2번 호출된다
     }
 ```
+
 ##### 참고 사항
 보통 소멸자를 사용하는 가장 단순한 방법은 포인터를 스마트 포인터(가령, `std::unique_ptr`)로 교체하고, 컴파일러가
 적절한 소멸자를 암묵적으로 호출하게 만들도록 놔두는 것이다.
@@ -761,10 +774,10 @@ Look at the initialization of raw member pointers and member references and see 
 또, 복사가 복사 손실로 이어질 수도 있다.
 
 ##### 잘못된 예
-```
-    class Handle {  // Very suspect
-        Shape& s;   // use reference rather than pointer to prevent rebinding
-                    // BAD: vague about ownership of *p
+```c++
+    class Handle {  // 굉장히 의심스럽다 
+        Shape& s;   // 중복 바인딩을 막기 위해서 포인터보다는 참조자를 사용하라
+                    // BAD: *p 의 소유가 불분명하다
         // ...
     public:
         Handle(Shape& ss) : s{ss} { /* ... */ }
@@ -775,9 +788,9 @@ Look at the initialization of raw member pointers and member references and see 
 만약 `Handle` 이 `s` 로 참조되는 객체를 소유한다면, 소멸자가 있어야 한다.
 
 ##### 예
-```
+```c++
     class Handle {        // OK
-        // use reference rather than pointer to prevent rebinding
+        // 중복 바인딩을 막기 위해서 포인터보다는 참조자를 사용하라
         owner<Shape&> s;  
         // ...
     public:
@@ -787,13 +800,14 @@ Look at the initialization of raw member pointers and member references and see 
     };
 ```
 `Handle` 이 `Shape` 를 소유하는지와는 별개로, 기본 복사 동작에 대해 의심해야 한다:
-```
-    // the Handle had better own the Circle or we have a leak
+
+```c++
+    // Handle이 Circle을 소유하지 않는다면 누수가 발생할 수 있다.
     Handle x { *new Circle{p1, 17} };
 
     Handle y { *new Triangle{p1, p2, p3} };
     
-    // the default assignment will try *x.s = *y.s
+    // 기본 대입 연산은 *x.s = *y.s 를 시도할 것이다.
     x = y;     
 ```
 코드에 사용된 `x = y` 는 굉장히 의심스럽다.
@@ -813,25 +827,28 @@ Look at the initialization of raw member pointers and member references and see 
 ### <a name="Rc-dtor-virtual"></a>C.35: 기본 클래스의 소멸자는 `public` `virtual` 이거나, `protected` non-`virtual`이어야 한다.
 
 ##### 근거
+미정의 동작(undefined behavior)을 막기 위함이다.
 
-To prevent undefined behavior.
-If the destructor is public, then calling code can attempt to destroy a derived class object through a base class pointer, and the result is undefined if the base class's destructor is non-virtual.
-If the destructor is protected, then calling code cannot destroy through a base class pointer and the destructor does not need to be virtual; it does need to be protected, not private, so that derived destructors can invoke it.
-In general, the writer of a base class does not know the appropriate action to be done upon destruction.
+만약 소멸자가 `public` 이면, 호출하는 코드는 파생 클래스가 기본 클래스의 포인터를 통해 소멸될 것이라 생각한다. 그리고 기본 클래스의 소멸자가 `virtual`이 아니면 결과는 미정의 동작으로 이어진다.
 
-##### Discussion
+만약 소멸자가 `protected`라면, 호출하는 코드는 기본 클래스의 포인터를 통해서 소멸시킬 수 없고, 따라서 소멸자는 `virtual`이 아니어도 문제가 없다. `private`가 아닌 `protected`여야 하는 이유는 파생 클래스의 소멸자가 호출할 수 있어야 하기 때문이다.
 
-See [this in the Discussion section](#Sd-dtor).
+일반적으로, 기본 클래스의 작성자는 소멸 과정에서 어떤 동작이 적합한지 알 수 없다.  
+
+
+##### 토의
+
+[토론](#Sd-dtor)을 함께 읽어보라.
 
 ##### 잘못된 예
-```
-    struct Base {  // BAD: no virtual destructor
+```c++
+    struct Base {  // BAD: virtual 소멸자가 없다
         virtual f();
     };
 
     struct D : Base {
         string s {"a resource needing cleanup"};
-        ~D() { /* ... do some cleanup ... */ }
+        ~D() { /* ... 정리 작업을 한다 ... */ }
         // ...
     };
 
@@ -839,35 +856,38 @@ See [this in the Discussion section](#Sd-dtor).
     {
         unique_ptr<Base> p = make_unique<D>();
         // ...
-    } // p's destruction calls ~Base(), not ~D(), which leaks D::s and possibly more
+    } 
+    // p 의 소멸은 ~Base()를 호출하지만, ~D() 는 호출하지 않는다.
+    // 따라서 D::s 에 누수가 발생하고, 다른 자원들도 누수될 것이다.
+
 ```
+
 ##### 참고 사항
 
-A virtual function defines an interface to derived classes that can be used without looking at the derived classes.
-If the interface allows destroying, it should be safe to do so.
+가상(`virtual`) 함수는 파생 클래스에 대한 인터페이스를 제공한다. 이 인터페이스를 통해 파생 클래스에 대해 신경을 쓰지 않게 된다.   
+만약 인터페이스가 소멸을 지원한다면, 그 과정은 안전해야만 한다.
 
 ##### 참고 사항
+소멸자는 private이 아니어야 한다. 만약 그럴 경우 해당 타입을 사용하지 못하게 될 것이다 : 
 
-A destructor must be nonprivate or it will prevent using the type :
-```
+```c++
     class X {
-        ~X();   // private destructor
+        ~X();   // private 소멸자
         // ...
     };
 
     void use()
     {
-        X a;                        // error: cannot destroy
-        auto p = make_unique<X>();  // error: cannot destroy
+        X a;                        // error: 소멸시킬 수 없다
+        auto p = make_unique<X>();  // error: 소멸시킬 수 없다
     }
 ```
 ##### 예외 사항
-
-We can imagine one case where you could want a protected virtual destructor: When an object of a derived type (and only of such a type) should be allowed to destroy *another* object (not itself) through a pointer to base. We haven't seen such a case in practice, though.
+protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있다. 파생 타입의 객체가 기본 타입 포인터를 통해 (그 자신이 아닌) *다른* 객체의 소멸을 하도록 허용해야 하는 경우가 그러하다. 하지만 아직까지 그런 사례를 볼 수 없었다.
 
 ##### 시행하기
+* 가상 함수를 하나라도 가지는 클래스는 `public` 하고 `virtual`한 소멸자를 가져야 한다. 또는 `protected`이고 non-`virtual`한 소멸자를 가져야 한다.
 
-* A class with any virtual functions should have a destructor that is either public and virtual or else protected and nonvirtual.
 
 ### <a name="Rc-dtor-fail"></a>C.36: 소멸자는 실패해선 안된다
 
@@ -875,7 +895,7 @@ We can imagine one case where you could want a protected virtual destructor: Whe
 일반적으로 소멸자가 실패할 때 에러 없는 코드를 작성하는 방법을 알 수 없다. 표준 라이브러리에서 다루는 모든 클래스들은 예외를 던지지 않는 소멸자를 요구한다.
 
 ##### 예
-```
+```c++
     class X {
     public:
         ~X() noexcept;
@@ -892,9 +912,11 @@ We can imagine one case where you could want a protected virtual destructor: Whe
 ##### 참고 사항
 
 소멸자에서의 실패를 다루기 위해 실패할 염려가 없는 방법(scheme)을 많이 고안해 왔다. 이에 대해선 일반적인 방법으로 성공한 예가 없다.
+
 이것은 정말 현실적인 문제가 될 수 있다: 예를 들면, 닫지 않은 소켓은 어떤가?  
 소멸자를 작성하는 사람은 왜 소멸자가 호출되고 예외를 던짐으로써 "동작을 거부하는 것"을 할 수 없는지 모른다.
-[토론](#Sd-dtor)을 보라.  
+
+[토론](#Sd-dtor)을 보라.    
 문제를 악화시키는 것은, 많은 "close/release" 연산이 재시도할 수 없게 되어있는 것이다.
 가능하다면, close/failure에 대한 실패를 근본적인 디자인 오류로 간주하고 종료시켜라.
 
@@ -922,7 +944,7 @@ We can imagine one case where you could want a protected virtual destructor: Whe
 ### <a name="Rc-dtor-noexcept"></a>C.37: 소멸자를 `noexcept`로 작성하라
 
 ##### 근거
-[소멸자는 실패해선 안된다](#Rc-dtor fail).  
+[소멸자는 실패해선 안된다](#Rc-dtor fail).   
 만약 소멸자가 예외로 인해 종료되려고 한다면, 좋지 않은 디자인 오류로 보고 종료하는 편이 나을 것이다.
 
 ##### 참고 사항
@@ -1014,21 +1036,21 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 ##### 잘못된 예
 ```
     class X1 {
-        FILE* f;   // call init() before any other function
+        FILE* f;   // 다른 함수에 앞서 init()을 호출한다
         // ...
     public:
         X1() {}
-        void init();   // initialize f
-        void read();   // read from f
+        void init();   // 멤버 f 초기화
+        void read();   // 멤버 f 로부터 읽는다
         // ...
     };
 
     void f()
     {
         X1 file;
-        file.read();   // crash or bad read!
+        file.read();   // crash 또는 bad read 가 발생한다.
         // ...
-        file.init();   // too late
+        file.init();   // 초기화 하기엔 너무 늦었다
         // ...
     }
 ```
@@ -1048,9 +1070,9 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 유효하지 않은 객체를 남겨두는 것은 문제를 일으킬 것이다.
 
 ##### 예
-```
+```c++
     class X2 {
-        FILE* f;   // call init() before any other function
+        FILE* f;   // 다른 함수에 앞서 init()을 호출한다
         // ...
     public:
         X2(const string& name)
@@ -1060,21 +1082,22 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
             // ...
         }
 
-        void read();      // read from f
+        void read();      // 멤버 f 로부터 읽는다
         // ...
     };
 
     void f()
     {
-        X2 file {"Zeno"}; // throws if file isn't open
-        file.read();      // fine
+        X2 file {"Zeno"}; // file이 열려있지 않으면 예외를 던진다
+        file.read();      // 문제 없다
         // ...
     }
 ```
+
 ##### 잘못된 예
-```
-    class X3 {     // bad: the constructor leaves a non-valid object behind
-        FILE* f;   // call init() before any other function
+```c++
+    class X3 {     // bad: 생성자가 유효하지 않은 객체를 남겨놓을 수 있다
+        FILE* f;   // 다른 함수에 앞서 init()을 호출한다
         bool valid;
         // ...
     public:
@@ -1086,21 +1109,21 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
         }
 
         void is_valid() { return valid; }
-        void read();   // read from f
+        void read();   // 멤버 f 로부터 읽는다
         // ...
     };
 
     void f()
     {
         X3 file {"Heraclides"};
-        file.read();   // crash or bad read!
+        file.read();   // crash 또는 bad read가 발생한다!
         // ...
         if (is_valid()) {
             file.read();
             // ...
         }
         else {
-            // ... handle error ...
+            // ... error를 처리한다 ...
         }
         // ...
     }
@@ -1117,10 +1140,11 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 
 ##### 참고 사항
+사람들이 생성자에서 초기화를 수행하지 않고 `init()`함수를 사용해온 이유 중 하나는 코드의 중복을 막기 위함이었다.
+[대리 생성자](#Rc-delegating)와 [기본 멤버 초기화](#Rc-in-class-initializer)가 이런 작업을 더 잘 해낼 수 있다.
 
-One reason people have used `init()` functions rather than doing the initialization work in a constructor has been to avoid code replication.
-[Delegating constructors](#Rc-delegating) and [default member initialization](#Rc-in-class-initializer) do that better.
-Another reason is been to delay initialization until an object is needed; the solution to that is often [not to declare a variable until it can be properly initialized](#Res-init)
+또 다른 이유로는 객체가 필요할 때까지 초기화를 지연시키는 것이다; 이러한 해법은 보통 [변수가 적절하게 초기화되기 전까지는 해당 변수를 선언하지 않는 것이다](#Res-init). 
+
 
 ##### 시행하기
 * (쉬움) 모든 생성자는 모든 멤버 변수를 초기화 해야 한다. (명시적으로든, 생성자를 호출하도록 위임하든, 또는 기본 생성자를 통해서라도)
@@ -1130,11 +1154,11 @@ Another reason is been to delay initialization until an object is needed; the so
 ### <a name="Rc-default0"></a>C.43: 클래스가 기본 생성자를 갖도록 하라
 
 ##### 근거
-많은 언어나 라이브러리 설비들이 기본 생성자들에 의존한다.  
-가령, `T a[10]` 나 `std::vector<T> v(10)` 는 기본 생성자들이 각 요소를 초기화 한다.
+많은 언어나 라이브러리들이 기본 생성자를 필요로 한다.  
+예를 들면, `T a[10]` 나 `std::vector<T> v(10)` 는 기본 생성자들이 각 요소를 초기화 한다.
 
 ##### 잘못된 예
-```
+```c++
     class Date { // BAD: 기본 생성자가 없다
     public:
         Date(int dd, int mm, int yyyy);
@@ -1143,23 +1167,22 @@ Another reason is been to delay initialization until an object is needed; the so
 
     vector<Date> vd1(1000);   // Date의 기본 값이 필요하다
 
-    // 대안
-    vector<Date> vd2(1000, Date{Month::october, 7, 1885});   
+    // 대안: 기본값 제공하기
+    vector<Date> vd2(1000, Date{ Month::october, 7, 1885 });   
 ```
+기본 생성자는 다른 사용자 정의 생성자가 없을 때만 자동으로 생성된다. 이런 코드와 같은 경우엔 `vd1`을 초기화 하는 것은 불가능하다.
 
-The default constructor is only auto-generated if there is no user-declared constructor, hence it's impossible to initialize the vector `vd1` in the example above.
-
-자연스러은 기본 날짜는 없다, 그래서 이 예는 사소하지 않다. (대부분의 사람들에게 태초의 시간은 필요없다)
+자연스러은 기본 날짜는 없다, 때문에 이 예는 사소하지 않다. (대부분의 사람들에게 태초의 시간은 필요없다)
 대부분의 달력 시스템에서 `{0,0,0}` 은 유효한 날짜가 아니다. 이것은 부동 소수점의 `NaN` 같은 것을 만드는 것이다. 
-하지만, 대부분의 현실적인 `Date` 클래스는 "첫째 날" (가령. 1970년 1월 1일이 많이 쓰인다)을 갖기 때문에 이것을 기본으로 갖는 것이 보통 일반적이다.
+하지만, 대부분의 현실적인 `Date` 클래스는 "첫째 날" (가령. 1970년 1월 1일이 많이 쓰인다)을 갖기 때문에 이것을 기본으로 사용하는 것이 일반적이다.
 
 
 ##### 예
-```
+```c++
     class Date {
     public:
         Date(int dd, int mm, int yyyy);
-        Date() = default; // See also C.45
+        Date() = default; // 함께 보기 : C.45 
         // ...
     private:
         int dd = 1;
@@ -1170,19 +1193,20 @@ The default constructor is only auto-generated if there is no user-declared cons
 
     vector<Date> vd1(1000);
 ```
-##### 참고 사항
 
-A class with members that all have default constructors implicitly gets a default constructor:
-```
+##### 참고 사항
+클래스의 모든 멤버들이 기본 생성자들을 가지고 있을 경우 묵시적으로 기본 생성자를 가진다 : 
+```c++
     struct X {
         string s;
         vector v;
     };
 
-    X x; // means X{{}, {}}; that is the empty string and the empty vector
+    X x; // X{{}, {}}를 의미한다; 빈 string과 빈 vector를 생성한다
 ```
-Beware that built-in types are not properly default constructed:
-```
+
+기본 내장(built-in) 타입들은 적절하게 기본 생성되지 않을 수도 있다:
+```c++
     struct X {
        string s;
        int i;
@@ -1190,24 +1214,27 @@ Beware that built-in types are not properly default constructed:
 
     void f()
     {
-       // x.s is initialized to the empty string; 
-       // x.i is uninitialized
+       // x.s 은 빈 string로 초기화 되었다 
+       // x.i 은 초기화되지 않았다
        X x;    
 
        cout << x.s << ' ' << x.i << '\n';
        ++x.i;
     }
 ```
-Statically allocated objects of built-in types are by default initialized to `0`, but local built-in variables are not.
-Beware that your compiler may default initialize local built-in variables, whereas an optimized build will not.
-Thus, code like the example above may appear to work, but it relies on undefined behavior.
-Assuming that you want initialization, an explicit default initialization can help:
-```
+
+정적으로 할당된 내장 타입 객체들은 `0`으로 초기화 된다. 하지만 지역 변수들은 그렇지 않다.  
+컴파일러의 최적화 빌드는 내장 타입 지역 변수들을 초기화하지 않을 수 있다는 점에 주의하라. 따라서, 위의 예시와 같은 코드가 나타난다면, 미정의 동작을 일으킬 수 있다.
+
+초기화를 하고자 한다면, 명시적 기본 생성이 도움이 될 것이다:
+
+```c++
     struct X {
        string s;
-       int i {};   // default initialize (to 0)
+       int i {};   // 기본 초기화 (i는 0 이 된다)
     };
 ```
+
 ##### 시행하기
 * 기본 생성자가 없는 클래스들에 표시를 남겨라.
 
@@ -1217,9 +1244,9 @@ Assuming that you want initialization, an explicit default initialization can he
 ##### 근거
 실패할 수 있는 연산없이 "기본"적인 값을 설정할 수 있다는 것은 에러 처리를 단순화 하고, 이동 연산을 추측 할 수 있도록 한다.
 
-##### 문제가 있는 예
-```
-    // elem points to space-elem element allocated using new
+##### 잘못된 예
+```c++
+    // elem은 공간에 대한 포인터다 - new를 사용해 원소들이 할당된다.
     template<typename T>
     class Vector0 {
     public:
@@ -1237,15 +1264,15 @@ Assuming that you want initialization, an explicit default initialization can he
 또, 기본 `Vector` 를 `{ new T[0], 0, 0}` 으로 표현하는 것 역시 낭비처럼 보인다
 
 예를 들면, `Vector0 v(100)`은 100 만큼 할당하는 비용이 든다.
+
 ##### 예
-```
-    // elem is nullptr or elem points 
-    // to space-elem element allocated using new
+```c++
+    // elem은 nullptr이거나, new를 사용해 할당된 공간을 가리킨다.
     template<typename T>
     class Vector1 {
     public:
-        // sets the representation to {nullptr, nullptr, nullptr}; 
-        // doesn't throw
+        // {nullptr, nullptr, nullptr}과 동일하다. 
+        // 예외를 던지지 않는다.
         Vector1() noexcept {}
 
         Vector1(int n) : 
@@ -1257,22 +1284,21 @@ Assuming that you want initialization, an explicit default initialization can he
         T* last = nullptr;
     };
 ```
-`{nullptr, nullptr, nullptr}`는 `Vector1{}` 를 만드는 비용을 줄여준다(cheap). 하지만 이는 특별한 경우이고 실행시간 검사가 필요하다.
+`{nullptr, nullptr, nullptr}`는 `Vector1{}` 를 만드는 비용을 줄여준다(cheap). 하지만 이는 특별한 경우이고 실행시간 평가가 필요하다.
 에러를 발견하고 `Vector1`를 비우는 것은 간단하다.
 
 ##### 시행하기
 * 예외를 던지는 기본 생성자에는 표시를 남겨라.
 
 
-### <a name="Rc-default"></a>C.45: Don't define a default constructor that only initializes data members; use in-class member initializers instead
+### <a name="Rc-default"></a>C.45: 멤버를 초기화 하기만 하는 기본 생성자는 정의하지 마라; 대신 멤버들이 스스로 초기화 하도록 하라
 
 ##### 근거
-
-Using in-class member initializers lets the compiler generate the function for you. The compiler-generated function can be more efficient.
+멤버들에게 초기화를 위임하면, 컴파일러가 효율적인 코드를 생성한다.
 
 ##### 잘못된 예
-```
-    class X1 { // BAD: doesn't use member initializers
+```c++
+    class X1 { // BAD: 멤버 초기화를 사용하지 않는다
         string s;
         int i;
     public:
@@ -1286,13 +1312,14 @@ Using in-class member initializers lets the compiler generate the function for y
         string s = "default";
         int i = 1;
     public:
-        // use compiler-generated default constructor
+        // 컴파일러가 생성한 기본 생성자를 사용한다.
         // ...
     };
 ```
 ##### 시행하기
 
-(쉬움) A default constructor should do more than just initialize member variables with constants.
+(쉬움) 명시적인 기본 생성자는 초기화 이외의 동작을 해야할 때 쓰는 것이 좋다.
+
 
 ### <a name="Rc-explicit"></a>C.46: By default, declare single-argument constructors explicit
 
@@ -1301,7 +1328,7 @@ Using in-class member initializers lets the compiler generate the function for y
 To avoid unintended conversions.
 
 ##### 잘못된 예
-```
+```c++
     class String {
         // ...
     public:
@@ -1314,7 +1341,7 @@ To avoid unintended conversions.
 ##### 예외 사항
 
 If you really want an implicit conversion from the constructor argument type to the class type, don't use `explicit`:
-```
+```c++
     class Complex {
         // ...
     public:
@@ -1339,7 +1366,7 @@ If you really want an implicit conversion from the constructor argument type to 
 To minimize confusion and errors. That is the order in which the initialization happens (independent of the order of member initializers).
 
 ##### 잘못된 예
-```
+```c++
     class Foo {
         int m1;
         int m2;
@@ -1365,7 +1392,7 @@ To minimize confusion and errors. That is the order in which the initialization 
 Makes it explicit that the same value is expected to be used in all constructors. Avoids repetition. Avoids maintenance problems. It leads to the shortest and most efficient code.
 
 ##### 잘못된 예
-```
+```c++
     class X {   // BAD
         int i;
         string s;
@@ -1379,7 +1406,7 @@ Makes it explicit that the same value is expected to be used in all constructors
 How would a maintainer know whether `j` was deliberately uninitialized (probably a poor idea anyway) and whether it was intentional to give `s` the default value `""` in one case and `qqq` in another (almost certainly a bug)? The problem with `j` (forgetting to initialize a member) often happens when a new member is added to an existing class.
 
 ##### 예
-```
+```c++
     class X2 {
         int i {666};
         string s {"qqq"};
@@ -1392,7 +1419,7 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 ```
 ##### 대안
 We can get part of the benefits from default arguments to constructors, and that is not uncommon in older code. However, that is less explicit, causes more arguments to be passed, and is repetitive when there is more than one constructor:
-```
+```c++
     class X3 {   // BAD: inexplicit, argument passing overhead
         int i;
         string s;
@@ -1416,7 +1443,7 @@ We can get part of the benefits from default arguments to constructors, and that
 An initialization explicitly states that initialization, rather than assignment, is done and can be more elegant and efficient. Prevents "use before set" errors.
 
 ##### 좋은 예
-```
+```c++
     class A {   // Good
         string s1;
     public:
@@ -1425,7 +1452,7 @@ An initialization explicitly states that initialization, rather than assignment,
     };
 ```
 ##### 잘못된 예
-```
+```c++
     class B {   // BAD
         string s1;
     public:
@@ -1447,7 +1474,7 @@ An initialization explicitly states that initialization, rather than assignment,
 If the state of a base class object must depend on the state of a derived part of the object, we need to use a virtual function (or equivalent) while minimizing the window of opportunity to misuse an imperfectly constructed object.
 
 ##### 잘못된 예
-```
+```c++
     class B {
     public:
         B()
@@ -1463,7 +1490,7 @@ If the state of a base class object must depend on the state of a derived part o
     };
 ```
 ##### 예
-```
+```c++
     class B {
     protected:
         B() { /* ... */ }              // create an imperfectly initialized object
@@ -1508,7 +1535,7 @@ Conventional factory functions allocate on the free store, rather than on the st
 To avoid repetition and accidental differences.
 
 ##### 잘못된 예
-```
+```c++
     class Date {   // BAD: repetitive
         int d;
         Month m;
@@ -1527,7 +1554,7 @@ To avoid repetition and accidental differences.
 The common action gets tedious to write and may accidentally not be common.
 
 ##### 예
-```
+```c++
     class Date2 {
         int d;
         Month m;
@@ -1558,7 +1585,7 @@ If you need those constructors for a derived class, re-implementing them is tedi
 ##### 예
 
 `std::vector` has a lot of tricky constructors, so if I want my own `vector`, I don't want to reimplement them:
-```
+```c++
     class Rec {
         // ... data and lots of nice constructors ...
     };
@@ -1570,7 +1597,7 @@ If you need those constructors for a derived class, re-implementing them is tedi
     };
 ```
 ##### 잘못된 예
-```
+```c++
     struct Rec2 : public Rec {
         int x;
         using Rec::Rec;
@@ -1595,7 +1622,7 @@ Make sure that every member of the derived class is initialized.
 이렇게 하는 것이 간단하고 효율적이다. r-value를 위해 최적화하길 원한다면, `&&`를 받는 대입 연산을 오버로드하여 제공하라. ([F.24](#Rf-pass-ref-ref)를 참조하라)
 
 ##### 예
-```
+```c++
     class Foo {
     public:
         Foo& operator=(const Foo& x)
@@ -1622,7 +1649,7 @@ Make sure that every member of the derived class is initialized.
 하지만 만약 임시 사본을 만들지 않음으로써 훨씬 더 좋은 성능을 얻을 수 있다면 어떨까? 
 크고 같은 크기의 `Vector`들의 대입이 빈번한 영역을 위한 간단한 `Vector`를 생각해보라.  
 이 경우, `swap`구현 기법에 의한 원소들의 사본은 상당한 비용 증가를 야기할 수 있다.
-```
+```c++
     template<typename T>
     class Vector {
     public:
@@ -1670,7 +1697,7 @@ Make sure that every member of the derived class is initialized.
 
 
 ##### 예
-```
+```c++
     class X {   // OK:  값 의미론
     public:
         X();
@@ -1701,7 +1728,7 @@ Make sure that every member of the derived class is initialized.
     if (x == y) throw Bad{};   // 값 의미론으로 가정한다
 ```
 ##### 예
-```
+```c++
     class X2 {  // OK: 포인터 의미론
     public:
         X2();
@@ -1741,7 +1768,7 @@ Make sure that every member of the derived class is initialized.
 ##### 예
 표준 라이브러리 컨테이너들은 자기 대입을 우아하고 효율적인 방법으로 처리한다.
 
-```
+```c++
     std::vector<int> v = {3, 1, 4, 1, 5, 9};
     v = v;
     // v의 값은 여전히 {3, 1, 4, 1, 5, 9} 그대로다
@@ -1749,7 +1776,7 @@ Make sure that every member of the derived class is initialized.
 ##### 참고 사항
 멤버들로부터 생성된 기본 대입 연산은 자기 대입에 안전하다.
 
-```
+```c++
     struct Bar {
         vector<pair<int, int>> v;
         map<string, int> m;
@@ -1763,7 +1790,7 @@ Make sure that every member of the derived class is initialized.
 ##### 참고 사항
 자기 대입을 명시적으로 검사함으로써 처리할 수도 있을 것이다. 하지만 종종 그런 검사 없이도 우아하고 빠르게 동작하도록 할 수 있다 (가령, [`swap` 사용법](#Rc-swap)).
 
-```
+```c++
     class Foo {
         string s;
         int i;
@@ -1786,7 +1813,7 @@ Make sure that every member of the derived class is initialized.
 그 말은 백만번이나 장황한 검사를해야 한다는 것과 같다 (하지만 자기 대입의 결과는 반드시 자신과 같아야 하기 때문에, 컴퓨터의 분기 예측은 매번 맞아떨어질 것이다.  
 이런 코드를 고려해보자 :
 
-```
+```c++
     // 간단하고, 아마도 훨씬 나을 것이다.
     Foo& Foo::operator=(const Foo& a)   
     {
@@ -1822,7 +1849,7 @@ Make sure that every member of the derived class is initialized.
 그것이 일반적으로 기대되는 동작(semantics)이다.  `x = std::move(y)`를 수행한 후에는, `x`의 값은 `y`여야 하며, `y`는 유효한 상태여야 한다.
 
 ##### 예
-```
+```c++
     template<typename T>
     class X {   // OK: 값 의미론
     public:
@@ -1871,7 +1898,7 @@ Make sure that every member of the derived class is initialized.
 
 
 ##### 예
-```
+```c++
     class Foo {
         string s;
         int i;
@@ -1899,7 +1926,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 
 ##### 예
 여기 검사 없이 포인터를 이동하는 방법이 있다.(마치 이동 대입을 구현한 코드라고 상상해보라.):
-```
+```c++
     // move from other.ptr to this->ptr
     T* temp = other.ptr;
     other.ptr = nullptr;
@@ -1918,7 +1945,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 예외를 던지지 않는 이동은 표준 라이브러리와 언어 특징들에 의해 더 효율적으로 사용될 수 있다. 
 
 ##### 예
-```
+```c++
     template<typename T>
     class Vector {
         // ...
@@ -1944,7 +1971,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 이 복사 연산들은 예외를 던지지 않는다.
 
 ##### 잘못된 예
-```
+```c++
     template<typename T>
     class Vector2 {
         // ...
@@ -1969,7 +1996,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 복사손실(slicing)을 피하기 위함이다. 일반적인 복사 연산은 파생 클래스 객체에서 기본 클래스 부분만 복사할 것이다. 
 
 ##### 잘못된 예
-```
+```c++
     class B { // BAD: 기본 클래스가 복사를 제한하지 않는다
         int data;
         // ... 복사 연산에 대한 정의가 없으므로, 기본 동작을 사용한다 ...
@@ -1988,7 +2015,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 ```
 
 ##### 예
-```
+```c++
     class B { // GOOD: 기본 클래스가 복사를 제한한다
         B(const B&) = delete;
         B& operator=(const B&) = delete;
@@ -2030,7 +2057,7 @@ Don't let this tempt you into returning an owning raw pointer; this is a minor d
 
 
 ##### 예
-```
+```c++
     class Tracer {
         string message;
     public:
@@ -2050,7 +2077,7 @@ Don't let this tempt you into returning an owning raw pointer; this is a minor d
 소멸자를 정의했기 때문에, 우리는 복사, 이동 연산들을 정의해야만 한다. 이를 위해선 `=default`가 가장 최선이고, 간단한 방법이다.  
 
 ##### 잘못된 예
-```
+```c++
     class Tracer2 {
         string message;
     public:
@@ -2081,7 +2108,7 @@ Don't let this tempt you into returning an owning raw pointer; this is a minor d
 
 
 ##### 예
-```
+```c++
     class Immortal {
     public:
         // 소멸이 금지되었다
@@ -2098,7 +2125,7 @@ Don't let this tempt you into returning an owning raw pointer; this is a minor d
 ```
 ##### 예
 `unique_ptr`는 이동 가능하지만, 복사는 불가능하다. 이 클래스의 복사를 막기 위해, 복사 연산들은 삭제되었다. l-value로부터 복사 연산을 막기 위해서는 `=delete`가 필요하다:
-```
+```c++
     template <class T, 
               class D = default_delete<T>> 
     class unique_ptr {
@@ -2139,7 +2166,7 @@ Don't let this tempt you into returning an owning raw pointer; this is a minor d
 나쁘게는, 생성자와 소멸자 내부에서 발생하는 구현되지 않은 순수 가상 함수에 대한 직접 또는 간접호출이 비정의된 동작을 일으킨다.  
 
 ##### 잘못된 예
-```
+```c++
     class base {
     public:
         virtual void f() = 0;   // 구현되지 않았다
@@ -2193,7 +2220,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 
 
 ##### 좋은 예
-```
+```c++
     class Foo {
         // ...
     public:
@@ -2209,7 +2236,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 ```
 호출자들의 편의를 위해서 같은 네임스페이스에 비-멤버 `swap`함수를 제공하라.
 
-```
+```c++
     void swap(Foo& a, Foo& b)
     {
         a.swap(b);
@@ -2228,7 +2255,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 
 
 ##### 잘못된 예
-```
+```c++
     void swap(My_vector& x, My_vector& y)
     {
         auto tmp = x;   // copy elements
@@ -2260,7 +2287,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 
 
 ##### 예
-```
+```c++
     class X {
         string name;
         int number;
@@ -2272,7 +2299,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
     }
 ```
 ##### 잘못된 예
-```
+```c++
     class B {
         string name;
         int number;
@@ -2307,7 +2334,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 계층 구조에서 잘못 사용하기 어렵고 유용한 `==`를 작성하는 것은 어려운 일이다. 
 
 ##### 잘못된 예
-```
+```c++
     class B {
         string name;
         int number;
@@ -2320,7 +2347,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
     };
 ```
 `B`의 비교 연산은 두번째 피연산자에 대해서 타입 변환을 허용하지만, 첫번째 피연산자에 대해서는 허용하지 않는다.
-```
+```c++
     class D :B {
         char character;
         virtual bool operator==(const D& a) const
@@ -2356,7 +2383,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 이는 표준 라이브러리의 요구사항이다.  
 
 ##### 잘못된 예
-```
+```c++
     template<>
     struct hash<My_type> {  // 정말정말 안좋은 해시 특수화
 
@@ -2487,7 +2514,7 @@ Do *not* use inheritance when simply having a data member will do. Usually this 
 ##### 잘못된 예
 
 Do *not* represent non-hierarchical domain concepts as class hierarchies.
-```
+```c++
     template<typename T>
     class Container {
     public:
@@ -2525,7 +2552,7 @@ A class is more stable (less brittle) if it does not contain data.
 Interfaces should normally be composed entirely of public pure virtual functions and a default/empty virtual destructor.
 
 ##### 예
-```
+```c++
     class my_interface {
     public:
         // ...only pure virtual functions here ...
@@ -2533,7 +2560,7 @@ Interfaces should normally be composed entirely of public pure virtual functions
     };
 ```
 ##### 잘못된 예
-```
+```c++
     class Goof {
     public:
         // ...only pure virtual functions here ...
@@ -2567,7 +2594,7 @@ Give `Goof` a virtual destructor and all is well.
 Such as on an ABI (link) boundary.
 
 ##### 예
-```
+```c++
     struct Device {
         virtual void write(span<const char> outbuf) = 0;
         virtual void read(span<char> inbuf) = 0;
@@ -2617,6 +2644,7 @@ An abstract class typically does not have any data for a constructor to initiali
 
 Flag abstract classes with constructors.
 
+
 ### <a name="Rh-dtor"></a>C.127: A class with a virtual function should have a virtual or protected destructor
 
 ##### 근거
@@ -2624,7 +2652,7 @@ Flag abstract classes with constructors.
 A class with a virtual function is usually (and in general) used via a pointer to base. Usually, the last user has to call delete on a pointer to base, often via a smart pointer to base, so the destructor should be public and virtual. Less commonly, if deletion through a pointer to base is not intended to be supported, the destructor should be protected and nonvirtual; see [C.35](#Rc-dtor-virtual).
 
 ##### 잘못된 예
-```
+```c++
     struct B {
         virtual int f() = 0;
         // ... no user-written destructor, defaults to public nonvirtual ...
@@ -2659,7 +2687,7 @@ Readability. Detection of mistakes. Writing explicit `virtual`, `override`, or `
 Use `virtual` only when declaring a new virtual function. Use `override` only when declaring an overrider. Use `final` only when declaring an final overrider.
 
 ##### 잘못된 예
-```
+```c++
     struct B {
         void f1(int);
         virtual void f2(int) const;
@@ -2705,7 +2733,7 @@ Use `virtual` only when declaring a new virtual function. Use `override` only wh
 Copying a base is usually slicing. If you really need copy semantics, copy deeply: Provide a virtual `clone` function that will copy the actual most-derived type and return an owning pointer to the new object, and then in derived classes return the derived type (use a covariant return type).
 
 ##### 예
-```
+```c++
     class base {
     public:
         virtual owner<base*> clone() = 0;
@@ -2735,7 +2763,7 @@ Note that because of language rules, the covariant return type cannot be a smart
 A trivial getter or setter adds no semantic value; the data item could just as well be `public`.
 
 ##### 예
-```
+```c++
     class point {
         int x;
         int y;
@@ -2749,7 +2777,7 @@ A trivial getter or setter adds no semantic value; the data item could just as w
     };
 ```
 Consider making such a class a `struct` -- that is, a behaviorless bunch of variables, all public data and no member functions.
-```
+```c++
     struct point {
         int x = 0;
         int y = 0;
@@ -2771,7 +2799,7 @@ Flag multiple `get` and `set` member functions that simply access a member witho
 가상 함수는 템플릿 계층구조에서 코드 복제를 야기한다.
 
 ##### 잘못된 예
-```
+```c++
     template<class T>
     class Vector {
     public:
@@ -2919,7 +2947,7 @@ Capping a hierarchy with `final` is rarely needed for logical reasons and can be
 Capping an individual virtual function with `final` is error-prone as that `final` can easily be overlooked when defining/overriding a set of functions.
 
 ##### 잘못된 예
-```
+```c++
     class Widget { /* ... */ };
 
     class My_widget final : public Widget { /* ... */ };    // nobody will ever want to improve My_widget (or so you thought)
@@ -2927,7 +2955,7 @@ Capping an individual virtual function with `final` is error-prone as that `fina
     class My_improved_widget : public My_widget { /* ... */ };  // error: can't do that
 ```
 ##### 잘못된 예
-```
+```c++
     struct Interface {
         virtual int f() = 0;
         virtual int g() = 0;
@@ -2980,7 +3008,7 @@ Flag uses of `final`.
 That can cause confusion: An overrider do not inherit default arguments..
 
 ##### 잘못된 예
-```
+```c++
     class base {
     public:
         virtual int multiply(int value, int factor = 2) = 0;
@@ -3012,7 +3040,7 @@ Flag default arguments on virtual functions if they differ between base and deri
 가상 함수를 가진 클래스가 있다면, 당신은 (일반적으로) 어떤 클래스가 실행될 함수를 제공할지 알 수 없다.
 
 ##### 예
-```
+```c++
     struct B { 
         int a; 
         virtual int f(); 
@@ -3041,7 +3069,7 @@ Flag default arguments on virtual functions if they differ between base and deri
 
 ##### 예외 사항
 객체가 정의된 범위 안에서는 이름이 있는 다형적 객체에 안전하게 접근할 수 있다. 단지 slice가 생기지 않도록 하라.
-```
+```c++
     void use3()
     {
         D d;
@@ -3058,7 +3086,7 @@ Flag default arguments on virtual functions if they differ between base and deri
 `dynamic_cast`는 실행시간에 검사된다.
 
 ##### 예
-```
+```c++
     struct B {   // 인터페이스
         virtual void f();
         virtual void g();
@@ -3094,7 +3122,7 @@ The latter (`typeid`) is easily hand-crafted if necessary (e.g., if working on a
 the former (`dynamic_cast`) is far harder to implement correctly in general.
 
 Consider:
-```
+```c++
     struct B {
         const char * name {"B"};
         virtual const char* id() const { return name; }
@@ -3177,7 +3205,7 @@ In very rare cases, if you have measured that the `dynamic_cast` overhead is mat
 자원 누수를 방지한다.
 
 ##### 예
-```
+```c++
     void use(int i)
     {
         // bad: initialize local pointers with new
@@ -3205,7 +3233,7 @@ In very rare cases, if you have measured that the `dynamic_cast` overhead is mat
 It also ensures exception safety in complex expressions.
 
 ##### 예
-```
+```c++
     unique_ptr<Foo> p {new<Foo>{7}};   // OK: but repetitive
 
     auto q = make_unique<Foo>(7);      // Better: no repetition of Foo
@@ -3236,7 +3264,7 @@ It also ensures exception safety in complex expressions.
 It also gives an opportunity to eliminate a separate allocation for the reference counts, by placing the `shared_ptr`'s use counts next to its object.
 
 ##### 예
-```
+```c++
     // OK: but repetitive; and separate allocations for the Foo and shared_ptr's use count
     shared_ptr<Foo> p {new<Foo>{7}};
 
@@ -3254,7 +3282,7 @@ It also gives an opportunity to eliminate a separate allocation for the referenc
 Subscripting the resulting base pointer will lead to invalid object access and probably to memory corruption.
 
 ##### 예
-```
+```c++
     struct B { int x; };
     struct D : B { int y; };
 
@@ -3297,7 +3325,7 @@ Overload rule summary:
 뜻밖의 의미가 없도록 한다.
 
 ##### 예
-```
+```c++
     class X {
     public:
         // ...
@@ -3313,7 +3341,7 @@ Overload rule summary:
 Here, the conventional semantics is maintained: [Copies compare equal](#SS-copy).
 
 ##### 잘못된 예
-```
+```c++
     X operator+(X a, X b) { return a.v - b.v; }   // bad: makes + subtract
 ```
 ##### 참고 사항
@@ -3333,7 +3361,7 @@ If you use member functions, you need two.
 Unless you use a non-member function for (say) `==`, `a == b` and `b == a` will be subtly different.
 
 ##### 예
-```
+```c++
     bool operator==(Point a, Point b) { return a.x == b.x && a.y == b.y; }
 ```
 ##### 시행하기
@@ -3350,13 +3378,13 @@ Having different names for logically equivalent operations on different argument
 ##### 예
 
 Consider:
-```
+```c++
     void print(int a);
     void print(int a, int base);
     void print(const string&);
 ```
 These three functions all print their arguments (appropriately). Conversely:
-```
+```c++
     void print_int(int a);
     void print_based(int a, int base);
     void print_string(const string&);
@@ -3377,12 +3405,12 @@ Having the same name for logically different functions is confusing and leads to
 ##### 예
 
 Consider:
-```
+```c++
     void open_gate(Gate& g);   // remove obstacle from garage exit lane
     void fopen(const char* name, const char* mode);   // open file
 ```
 The two operations are fundamentally different (and unrelated) so it is good that their names differ. Conversely:
-```
+```c++
     void open(Gate& g);   // remove obstacle from garage exit lane
     void open(const char* name, const char* mode ="r");   // open file
 ```
@@ -3409,7 +3437,7 @@ and frequently needed. Do not introduce implicit conversions (through conversion
 just to gain a minor convenience.
 
 ##### 잘못된 예
-```
+```c++
     class String {   // handle ownership and access to a sequence of characters
         // ...
         String(czstring p); // copy from *p to *(this->elem)
@@ -3443,7 +3471,7 @@ To find function objects and functions defined in a separate namespace to "custo
 Consider `swap`. It is a general (standard library) function with a definition that will work for just about any type.
 However, it is desirable to define specific `swap()`s for specific types.
 For example, the general `swap()` will copy the elements of two `vector`s being swapped, whereas a good specific implementation will not copy elements at all.
-```
+```c++
     namespace N {
         My_type X { /* ... */ };
         void swap(X&, X&);   // optimized swap for N::X
@@ -3458,7 +3486,7 @@ For example, the general `swap()` will copy the elements of two `vector`s being 
 The `std::swap()` in `f1()` does exactly what we asked it to do: it calls the `swap()` in namespace `std`.
 Unfortunately, that's probably not what we wanted.
 How do we get `N::X` considered?
-```
+```c++
     void f2(N::X& a, N::X& b)
     {
         swap(a, b);   // calls N::swap
@@ -3467,7 +3495,7 @@ How do we get `N::X` considered?
 But that may not be what we wanted for generic code.
 There, we typically want the specific function if it exists and the general function if not.
 This is done by including the general function in the lookup for the function:
-```
+```c++
     void f3(N::X& a, N::X& b)
     {
         using std::swap;  // make std::swap available
@@ -3488,7 +3516,7 @@ The `&` operator is fundamental in C++.
 Many parts of the C++ semantics assumes its default meaning.
 
 ##### 예
-```
+```c++
     class Ptr { // a somewhat smart pointer
         Ptr(X* pp) :p(pp) { /* check */ }
         X* operator->() { /* check */ return p; }
@@ -3524,7 +3552,7 @@ Ability for find operators using ADL.
 Avoiding inconsistent definition in different namespaces
 
 ##### 예
-```
+```c++
     struct S { };
     bool operator==(S, S);   // OK: in the same namespace as S, and even next to S
     S s;
@@ -3534,7 +3562,7 @@ Avoiding inconsistent definition in different namespaces
 This is what a default `==` would do, if we had such defaults.
 
 ##### 예
-```
+```c++
     namespace N {
         struct S { };
         bool operator==(S, S);   // OK: in the same namespace as S, and even next to S
@@ -3544,8 +3572,9 @@ This is what a default `==` would do, if we had such defaults.
 
     bool s == s;  // finds N::operator==() by ADL
 ```
+
 ##### 잘못된 예
-```
+```c++
     struct S { };
     S s;
 
@@ -3567,7 +3596,7 @@ Remove the definition of `namespace M` and the confusion is replaced by an oppor
 
 If a binary operator is defined for two types that are defined in different namespaces, you cannot follow this rule.
 For example:
-```
+```c++
     Vec::Vector operator*(const Vec::Vector&, const Mat::Matrix&);
 ```
 This may be something best avoided.
@@ -3588,7 +3617,7 @@ This is a special case of the rule that [helper functions should be defined in t
 Readability. Convention. Reusability. Support for generic code
 
 ##### 예
-```
+```c++
     void cout_my_class(const my_class& c) // confusing, not conventional,not generic
     {
         std::cout << /* class members here */;
@@ -3600,7 +3629,7 @@ Readability. Convention. Reusability. Support for generic code
     }
 ```
 By itself, `cout_my_class` would be OK, but it is not usable/composable with code that rely on the `<<` convention for output:
-```
+```c++
     My_class var { /* ... */ };
     // ...
     cout << "var = " << var << '\n';
@@ -3627,7 +3656,7 @@ Don't define those unconventionally and don't invent your own names for them.
 같은 이름으로 다른 람다 함수를 오버로드 할 수 없다. 
 
 ##### 예
-```
+```c++
     void f(int);
     void f(double);
     auto f = [](char);   // error: cannot overload variable and function
@@ -3646,7 +3675,7 @@ Don't define those unconventionally and don't invent your own names for them.
 
 ???
 
-Unions 규칙 요약:
+공용체(Unions) 규칙 요약:
 
 * [C.180: `union`은 ???에 사용하라](#Ru-union)
 * [C.181: `union` 그대로 사용하는 것을 지양하라](#Ru-naked)
