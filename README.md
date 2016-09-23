@@ -37,8 +37,9 @@
 - Yonghyun Kim (drvoss)
 - Hyungtae Kim (cavecafe)
 - Junho Kim (h4wldev)
-- Incheol Kang(kangic)
-- DongHa Park(luncliff)
+- Incheol Kang (kangic)
+- DongHa Park (luncliff)
+- Muhun Kim (MuhunKim)
 
 ## C++ 핵심 가이드라인 한글화 진행 상황
 
