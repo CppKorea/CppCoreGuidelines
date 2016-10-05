@@ -28,10 +28,9 @@ The aim is to help C++ programmers to write simpler, more efficient, more mainta
 >The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
 
 개별적인 규칙 하나하나가 모든 코드에 효과적으로 적용될 것이라고 생각하진 않는다.
-오래된 시스템을 업그레이드하는 것은 어렵지만, 이 규칙을 사용하는 프로그램이 에러를 덜 만들고 더 유지보수가 쉬울 거라고 믿는다. 아마도 이 규칙들이 초기 개발을 더 쉽고 빠르게 만들지도 모른다.
-우리가 말할 수 있는 것은, 이 규칙들이 이전보다 더 좋은 성능, 더 관례적인 기술을 쓰는 코드를 만든다는 점이고 비용을 지불할 필요가 없는 규칙을 따른다는 것이다.
-("사용하지 않으면 지불하지 않아도 된다.", "추상화 방법을 적절히 사용하면 하위레벨 언어구조를 사용해서 직접 코딩한 정도의 성능을 얻을 것이다.")
-오래된 코드를 동작시킬 때 이상이 생겨 새코드를 작성해야 할 때 이 규칙을 활용하는 것을 고려해보고 실현 가능할 정도로 이 규칙에 대해 알고 있으면 좋을것이다.
+오래된 시스템을 업그레이드하는 것은 어려운 작업이다. 그럼에도 이러한 규칙들을 적용하면 기존의 방식보다 에러를 유발할 가능성이 낮고, 유지보수도 편리한 코드를 작성할 수 있을 것이라 확신한다. 종종 이러한 규칙들이 초기 개발을 더욱 신속하고 쉽게 진행할 수 있도록 도와주기도 한다.
+확실히 말할 수 있는 것은, 이러한 규칙들을 적용하면 이전 보다 더 잘 수행되는 코드를 만들 수 있으며, 제로-비용 원칙(Zero-overhead principle)을 따르고 있어서 더욱 보편 타당한 기법이라는 것이다. (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 말라", "올바른 추상화 방법을 사용하여 적어도 저수준 언어로 하드코딩 한 것 만큼의 성능을 얻을 수 있도록 하라" 정도로 설명될 수 있다.)
+새로운 코드를 작성하거나 기존 코드를 개선할 기회가 생겼을 때 규칙들을 적용해 보는 것이 좋다. 이러한 기회를 통해 개별 규칙들에 익숙해 지길 바란다.
 기억해라:
 >We do not suffer the delusion that every one of these rules can be effectively applied to every code base. Upgrading old systems is hard. However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not. Often, rules also lead to faster/easier initial development.
 As far as we can tell, these rules lead to code that performs as well or better than older, more conventional techniques; they are meant to follow the zero-overhead principle ("what you don't use, you don't pay for" or "when you use an abstraction mechanism appropriately, you get at least as good performance as if you had handcoded using lower-level language constructs").
