@@ -30,7 +30,7 @@ The aim is to help C++ programmers to write simpler, more efficient, more mainta
 개별적인 규칙 하나하나가 모든 코드에 효과적으로 적용될 것이라고 생각하진 않는다.
 오래된 시스템을 업그레이드하는 것은 어려운 작업이다. 그럼에도 이러한 규칙들을 적용하면 기존의 방식보다 에러를 유발할 가능성이 낮고, 유지보수도 편리한 코드를 작성할 수 있을 것이라 확신한다. 종종 이러한 규칙들이 초기 개발을 더욱 신속하고 쉽게 진행할 수 있도록 도와주기도 한다.
 확실히 말할 수 있는 것은, 이러한 규칙들을 적용하면 이전 보다 더 잘 수행되는 코드를 만들 수 있으며, 제로-비용 원칙(Zero-overhead principle)을 따르고 있어서 더욱 보편 타당한 기법이라는 것이다. (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 말라", "올바른 추상화 방법을 사용하여 적어도 저수준 언어로 하드코딩 한 것 만큼의 성능을 얻을 수 있도록 하라" 정도로 설명될 수 있다.)
-새로운 코드를 작성하거나 기존 코드를 개선할 기회가 생겼을 때 규칙들을 적용해 보는 것이 좋다. 이러한 기회를 통해 개별 규칙들에 익숙해 지길 바란다.
+새로운 코드를 작성하거나 기존 코드를 개선할 기회가 생겼을 때 규칙들을 적용해 보는 것이 좋다. 이런 기회에 적용 가능한 수준에서 규칙들을 활용해 보라.  
 기억해라:
 >We do not suffer the delusion that every one of these rules can be effectively applied to every code base. Upgrading old systems is hard. However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not. Often, rules also lead to faster/easier initial development.
 As far as we can tell, these rules lead to code that performs as well or better than older, more conventional techniques; they are meant to follow the zero-overhead principle ("what you don't use, you don't pay for" or "when you use an abstraction mechanism appropriately, you get at least as good performance as if you had handcoded using lower-level language constructs").
@@ -40,19 +40,20 @@ Remember:
 ### <a name="R0"></a> In.0: 당황하지 마라!
 >### <a name="R0"></a> In.0: Don't panic!
 
-당신의 프로그램에 가이드라인 규칙을 적용했을때 어떤 영향을 미치는지 이해하기 위해선 시간이 필요할 것 이다.
+개발 중인 프로그램에 가이드라인을 적용할 경우 어떤 영향이 있을지 이해하기 위해서 시간을 할애하기 바란다.  
 >Take the time to understand the implications of a guideline rule on your program.
 
-가이드라인은 상위집합의 부분집합 원칙([Stroustrup05](#Stroustrup05))에 따라 디자인되었다.
-신뢰성, 안정성, 성능 등을 위해 단순히 C++의 부분집합으로 정의하지는 않았다.
-대신, 몇몇의 간단한 "확장"([library components](#S-gsl))을 사용하도록 강력히 추천한다.
-C++의 에러를 일으키기 쉬운 불필요한 특징을 사용하는 것 같은 규칙들은 제외하고 사용할 수 있다.
+가이드라인은 상위집합의 부분집합 원칙([Stroustrup05](#Stroustrup05))에 따라 구성하였다.
+신뢰성, 안정성, 성능 등을 고려하여 흔히 사용되는 C++의 일부 기능만을 이용하여 가이드라인을 정의하지 않았다.
+대신, 몇가지 간단한 "확장" 컴포넌트([library components](#S-gsl))를 사용하도록 강력히 권고하고 있는데, 이를 이용하면 다소 장황하여 에러를 유발할 가능성이 높은 C++의 기능들을 배제할 수 있다.
 >These guidelines are designed according to the "subset of a superset" principle ([Stroustrup05](#Stroustrup05)).
 They do not simply define a subset of C++ to be used (for reliability, safety, performance, or whatever).
 Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-gsl))
 that make the use of the most error-prone features of C++ redundant, so that they can be banned (in our set of rules).
 
-정적 타입 안전성, 리소스 안전성을 위해 RAII(Resource acquisition is initialization)를 통한 범위 체크 가능성, `nullptr` 역참조 피하기, 없는 메모리 참조 포인터 피하기, 예외에 대한 기계적인 사용과 부분적으로 안전성을 이루고 에러 원인인 애매한 코드를 최소화하기 위해 잘 정의된 인터페이스 뒤에 복잡성 숨기기를 이용하여 단순하게 하는것을 강조한다.
+가이드라인에 포함된 규칙들은 정적 타입 안정성과 리소스 안정성에 주안점을 두고 있다.
+이런 이유로 범위 확인 가능성, `nullptr`를 통한 역참조 회피 가능성, dangling 포인터 회피 가능성, 시스템적인 예외 사용(RAII를 통한) 등을 강조하고 있으며,
+소스 코드의 오류 발생 가능성을 부분적으로 극복하거나 최소화 하는 방법들, 단순한 표현 방식, 더불어 올바르게 정의된 인터페이스를 통해 복잡도를 드러내지 않는 방법 등을 중요시 하고 있다.
 >The rules emphasize static type safety and resource safety.
 For that reason, they emphasize possibilities for range checking, for avoiding dereferencing `nullptr`, for avoiding dangling pointers, and the systematic use of exceptions (via RAII).
 Partly to achieve that and partly to minimize obscure code as a source of errors, the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
