@@ -1,6 +1,7 @@
 # <a name="S-introduction"></a> In: Introduction
 
-이 문서는 추후 강화될 내용과 ISO 기술명세까지 고려한 모던 C++, C++14를 위한 핵심 가이드라인 집합이며 C++ 프로그래머가 더 쉽고 효과적으로 유지보수가 좋은 코드를 작성하도록 하는 것을 목표로 두고 있다.
+이 문서는 modern C++, C++14 뿐 아니라 추후 개션될 것으로 보이는 내용과 IOS 기술 명세(Technical Specification까지를 고려한 핵심 가이드라인이며,
+C++ 프로그래머가 더욱 간단하고, 효과적이며, 유지보수하기 좋은 코드를 작성하도록 돕기 위해 작성되었다.
 >This is a set of core guidelines for modern C++, C++14, and taking likely future enhancements and taking ISO Technical Specifications (TSs) into account.
 The aim is to help C++ programmers to write simpler, more efficient, more maintainable code.
 
@@ -14,19 +15,19 @@ The aim is to help C++ programmers to write simpler, more efficient, more mainta
 * [In.struct: The structure of this document](#SS-struct)
 * [In.sec: Major sections](#SS-sec)
 
-## <a name="SS-readers"></a> In.target: 타겟이 되는 독자층
+## <a name="SS-readers"></a> In.target: 대상 독자층
 >## <a name="SS-readers"></a> In.target: Target readership
 
-모든 C++ 프로그래머가 타겟이며 여기에 [programmers who might consider C](#S-cpl)도 포함된다.
+모든 C++ 프로그래머가 대상이며 여기에 [programmers who might consider C](#S-cpl)도 포함된다.
 >All C++ programmers. This includes [programmers who might consider C](#S-cpl).
 
-## <a name="SS-aims"></a> In.aims: 목표
+## <a name="SS-aims"></a> In.aims: 목적
 >## <a name="SS-aims"></a> In.aims: Aims
 
-이 문서의 목적은 개발자들이 모던 C++(C++11, C++14, 이후 C++17까지)에 적응하는 것을 돕고 코드에 일정한 스타일을 적용하도록 하는 것이다.
+이 문서의 목적은 개발자들이 모던 C++(C++11, C++14, 이후 C++17까지)을 도입하는 것을 돕고, 코드 작성시에 더욱 일관된 스타일을 적용하도록 하기 위함이다.
 >The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
 
-우리는 이 규칙들이 모든 코드에 효과적으로 적용될 수 있다는 환상을 갖고 있진 않다.
+개별적인 규칙 하나하나가 모든 코드에 효과적으로 적용될 것이라고 생각하진 않는다.
 오래된 시스템을 업그레이드하는 것은 어렵지만, 이 규칙을 사용하는 프로그램이 에러를 덜 만들고 더 유지보수가 쉬울 거라고 믿는다. 아마도 이 규칙들이 초기 개발을 더 쉽고 빠르게 만들지도 모른다.
 우리가 말할 수 있는 것은, 이 규칙들이 이전보다 더 좋은 성능, 더 관례적인 기술을 쓰는 코드를 만든다는 점이고 비용을 지불할 필요가 없는 규칙을 따른다는 것이다.
 ("사용하지 않으면 지불하지 않아도 된다.", "추상화 방법을 적절히 사용하면 하위레벨 언어구조를 사용해서 직접 코딩한 정도의 성능을 얻을 것이다.")
