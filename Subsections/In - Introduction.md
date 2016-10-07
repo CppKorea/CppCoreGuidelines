@@ -58,36 +58,38 @@ that make the use of the most error-prone features of C++ redundant, so that the
 For that reason, they emphasize possibilities for range checking, for avoiding dereferencing `nullptr`, for avoiding dangling pointers, and the systematic use of exceptions (via RAII).
 Partly to achieve that and partly to minimize obscure code as a source of errors, the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
 
-많은 규칙들은 권위적이다.
-우리는 대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들을 싫어한다.
-몇몇 규칙들은 정확하고 기계적인 검증보다는 경험적으로만 지원될 수 있다는 것이다. (?)
-다른 규칙들은 일반적인 원리를 설명하지만 이런 일반적인 규칙들에 대해서, 좀더 자세하고 구체적인 규칙을 부분적으로 검증한다.
+많은 규칙들은 규범적인 성격을 띄고 있다.
+대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들은 매우 불편할 수 밖에 없다.
+일부 규칙들은 정밀하고 기계적으로 검증할 수 있다기 보다는 경험에 근거하여 제시된 규칙들도 있다. 
+그외의 다른 규칙들은 보편적인 원칙을 논리적으로 정리한 것인데, 일반화의 수준이 높을수록 더욱 자세하게 설명하였고 부분적으로 나마 검증이 가능하도록 구체적으로 규칙을 규정하였다.
+
 >Many of the rules are prescriptive.
 We are uncomfortable with rules that simply state "don't do that!" without offering an alternative.
 One consequence of that is that some rules can be supported only by heuristics, rather than precise and mechanically verifiable checks.
 Other rules articulate general principles. For these more general rules, more detailed and specific rules provide partial checking.
 
-가이드라인은 C++의 핵심과 사용법을 언급한다. 우리는 대규모 기구, 특수 응용 영역, 대규모 프로젝트에선 더 많은 규칙, 더 많은 제약, 더 많은 라이브러리 지원을 필요로 한다고 생각한다.
-예를 들어, 실시간 프로그래머는 전형적으로 공짜 스토어(동적 메모리)를 사용하면 안되고 라이브러리의 선택도 제한되듯이 말이다.
-가이드라인에 부록으로 더 구체적인 규칙을 추가하기를 기대한다.
-미화된 어셈블리 코드로 당신의 프로그래밍을 하위 레벨로 낮추지 말고, 당신의 작은 기본 라이브러리를 구성하고 사용하는 것이 좋다.
+가이드라인은 C++의 핵심과 그 사용법을 다루고 있다. 
+C++을 사용하는 조직의 규모가 크거나, 매우 특화된 분야의 응용 프로그램을 개발하는 경우이거나 혹은 프로젝트의 규모가 방대한 경우라면 더 다양한 규칙과 제약, 그리고 더 많은 라이브러리가 필요할 것이다.
+예를 들어, 고도의 실시간 응용 프로그램을 개발하는 경우라면 자유 저장소(free store, 동적 메모리)를 아무렇게나 사용하면 안되기 때문에, 라이브러리를 선택하는데 제약이 있을 수 밖에 없다.
+이처럼 특화된 개발 분야에만 적용 할 수 있는 규칙들은 핵심 가이드라인의 부록으로 다루었으면 한다.
+어셈블리 코드와 같이 저수준의 프로그래밍 방식을 고수하기 보다는 핵심을 담고 있는 소규모의 라이브러리를 만들고 사용하기 바란다.
+
 >These guidelines address a core of C++ and its use.
 We expect that most large organizations, specific application areas, and even large projects will need further rules, possibly further restrictions, and further library support.
 For example, hard real-time programmers typically can't use free store (dynamic memory) freely and will be restricted in their choice of libraries.
 We encourage the development of such more specific rules as addenda to these core guidelines.
 Build your ideal small foundation library and use that, rather than lowering your level of programming to glorified assembly code.
 
-규칙들은 [gradual adoption](#S-modernizing)를 허용하도록 디자인했다.
+개별적인 규칙들은 점진적으로 적용[gradual adoption](#S-modernizing)해 볼 수 있다.
 >The rules are designed to allow [gradual adoption](#S-modernizing).
 
-몇몇 규칙은 다양한 형태로 안전성을 증가시킬 목표가지지만 다른 몇몇 규칙은 사고 가능성을 줄일 목표를 가지고 있다. 이 둘을 모두 가지고 있는 규칙도 많다.
-사고를 줄일 목적인 가이드라인은 C++에서 사용될 수 있는 것을 제한하고 있다.
-그러나 사고를 줄일 방법이 두가지이고 하나는 에러가 발생하고 나머지 하나는 에러가 발생하지 않는다면, 후자를 프로그래머에게 가이드할 것이다.
+일부 규칙들은 다양한 방식으로 안전성을 높이기 위한 목적으로 만들어졌으며, 또 다른 일부는 문제 발생 가능성을 낮추거나 혹은 이 둘을 모두 고려하여 만들어진 규칙들도 있다.
+규칙에 내포되어 있는 아이디어를 표현할 때, 통상 오류 발생 가능성이 높은 경우와 그렇지 않은 경우가 있다면, 가능한 오류 발생 가능성이 낮은 쪽을 택하였다.
 >Some rules aim to increase various forms of safety while others aim to reduce the likelihood of accidents, many do both.
 The guidelines aimed at preventing accidents often ban perfectly legal C++.
 However, when there are two ways of expressing an idea and one has shown itself a common source of errors and the other has not, we try to guide programmers towards the latter.
 
-## <a name="SS-non"></a> In.not: 목표가 아닌 것
+## <a name="SS-non"></a> In.not: 목적이 아닌 것
 >## <a name="SS-non"></a> In.not: Non-aims
 
 규칙들을 최소로 하거나, 서로 관계 없이 할 의도는 없다.
