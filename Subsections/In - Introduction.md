@@ -1,6 +1,7 @@
 # <a name="S-introduction"></a> In: Introduction
 
-이 문서는 추후 강화될 내용과 ISO 기술명세까지 고려한 모던 C++, C++14를 위한 핵심 가이드라인 집합이며 C++ 프로그래머가 더 쉽고 효과적으로 유지보수가 좋은 코드를 작성하도록 하는 것을 목표로 두고 있다.
+이 문서는 modern C++, C++14 뿐 아니라 추후 개션될 것으로 보이는 내용과 IOS 기술 명세(Technical Specification까지를 고려한 핵심 가이드라인이며,
+C++ 프로그래머가 더욱 간단하고, 효과적이며, 유지보수하기 좋은 코드를 작성하도록 돕기 위해 작성되었다.
 >This is a set of core guidelines for modern C++, C++14, and taking likely future enhancements and taking ISO Technical Specifications (TSs) into account.
 The aim is to help C++ programmers to write simpler, more efficient, more maintainable code.
 
@@ -14,23 +15,22 @@ The aim is to help C++ programmers to write simpler, more efficient, more mainta
 * [In.struct: The structure of this document](#SS-struct)
 * [In.sec: Major sections](#SS-sec)
 
-## <a name="SS-readers"></a> In.target: 타겟이 되는 독자층
+## <a name="SS-readers"></a> In.target: 대상 독자층
 >## <a name="SS-readers"></a> In.target: Target readership
 
-모든 C++ 프로그래머가 타겟이며 여기에 [programmers who might consider C](#S-cpl)도 포함된다.
+모든 C++ 프로그래머가 대상이며 여기에 [programmers who might consider C](#S-cpl)도 포함된다.
 >All C++ programmers. This includes [programmers who might consider C](#S-cpl).
 
-## <a name="SS-aims"></a> In.aims: 목표
+## <a name="SS-aims"></a> In.aims: 목적
 >## <a name="SS-aims"></a> In.aims: Aims
 
-이 문서의 목적은 개발자들이 모던 C++(C++11, C++14, 이후 C++17까지)에 적응하는 것을 돕고 코드에 일정한 스타일을 적용하도록 하는 것이다.
+이 문서의 목적은 개발자들이 모던 C++(C++11, C++14, 이후 C++17까지)을 도입하는 것을 돕고, 코드 작성시에 더욱 일관된 스타일을 적용하도록 하기 위함이다.
 >The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
 
-우리는 이 규칙들이 모든 코드에 효과적으로 적용될 수 있다는 환상을 갖고 있진 않다.
-오래된 시스템을 업그레이드하는 것은 어렵지만, 이 규칙을 사용하는 프로그램이 에러를 덜 만들고 더 유지보수가 쉬울 거라고 믿는다. 아마도 이 규칙들이 초기 개발을 더 쉽고 빠르게 만들지도 모른다.
-우리가 말할 수 있는 것은, 이 규칙들이 이전보다 더 좋은 성능, 더 관례적인 기술을 쓰는 코드를 만든다는 점이고 비용을 지불할 필요가 없는 규칙을 따른다는 것이다.
-("사용하지 않으면 지불하지 않아도 된다.", "추상화 방법을 적절히 사용하면 하위레벨 언어구조를 사용해서 직접 코딩한 정도의 성능을 얻을 것이다.")
-오래된 코드를 동작시킬 때 이상이 생겨 새코드를 작성해야 할 때 이 규칙을 활용하는 것을 고려해보고 실현 가능할 정도로 이 규칙에 대해 알고 있으면 좋을것이다.
+개별적인 규칙 하나하나가 모든 코드에 효과적으로 적용될 것이라고 생각하진 않는다.
+오래된 시스템을 업그레이드하는 것은 어려운 작업이다. 그럼에도 이러한 규칙들을 적용하면 기존의 방식보다 에러를 유발할 가능성이 낮고, 유지보수도 편리한 코드를 작성할 수 있을 것이라 확신한다. 종종 이러한 규칙들이 초기 개발을 더욱 신속하고 쉽게 진행할 수 있도록 도와주기도 한다.
+확실히 말할 수 있는 것은, 이러한 규칙들을 적용하면 이전 보다 더 잘 수행되는 코드를 만들 수 있으며, 제로-비용 원칙(Zero-overhead principle)을 따르고 있어서 더욱 보편 타당한 기법이라는 것이다. (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 말라", "올바른 추상화 방법을 사용하여 적어도 저수준 언어로 하드코딩 한 것 만큼의 성능을 얻을 수 있도록 하라" 정도로 설명될 수 있다.)
+새로운 코드를 작성하거나 기존 코드를 개선할 기회가 생겼을 때 규칙들을 적용해 보는 것이 좋다. 이런 기회에 적용 가능한 수준에서 규칙들을 활용해 보라.  
 기억해라:
 >We do not suffer the delusion that every one of these rules can be effectively applied to every code base. Upgrading old systems is hard. However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not. Often, rules also lead to faster/easier initial development.
 As far as we can tell, these rules lead to code that performs as well or better than older, more conventional techniques; they are meant to follow the zero-overhead principle ("what you don't use, you don't pay for" or "when you use an abstraction mechanism appropriately, you get at least as good performance as if you had handcoded using lower-level language constructs").
@@ -40,60 +40,63 @@ Remember:
 ### <a name="R0"></a> In.0: 당황하지 마라!
 >### <a name="R0"></a> In.0: Don't panic!
 
-당신의 프로그램에 가이드라인 규칙을 적용했을때 어떤 영향을 미치는지 이해하기 위해선 시간이 필요할 것 이다.
+개발 중인 프로그램에 가이드라인을 적용할 경우 어떤 영향이 있을지 이해하기 위해서 시간을 할애하기 바란다.  
 >Take the time to understand the implications of a guideline rule on your program.
 
-가이드라인은 상위집합의 부분집합 원칙([Stroustrup05](#Stroustrup05))에 따라 디자인되었다.
-신뢰성, 안정성, 성능 등을 위해 단순히 C++의 부분집합으로 정의하지는 않았다.
-대신, 몇몇의 간단한 "확장"([library components](#S-gsl))을 사용하도록 강력히 추천한다.
-C++의 에러를 일으키기 쉬운 불필요한 특징을 사용하는 것 같은 규칙들은 제외하고 사용할 수 있다.
+가이드라인은 상위집합의 부분집합 원칙([Stroustrup05](#Stroustrup05))에 따라 구성하였다.
+신뢰성, 안정성, 성능 등을 고려하여 흔히 사용되는 C++의 일부 기능만을 이용하여 가이드라인을 정의하지 않았다.
+대신, 몇가지 간단한 "확장" 컴포넌트([library components](#S-gsl))를 사용하도록 강력히 권고하고 있는데, 이를 이용하면 다소 장황하여 에러를 유발할 가능성이 높은 C++의 기능들을 배제할 수 있다.
 >These guidelines are designed according to the "subset of a superset" principle ([Stroustrup05](#Stroustrup05)).
 They do not simply define a subset of C++ to be used (for reliability, safety, performance, or whatever).
 Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-gsl))
 that make the use of the most error-prone features of C++ redundant, so that they can be banned (in our set of rules).
 
-정적 타입 안전성, 리소스 안전성을 위해 RAII(Resource acquisition is initialization)를 통한 범위 체크 가능성, `nullptr` 역참조 피하기, 없는 메모리 참조 포인터 피하기, 예외에 대한 기계적인 사용과 부분적으로 안전성을 이루고 에러 원인인 애매한 코드를 최소화하기 위해 잘 정의된 인터페이스 뒤에 복잡성 숨기기를 이용하여 단순하게 하는것을 강조한다.
+가이드라인에 포함된 규칙들은 정적 타입 안정성과 리소스 안정성에 주안점을 두고 있다.
+이런 이유로 범위 확인 가능성, `nullptr`를 통한 역참조 회피 가능성, dangling 포인터 회피 가능성, 시스템적인 예외 사용(RAII를 통한) 등을 강조하고 있으며,
+소스 코드의 오류 발생 가능성을 부분적으로 극복하거나 최소화 하는 방법들, 단순한 표현 방식, 더불어 올바르게 정의된 인터페이스를 통해 복잡도를 드러내지 않는 방법 등을 중요시 하고 있다.
 >The rules emphasize static type safety and resource safety.
 For that reason, they emphasize possibilities for range checking, for avoiding dereferencing `nullptr`, for avoiding dangling pointers, and the systematic use of exceptions (via RAII).
 Partly to achieve that and partly to minimize obscure code as a source of errors, the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
 
-많은 규칙들은 권위적이다.
-우리는 대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들을 싫어한다.
-몇몇 규칙들은 정확하고 기계적인 검증보다는 경험적으로만 지원될 수 있다는 것이다. (?)
-다른 규칙들은 일반적인 원리를 설명하지만 이런 일반적인 규칙들에 대해서, 좀더 자세하고 구체적인 규칙을 부분적으로 검증한다.
+많은 규칙들은 규범적인 성격을 띄고 있다.
+대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들은 매우 불편할 수 밖에 없다.
+일부 규칙들은 정밀하고 기계적으로 검증할 수 있다기 보다는 경험에 근거하여 제시된 규칙들도 있다. 
+그외의 다른 규칙들은 보편적인 원칙을 논리적으로 정리한 것인데, 일반화의 수준이 높을수록 더욱 자세하게 설명하였고 부분적으로 나마 검증이 가능하도록 구체적으로 규칙을 규정하였다.
+
 >Many of the rules are prescriptive.
 We are uncomfortable with rules that simply state "don't do that!" without offering an alternative.
 One consequence of that is that some rules can be supported only by heuristics, rather than precise and mechanically verifiable checks.
 Other rules articulate general principles. For these more general rules, more detailed and specific rules provide partial checking.
 
-가이드라인은 C++의 핵심과 사용법을 언급한다. 우리는 대규모 기구, 특수 응용 영역, 대규모 프로젝트에선 더 많은 규칙, 더 많은 제약, 더 많은 라이브러리 지원을 필요로 한다고 생각한다.
-예를 들어, 실시간 프로그래머는 전형적으로 공짜 스토어(동적 메모리)를 사용하면 안되고 라이브러리의 선택도 제한되듯이 말이다.
-가이드라인에 부록으로 더 구체적인 규칙을 추가하기를 기대한다.
-미화된 어셈블리 코드로 당신의 프로그래밍을 하위 레벨로 낮추지 말고, 당신의 작은 기본 라이브러리를 구성하고 사용하는 것이 좋다.
+가이드라인은 C++의 핵심과 그 사용법을 다루고 있다. 
+C++을 사용하는 조직의 규모가 크거나, 매우 특화된 분야의 응용 프로그램을 개발하는 경우이거나 혹은 프로젝트의 규모가 방대한 경우라면 더 다양한 규칙과 제약, 그리고 더 많은 라이브러리가 필요할 것이다.
+예를 들어, 고도의 실시간 응용 프로그램을 개발하는 경우라면 자유 저장소(free store, 동적 메모리)를 아무렇게나 사용하면 안되기 때문에, 라이브러리를 선택하는데 제약이 있을 수 밖에 없다.
+이처럼 특화된 개발 분야에만 적용 할 수 있는 규칙들은 핵심 가이드라인의 부록으로 다루었으면 한다.
+어셈블리 코드와 같이 저수준의 프로그래밍 방식을 고수하기 보다는 핵심을 담고 있는 소규모의 라이브러리를 만들고 사용하기 바란다.
+
 >These guidelines address a core of C++ and its use.
 We expect that most large organizations, specific application areas, and even large projects will need further rules, possibly further restrictions, and further library support.
 For example, hard real-time programmers typically can't use free store (dynamic memory) freely and will be restricted in their choice of libraries.
 We encourage the development of such more specific rules as addenda to these core guidelines.
 Build your ideal small foundation library and use that, rather than lowering your level of programming to glorified assembly code.
 
-규칙들은 [gradual adoption](#S-modernizing)를 허용하도록 디자인했다.
+개별적인 규칙들은 점진적으로 적용[gradual adoption](#S-modernizing)해 볼 수 있다.
 >The rules are designed to allow [gradual adoption](#S-modernizing).
 
-몇몇 규칙은 다양한 형태로 안전성을 증가시킬 목표가지지만 다른 몇몇 규칙은 사고 가능성을 줄일 목표를 가지고 있다. 이 둘을 모두 가지고 있는 규칙도 많다.
-사고를 줄일 목적인 가이드라인은 C++에서 사용될 수 있는 것을 제한하고 있다.
-그러나 사고를 줄일 방법이 두가지이고 하나는 에러가 발생하고 나머지 하나는 에러가 발생하지 않는다면, 후자를 프로그래머에게 가이드할 것이다.
+일부 규칙들은 다양한 방식으로 안전성을 높이기 위한 목적으로 만들어졌으며, 또 다른 일부는 문제 발생 가능성을 낮추거나 혹은 이 둘을 모두 고려하여 만들어진 규칙들도 있다.
+규칙에 내포되어 있는 아이디어를 표현할 때, 통상 오류 발생 가능성이 높은 경우와 그렇지 않은 경우가 있다면, 가능한 오류 발생 가능성이 낮은 쪽을 택하였다.
 >Some rules aim to increase various forms of safety while others aim to reduce the likelihood of accidents, many do both.
 The guidelines aimed at preventing accidents often ban perfectly legal C++.
 However, when there are two ways of expressing an idea and one has shown itself a common source of errors and the other has not, we try to guide programmers towards the latter.
 
-## <a name="SS-non"></a> In.not: 목표가 아닌 것
+## <a name="SS-non"></a> In.not: 목적이 아닌 것
 >## <a name="SS-non"></a> In.not: Non-aims
 
-규칙들을 최소로 하거나, 서로 관계 없이 할 의도는 없다.
-특히 일반화된 규칙은 단순하지만 시행할 수 없기도 하고, 규칙의 의미를 이해하기가 어렵기도 하다.
-구체적인 규칙들은 종종 이해하기가 더 쉽고 시행하기도 쉽습니다. 하지만 일반화된 규칙들이 없다면 특수한 경우의 나열일 뿐이다.
-우리는 초보자들을 돕기 위한 규칙들, 전문가를 잘 지원하는 규칙들을 제공하려고 한다.
-어떤 규칙들은 완전히 실행이 가능하기도 하고, 또 어떤 것들은 경험치에 의존하기도 한다.
+최소한의 규칙만을 정의하고, 그러한 규칙들이 직교성을 띄도록 정밀하게 구성하려 하지는 않았다.
+실제로, 범용적인 규칙 중 일부는 일면 간단해 보일 수도 있지만 실제로 적용하기가 매우 어려울 수 있으며, 그러한 규칙이 의미하는 함축적인 의미를 이해하기가 매우 어려울 수도 있다.
+반대로, 구체적인 규칙들은 이해하기도 쉽고 적용하기도 쉽다. 하지만 범용적인 규칙들을 다루지 않고는 특별한 경우만을 장황하게 나열할 수 밖에 없을 것이다.
+가이드라인에 포함된 규칙들은 초보 개발자뿐 아니라 전문가들에게 도움이 될 수 있도록 만들었다.
+규칙 중 일부는 반드시 적용되어야만 하는 것들도 있고, 또 다른 일부는 필요에 따라 적용 여부를 결정하는 되는 것들도 있다.
 >The rules are not intended to be minimal or orthogonal.
 In particular, general rules can be simple, but unenforceable.
 Also, it is often hard to understand the implications of a general rule.
@@ -101,11 +104,10 @@ More specialized rules are often easier to understand and to enforce, but withou
 We provide rules aimed at helping novices as well as rules supporting expert use.
 Some rules can be completely enforced, but others are based on heuristics.
 
-이 규칙들을 책처럼 진지하게 읽을 필요는 없다.
-링크를 사용해서 규칙들을 둘러볼 수 있다.
-하지만 링크는 규칙 위반 사항을 고치는 것을 돕기 위한 것이다.
-즉, 툴은 위반 사항을 찾고 위반한 규칙에 대한 링크를 반환한다.
-링크를 통해 원인, 위반에 대한 결과 예제, 그리고 수정 방안을 볼 수 있다.
+규칙들을 책처럼 너무 심각하게 받아들을 필요는 없으며, 링크를 통해서 가볍게 살펴보는 것도 좋다.
+사실 이처럼 규칙을 정의한 본질적인 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 툴을 만들 수 있도록 하기 위함이다.
+또한, 규칙이 만들어진 이유와 규칙을 따르지 않았을 때 어떤 문제를 유발할 가능성이 있는지 그리고 그 문제를 어떻게 해결할 수 있는지를 알려주기 위함이다.
+
 >These rules are not meant to be read serially, like a book.
 You can browse through them using the links.
 However, their main intended use is to be targets for tools.
