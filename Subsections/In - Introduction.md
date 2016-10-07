@@ -92,11 +92,11 @@ However, when there are two ways of expressing an idea and one has shown itself 
 ## <a name="SS-non"></a> In.not: 목적이 아닌 것
 >## <a name="SS-non"></a> In.not: Non-aims
 
-규칙들을 최소로 하거나, 서로 관계 없이 할 의도는 없다.
-특히 일반화된 규칙은 단순하지만 시행할 수 없기도 하고, 규칙의 의미를 이해하기가 어렵기도 하다.
-구체적인 규칙들은 종종 이해하기가 더 쉽고 시행하기도 쉽습니다. 하지만 일반화된 규칙들이 없다면 특수한 경우의 나열일 뿐이다.
-우리는 초보자들을 돕기 위한 규칙들, 전문가를 잘 지원하는 규칙들을 제공하려고 한다.
-어떤 규칙들은 완전히 실행이 가능하기도 하고, 또 어떤 것들은 경험치에 의존하기도 한다.
+최소한의 규칙만을 정의하고, 그러한 규칙들이 직교성을 띄도록 정밀하게 구성하려 하지는 않았다.
+실제로, 범용적인 규칙 중 일부는 일면 간단해 보일 수도 있지만 실제로 적용하기가 매우 어려울 수 있으며, 그러한 규칙이 의미하는 함축적인 의미를 이해하기가 매우 어려울 수도 있다.
+반대로, 구체적인 규칙들은 이해하기도 쉽고 적용하기도 쉽다. 하지만 범용적인 규칙들을 다루지 않고는 특별한 경우만을 장황하게 나열할 수 밖에 없을 것이다.
+가이드라인에 포함된 규칙들은 초보 개발자뿐 아니라 전문가들에게 도움이 될 수 있도록 만들었다.
+규칙 중 일부는 반드시 적용되어야만 하는 것들도 있고, 또 다른 일부는 필요에 따라 적용 여부를 결정하는 되는 것들도 있다.
 >The rules are not intended to be minimal or orthogonal.
 In particular, general rules can be simple, but unenforceable.
 Also, it is often hard to understand the implications of a general rule.
@@ -104,11 +104,10 @@ More specialized rules are often easier to understand and to enforce, but withou
 We provide rules aimed at helping novices as well as rules supporting expert use.
 Some rules can be completely enforced, but others are based on heuristics.
 
-이 규칙들을 책처럼 진지하게 읽을 필요는 없다.
-링크를 사용해서 규칙들을 둘러볼 수 있다.
-하지만 링크는 규칙 위반 사항을 고치는 것을 돕기 위한 것이다.
-즉, 툴은 위반 사항을 찾고 위반한 규칙에 대한 링크를 반환한다.
-링크를 통해 원인, 위반에 대한 결과 예제, 그리고 수정 방안을 볼 수 있다.
+규칙들을 책처럼 너무 심각하게 받아들을 필요는 없으며, 링크를 통해서 가볍게 살펴보는 것도 좋다.
+사실 이처럼 규칙을 정의한 본질적인 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 툴을 만들 수 있도록 하기 위함이다.
+또한, 규칙이 만들어진 이유와 규칙을 따르지 않았을 때 어떤 문제를 유발할 가능성이 있는지 그리고 그 문제를 어떻게 해결할 수 있는지를 알려주기 위함이다.
+
 >These rules are not meant to be read serially, like a book.
 You can browse through them using the links.
 However, their main intended use is to be targets for tools.
