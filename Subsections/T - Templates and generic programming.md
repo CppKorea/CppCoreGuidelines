@@ -1721,6 +1721,7 @@ For example, if you really need AST manipulation at compile time (e.g., for opti
 Use cases that require concepts (e.g. overloading based on concepts) are among the most common (and simple) uses of TMP.
 
 ##### 예
+
 ```c++
     template<typename Iter>
         /*requires*/ enable_if<random_access_iterator<Iter>, void>
@@ -1730,16 +1731,19 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
         /*requires*/ enable_if<forward_iterator<Iter>, void>
     advance(Iter p, int n) { assert(n >= 0); while (n--) ++p;}
 ```
+
 ##### 참고 사항
 
 아래 코드는 컨셉을 사용하면 엄청 쉬워진다:
 
 >Such code is much simpler using concepts:
+
 ```c++
     void advance(RandomAccessIterator p, int n) { p += n; }
 
     void advance(ForwardIterator p, int n) { assert(n >= 0); while (n--) ++p;}
 ```
+
 ##### 시행하기
 
 ???
@@ -1760,13 +1764,14 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
 >"Traits" techniques are mostly replaced by template aliases to compute types and `constexpr` functions to compute values.
 
 ##### 예
-```
-    ??? big object / small object optimization
-```
+
+    ??? big/small object optimization
 
 ##### 시행하기
 
 ???
+
+
 
 ### <a name="Rt-fct"></a> T.123: 컴파일타임에 값을 계산하려면 `constexpr`를 사용하라.
 >### <a name="Rt-fct"></a> T.123: Use `constexpr` functions to compute values at compile time
@@ -1786,6 +1791,7 @@ Often a `constexpr` function implies less compile-time overhead than alternative
 >"Traits" techniques are mostly replaced by template aliases to compute types and `constexpr` functions to compute values.
 
 ##### 예
+
 ```c++
     template<typename T>
         // requires Number<T>
@@ -1812,9 +1818,11 @@ Often a `constexpr` function implies less compile-time overhead than alternative
 >Facilities defined in the standard, such as `conditional`, `enable_if`, and `tuple`, are portable and can be assumed to be known.
 
 ##### 예
+
 ```
     ???
 ```
+
 ##### 시행하기
 
 ???
@@ -1830,9 +1838,11 @@ Often a `constexpr` function implies less compile-time overhead than alternative
 Write your own "advanced TMP support" only if you really have to.
 
 ##### 예
+
 ```
     ???
 ```
+
 ##### 시행하기
 
 ???
@@ -1842,8 +1852,6 @@ Write your own "advanced TMP support" only if you really have to.
 ## <a name="SS-temp-other"></a> 기타 템플릿 규칙
 
 ### <a name="Rt-name"></a> T.140: 모든 중요한 연산에는 이름을 붙여라.
-
-> 역주 : 중요한(non-trivial)
 
 
 ##### 근거
@@ -1883,9 +1891,11 @@ Write your own "advanced TMP support" only if you really have to.
 >That makes the code concise and gives better locality than alternatives.
 
 ##### 예
+
 ```
     ??? for-loop equivalent
 ```
+
 ##### 예외 사항
 한번만 사용한다고 해도 람다에 이름을 붙이면 분명해 보인다.
 >Naming a lambda can be useful for clarity even if it is used only once
