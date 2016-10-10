@@ -114,51 +114,53 @@ However, their main intended use is to be targets for tools.
 That is, a tool looks for violations and the tool returns links to violated rules.
 The rules then provide reasons, examples of potential consequences of the violation, and suggested remedies.
 
-이 가이드라인은 C++의 튜토리얼을 대신하지 않는다.
-당신의 능력에 맞는 튜토리얼이 필요하다면, [the references](#S-references)를 참조해라.
+이 가이드라인이 C++의 튜토리얼을 대체하기 위한 목적으로 만들어진 것은 아니다.
+개발 수준별 튜토리얼이 필요하다면, [the references](#S-references)를 참조하라.
 >These guidelines are not intended to be a substitute for a tutorial treatment of C++.
 If you need a tutorial for some given level of experience, see [the references](#S-references).
 
-이 문서는 오래전 C++ 코드를 모던 코드로 어떻게 변환할지에 대한 가이드는 아니다.
-구체적인 방법으로 새로운 코드에 대한 방법을 말하고 있을 뿐이다.
-그러니 코드를 현대적이고, 젊게만들고, 업그레이드하려면 [the modernization section](#S-modernizing)를 참조해라.
-한가지 중요한건, 이 규칙들은 점진적인 적응을 지원한다. 한방에 모든 모든 코드를 변환시키는 것은 불가능하기 때문이다.
+이 문서는 이전 C++ 코드를 모던 코드로 변환하는 방법에 대해 다루고 있는 것 또한 아니며,
+새로운 코드에 대한 논리정연한 생각을 구체적으로 기술하고자 하였을 따름이다.
+따라서 코드를 현대적이며, 젊고 활기차게, 업그레이드 하고 싶다면 [the modernization section](#S-modernizing)를 참조하라.
+중요한건, 이 문서에 다루고 있는 규칙들은 점진적으로 적용이 가능하다는 것이다. 엄청난 양의 코드를 한번에 바꾸는 것은 그다지 현실적이지 않다.
 >This is not a guide on how to convert old C++ code to more modern code.
 It is meant to articulate ideas for new code in a concrete fashion.
 However, see [the modernization section](#S-modernizing) for some possible approaches to modernizing/rejuvenating/upgrading.
 Importantly, the rules support gradual adoption: It is typically infeasible to convert all of a large code base at once.
 
-이 가이드라인은 언어의 기술적인 상세한 부분에 대해선 정확하지도 않고 완벽하지도 않다.
-언어 정의 문제에 대해 우리가 할 마지막 말은, 일반화된 규칙에 대한 모든 예외와 모든 특징을 포함해서 ISO C++ 표준을 참조하라는 것이다.
+이 가이드라인을 통해서 언어의 기술적인 세부사항을 완벽하고 정확하게 설명하려 하지 않았다. 
+언어의 명세, 일반 규칙에 대한 예외 사항, 그외 모든 세부 기능 들에 대해서는 ISO C++ 표준을 참조하기 바란다.
 >These guidelines are not meant to be complete or exact in every language-technical detail.
 For the final word on language definition issues, including every exception to general rules and every feature, see the ISO C++ standard.
 
-여기 규칙들은 C++의 협소한 부분집합으로 코드를 작성하도록 요구하지 않는다.
-자바같이 C++의 부분집합을 정의하는 것은 *절대로* 요구하지 않는다.
-단 하나의 진짜 C++ 언어를 정의하려고 하지도 않는다.
-우리는 원하는 성능과 표현력에 가치를 두고 있다.
+규칙들을 통해서 C++의 일부 기능만을 이용하여 코드를 작성하도록 의도하기 위해 작성된 것도 아니다.
+마치 Java와 같이 C++의 일부만을 사용하도록 강요하기 위함은 *절대로* 아니라는 것이다.
+"단 하나의 올바른 C++" 언어라는 식의 정의 또한 의도하는 바가 아니다.
+우리는 가이드라인에 포함된 규칙을 통해서 성능과 타협하지 않으면서도 풍부한 표현력을 지닌 언어라는 점을 강조하고자 하였다.
 >The rules are not intended to force you to write in an impoverished subset of C++.
 They are *emphatically* not meant to define a, say, Java-like subset of C++.
 They are not meant to define a single "one true C++" language.
 We value expressiveness and uncompromised performance.
 
-여기 규칙들은 가치중립적이지 않다.
-성능 손실없이 기존의 대부분 소스보다 코드를 더 쉽게, 더 정확하고 안전하게 만들고, 에러, 복잡한 코드, 성능 저하와 연관성이 있는 C++ 코드를 금하기 위한 것이다.
+규칙들을 통해서 설명하고자 하는 가치는 명확하다.
+기존의 C++ 코드보다 더욱 간단하고 올바르며 안전한 코드를 성능 손실없이 작성할 수 있도록 돕고자 함이다.
+또한 유효한 C++ 코드이긴 하지만 에러를 유발할 가능성이 높고, 불필요하게 복잡하고, 성능도 좋지 않은 코드를 피할 수 있도록 하기 위함이다.
 >The rules are not value-neutral.
 They are meant to make code simpler and more correct/safer than most existing C++ code, without loss of performance.
 They are meant to inhibit perfectly valid C++ code that correlates with errors, spurious complexity, and poor performance.
 
-## <a name="SS-force"></a> In.force: 실행
+## <a name="SS-force"></a> In.force: 적용
 >## <a name="SS-force"></a> In.force: Enforcement
 
-이 규칙은 거대한 코드베이스를 관리할 수 없다.
-모든 규칙은 작은 집합일때만 가능하거나, 또는 특수한 사용자 집단에서만 가능하다.
-그러나 우리는 많은 규칙을 필요로 하고, 모든 사람들이 사용할 수 있는 규칙이 필요하다.
-다른 사람들은 많은 규칙을 읽고 싶어하지 않고 기억할 수도 없다.
-그래서 우리는 다양한 필요를 만족시킬 부분집합이 필요하다.
-임의로 부분집합을 만들면 혼란만 초래한다. 코드를 보기 좋게 만들고, 현대화할 수 있게 도와주는 가이드라인이 필요하다.
-우리는 개인적인 선택과 관리 압박을 모두에게 떠넘기기보다는 모범사례로 남고 싶다.
-이 모든 규칙을 사용하는 것이 이상적이고, 당신에게 최고의 혜택을 줄 것이다.
+규칙들을 사용할 것을 강제화 하지 않고 방대한 코드에 이러한 규칙들이 적용되길 기대하는 것은 사실상 어렵다.
+물론, 모든 규칙을 강제적으로 적용하는 것은 규칙의 수가 몇개 되지 않거나 혹은 특수한 사용자 집단에서나 가능한 일이다.
+그럼에도, 개발자들은 여전히 다양한 규칙들을 기대하고, 규칙에 대한 서로 다른 기대치를 가지고 있지만, 
+방대한 규칙을 모두 읽고 싶어하지도 않을 것이며, 각각의 규칙을 낱낱이 기억하는 것도 불가능하다.
+이런 이유로 우리는 다양한 기대치를 아우르는 공통분모를 뽑아내려고도 했지만, 이처럼 임의의 규칙을 정하는 것 조차 혼돈을 초래할 것으로 생각했다.
+우리는 많은 개발자들에게 도움이 되고, 코드를 좀더 간결하게 만들고, 기존 코드를 현대화 할 수 있는 그런 가이드라인이 만들고 싶었다.
+개인의 취향이라거나 관리의 압박으로 인해 도외시 하였던 부분들도 남겨두지 않고 최선의 실용적인 예를 다루고자 하였다
+따라서 이상적으로는 모든 규칙들을 적용하는 것이 좋다. 그렇게 해야만 최고의 이득을 얻을 수 있을 것이기 때문이다.
+
 >Rules with no enforcement are unmanageable for large code bases.
 Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
 But we want lots of rules, and we want rules that everybody can use.
