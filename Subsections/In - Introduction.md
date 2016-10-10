@@ -238,23 +238,26 @@ We do not limit our comment in the **Enforcement** sections to things we know ho
 >* **Note**s (comments) - something that needs saying that doesn't fit the other classifications
 >* **Discussion** - references to more extensive rationale and/or examples placed outside the main lists of rules
 
-어떤 규칙들은 기계적으로 체크하기가 어렵지만 전문가들이 쉽게 위반 내용을 지적할 수 있는 최소한의 기준을 만족시키고 있다.
-우리는 기계적인 툴이 시간이 지나면 전문가가 언급한 것을 추정해 낼 수 있고, 규칙들이 시간이 지남에 따라 더 정확하게 체크할 수 있을 정도로 수정될 것으로 기대하고 있다.
+일부 규칙들은 기계적으로 확인하기는 어렵지만 전문성을 가진 프로그래머라면 규칙 위반 여부를 손쉽게 발견할 수 있을 것이다.
+또한, 규칙들은 시간이 지남에 따라 좀더 정밀하고 확인 가능하도록 개선될 것이다.
 >Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
 We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
 Also, we assume that the rules will be refined over time to make them more precise and checkable.
 
-규칙은 모든 대안이나 특수한 경우를 언급하는 것보다는 단순화가 목적이다.
-그런 정보는 **Alternative** 단락, [Discussion](#S-discussion) 절에서 찾을 수 있다.
-만약 당신이 이 룰에 대해 이해가 되지 않거나 동의하지 않는 경우, **Alternative**를 방문하고, 불안정하거나 빠진 부분에 대해 논의 할 것이 있으면 우리에게 이메일을 보내라.
+각각의 규칙은 모든 대안과 특별한 경우까지를 모두 언급하기 보다는 단순하게 유지되길 기대한다.
+지엽적인 내용이나 다른 대안은 **Alternative** 단락과 [Discussion](#S-discussion) 절에서 찾을 수 있을 것이다.
+규칙을 이해할 수 없거나 동의하지 않는다면, **Discussion**을 먼저 살펴보라.
+의구심을 가지고 있는 부분이 논의되지 않았거나 불완전하다고 생각된다면, 메일을 보내주기 바란다.
+
 >A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
 Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
 If you don't understand a rule or disagree with it, please visit its **Discussion**.
 If you feel that a discussion is missing or incomplete, send us an email.
 
-이 문서는 언어 메뉴얼이 아니다.
-기술적으로 완전히 완벽하기 보다는, 기존에 작성 된 코드에 대한 가이드로써 도움이 되기를 기대한다.
+이 문서는 언어어 대한 메뉴얼이 아니다.
+따라서 기술적인 세부사항을 완벽하고 정밀하게 다루기 보다는 기존에 작성 된 코드에 대한 가이드로써 도움이 되었으면 한다.
 추천할만한 내용은 [the references](#S-references)에서 찾을 수 있다.
+
 >This is not a language manual.
 It is meant to be helpful
 rather than complete, fully accurate on technical details, or a guide to existing code.
@@ -293,10 +296,10 @@ Recommended information sources can be found in [the references](#S-references).
 * [용어정리](#S-glossary)
 * [할일: 분류되지 않은 규칙들](#S-unclassified)
 
-이 단원들은 관련이 있진 않다.
+각각의 단원들은 상호 직교성을 띄지는 않는다.
 >These sections are not orthogonal.
 
-각각의 단원("P"는 "Philosophy"), 각각의 부단원("C.hier"는 "Class Hierarchies (OOP)")들은 검색, 참조 편의를 위해 약칭이 있다.
-주 단원에 대한 약칭은 규칙번호에도 사용된다.("C.11"은 "Make concrete types regular")
+각각의 단원("P"는 "Philosophy")과 부단원("C.hier"는 "Class Hierarchies (OOP)")들은 검색, 참조의 편의를 위해 약칭을 가진다.
+주 단원에 대한 약칭으로 규칙 번호를 사용하기도 한다.("Make concrete types regular"을 "C.11"로 나타내기도 한다.)
 >Each section (e.g., "P" for "Philosophy") and each subsection (e.g., "C.hier" for "Class Hierarchies (OOP)") have an abbreviation for ease of searching and reference.
 The main section abbreviations are also used in rule numbers (e.g., "C.11" for "Make concrete types regular").
