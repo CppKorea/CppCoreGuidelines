@@ -152,14 +152,14 @@ They are meant to inhibit perfectly valid C++ code that correlates with errors, 
 ## <a name="SS-force"></a> In.force: 적용
 >## <a name="SS-force"></a> In.force: Enforcement
 
-규칙들을 사용할 것을 강제화 하지 않고 방대한 코드에 이러한 규칙들이 적용되길 기대하는 것은 사실상 어렵다.
-물론, 모든 규칙을 강제적으로 적용하는 것은 규칙의 수가 몇개 되지 않거나 혹은 특수한 사용자 집단에서나 가능한 일이다.
+규칙들을 사용할 것을 사실상 강제화 하지 않고 방대한 코드에 이러한 규칙들이 적용되길 기대하는 것은 어렵다.
+물론, 모든 규칙을 강제적으로 적용하는 것은 규칙의 수가 몇개 되지 않거나 혹은 특수한 사용자 집단에서나 가능한 일일지도 모르겠다.
 그럼에도, 개발자들은 여전히 다양한 규칙들을 기대하고, 규칙에 대한 서로 다른 기대치를 가지고 있지만, 
 방대한 규칙을 모두 읽고 싶어하지도 않을 것이며, 각각의 규칙을 낱낱이 기억하는 것도 불가능하다.
 이런 이유로 우리는 다양한 기대치를 아우르는 공통분모를 뽑아내려고도 했지만, 이처럼 임의의 규칙을 정하는 것 조차 혼돈을 초래할 것으로 생각했다.
 우리는 많은 개발자들에게 도움이 되고, 코드를 좀더 간결하게 만들고, 기존 코드를 현대화 할 수 있는 그런 가이드라인이 만들고 싶었다.
-개인의 취향이라거나 관리의 압박으로 인해 도외시 하였던 부분들도 남겨두지 않고 최선의 실용적인 예를 다루고자 하였다
-따라서 이상적으로는 모든 규칙들을 적용하는 것이 좋다. 그렇게 해야만 최고의 이득을 얻을 수 있을 것이기 때문이다.
+개인의 취향이라거나 관리의 압박으로 인해 도외시 하였던 부분들도 남겨두지 않고 최선의 실용적인 예를 다루고자 하였다.
+따라서 이상적으로는 모든 규칙들을 적용하는 것이 좋다. 그렇게 해야만 최고의 이득을 얻을 수 있을 것으로 생각하기 때문이다.
 
 >Rules with no enforcement are unmanageable for large code bases.
 Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
@@ -172,16 +172,16 @@ But arbitrary subsetting leads to chaos: We want guidelines that help a lot of p
 We want to encourage best practices, rather than leave all to individual choices and management pressures.
 The ideal is to use all rules; that gives the greatest benefits.
 
-이것은 상당한 딜레마를 덧붙인 격이다.
-그래서 우리는 툴을 사용해서 딜레마를 해결하고 싶다.
-각 규칙은 시행을 위한 아이디어를 나열하는 **Enforcement** 단락을 가지고 있다.
-시행은 코드 리뷰, 정적 분석, 컴파일러, 런타임 체크 등이 될 수도 있다.
-인간은 느리고 쉽게 지루해 하기 때문에 가능하다면 우리는 "기계적인" 체크와 정적 체크를 선호한다.
-런타임 체크는 대안이 없을 때만 아주 드물게 기계적인 것에서 벗어날 수 있다.
-난장판을 소개하고 싶지는 않다. - 당신이 원하는 것이 그것이라면, 어디 있는지 알 수 있게 하고 싶었다.
-그래서 적당한 곳에, 관련된 규칙을 그룹으로 묶어 "프로필"이라고 불리우는 이름을 달다.
-규칙은 여러 프로필의 한 부분일 수 있고, 아닐 수도 있다.
-처음으로 공통된 필요성(요구사항, 아이디어)에 해당하는 몇몇 프로필을 보자.
+이는 꽤나 심각한 딜레마이지만 우리는 이를 툴을 이용하여 해결하려 하였다.
+개별 규칙들은 실제 적용을 위한 방법을 나열하고 있는 **Enforcement** 단락을 가지고 있는데, 
+코드 리뷰, 정적 분석, 컴파일러, 런타임 체크 등을 기술하고 있다.
+어떤 방식이던 우리는 "기계적"이며(사람은 느리기도 하거니와, 쉽게 지루해 할 수 있으므로) 일관된 방법으로 개별 규칙들이 적용될 수 있는 방법을 선호하며,
+이런 이유로 런타임 체크는 다른 대안이 없을 경우에 한해서만 드물게 제시될 것이다.
+관련 내용들을 여기저기에 흩어 놓기 보다는 사용자가 원할 경우 손쉽게 찾을 수 있도록 하고 싶었기 때문에,
+**Enfocement** 단락 내에 적절하다고 생각되는 위치에 관련된 규칙들을 "프로필"이라는 단위로 이름을 붙여두었다.
+하나의 규칙은 여러 프로필에 속할 수 있으며, 어떤 프로필에도 속하지 않은 규칙들도 있다.
+먼저 아주 일반적인 프로필 몇 가지를 살펴보자.
+
 >This adds up to quite a few dilemmas.
 We try to resolve those using tools.
 Each rule has an **Enforcement** section listing ideas for enforcement.
@@ -192,27 +192,28 @@ Where appropriate, we label a rule (in the **Enforcement** sections) with the na
 A rule can be part of several profiles, or none.
 For a start, we have a few profiles corresponding to common needs (desires, ideals):
 
-* **types**: 타입없음 위반 (형변환, 유니언, 가변매개변수로 `U`를 `T`를 재해석하기)
-* **bounds**: 범위없음 위반 (배열의 범위를 넘어서 접근하기)
-* **lifetime**: 누수없음(`delete`, `delete []`에 실패), 잘못된 객체에 접근하기(`nullptr` 비참조, 없는 포인터 참조).
+* **types**: 타입 위반 없음 (형변환, 유니언, 가변매개변수 통해 `T`를 `U`를 재해석 하는 등)
+* **bounds**: 범위 위반 없음 (배열의 범위를 넘어서 접근 하는 등)
+* **lifetime**: 누수 없음 (`delete`나 `delete []`등이 실패하는 등)과 유효하지 않은 객체에 접근하지 않음(`nullptr`나 dangling된 참조를 통해 역참조 하는 등)
 
 >* **types**: No type violations (reinterpreting a `T` as a `U` through casts/unions/varargs)
 >* **bounds**: No bounds violations (accessing beyond the range of an array)
 >* **lifetime**: No leaks (failing to `delete` or multiple `delete`) and no access to invalid objects (dereferencing `nullptr`, using a dangling reference).
 
-프로필은 툴에서 사용할 생각으로 구성했고 사람들에게도 도움이 될 것이다.
-**Enforcement** 단락에서는 어떻게 시행할지 아는 사항에 대해서만 의견을 제시하지는 않았다. 몇몇 의견은 툴 개발자를 격려하려는 의도이기도 하다.
+프로필은 툴에서 사용될 수 있도록 만들어졌지만, 내용을 직접 읽어 보아도 도움이 될 것이다.
+**Enforcement** 단락을 단순히 우리가 알고 있는 적용 방법을 제시하는 것으로만 제한하지는 않을 것이다.
+아마 일부 개발자는 툴 개발자에게 도움이 될만한 글을 남기고 싶을 수도 있을 것이다.
 >The profiles are intended to be used by tools, but also serve as an aid to the human reader.
 We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
 
 ## <a name="SS-struct"></a> In.struct: 이 문서의 구조
 >## <a name="SS-struct"></a> In.struct: The structure of this document
 
-규칙(가이드라인, 제안)은 여러 부분으로 나뉜다.
+개별 규칙(가이드라인, 제안)은 여러 부분으로 나뉜다.
 >Each rule (guideline, suggestion) can have several parts:
 
-* 규칙 - **no naked `new`**
-* 규칙 번호 - **C.7** (클래스와 관련된 7번째 규칙)
+* 규칙 자체 - 예. **`naked new를 사용하지 마라`**
+* 규칙 번호 - 예. **C.7** (클래스와 관련된 7번째 규칙)
   주요 단원이 순서대로 나열되지 않았기 때문에 참조번호는 문자로 시작함.
   규칙을 추가하거나 삭제할 때 혼란스럽지 않도록 숫자를 매길때 간격을 둠.
 * **Reason**s (근거) - 프로그래머는 이해할 수 없는 규칙을 따르지 않으려 하기 때문에 근거를 두어 설명함.
