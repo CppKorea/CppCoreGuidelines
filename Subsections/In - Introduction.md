@@ -1,6 +1,6 @@
 # <a name="S-introduction"></a> In: Introduction
 
-이 문서는 modern C++, C++14 뿐 아니라 추후 개션될 것으로 보이는 내용과 IOS 기술 명세(Technical Specification까지를 고려한 핵심 가이드라인이며,
+이 문서는 modern C++, C++14 뿐 아니라 추후 개션될 것으로 보이는 내용과 ISO 기술 명세(Technical Specification까지를 고려한 핵심 가이드라인이며,
 C++ 프로그래머가 더욱 간단하고, 효과적이며, 유지보수하기 좋은 코드를 작성하도록 돕기 위해 작성되었다.
 >This is a set of core guidelines for modern C++, C++14, and taking likely future enhancements and taking ISO Technical Specifications (TSs) into account.
 The aim is to help C++ programmers to write simpler, more efficient, more maintainable code.
