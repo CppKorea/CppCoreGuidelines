@@ -16,7 +16,7 @@
 * [P.8: Don't leak any resources](#Rp-leak)
 * [P.9: Don't waste time or space](#Rp-waste)
 
-철학적 규칙은 일반적으로 기계적으로 체크할 수 없다.
+철학적 규칙은 보통 기계적으로 체크할 수 없다.
 그러나 철학적인 테마를 반영하는 개별적인 규칙은 체크가능하다.
 철학적인 기초가 없이 구체적이고/특수하고/체크가능한 규칙은 근거가 부족하다.
 >Philosophical rules are generally not mechanically checkable.
@@ -28,8 +28,8 @@ Without a philosophical basis the more concrete/specific/checkable rules lack ra
 
 ##### Reason
 
-컴파일러는 주석문(디자인 문서나)을 읽지 않는다. 많은 프로그래머도 역시 읽지 않는다.(일관되게)
-코드로 표현된다면 의미(의도)를 정의한 것과 같고, 컴파일러나 다른 툴로 체크할 수 있다.
+컴파일러는 주석문 (혹은 디자인 문서 등)을 읽지 않는다. 수 많은 프로그래머 또한 주석을 (일관되게) 읽지 않는다.
+코드로 표현된 내용이라면 그 의미(의도)를 이미 정의 했을 것이며 (대체로) 컴파일러나 다른 툴로 체크할 수 있다.
 >Compilers don't read comments (or design documents) and neither do many programmers (consistently).
 What is expressed in code has defined semantics and can (in principle) be checked by compilers and other tools.
 
@@ -43,8 +43,8 @@ What is expressed in code has defined semantics and can (in principle) be checke
         // ...
     };
 
-`month`의 첫번째 선언은 `Month`를 반환하는 것과 `Date`객체의 상태를 변경하지 않는데 대해 명확하다.
-두번째 버전은 독자들이 상상하게 만들고 찾지 못하는 버그가 있을 가능성을 높인다.
+첫번째 `month` 함수는 명확히 `Month`를 반한 하도록 선언되어 있으며, `Date` 객체의 상태를 변경하지 않을 것 처럼 보인다. 
+두번째 버전은 코드를 읽는 개발자들을 고민하게 만들며, 발견하기 어려운 버그를 유발할 가능성이 있다.
 >The first declaration of `month` is explicit about returning a `Month` and about not modifying the state of the `Date` object.
 The second version leaves the reader guessing and opens more possibilities for uncaught bugs.
 
@@ -55,7 +55,7 @@ The second version leaves the reader guessing and opens more possibilities for u
         string val;
         cin >> val;
         // ...
-        int index = 0;            // bad
+        int index = 0;            // 나쁨
         for (int i = 0; i < v.size(); ++i)
             if (v[i] == val) {
                 index = i;
@@ -64,8 +64,8 @@ The second version leaves the reader guessing and opens more possibilities for u
         // ...
     }
 
-위의 루프는 `std::find`의 제한된 형태이다.
-의도를 더 분명하게 표현하면 이럴 것이다:
+위의 루프는 `std::find`를 이용하여 표현 가능하므로, 
+의도를 더 명확하게 드러내기 위해서 아래와 같이 코드를 바꾸어 작성할 수 있다:
 >That loop is a restricted form of `std::find`.
 A much clearer expression of intent would be:
 
@@ -74,47 +74,46 @@ A much clearer expression of intent would be:
         string val;
         cin >> val;
         // ...
-        auto p = find(v, val);  // better
+        auto p = find(v, val);  // 좋음
         // ...
     }
 
-잘 정의된 라이브러리는 의도를 표현한다. (무엇을 하는지, 어떻게 하고 있는지 보다는.)
-언어의 특징을 직접적으로 사용하는 것보다 더 낫다.
+언어가 제공하는 기능을 직접 사용하기 보다 잘 설계된 라이브러리를 사용하여 그 의도(어떻게 수행되는지 보다 무엇이 수행되는지를) 표현하는 것이 훨씬 낫다.  
 >A well-designed library expresses intent (what is to be done, rather than just how something is being done) far better than direct use of language features.
 
-C++ 프로그래머는 표준라이브러리의 기초을 알아야 하고 적절한 곳에서 사용해야 한다.
-프로그래머는 동작하는 프로젝트의 기본 라이브러리의 기초를 알아야 하고 적절하게 사용해야 한다.
-이런 가이드라인을 사용하는 프로그래머는 [guideline support library](#S-gsl)를 알아야 하고 적절히 사용해야 한다.
+C++ 프로그래머는 표준 라이브러리의 기본을 반드시 이해하고 올바른 곳에 사용해야 한다.
+어떤 프로그래머이든 프로젝트가 기반하고 있는 핵심 라이브러리의 기본을 반드시 이해하고 있어야 하며, 올바르게 사용할 줄 알아야 한다.
+이 가이드라인을 사용하는 프로그래머는 [guideline support library](#S-gsl)를 반드시 알아야 하고 적절히 사용할 줄 알아야 한다.
 >A C++ programmer should know the basics of the standard library, and use it where appropriate.
 Any programmer should know the basics of the foundation libraries of the project being worked on, and use them appropriately.
 Any programmer using these guidelines should know the [guideline support library](#S-gsl), and use it appropriately.
 
 ##### Example
 
-    change_speed(double s);   // bad: what does s signify?
+    change_speed(double s);   // 나쁨: 무슨 의미일까?
     // ...
     change_speed(2.3);
 
-더 좋은 접근법은 `double`(새 스피드, 이전 스피드와의 차이값)의 의미와 단위를 명확히 하는 것이다.
+더 좋은 접근법은 `double`(새 스피드, 혹은 이전 스피드와의 차이?)의 의미와 단위를 명확히 하는 것이다.
 >A better approach is to be explicit about the meaning of the double (new speed or delta on old speed?) and the unit used:
 
-    change_speed(Speed s);    // better: the meaning of s is specified
+    change_speed(Speed s);    // 좋음: s의 의미가 구체적임
     // ...
-    change_speed(2.3);        // error: no unit
-    change_speed(23m / 10s);  // meters per second
+    change_speed(2.3);        // 에러: 단위가 없음
+    change_speed(23m / 10s);  // 미터/초
 
-단순한(단위가 없는) `double`을 델타값으로 받아들일 수 있지만 에러가 발생하기 쉽다.
-절대속도와 델타값 둘다 필요하다면 `Delta` 타입을 정의했을 것이다.
+단순한(단위가 없는) `double`을 델타(속도의 차)로 받아들일 수도 있겠지만, 아무래도 에러가 발생하기 쉽다.
+속도와 델타 둘다 필요하다면, `Delta` 타입을 정의해야 할 것이다.
 >We could have accepted a plain (unit-less) `double` as a delta, but that would have been error-prone.
 If we wanted both absolute speed and deltas, we would have defined a `Delta` type.
 
 ##### Enforcement
 
-일반화하기는 아주 어렵다.
+일반화하여 적용하기는 매우 어려움.
 >Very hard in general.
 
-* 일관성있게 `const`를 사용하라. (멤버함수가 객체를 변경하는지 체크하고, 함수가 포인터,참조로 넘어온 인자를 변경하는지 체크하라.)
-* 형변환을 사용한다면 표시하라. (형변환은 타입시스템을 무력화시킨다.)
+* 일관성 있게 `const`를 사용하라.(멤버함수가 객체를 변경하는지 확인하라; 포인터나 참조로 넘어온 인자를 변경하는지 확인하라.)
+* 형변환은 그만 사용하라.(형변환은 타입시스템을 무력화시킨다)
 * 표준 라이브러리를 흉내내는 코드를 찾아라. (어렵다)
 
 >* use `const` consistently (check if member functions modify their object; check if functions modify arguments passed by pointer or reference)
