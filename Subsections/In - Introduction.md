@@ -1,7 +1,7 @@
 # <a name="S-introduction"></a> In: Introduction
 
 이 문서는 modern C++, C++14는 물론이고 추후 개션될 내용과 ISO 기술 명세(Technical Specification)까지 고려한 핵심 가이드라인으로써,
-C++ 프로그래머가 더욱 간단하고, 효과적이며, 유지보수하기 좋은 코드를 작성하는데 도움을 주기위해 작성되었다.
+C++ 프로그래머가 더욱 간단하고, 효과적이며, 유지보수하기 좋은 코드를 작성하는데 도움을 주기 위해 작성되었다.
 >This is a set of core guidelines for modern C++, C++14, and taking likely future enhancements and taking ISO Technical Specifications (TSs) into account.
 The aim is to help C++ programmers to write simpler, more efficient, more maintainable code.
 
@@ -27,9 +27,9 @@ The aim is to help C++ programmers to write simpler, more efficient, more mainta
 이 문서는 개발자들이 모던 C++(C++11, C++14, 이후 C++17까지)을 도입하도록 도움을 주고, 코드 작성시에 좀 더 일관된 스타일로 개발을 할 수 있도록 돕기 위해 작성되었다.
 >The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
 
-이 문서에서 다루고 있는 규칙들이 모든 코드에 효과적으로 적용 가능할 것이라고 생각하진 않는다.
-실상 오래된 시스템을 새롭게 업그레이드하는 것은 쉽지 않은 일이다. 하지만 여기서 다루는 규칙들을 적용한다면 기존의 방식보다 에러 발생 가능성을 낮추고, 유지보수도 편리한 코드를 작성할 수 있을 것이라 확신한다. 또한 이러한 규칙들이 개발 초기에 좀 더 빠르고 쉽게 개발을 진행하는 데도 도움일 될 것이다.
-분명히 말할 수 있는 것은, 이러한 규칙들을 적용하면 이전보다 더 올바르게 수행되는 코드를 만들 수 있으며, 제로-비용 원칙(Zero-overhead principle)에 입각하여 작성된 만큼 규칙들이 설명하고 있는 내용이 더욱 보편 타당한 개발 방법이라는 것이다. (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 말라", "올바른 추상화 방법을 사용하여 저수준 언어로 하드코딩 한 것 만큼의 성능을 얻을 수 있도록 하라" 정도로 설명될 수 있다.)
+이 문서에서 다루고 있는 규칙들이 모든 코드에 효과적으로 적용 가능할 것이라고 생각하지는 않는다.
+실상 오래된 시스템을 새롭게 업그레이드하는 것은 쉽지 않은 일이다. 하지만 여기서 다루는 규칙들을 적용한다면 기존의 방식보다 에러 발생 가능성을 낮추고, 유지보수도 편리한 코드를 작성할 수 있을 것이라 확신한다. 또한 이러한 규칙들이 개발 초기에 좀 더 빠르고 쉽게 개발을 진행하는 데도 도움이 될 것이다.
+분명히 말할 수 있는 것은, 이러한 규칙들을 적용하면 이전보다 더 올바르게 수행되는 코드를 만들 수 있으며, 제로-비용 원칙(Zero-overhead principle)에 입각하여 작성된 만큼 규칙들이 설명하고 있는 내용이 매우 보편 타당한 개발 방법이라는 것이다. (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 말라", "올바른 추상화 방법을 사용하여 저수준 언어로 하드코딩 한 것 만큼의 성능을 얻을 수 있도록 하라" 정도로 설명될 수 있다.)
 새로운 코드를 작성하거나 기존 코드를 개선할 여지가 생겼다면,적용 가능한 수준에서 규칙들을 적용해 보기 바란다.  
 기억해라:
 >We do not suffer the delusion that every one of these rules can be effectively applied to every code base. Upgrading old systems is hard. However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not. Often, rules also lead to faster/easier initial development.
@@ -43,8 +43,8 @@ Remember:
 기존 프로그램에 가이드라인을 적용하는 경우라면, 이러한 변화가 프로그램에 어떤 영향을 미칠지 충분히 고려해야 한다. 
 >Take the time to understand the implications of a guideline rule on your program.
 
-가이드라인은 상위집합과 하위집합([Stroustrup05](#Stroustrup05))의 형태로 구성하였다.
-신뢰성, 안정성, 성능만을 고려하여 C++의 기본적인 기능만을 이용하여 가이드라인을 정의하기 보다는
+가이드라인은 상위집합과 하위집합([Stroustrup05](#Stroustrup05))의 형태로 구성되어 있다.
+신뢰성, 안정성, 성능 등을 고려하여 C++의 기본적인 기능만을 이용하여 가이드라인을 정의하기 보다는
 몇가지 간단한 "확장" 컴포넌트([library components](#S-gsl))를 함께 활용하여 가이드라인을 작성하였다.
 이를 통해 다소 장황하고 에러를 유발할 가능성이 높은 C++의 기본 기능들을 보강할 수 있었다.
 >These guidelines are designed according to the "subset of a superset" principle ([Stroustrup05](#Stroustrup05)).
@@ -94,10 +94,10 @@ However, when there are two ways of expressing an idea and one has shown itself 
 >## <a name="SS-non"></a> In.not: Non-aims
 
 최소한의 규칙만을 정의하고, 그 규칙들이 정밀하게 들어 맞도록 조직적으로 가이드라인을 작성한 것은 아니다.
-실제로, 범용적인 규칙 둘 중에는 일면 간단해 보이지만 실제로 적용하기가 매우 어려울 수 있으며, 그러한 규칙들이 의미하는 함축적인 의미를 이해하기가 어려울 수도 있다.
+실제로, 범용적인 규칙들 중에는 일면 간단해 보이지만 실제로 적용하기가 매우 어려운 것들도 있으며, 그러한 규칙들이 의미하는 함축적인 의미를 이해하기가 어려울 수도 있다.
 구체적인 규칙들이 좀더 이해하기 쉽고 적용하기도 쉽지만, 범용적인 규칙들을 다루지 않고는 특별한 경우만을 장황하게 나열할 수 밖에 없었을 것이다.
-각각의 규칙들은 초보 개발자뿐 아니라 전문가들에게 도움이 될 수 있도록 작성하였다.
-가이드라인에서 다루고 있는 일부 규칙은 반드시 적용되어야 하는 것들도 있지만, 필요에 따라 선택적으로 적용 여부를 결정해야 하는 것들도 있다.
+각각의 규칙들은 초보 개발자뿐 아니라 전문가들에게도 도움이 될 수 있도록 작성하였다.
+일부 규칙은 반드시 적용되어야 하는 것들도 있지만, 필요에 따라 선택적으로 적용 여부를 결정해야 하는 규칙들도 있다.
 >The rules are not intended to be minimal or orthogonal.
 In particular, general rules can be simple, but unenforceable.
 Also, it is often hard to understand the implications of a general rule.
@@ -105,8 +105,8 @@ More specialized rules are often easier to understand and to enforce, but withou
 We provide rules aimed at helping novices as well as rules supporting expert use.
 Some rules can be completely enforced, but others are based on heuristics.
 
-여기서 다루는 규칙들을 책에서 다루는 내용인 것 처럼 너무 심각하게 받아들을 필요는 없다. 링크를 통해서 규칙들을 가볍게 살펴보는 것도 괜찮다.
-사실 이와 같이 규칙을 엄밀하게 정의한 본질적인 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 툴을 만들 수 있도록 하기 위해서이다.
+여기서 다루는 규칙들을 책에서 다루는 것인냥 너무 심각하게 받아들을 필요는 없다. 링크를 통해서 규칙들을 가볍게 살펴보는 것도 괜찮다.
+사실 이처럼 규칙을 엄밀하게 정의한 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 툴을 만들 수 있도록 하기 위해서이다.
 더하여, 규칙이 만들어진 이유를 설명하고, 만약 규칙을 따르지 않았을 때 어떤 문제가 발생할 수 있고, 그 문제를 어떻게 해결할 수 있는지를 알려주기 위해서이기도 하다.
 
 >These rules are not meant to be read serially, like a book.
@@ -154,13 +154,13 @@ They are meant to inhibit perfectly valid C++ code that correlates with errors, 
 >## <a name="SS-force"></a> In.force: Enforcement
 
 다양한 규칙들을 적용하도록 사실상 강제화 하지 않고서는 방대한 코드에 이러한 규칙들이 모두 적용되길 기대하는 것은 어려운 일이다.
-실상, 모든 규칙을 강제적으로 적용하는 것은 규칙의 수가 몇개 되지 않거나 혹은 특수한 사용자 집단에서나 가능한 일일지도 모르겠다.
+실상, 모든 규칙을 강제적으로 적용하는 것은 규칙의 수가 몇 개 되지 않거나 혹은 특수한 사용자 집단에서나 가능한 일일지도 모르겠다.
 그러나, 개발자들은 여전히 다양한 규칙들을 기대하고 있으며, 이러한 규칙들에 대한 서로 다른 기대치를 가지고 있다고 생각한다. 
-역설적이지만, 어떤 개발자도 이처럼 방대한 규칙을 모두 읽고 이해하고 싶어하지도 않을 것이며, 각각의 규칙을 낱낱이 기억하고 싶지도 않을 것이다.
+역설적이지만, 어떤 개발자도 이처럼 방대한 규칙을 모두 읽고 이해하고 싶어하지 않을 것이며, 각각의 규칙을 낱낱이 기억하고 싶지도 않을 것이다.
 이런 이유로 다양한 기대치의 공통적인 부분만을 뽑아내려고도 해보았지만, 이처럼 임의의 규칙을 정하는 것 조차 혼돈을 초래할 것으로 생각했다.
 우리는 더 많은 개발자들에게 도움이 되고, 코드를 좀더 간결하게 만들 수 있으며, 기존 코드를 현대화 할 수 있는 그런 가이드라인이 만들고 싶었다.
 개인의 선택의 문제라거나 관리의 압박으로 인해 신경쓰지 않았던 부분들도 도외시 하지 않고 최선의 실용적인 예를 다루고자 하였다.
-따라서 바라건데는 모든 규칙들을 적용하는 것이 좋다고 생각한다. 그렇게 해야만 최고의 이득을 얻을 수 있을 것으로 생각하기 때문이다.
+따라서, 바라건데는 모든 규칙들을 적용하는 것이 좋다고 생각한다. 그렇게 해야만 최고의 이득을 얻을 수 있을 것으로 생각하기 때문이다.
 
 >Rules with no enforcement are unmanageable for large code bases.
 Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
@@ -173,7 +173,7 @@ But arbitrary subsetting leads to chaos: We want guidelines that help a lot of p
 We want to encourage best practices, rather than leave all to individual choices and management pressures.
 The ideal is to use all rules; that gives the greatest benefits.
 
-이는 꽤나 중요한 딜레마가 아닐 수 없는데, 우리는 이러한 딜레마의 해결책이 툴을 개발하는 것이라고 생각하였다.
+이는 꽤나 심각한 딜레마가 아닐 수 없는데, 우리는 이러한 딜레마의 해결책이 툴을 개발하는 것이라고 생각하였다.
 각각의 규칙들은 적용 방법을 설명하고 있는 **Enforcement** 단락을 가지고 있는데, 
 코드 리뷰, 정적 분석, 컴파일러, 런타임 체크 등의 방법을 나열하고 있다.
 어떤 방식이 되던 우리는 "기계적"이며(사람은 느리기도 하거니와, 쉽게 지루해 할 수 있으므로) 일관된 방법으로 개별 규칙들이 적용될 수 있는 방법을 원했다.
