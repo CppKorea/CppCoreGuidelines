@@ -40,7 +40,7 @@
 - Incheol Kang (kangic)
 - Dongha Park (luncliff)
 - Muhun Kim (MuhunKim)
-- Myungsin Kim (options)
+- Myungshin Kim (options)
 
 ## C++ 핵심 가이드라인 한글화 진행 상황
 
