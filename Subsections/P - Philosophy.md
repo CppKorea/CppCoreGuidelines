@@ -114,7 +114,7 @@ If we wanted both absolute speed and deltas, we would have defined a `Delta` typ
 
 * 일관성 있게 `const`를 사용하라.(멤버함수가 객체를 변경하는지 확인하라; 포인터나 참조로 넘어온 인자를 변경하는지 확인하라.)
 * 형변환은 그만 사용하라.(형변환은 타입시스템을 무력화시킨다)
-* 표준 라이브러리를 흉내내는 코드를 찾아라. (어렵다)
+* 표준 라이브러리를 흉내내는 코드를 찾아라.(어려움)
 
 >* use `const` consistently (check if member functions modify their object; check if functions modify arguments passed by pointer or reference)
 * flag uses of casts (casts neuter the type system)
@@ -125,26 +125,27 @@ If we wanted both absolute speed and deltas, we would have defined a `Delta` typ
 
 ##### Reason
 
-ISO 표준 C++을 사용하기 위한 가이드라인 집합이다.
+이 규칙은 ISO 표준 C++을 만드는 가이드라인의 하나이다.
 >This is a set of guidelines for writing ISO Standard C++.
 
 ##### Note
 
-시스템 리소스를 접근하기 위해 확장 모듈이 필요한 환경이 있다.
-이런 경우에는 필요한 확장모듈을 지역적으로 사용하라. 비핵심 코딩 가이드라인으로 사용을 제한하라.
+시스템 리소스에 접근하는 등의 작업을 수행하기 위해서 확장 기능이 필요할 수 있다.
+이런 경우에는 필요한 확장 기능을 지역적으로 제한하여 사용하고, 비핵심 코딩 가이드라인을 활용하여 관리하라.
 >There are environments where extensions are necessary, e.g., to access system resources.
 In such cases, localize the use of necessary extensions and control their use with non-core Coding Guidelines.
 
 ##### Note
 
-표준 C++ 언어, 라이브러리 특성에 대한 제약이 필요한 환경도 있다. 예를 들면 비행기 제어 소프트웨어 표준에서 요구하는 동적 메모리 할당을 피하기.
-이러 경우에는 비핵심 코딩 가이드라인으로 사용을 제한하라.
+표준 C++ 언어의 기능나 라이브러리 조차도 제한적으로 사용할 수 밖에 없는 환경도 있다.
+예를 들면 항공기 제어 소프트웨어 개발 표준에는 동적 메모리 할당을 피할 것을 주문하고 있다. 
+이러 경우에는 비핵심 코딩 가이드라인을 활용하여 사용하지 않아야 하는 기능을 관리하라.
 >There are environments where restrictions on use of standard C++ language or library features are necessary, e.g., to avoid dynamic memory allocation as required by aircraft control software standards.
 In such cases, control their (dis)use with non-core Coding Guidelines.
 
 ##### Enforcement
 
-확장을 허용하지 않는 옵션셋을 가진 최신 C++ 컴파일러를 사용하라. (현재 C++11, C++14)
+확장을 허용하지 않도록 기능 설정이 가능한 최신의 C++ 컴파일러를 사용하라. (현재 C++11, C++14) 
 >Use an up-to-date C++ compiler (currently C++11 or C++14) with a set of options that do not accept extensions.
 
 ### <a name="Rp-what"></a> P.3: 의도를 표현하라.
@@ -152,40 +153,37 @@ In such cases, control their (dis)use with non-core Coding Guidelines.
 
 ##### Reason
 
-코드의 의도를 (이름이나 주석문으로) 기술하지 않는다면, 의도대로 코드가 실행되는지 어떤지 말하기가 불가능하다.
+코드를 통해서 의도를 제대로 드러내지 못한다면, 코드가 제대로 수행되는지 조차 말하기 불가능 것이다.
 >Unless the intent of some code is stated (e.g., in names or comments), it is impossible to tell whether the code does what it is supposed to do.
 
 ##### Example
 
     int i = 0;
     while (i < v.size()) {
-        // ... do something with v[i] ...
+        // ... v[i]로 어떤 작업을 수행 ...
     }
 
-여기에 `v`의 요소를 루프하는 의도가 표현되지 않는다.
-인덱스의 상세한 구현은 보인다. (잘못 사용될지도 모르겠지만) 의도적이든 아니든 `i`는 루프 영역 외에서도 살아 있다.
-읽는 사람은 이 코드 일부분으로는 알 수 있는 게 없다.
+위 코드만 보았을 때는 `v`의 개별 요소를 순회하겠다는 의도가 드러나지 않는다.
+인덱스에 대한 세부적인 구현부는 나타나 있다(잘못 사용될지도 모르겠지만). 그리고 의도적인지는 알 수 없지만 `i`를 루프 밖에서도 여전히 사용할 수 있다. 이 일부분의 코드만을 읽었을 때 쉽사리 와 닿는 부분이 없다. 
 >The intent of "just" looping over the elements of `v` is not expressed here. The implementation detail of an index is exposed (so that it might be misused), and `i` outlives the scope of the loop, which may or may not be intended. The reader cannot know from just this section of code.
 
-더 좋게:
+개선:
 >Better:
 
-    for (auto x : v) { /* do something with x */ }
+    for (auto x : v) { /* x로 어떤 작업을 수행 */ }
 
-여기 구체적인 언급은 없다. 반복 메커니즘에 대한, 그리고 루프는 요소의 복사본을 가지고 동작한다.
-실수로 수정되는 것을 막기 위해.
-수정이 필요하다면 아래처럼 써라:
+위 코드를 보면 v에 대한 순회 메커니즘을 명시적으로 언급되지 않는다. 그리고 순회하는 동안 v의 개별요소에 대한 복사가 일어나기 때문에 개별요소를 수정할 수 없다. 만약 수정이 필요한 경우라면 아래와 같이 코드를 작성해야 한다. 
 >Now, there is no explicit mention of the iteration mechanism, and the loop operates on a copy of elements so that accidental modification cannot happen. If modification is desired, say so:
 
-    for (auto& x : v) { /* do something with x */ }
+    for (auto& x : v) { /* x로 어떤 작업을 수행 */ }
 
-나아지기는 했지만, 이름붙인 알고리즘을 사용하라.:
+이전보다 개선되었지만, 이 보다는 잘알려진 알고리즘을 사용하라.
 >Sometimes better still, use a named algorithm:
 
-    for_each(v, [](int x) { /* do something with x */ });
-    for_each(parallel.v, [](int x) { /* do something with x */ });
+    for_each(v, [](int x) { /* x로 어떤 작업을 수행 */ });
+    for_each(parallel.v, [](int x) { /*x로 어떤 작업을 수행 */ });
 
-마지막 수정은 `v` 요소의 순서에는 별다른 흥미가 없다는 것을 명확하게 만든다.
+마지막 예는 `v`의 개별 요소를 순차적으로 처리하지 않아도 된다는 것을 명확히 하고 있다.
 >The last variant makes it clear that we are not interested in the order in which the elements of `v` are handled.
 
 프로그래머라면 다음과 익숙해져야 한다.
@@ -193,38 +191,38 @@ In such cases, control their (dis)use with non-core Coding Guidelines.
 
 * [The guideline support library](#S-gsl)
 * [The ISO C++ standard library](#S-stdlib)
-* 기본 라이브러리를 무엇을 사용하던지.
 
+* 이는 현재 프로젝트에서 어떤 기본 라이브러리를 사용하던지와 상관없이 적용되어야 한다.
 >* Whatever foundation libraries are used for the current project(s)
 
 ##### Note
 
-대안 공식: 무엇을 할지 말하라, 어떻게 할지 말하지 말고.
+다른 표기: 어떻게 작업이 수행되는지를 말하지 말고 무엇이 수행될지를 말하라.
 >Alternative formulation: Say what should be done, rather than just how it should be done.
 
 ##### Note
 
-몇몇 언어의 구조는 의도를 잘 표현한다.
+언어의 기본 요소가 다른 무엇 보다도 그 의도를 더 잘 표현한다.
 >Some language constructs express intent better than others.
 
 ##### Example
 
-2개의 `int`값이 2D 포인터 좌표를 의미한다면 이렇게 써라:
+2개의 `int` 값으로 2차원 좌표를 표현하는 경우 다음과 같이 써라.
 >If two `int`s are meant to be the coordinates of a 2D point, say so:
 
-      drawline(int, int, int, int);  // obscure
-      drawline(Point, Point);        // clearer
+      drawline(int, int, int, int);  // 모호함
+      drawline(Point, Point);        // 좀더 명확함
 
 ##### Enforcement
 
-대안이 더 좋은 공통 패턴을 찾아라.
+범용적인 패턴에 대하여 좀 더 나은 대안을 찾아보라.
 >Look for common patterns for which there are better alternatives
 
-* 단순 `for`문 루프 대 범위 `for`문
+* 단순 `for`루프 대 range-`for`문
 * `f(T*, int)` 인터페이스 대 `f(array_view<T>)` 인터페이스
-* 아주 큰 범위에서 사용하는 루프 변수
-* 생짜 `new`, `delete`
-* 여러개의 내장 타입 인자를 가진 함수.
+* 아주 큰 코드 블록을 순회할 경우의 루프 변수
+* naked `new`와 `delete`
+* 내장 타입의 인자를 여러개 가진 함수.
 
 >* simple `for` loops vs. range-`for` loops
 >* `f(T*, int)` interfaces vs. `f(array_view<T>)` interfaces
@@ -232,7 +230,7 @@ In such cases, control their (dis)use with non-core Coding Guidelines.
 >* naked `new` and `delete`
 >* functions with many arguments of built-in types
 
-영리함, 반자동 프로그램 변환을 위한 거대한 범위(?)가 있다. (? - scope 모르겠음.)
+이 규칙은 광범위한 분야에 걸쳐 적용이 가능하며, 영민하게 개발된 프로그램으로 준자동화 수준으로 변경할 수 있다.
 >There is a huge scope for cleverness and semi-automated program transformation.
 
 ### <a name="Rp-typesafe"></a> P.4: 이상적으로는 프로그램은 정적으로 타입이 안전해야 한다.
