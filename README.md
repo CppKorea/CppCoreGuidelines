@@ -1,6 +1,6 @@
 #[C++ 핵심 가이드라인](http://cppkorea.github.io/CppCoreGuidelines/CppCoreGuidelines)
 
-> "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다. (Within C++ is a smaller, simpler, safer language struggling to get out.)"
+> "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다."
 > -- <cite>비야네 스트롭스트룹 (Bjarne Stroustrup)</cite>
 
 # C++ 핵심 가이드라인 한글화 프로젝트
@@ -12,15 +12,17 @@
 - 원문의 의도만 바뀌지 않는다면 재밌게 의역해도 상관없습니다.
 - 참여를 원하시는 분께서는 Chris Ohk (utilForever)에게 [페이스북](http://www.facebook.com/utilForever)이나 [이메일](utilForever@gmail.com)로 연락주시기 바랍니다.
 
-## 프로젝트 진행 계획
+## 프로젝트 진행 상황
 
-- 1단계 : <B>1차 번역 작업 - C++ 핵심 가이드라인 (완료)</B>
+- 1단계 : C++ 핵심 가이드라인 1차 번역 작업 (완료)
 
-- 2단계 : <B>2차 번역 작업 - C++ 관련 문서 및 C++ 핵심 가이드라인 갱신 내용, 1차 교정 및 통합 문서 제작 (진행중)</B>
+- 2단계 : C++ 핵심 가이드라인 원본 갱신 + 2차 번역 작업 (진행중)
 
-- 3단계 : 2차 교정 및 PDF 문서 제작 (TBD)
+- 3단계 : C++ 핵심 가이드라인 웹 사이트 제작 + 1차 교정 작업 (진행 예정)
 
-## 프로젝트를 도와주시는 분
+- 4단계 : C++ 핵심 가이드라인 2차 교정 작업 + PDF 문서 제작 (진행 예정)
+
+## 프로젝트를 도와주시는 분들
 
 - Chris Ohk (utilForever)
 - Seokjoon Yun (DevStarSJ)
@@ -41,10 +43,6 @@
 - Dongha Park (luncliff)
 - Muhun Kim (MuhunKim)
 - Myungshin Kim (options)
-
-## C++ 핵심 가이드라인 한글화 진행 상황
-
-TBA
 
 ## 개요
 
