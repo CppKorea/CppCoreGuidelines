@@ -12,7 +12,7 @@
 이 프로젝트의 복사, 사용, 수정, 파생 성과물과 관련된 저작권은 MIT 라이선스를 따른다.
 이 프로젝트에 기여하려면 기여자 라이선스(Contributor License)에 동의해야 한다.
 자세한 내용은 첨부된 [라이선스 파일(LICENSE)](LICENSE)을 참조하길 바란다.
-오픈 소스 프로젝트에 익숙한 사용자들이 사용, 복사, 수정, 파생을 통해 건설적인 정보를 제공해주기 바란다.
+오픈 소스 프로젝트에 익숙한 사용자들이 사용, 복사, 수정, 파생 성과물들을 통해 좋은 정보를 제공해주기 바란다.
 
 Comments and suggestions for improvements are most welcome.
 We plan to modify and extend this document as our understanding improves and the language and the set of available libraries improve.
