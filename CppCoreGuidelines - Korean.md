@@ -91,44 +91,42 @@ Definitions of terms used to express and discuss the rules, that are not languag
 * resource
 * exception guarantee
 
-# <a name="S-abstract"></a>Abstract
+# <a name="S-abstract"></a>개요
 
-This document is a set of guidelines for using C++ well.
-The aim of this document is to help people to use modern C++ effectively.
-By "modern C++" we mean C++11 and C++14 (and soon C++17).
-In other words, what would you like your code to look like in 5 years' time, given that you can start now? In 10 years' time?
+이 문서는 C++를 올바로 사용하기 위한 가이드라인의 모음이며,
+개발자들이 모던 C++를 좀 더 효율적으로 사용할 수 있도록 돕기 위해 작성되었다.
+"모던 C++"이란 C++11, C++14 (그리고 곧 나올 C++17)을 뜻한다.
+지금 개발중인 코드가 5년, 또는 10년 후에 어떤 모습이었으면 좋겠는가?
 
-The guidelines are focused on relatively higher-level issues, such as interfaces, resource management, memory management, and concurrency.
-Such rules affect application architecture and library design.
-Following the rules will lead to code that is statically type safe, has no resource leaks, and catches many more programming logic errors than is common in code today.
-And it will run fast -- you can afford to do things right.
+C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관리, 동시성와 같이 상대적으로 고수준의 내용을 다루고 있으며,
+이러한 내용들은 대체로 애플리케이션 아키텍쳐나 라이브러리 디자인에 영향을 미친다.
+가이드라인에 나오는 규칙들을 준수하면 코드가 정적 타입 안정성을 갖도록 할 수 있으며, 리소스의 누수가 없고, 
+흔히 저지르는 수많은 프로그래밍 로직 오류를 잡아낼 수 있으며, 더욱 빠르게 수행되는 코드를 작성할 수 있을 것이다.
+즉, 올바른 코드를 만들 수 있다.
 
-We are less concerned with low-level issues, such as naming conventions and indentation style.
-However, no topic that can help a programmer is out of bounds.
+이름 지정 규칙이나 들여쓰기 스타일과 같이 세부적인 내용에 대해서는 크게 언급하지 않을 것이다.
+하지만, 프로그래머에게 도움을 줄 수 있는 주제가 있다면 다루도록 하겠다. 
 
-Our initial set of rules emphasizes safety (of various forms) and simplicity.
-They may very well be too strict.
-We expect to have to introduce more exceptions to better accommodate real-world needs.
-We also need more rules.
+초기의 규칙들은 (다양한 형태의) 안정성과 간결함을 과도하게 강조한 측면이 있다.
+실용성을 위해 여러 예외 사항들이 도입되기를 바란다. 또한 더 많은 규칙들이 필요하다.
 
-You will find some of the rules contrary to your expectations or even contrary to your experience.
-If we haven't suggested you change your coding style in any way, we have failed!
-Please try to verify or disprove rules!
-In particular, we'd really like to have some of our rules backed up with measurements or better examples.
+규칙들 중에는 기대했던 것과 다르거나 기존에 경험했던 것과 전혀 다른 부분이 있을 것이다.
+이렇든 저렇든 여러분의 코딩 스타일에 변화를 주지 못한다면, 우리는 실패한 것이다!
+올바른 규칙인지 확인해 보고, 문제가 있다면 반박해주길 바란다!
+특히, 측정 결과나 더 나은 예제들로 규칙들을 뒷받침해주길 바란다.
 
-You will find some of the rules obvious or even trivial.
-Please remember that one purpose of a guideline is to help someone who is less experienced or coming from a different background or language to get up to speed.
+명백하거나 당연해 보이는 규칙도 일부 있을 것이다.
+하지만 이 가이드라인은 숙련되지 않은 개발자들 또는 다른 배경 지식을 갖거나 다른 언어를 알고 있는 개발자들이 C++ 언어를 빨리 익힐 수 있도록 돕기 위한 문서임을 기억해 주었으면 한다.
 
-Many of the rules are designed to be supported by an analysis tool.
-Violations of rules will be flagged with references (or links) to the relevant rule.
-We do not expect you to memorize all the rules before trying to write code.
-One way of thinking about these guidelines is as a specification for tools that happens to be readable by humans.
+우리는 분석 도구를 통해 지원할 수 있도록 대부분의 규칙들을 설계했다.
+분석 도구를 이용하면 참조(또는 링크)를 통해 어떤 규칙을 위반했는지 파악할 수 있다.
+모든 규칙을 알고 코드를 작성할 수는 없는 노릇이다.
+이러한 가이드라인은 무슨 문제가 발생했는지 파악할 수 있게 해주는 도구에 대한 명세라고 볼 수 있다.
 
-The rules are meant for gradual introduction into a code base.
-We plan to build tools for that and hope others will too.
+우리는 규칙들이 코드에 점진적으로 도입되길 바라며, 이를 위한 도구를 만들 계획을 갖고 있다.
 
-Comments and suggestions for improvements are most welcome.
-We plan to modify and extend this document as our understanding improves and the language and the set of available libraries improve.
+규칙을 개선하기 위한 의견과 제안은 언제든 환영한다. 
+규칙들을 좀 더 이해하게 되고 언어와 사용 가능한 라이브러리들이 개선될 때마다 이 문서를 지속적으로 수정하고 확장해 나갈 것이다.
 
 # <a name="S-introduction"></a>In: Introduction
 
