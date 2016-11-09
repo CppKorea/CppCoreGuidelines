@@ -63,7 +63,7 @@ def main():
                     code_block_index += 1
                 # reach here either line was not code, or was code
                 # and we dealt with n code lines
-                if not is_code(line, indent_depth):
+                if indent_depth < 4 or not is_code(line, indent_depth):
                     # store header id for codeblock
                     section_id = get_marker(line)
                     if section_id is not None:
@@ -72,15 +72,16 @@ def main():
                     sline = stripped(line)
                     text_filehandle.write(sline)
 
+    assert line_length(args.sourcefile) == line_length(args.targetfile)
+
 
 def process_code(read_filehandle, text_filehandle, line, linenum, sourcefile, codedir, name, index, indent_depth):
-
     fenced = (line.strip() == '```')
     if fenced:
         try:
             line = read_filehandle.next()
             linenum += 1
-            text_filehandle.write('')
+            text_filehandle.write('\n')
         except StopIteration:
             return ('', linenum)
     start_linenum = linenum
@@ -92,22 +93,22 @@ def process_code(read_filehandle, text_filehandle, line, linenum, sourcefile, co
         comment_idx = line.find('//')
         no_comment_line = line
         if comment_idx >= 0:
-            no_comment_line = line[:comment_idx]
+            no_comment_line = line[:comment_idx].strip()
             text_filehandle.write(line[comment_idx + 2:])
-            if (not has_actual_code
-                    and not line.strip().startswith('//')
-                    and not line.strip().startswith('???')
-                    and not line.strip() ==''):
-                has_actual_code = True
         else:
             # write empty line so line numbers stay stable
-            text_filehandle.write('')
+            text_filehandle.write('\n')
+
+        if (not has_actual_code
+            and not line.strip().startswith('//')
+            and not line.strip().startswith('???')
+            and not line.strip() == ''):
+            has_actual_code = True
 
         if (not line.strip() == '```'):
-
-            if ('???' in no_comment_line or '...' in no_comment_line):
+            if ('???' == no_comment_line or '...' == no_comment_line):
                 has_question_marks = True
-            linebuffer.append(dedent(line) if not fenced else line)
+            linebuffer.append(dedent(line, indent_depth) if not fenced else line)
         try:
             line = read_filehandle.next()
             linenum += 1
@@ -115,14 +116,35 @@ def process_code(read_filehandle, text_filehandle, line, linenum, sourcefile, co
             line = ''
             break
     codefile = os.path.join(codedir, '%s%s.cpp' % (name, index))
-
     if fenced:
-        text_filehandle.write('')
+        text_filehandle.write('\n')
 
     if (has_actual_code and not has_question_marks):
-        # add commonly used headers, so that lines can compile
-        with io.open(codefile, 'w') as code_filehandle:
-            code_filehandle.write('''\
+        linebuffer = clean_trailing_newlines(linebuffer)
+        write_with_harness(codefile, sourcefile, start_linenum, linebuffer)
+    return (line, linenum)
+
+
+def clean_trailing_newlines(linebuffer):
+    result = []
+    code_started = False
+    linebuffer.reverse()
+    for line in linebuffer:
+        if not code_started and line == '\n':
+            continue
+        code_started = True
+        result.append(line)
+    result.reverse()
+    return result
+
+
+def write_with_harness(codefile, sourcefile, start_linenum, linebuffer):
+    '''write output with additional lines to make code likely compilable'''
+    # add commonly used headers, so that lines can likely compile.
+    # This is work in progress, the main issue remains handling class
+    # declarations in in-function code differently
+    with io.open(codefile, 'w') as code_filehandle:
+        code_filehandle.write('''\
 #include<stdio.h>      // by md-split
 #include<stdlib.h>     // by md-split
 #include<tuple>        // by md-split
@@ -138,19 +160,19 @@ def process_code(read_filehandle, text_filehandle, line, linenum, sourcefile, co
 using namespace std;   // by md-split
 // %s : %s
 ''' % (sourcefile, start_linenum))
-            # TODO: if not toplevel code, wrap inside class
-            for line in linebuffer:
-                code_filehandle.write(line)
-    return (line, linenum)
+        # TODO: if not toplevel code, wrap inside class
+        for codeline in linebuffer:
+            code_filehandle.write(codeline)
 
 
 def is_code(line, indent_depth = 4):
+    '''returns the indent depth, 0 means not code in markup'''
     if line.startswith(' ' * indent_depth):
         return len(line) - len(line.lstrip(' '))
     return 0
 
 def is_inside_code(line, indent_depth):
-    return is_code(line, indent_depth) or line.strip() == ''
+    return is_code(line, indent_depth) > 0 or line.strip() == ''
 
 def stripped(line):
     # Remove well-formed html tags, fixing mistakes by legitimate users
@@ -158,9 +180,9 @@ def stripped(line):
     sline = re.sub('[()\[\]#*]', ' ', line)
     return sline
 
-def dedent(line):
-    if line.startswith('    '):
-        return line[4:]
+def dedent(line, indent_depth):
+    if line.startswith(' ' * indent_depth):
+        return line[indent_depth:]
     if line.startswith('\t'):
         return line[1:]
     return line
@@ -171,7 +193,11 @@ def get_marker(line):
         namematch = NAMED_A_TAG_REGEX.match(line)
         if namematch:
             return namematch.group(1) # group 0 is full match
+
     return None
+
+def line_length(filename):
+    return sum(1 for line in open(filename))
 
 if __name__ == '__main__':
     main()
