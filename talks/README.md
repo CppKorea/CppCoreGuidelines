@@ -1,8 +1,5 @@
-본 가이드라인은 2015년 [CppCon](http://cppcon.org)을 통해서 수차례 소개되었다.
-아래에서 녹화된 동영상을 살펴볼 수 있다.
-
-The guidelines were introduced during a number of talks at [CppCon](http://cppcon.org) 2015.
-Here are video recordings of those talks:
+C++ 핵심 가이드라인은 2015년 [CppCon](http://cppcon.org)을 통해서 수차례 소개되었다.
+다음은 C++ 핵심 가이드라인을 주제로 다룬 강연들의 녹화 동영상이다.
 
 - [Keynote: Writing Good C++ 14 (Bjarne Stroustrup)](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A)
 - [Writing good C++ 14 By Default (Herb Sutter)](https://www.youtube.com/watch?v=hEx5DNLWGgA])
@@ -11,10 +8,6 @@ Here are video recordings of those talks:
 - [Static analysis and C++: more than lint (Neil MacIntosh)](https://www.youtube.com/watch?v=rKlHvAw1z50)
 - [A few good types: Evolving `array_view` and `string_view` for safe C++ code (Neil MacIntosh)](https://www.youtube.com/watch?v=C4Z3c4Sv52U) 
 
-[CppCon](http://cppcon.org)의 유튜브 체널의 링크는 [here](https://www.youtube.com/channel/UCMlGfpWw-RUdWX_JbLCukXg) 이다.
+[CppCon](http://cppcon.org)의 유튜브 채널을 방문하고 싶다면, [여기](https://www.youtube.com/channel/UCMlGfpWw-RUdWX_JbLCukXg)를 클릭하면 된다.
 
-각 주제별 슬라이드는 이 폴더에서 찾아볼 수 있다.
-
-The YouTube channel for [CppCon](http://cppcon.org) is [here](https://www.youtube.com/channel/UCMlGfpWw-RUdWX_JbLCukXg).
-
-Slides from the talks are available in this folder.
+강연에 사용한 슬라이드는 이 폴더에서 찾을 수 있다.
