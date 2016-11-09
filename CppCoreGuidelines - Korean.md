@@ -1,17 +1,18 @@
-# <a name="main"></a>C++ Core Guidelines
+# <a name="main"></a>C++ 핵심 가이드라인
 
-September 4, 2016
+2016년 9월 4일
 
-Editors:
+편집자:
 
 * [Bjarne Stroustrup](http://www.stroustrup.com)
 * [Herb Sutter](http://herbsutter.com/)
 
-This document is a very early draft. It is inkorrekt, incompleat, and pÂµÃoorly formatted.
-Had it been an open source (code) project, this would have been release 0.7.
-Copying, use, modification, and creation of derivative works from this project is licensed under an MIT-style license.
-Contributing to this project requires agreeing to a Contributor License. See the accompanying [LICENSE](LICENSE) file for details.
-We make this project available to "friendly users" to use, copy, modify, and derive from, hoping for constructive input.
+이 문서는 초안 상태다. 아직 완벽하지 않으며, 심지어 잘못된 내용이 있을 수 있다.
+오픈 소스 (코드) 프로젝트로, 0.7 버전까지 배포되었다.
+이 프로젝트의 복사, 사용, 수정, 파생 성과물과 관련된 저작권은 MIT 라이선스를 따른다.
+이 프로젝트에 기여하려면 기여자 라이선스(Contributor License)에 동의해야 한다.
+자세한 내용은 첨부된 [라이선스 파일(LICENSE)](LICENSE)을 참조하길 바란다.
+오픈 소스 프로젝트에 익숙한 사용자들이 사용, 복사, 수정, 파생을 통해 건설적인 정보를 제공해주기 바란다.
 
 Comments and suggestions for improvements are most welcome.
 We plan to modify and extend this document as our understanding improves and the language and the set of available libraries improve.
