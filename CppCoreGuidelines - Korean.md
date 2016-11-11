@@ -14,10 +14,10 @@
 자세한 내용은 첨부된 [라이선스 파일(LICENSE)](LICENSE)을 참조하길 바란다.
 오픈 소스 프로젝트에 익숙한 사용자들이 사용, 복사, 수정, 파생 성과물들을 통해 좋은 정보를 제공해주기 바란다.
 
-Comments and suggestions for improvements are most welcome.
-We plan to modify and extend this document as our understanding improves and the language and the set of available libraries improve.
-When commenting, please note [the introduction](#S-introduction) that outlines our aims and general approach.
-The list of contributors is [here](#SS-ack).
+개선 사항에 대한 의견과 제안은 대부분 환영한다.
+C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
+의견을 보내고 싶다면, [소개](#S-introduction)에 있는 목적과 방법을 참고하기 바란다.
+기여자 목록은 [여기](#SS-ack)를 참고하기 바란다.
 
 Problems:
 
@@ -127,7 +127,7 @@ C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관�
 우리는 규칙들이 코드에 점진적으로 도입되길 바라며, 이를 위한 도구를 만들 계획을 갖고 있다.
 
 규칙을 개선하기 위한 의견과 제안은 언제든 환영한다. 
-규칙들을 좀 더 이해하게 되고 언어와 사용 가능한 라이브러리들이 개선될 때마다 이 문서를 지속적으로 수정하고 확장해 나갈 것이다.
+C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
 
 # <a name="S-introduction"></a>In: Introduction
 
