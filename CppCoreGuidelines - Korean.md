@@ -19,78 +19,79 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 의견을 보내고 싶다면, [소개](#S-introduction)에 있는 목적과 방법을 참고하기 바란다.
 기여자 목록은 [여기](#SS-ack)를 참고하기 바란다.
 
-Problems:
+참고 사항:
 
-* The sets of rules have not been thoroughly checked for completeness, consistency, or enforceability.
-* Triple question marks (???) mark known missing information
-* Update reference sections; many pre-C++11 sources are too old.
-* For a more-or-less up-to-date to-do list see: [To-do: Unclassified proto-rules](#S-unclassified)
+* 규칙들은 아직 완성도, 일관성, 시행 가능성 등에 대해서 철저하게 검증되지 않았다.
+* (???)로 표시되어 있는 부분은 아직 관련 정보를 기입하지 않았음을 의미한다.
+* 참조 절에 있는 예제들을 갱신해야 한다. C++11 이전의 오래된 소스 코드들이 아직 많이 있다.
+* 앞으로 해야 할 일에 대한 최신 목록은 [To-do: 미분류 규칙 초안](#S-unclassified)에서 확인할 수 있다.
 
-You can [read an explanation of the scope and structure of this Guide](#S-abstract) or just jump straight in:
+[이 가이드의 범위와 구조](#S-abstract)를 확인하거나, 목차에서 읽고 싶은 부분을 클릭해 해당 내용으로 바로 이동할 수 있다.
 
-* [In: Introduction](#S-introduction)
-* [P: Philosophy](#S-philosophy)
-* [I: Interfaces](#S-interfaces)
-* [F: Functions](#S-functions)
-* [C: Classes and class hierarchies](#S-class)
-* [Enum: Enumerations](#S-enum)
-* [R: Resource management](#S-resource)
-* [ES: Expressions and statements](#S-expr)
-* [Per: Performance](#S-performance)
-* [CP: Concurrency](#S-concurrency)
-* [E: Error handling](#S-errors)
-* [Con: Constants and immutability](#S-const)
-* [T: Templates and generic programming](#S-templates)
-* [CPL: C-style programming](#S-cpl)
-* [SF: Source files](#S-source)
-* [SL: The Standard library](#S-stdlib)
+* [In(Introduction): 소개](#S-introduction)
+* [P(Philosophy): 철학](#S-philosophy)
+* [I(Interfaces): 인터페이스](#S-interfaces)
+* [F(Functions): 함수](#S-functions)
+* [C(Classes and class hierarchies): 클래스와 클래스 계층](#S-class)
+* [Enum(Enumerations): 열거형](#S-enum)
+* [R(Resource management): 리소스 관리](#S-resource)
+* [ES(Expressions and statements): 표현식과 문장](#S-expr)
+* [Per(Performance): 성능](#S-performance)
+* [CP(Concurrency): 동시성](#S-concurrency)
+* [E(Error handling): 오류 처리](#S-errors)
+* [Con(Constants and immutability): 상수와 불변성](#S-const)
+* [T(Templates and generic programming): 템플릿과 제너릭 프로그래밍](#S-templates)
+* [CPL(C-style programming): C 스타일 프로그래밍](#S-cpl)
+* [SF(Source files): 소스 파일](#S-source)
+* [SL(The Standard library): 표준 라이브러리](#S-stdlib)
 
-Supporting sections:
+참고할 만한 내용:
 
-* [A: Architectural Ideas](#S-A)
-* [N: Non-Rules and myths](#S-not)
-* [RF: References](#S-references)
-* [Pro: Profiles](#S-profile)
-* [GSL: Guideline support library](#S-gsl)
-* [NL: Naming and layout](#S-naming)
-* [FAQ: Answers to frequently asked questions](#S-faq)
-* [Appendix A: Libraries](#S-libraries)
-* [Appendix B: Modernizing code](#S-modernizing)
-* [Appendix C: Discussion](#S-discussion)
-* [Glossary](#S-glossary)
-* [To-do: Unclassified proto-rules](#S-unclassified)
+* [A(Architectural Ideas): 구조적 아이디어](#S-A)
+* [N(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
+* [RF(References): 참조](#S-references)
+* [Pro(Profiles): 프로파일](#S-profile)
+* [GSL(Guideline support library): 지원하는 라이브러리에 대한 가이드라인](#S-gsl)
+* [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
+* [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
+* [부록 A: 라이브러리](#S-libraries)
+* [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
+* [부록 C: 토론](#S-discussion)
+* [용어 설명](#S-glossary)
+* [To-do(Unclassified proto-rules): 미분류 규칙 초안](#S-unclassified)
 
-or look at a specific language feature
+구체적인 C++ 기능은 다음을 참고하기 바란다.
 
-* [assignment](#S-???)
+* [대입](#S-???)
 * [`class`](#S-class)
-* [constructor](#SS-ctor)
-* [derived `class`](#SS-hier)
-* [destructor](#SS-dtor)
-* [exception](#S-errors)
+* [생성자](#SS-ctor)
+* [상속(파생)된 `class`](#SS-hier)
+* [소멸자](#SS-dtor)
+* [예외](#S-errors)
 * [`for`](#S-???)
 * [`inline`](#S-class)
-* [initialization](#S-???)
-* [lambda expression](#SS-lambdas)
-* [operator](#S-???)
-* [`public`, `private`, and `protected`](#S-???)
+* [초기화](#S-???)
+* [람다 표현식](#SS-lambdas)
+* [연산자](#S-???)ㅏ
+* [`public`, `private`, `protected`](#S-???)
 * [`static_assert`](#S-???)
 * [`struct`](#S-class)
 * [`template`](#S-???)
 * [`unsigned`](#S-???)
 * [`virtual`](#SS-hier)
 
-Definitions of terms used to express and discuss the rules, that are not language-technical, but refer to design and programming techniques
+다음에 나오는 용어들의 정의는 규칙을 설명하기 위한 목적으로 사용되며, 특정 언어에 따른 기술적 용어들이 아니다.
+하지만 디자인과 프로그래밍 테크닉에사 자주 등장하는 용어들이다.
 
-* error
-* exception
-* failure
-* invariant
-* leak
-* precondition
-* postcondition
-* resource
-* exception guarantee
+* 오류(error)
+* 예외(exception)
+* 살패(failure)
+* 불변(invariant)
+* 누수(leak)
+* 사전조건(precondition)
+* 사후조건(postcondition)
+* 리소스(resource)
+* 예외 보증(exception guarantee)
 
 # <a name="S-abstract"></a>개요
 
@@ -129,32 +130,34 @@ C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관�
 규칙을 개선하기 위한 의견과 제안은 언제든 환영한다. 
 C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
 
-# <a name="S-introduction"></a>In: Introduction
+# <a name="S-introduction"></a>In(Introduction): 소개
 
-This is a set of core guidelines for modern C++, C++14, taking likely future enhancements and ISO Technical Specifications (TSs) into account.
-The aim is to help C++ programmers to write simpler, more efficient, more maintainable code.
+이 문서는 모던 C++, C++14는 물론이고 추후 개션될 내용과 ISO 기술 명세(Technical Specification; TS)까지 고려한 핵심 가이드라인이다.
+이 문서의 목표는 C++ 프로그래머가 더욱 간단하고, 효과적이며, 유지 보수하기 좋은 코드를 작성하는데 도움을 주는 것이다.
 
-Introduction summary:
+소개 요약:
 
-* [In.target: Target readership](#SS-readers)
-* [In.aims: Aims](#SS-aims)
-* [In.not: Non-aims](#SS-non)
-* [In.force: Enforcement](#SS-force)
-* [In.struct: The structure of this document](#SS-struct)
-* [In.sec: Major sections](#SS-sec)
+* [In.target(Target readership): 대상 독자](#SS-readers)
+* [In.aims(Aims): 목표인 부분](#SS-aims)
+* [In.not(Non-aims): 목표가 아닌 부분](#SS-non)
+* [In.force(Enforcement): 적용](#SS-force)
+* [In.struct(The structure of this document): 이 문서의 구조](#SS-struct)
+* [In.sec(Major sections): 주요 목차](#SS-sec)
 
-## <a name="SS-readers"></a>In.target: Target readership
+## <a name="SS-readers"></a>In.target(Target readership): 대상 독자
 
-All C++ programmers. This includes [programmers who might consider C](#S-cpl).
+모든 C++ 프로그래머. 또한 [C를 고려하는 프로그래머](#S-cpl).
 
-## <a name="SS-aims"></a>In.aims: Aims
+## <a name="SS-aims"></a>In.aims(Aims): 목표인 부분
 
-The purpose of this document is to help developers to adopt modern C++ (C++11, C++14, and soon C++17) and to achieve a more uniform style across code bases.
+이 문서는 개발자들이 모던 C++(C++11, C++14, 이후 C++17까지)을 익히는데 도움을 주고, 좀 더 일관된 스타일로 코드를 작성할 수 있게 해주려는 목적으로 작성되었다.
 
-We do not suffer the delusion that every one of these rules can be effectively applied to every code base. Upgrading old systems is hard. However, we do believe that a program that uses a rule is less error-prone and more maintainable than one that does not. Often, rules also lead to faster/easier initial development.
-As far as we can tell, these rules lead to code that performs as well or better than older, more conventional techniques; they are meant to follow the zero-overhead principle ("what you don't use, you don't pay for" or "when you use an abstraction mechanism appropriately, you get at least as good performance as if you had handcoded using lower-level language constructs").
-Consider these rules ideals for new code, opportunities to exploit when working on older code, and try to approximate these ideals as closely as feasible.
-Remember:
+이 문서에서 다루고 있는 규칙들이 모든 코드에 효과적으로 적용할 수 있다고 생각하지는 않는다.
+오래된 시스템을 새롭게 업그레이드하는 것은 쉽지 않은 일이다. 하지만 여기서 다루는 규칙들을 적용한다면 기존의 방식보다 오류가 발생할 가능성이 낮고, 유지 보수가 편리한 코드를 작성할 수 있을 것이라 확신한다.
+또한 이러한 규칙들은 개발 초기에 좀 더 빠르고 쉽게 개발을 진행하는 데도 도움이 될 것이다.
+분명히 말할 수 있는 것은, 이러한 규칙들을 적용하면 제로-비용 원칙(Zero-overhead principle)에 입각해 이전보다 더 나은 동작을 수행되는 코드를 만들 수 있다는 점이다. 
+(제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 마라.", 또는 "올바른 추상화 메커니즘을 사용했을 경우, 적어도 저수준 언어로 하드코딩한 것 만큼의 성능을 얻을 수 있다." 정도로 설명할 수 있다.)
+새로운 코드를 작성하거나 기존 코드를 개선할 여지가 생겼다면, 적용 가능한 수준에서 규칙들을 적용해 보기 바란다.
 
 ### <a name="R0"></a>In.0: Don't panic!
 
