@@ -159,18 +159,18 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 마라.", 또는 "올바른 추상화 메커니즘을 사용했을 경우, 적어도 저수준 언어로 하드코딩한 것 만큼의 성능을 얻을 수 있다." 정도로 설명할 수 있다.)
 새로운 코드를 작성하거나 기존 코드를 개선할 여지가 생겼다면, 적용 가능한 수준에서 규칙들을 적용해 보기 바란다.
 
-### <a name="R0"></a>In.0: Don't panic!
+### <a name="R0"></a>In.0(Don't panic!): 당황하지 마라! 
 
-Take the time to understand the implications of a guideline rule on your program.
+여러분의 프로그램에 가이드라인에 나온 규칙을 적용한다면, 어떤 영향을 줄 지 충분히 고려해야 한다. 
 
-These guidelines are designed according to the "subset of superset" principle ([Stroustrup05](#Stroustrup05)).
-They do not simply define a subset of C++ to be used (for reliability, safety, performance, or whatever).
-Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-gsl))
-that make the use of the most error-prone features of C++ redundant, so that they can be banned (in our set of rules).
+가이드라인은 "상위 집합의 하위 집합(Subset of superset)" ([Stroustrup05](#Stroustrup05)) 원리에 따라 구성되어 있다.
+우리는 신뢰성, 안정성, 성능 등을 고려해 단순히 C++의 한 부분 집합을 정의하지 않는다.
+대신, 몇 가지 간단한 "확장" ([라이브러리 구성 요소](#S-gsl))을 사용하길 강력히 권고한다.
+이를 통해 오류가 발생하기 쉬운 C++ 기능들의 대부분을 제거할 수 있다.
 
-The rules emphasize static type safety and resource safety.
-For that reason, they emphasize possibilities for range checking, for avoiding dereferencing `nullptr`, for avoiding dangling pointers, and the systematic use of exceptions (via RAII).
-Partly to achieve that and partly to minimize obscure code as a source of errors, the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
+가이드라인에 포함된 규칙들은 정적 타입 안정성과 리소스 안정성에 특히 주안점을 두고 있다.
+이러한 이유로 범위 확인 가능성, `nullptr`를 통한 역참조 회피 가능성, 댕글링 포인터(Dangling pointer) 회피 가능성, (RAII를 통한) 시스템적인 예외 사용 등을 강조한다.
+잘 알려져 있지 않은 소스 코드의 오류 발생 가능성을 부분적으로나마 극복하고 최소화 하는 방법, 좀 더 단순한 표현 방식뿐 아니라 올바르게 정의된 인터페이스를 통해 복잡도를 드러내지 않는 방법 등을 강조한다.
 
 Many of the rules are prescriptive.
 We are uncomfortable with rules that simply state "don't do that!" without offering an alternative.

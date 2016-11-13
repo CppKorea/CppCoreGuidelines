@@ -1,25 +1,3 @@
-### <a name="R0"></a> In.0: 당황하지 마라!
->### <a name="R0"></a> In.0: Don't panic!
-
-기존 프로그램에 가이드라인을 적용하는 경우라면, 이러한 변화가 프로그램에 어떤 영향을 미칠지 충분히 고려해야 한다. 
->Take the time to understand the implications of a guideline rule on your program.
-
-가이드라인은 상위집합과 하위집합([Stroustrup05](#Stroustrup05))의 형태로 구성되어 있다.
-신뢰성, 안정성, 성능 등을 고려하여 C++의 기본적인 기능만을 이용하여 가이드라인을 정의하기 보다는
-몇가지 간단한 "확장" 컴포넌트([library components](#S-gsl))를 함께 활용하여 가이드라인을 작성하였다.
-이를 통해 다소 장황하고 에러를 유발할 가능성이 높은 C++의 기본 기능들을 보강할 수 있었다.
->These guidelines are designed according to the "subset of a superset" principle ([Stroustrup05](#Stroustrup05)).
-They do not simply define a subset of C++ to be used (for reliability, safety, performance, or whatever).
-Instead, they strongly recommend the use of a few simple "extensions" ([library components](#S-gsl))
-that make the use of the most error-prone features of C++ redundant, so that they can be banned (in our set of rules).
-
-가이드라인에 포함된 규칙들은 정적 타입 안정성과 리소스 안정성에 특히 주안점을 두고 있다.
-범위 확인 가능성, `nullptr`를 통한 역참조 회피 가능성, dangling 포인터 회피 가능성, 시스템적인 예외 사용(RAII를 통한) 등을 강조하고 있으며,
-소스 코드의 오류 발생 가능성을 부분적으로나마 극복하고 최소화 하는 방법, 좀 더 단순한 표현 방식뿐 아니라 올바르게 정의된 인터페이스를 통해 복잡도를 드러내지 않는 방법 등을 중요하게 다루고 있다.
->The rules emphasize static type safety and resource safety.
-For that reason, they emphasize possibilities for range checking, for avoiding dereferencing `nullptr`, for avoiding dangling pointers, and the systematic use of exceptions (via RAII).
-Partly to achieve that and partly to minimize obscure code as a source of errors, the rules also emphasize simplicity and the hiding of necessary complexity behind well-specified interfaces.
-
 많은 규칙들은 규범적인 성격을 띄고 있다.
 대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들은 불편할 수 밖에 없다.
 일부 규칙들은 정밀하게 기계적으로 검증할 수 있다기 보다는 경험에 근거하여 작성된 것들도 있다. 
