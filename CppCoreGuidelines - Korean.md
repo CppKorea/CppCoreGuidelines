@@ -172,10 +172,10 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 이러한 이유로 범위 확인 가능성, `nullptr`를 통한 역참조 회피 가능성, 댕글링 포인터(Dangling pointer) 회피 가능성, (RAII를 통한) 시스템적인 예외 사용 등을 강조한다.
 잘 알려져 있지 않은 소스 코드의 오류 발생 가능성을 부분적으로나마 극복하고 최소화 하는 방법, 좀 더 단순한 표현 방식뿐 아니라 올바르게 정의된 인터페이스를 통해 복잡도를 드러내지 않는 방법 등을 강조한다.
 
-Many of the rules are prescriptive.
-We are uncomfortable with rules that simply state "don't do that!" without offering an alternative.
-One consequence of that is that some rules can be supported only by heuristics, rather than precise and mechanically verifiable checks.
-Other rules articulate general principles. For these more general rules, more detailed and specific rules provide partial checking.
+많은 규칙들은 규범적인 성격을 띄고 있다.
+대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들은 불편할 수 밖에 없다.
+일부 규칙들은 기계적으로 정밀 검증할 수 있다기 보다는 경험에 근거하여 작성되었다. 
+다른 부류의 규칙들은 일반적인 원칙을 논리적으로 정리한 것이며, 널리 사용될 것이라 생각되는 규칙들은 더욱 자세하게, 그리고 부분적으로나마 검증이 가능하도록 구체적으로 설명했다.
 
 These guidelines address the core of C++ and its use.
 We expect that most large organizations, specific application areas, and even large projects will need further rules, possibly further restrictions, and further library support.
