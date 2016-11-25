@@ -177,19 +177,18 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 일부 규칙들은 기계적으로 정밀 검증할 수 있다기 보다는 경험에 근거하여 작성되었다. 
 다른 부류의 규칙들은 일반적인 원칙을 논리적으로 정리한 것이며, 널리 사용될 것이라 생각되는 규칙들은 더욱 자세하게, 그리고 부분적으로나마 검증이 가능하도록 구체적으로 설명했다.
 
-These guidelines address the core of C++ and its use.
-We expect that most large organizations, specific application areas, and even large projects will need further rules, possibly further restrictions, and further library support.
-For example, hard real-time programmers typically can't use free store (dynamic memory) freely and will be restricted in their choice of libraries.
-We encourage the development of such more specific rules as addenda to these core guidelines.
-Build your ideal small foundation library and use that, rather than lowering your level of programming to glorified assembly code.
+또한 이 가이드라인은 C++에서 핵심이 되는 내용과 그 사용법을 다루고 있기도 하다. 
+조직의 규모가 매우 크거나, 특화된 분야의 애플리케이션을 개발하거나, 프로젝트의 규모가 매우 크다면 여기서 다루는 내용보다 더 다양한 규칙과 제약, 라이브러리가 필요할 것이다.
+예를 들어 고도의 실시간 애플리케이션을 개발하는 경우라면 자유 저장소(Free Store, 동적 메모리)를 아무렇게나 사용하면 안되기 때문에, 라이브러리를 선택하는데 제약이 있을 수 밖에 없다.
+이처럼 특화된 개발 분야에만 적용 할 수 있는 규칙들은 핵심 가이드라인의 부록에 담았다.
+어셈블리 코드와 같이 저수준의 프로그래밍 방식을 고수하기 보다는 핵심 기능을 구현하고 있는 소규모의 라이브러리를 만들고 사용하기 바란다.
 
-The rules are designed to allow [gradual adoption](#S-modernizing).
+규칙들은 [점진적으로 적용](#S-modernizing)해 볼 수 있다.
 
-Some rules aim to increase various forms of safety while others aim to reduce the likelihood of accidents, many do both.
-The guidelines aimed at preventing accidents often ban perfectly legal C++.
-However, when there are two ways of expressing an idea and one has shown itself a common source of errors and the other has not, we try to guide programmers towards the latter.
+일부 규칙들은 안정성을 높이기 위해 다양한 방법들을 설명하고 있으며, 또 다른 규칙들은 문제 발생 가능성을 낮추는 방법을 설명하고 있다. 혹은 이 둘을 모두 고려해 만들어진 규칙들도 있다.
+규칙을 통해 전달하고자 하는 내용을 기술할 때 통상 오류 발생 가능성이 높은 경우와 그렇지 않은 경우가 있다면, 가능한 오류 발생 가능성이 낮은 방법을 택했다.
 
-## <a name="SS-non"></a>In.not: Non-aims
+## <a name="SS-non"></a>In.not(Non-aims): 목표가 아닌 부분
 
 The rules are not intended to be minimal or orthogonal.
 In particular, general rules can be simple, but unenforceable.
