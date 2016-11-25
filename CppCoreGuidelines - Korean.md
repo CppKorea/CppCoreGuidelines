@@ -190,26 +190,23 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 
 ## <a name="SS-non"></a>In.not(Non-aims): 목표가 아닌 부분
 
-The rules are not intended to be minimal or orthogonal.
-In particular, general rules can be simple, but unenforceable.
-Also, it is often hard to understand the implications of a general rule.
-More specialized rules are often easier to understand and to enforce, but without general rules, they would just be a long list of special cases.
-We provide rules aimed at helping novices as well as rules supporting expert use.
-Some rules can be completely enforced, but others are based on heuristics.
+최소한의 규칙만을 정의하고, 그 규칙들이 정밀하게 들어 맞도록 가이드라인을 조직적으로 작성한 것은 아니다.
+실제로 범용적인 규칙들 중에는 간단해 보이지만 실제로 적용하기가 매우 어려운 것들도 있으며, 그러한 규칙들이 지닌 함축적인 의미를 이해하기 어려울 수도 있다.
+구체적인 규칙들이 좀 더 이해 및 적용하기 쉽지만, 범용적인 규칙들을 다루지 않고는 특별한 경우만을 장황하게 나열할 수 밖에 없었을 것이다.
+각각의 규칙들은 초보 개발자 뿐만 아니라 전문가들에게도 도움이 될 수 있도록 작성했다.
+일부 규칙은 반드시 적용되어야 하지만, 필요에 따라 적용 여부를 선택적으로 결정해야 하는 경우도 있다.
 
-These rules are not meant to be read serially, like a book.
-You can browse through them using the links.
-However, their main intended use is to be targets for tools.
-That is, a tool looks for violations and the tool returns links to violated rules.
-The rules then provide reasons, examples of potential consequences of the violation, and suggested remedies.
+여기서 다루는 규칙들을 책에서 다루는 것인냥 너무 심각하게 받아들을 필요는 없다. 링크를 통해서 규칙들을 가볍게 살펴보는 것도 괜찮다.
+사실 이처럼 규칙을 엄밀하게 정의한 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 도구를 만들기 위해서이다.
+즉, 규칙이 만들어진 이유를 설명하고, 만약 규칙을 따르지 않았을 때 어떤 문제가 발생할 수 있고, 그 문제를 어떻게 해결할 수 있는지를 알려주기 위해서다.
 
-These guidelines are not intended to be a substitute for a tutorial treatment of C++.
-If you need a tutorial for some given level of experience, see [the references](#S-references).
+이 가이드라인은 C++ 튜토리얼을 대체할 용도로 작성된 것이 아니다.
+개발자의 수준에 부합하는 튜토리얼이 필요하다면, [참고 문헌](#S-references)을 참조하기 바란다.
 
-This is not a guide on how to convert old C++ code to more modern code.
-It is meant to articulate ideas for new code in a concrete fashion.
-However, see [the modernization section](#S-modernizing) for some possible approaches to modernizing/rejuvenating/upgrading.
-Importantly, the rules support gradual adoption: It is typically infeasible to convert all of a large code base at once.
+이 문서는 기존의 C++ 코드를 모던 C++ 코드로 변환하는 방법에 대해서 다루고 있는 것도 아니다.
+다만, 새로운 C++ 코드에 대한 논리 정연한 생각들을 구체적으로 설명한다.
+따라서 기존 코드를 모던하게, 젊고 활기차게, 업그레이드 하고 싶다면 [모던화](#S-modernizing)를 참조하기 바란다.
+중요한 것은 이 문서에서 다루고 있는 규칙들을 점진적으로 적용할 수 있다는 점이다. 엄청난 양의 코드를 단번에 바꿀 수는 없는 노릇이다.
 
 These guidelines are not meant to be complete or exact in every language-technical detail.
 For the final word on language definition issues, including every exception to general rules and every feature, see the ISO C++ standard.
