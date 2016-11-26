@@ -229,19 +229,19 @@ Instead, our aim is the less ambitious: "Do the most good for most programmers";
 if you cannot live with a rule, object to it, ignore it, but don't water it down until it becomes meaningless.
 Also, suggest an improvement.
 
-## <a name="SS-force"></a>In.force: Enforcement
+## <a name="SS-force"></a>In.force(Enforcement): 적용
 
-Rules with no enforcement are unmanageable for large code bases.
-Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
+사실상 다양한 규칙들을 적용하도록 강제하지 않고서는 이러한 규칙들이 방대한 코드에 모두 적용되리라고 기대하기는 어렵다.
+실상, 모든 규칙을 강제적으로 적용하는 것은 규칙의 수가 몇 개 되지 않거나 특수한 사용자 집단에서나 가능한 일일지도 모르겠다.
 
-* But we want lots of rules, and we want rules that everybody can use.
-* But different people have different needs.
-* But people don't like to read lots of rules.
-* But people can't remember many rules.
+* 그러나 사람들은 모든 사람들이 사용할 수 있는 다양한 규칙들을 원한다.
+* 그러나 사람들은 서로 다른 규칙들을 갖는다.
+* 그러나 사람들은 방대한 규칙을 모두 읽고 싶어하지 않는다.
+* 그러나 사람들은 수많은 규칙들을 기억할 수 없다.
 
-So, we need subsetting to meet a variety of needs.
+이러한 이유로 다양한 요구 사항들의 공통적인 부분만을 뽑아내려고 해봤다.
 
-* But arbitrary subsetting leads to chaos.
+* 그러나 임의의 규칙을 정하는 것 조차 혼돈을 초래할 것으로 생각한다.
 
 We want guidelines that help a lot of people, make code more uniform, and strongly encourage people to modernize their code.
 We want to encourage best practices, rather than leave all to individual choices and management pressures.
