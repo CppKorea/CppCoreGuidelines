@@ -1,33 +1,3 @@
-이 문서는 기존의 C++ 코드를 모던 C++ 코드로 변환하는 방법에 대해서 다루고 있는 것도 아니다.
-다만, 새로운 C++ 코드에 대한 논리 정연한 생각들을 구체적으로 설명하고자 하였을 따름이다.
-따라서 기존 코드를 현대적이며, 젊고 활기차게 업그레이드 하고 싶다면 [the modernization section](#S-modernizing)를 참조하기 바란다.
-이 문서에 다루고 있는 규칙들을 점진적으로 적용해 갈 수 있다는 것은 이해하는 것은 매우 중요하다. 엄청난 양의 코드를 단번에 바꿀 수는 없는 노릇이다.
->This is not a guide on how to convert old C++ code to more modern code.
-It is meant to articulate ideas for new code in a concrete fashion.
-However, see [the modernization section](#S-modernizing) for some possible approaches to modernizing/rejuvenating/upgrading.
-Importantly, the rules support gradual adoption: It is typically infeasible to convert all of a large code base at once.
-
-이 가이드라인이 언어의 기술적인 세부사항을 완벽하고 정확하게 설명하지는 않는다. 
-언어의 명세, 일반 규칙에 대한 예외 사항, 그외  세부 기능들에 대해서는 ISO C++ 표준을 참조하기 바란다.
->These guidelines are not meant to be complete or exact in every language-technical detail.
-For the final word on language definition issues, including every exception to general rules and every feature, see the ISO C++ standard.
-
-규칙들을 작성할 때 C++의 일부 기능만을 이용하여 코드를 작성하도록 의도하지 않았다.
-마치 C++의 일부만을 때어놓은 Java를 사용하는 것처럼 강제하기 위함은 *절대로* 아니라는 것이다.
-"단 하나의 올바른 C++" 언어라는 식의 정의 또한 의도하는 바가 아니다.
-다만 가이드라인에 포함된 규칙을 통해서 C++라는 언어가 성능과 타협하지 않으면서도 풍부한 표현력을 지닌 언어라는 점을 강조하고자 하였다.
->The rules are not intended to force you to write in an impoverished subset of C++.
-They are *emphatically* not meant to define a, say, Java-like subset of C++.
-They are not meant to define a single "one true C++" language.
-We value expressiveness and uncompromised performance.
-
-세부 규칙들을 통해서 전달하고자 가치는 명확하다.
-기존의 C++ 코드보다 더욱 간단하고, 올바르며, 안전한 코드를 성능 손실없이 작성할 수 있도록 돕는 것이다.
-또한 유효한 C++ 코드이긴 하지만 에러를 유발할 가능성이 높고, 불필요하게 복잡하고, 성능도 좋지 않은 코드를 피할 수 있도록 돕는 것이다.
->The rules are not value-neutral.
-They are meant to make code simpler and more correct/safer than most existing C++ code, without loss of performance.
-They are meant to inhibit perfectly valid C++ code that correlates with errors, spurious complexity, and poor performance.
-
 ## <a name="SS-force"></a> In.force: 적용
 >## <a name="SS-force"></a> In.force: Enforcement
 
