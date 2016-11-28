@@ -243,19 +243,19 @@ Also, suggest an improvement.
 
 * 그러나 임의의 규칙을 정하는 것 조차 혼돈을 초래할 것으로 생각한다.
 
-We want guidelines that help a lot of people, make code more uniform, and strongly encourage people to modernize their code.
-We want to encourage best practices, rather than leave all to individual choices and management pressures.
-The ideal is to use all rules; that gives the greatest benefits.
+우리는 더 많은 개발자들에게 도움이 되고, 코드를 좀 더 간결하게 만들 수 있으며, 기존 코드를 모던화 할 수 있는 가이드라인을 만들고 싶었다.
+개인의 선택의 문제라거나 관리의 압박으로 인해 신경쓰지 않았던 부분들도 도외시하지 않고 최선의 실용적인 예를 다루고자 했다.
+바라건대 모든 규칙들을 적용하는 것이 좋다고 생각한다. 그렇게 해야만 최고의 이득을 본다고 생각하기 때문이다.
 
-This adds up to quite a few dilemmas.
-We try to resolve those using tools.
-Each rule has an **Enforcement** section listing ideas for enforcement.
-Enforcement might be done by code review, by static analysis, by compiler, or by run-time checks.
-Wherever possible, we prefer "mechanical" checking (humans are slow, inaccurate, and bore easily) and static checking.
-Run-time checks are suggested only rarely where no alternative exists; we do not want to introduce "distributed fat".
-Where appropriate, we label a rule (in the **Enforcement** sections) with the name of groups of related rules (called "profiles").
-A rule can be part of several profiles, or none.
-For a start, we have a few profiles corresponding to common needs (desires, ideals):
+이는 꽤나 심각한 딜레마가 아닐 수 없는데, 우리는 이러한 딜레마의 해결책이 툴을 개발하는 것이라고 생각했다.
+각각의 규칙들은 적용 방법을 설명하고 있는 **적용** 단락을 갖고 있는데, 
+코드 리뷰, 정적 분석, 컴파일러, 런타임 체크 등의 방법을 나열하고 있다.
+어떤 방식이든 우리는 "기계적"이며(사람은 느리기도 하고, 쉽게 지루해 할 수 있으므로) 일관된 방법으로 개별 규칙들이 적용되기를 원했다.
+이런 이유로 런타임 체크는 다른 대안이 없을 경우에 한해서만 언급했다.
+이 같은 내용들을 여기저기에 흩어놓기 보다는 사용자가 원할 경우 쉽게 찾을 수 있도록 하고 싶었기에,
+(**적용** 단락 내에) 적절한 위치라고 생각되는 곳에 연관된 규칙들을 "프로필"이라는 이름으로 나열해 두었다.
+하나의 규칙은 여러 프로필에 속할 수 있으며, 어떤 프로필에도 속하지 않은 규칙들도 있다.
+자주 사용되는 프로필 몇 가지를 먼저 살펴보자.
 
 * **type**: No type violations (reinterpreting a `T` as a `U` through casts, unions, or varargs)
 * **bounds**: No bounds violations (accessing beyond the range of an array)
