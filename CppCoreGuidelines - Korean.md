@@ -257,12 +257,13 @@ Also, suggest an improvement.
 하나의 규칙은 여러 프로필에 속할 수 있으며, 어떤 프로필에도 속하지 않은 규칙들도 있다.
 자주 사용되는 프로필 몇 가지를 먼저 살펴보자.
 
-* **type**: No type violations (reinterpreting a `T` as a `U` through casts, unions, or varargs)
-* **bounds**: No bounds violations (accessing beyond the range of an array)
-* **lifetime**: No leaks (failing to `delete` or multiple `delete`) and no access to invalid objects (dereferencing `nullptr`, using a dangling reference).
+* **타입**: (캐스팅, 공용체, 가변 인수를 통해 `T`를 `U`로 재해석 하는) 타입 위반 없음
+* **한계**: (배열의 범위를 넘어서 접근하는) 범위 위반 없음
+* **수명**: (`delete`나 `delete[]`이 실패하는) 누수 없음, (`nullptr`를 역참조하고 댕글링된 참조를 사용해) 유효하지 않은 객체에 접근하지 않음
 
-The profiles are intended to be used by tools, but also serve as an aid to the human reader.
-We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
+프로필은 툴에서 활용할 용도로 만들었지만, 내용을 읽어보면 많은 도움이 된다.
+**적용** 단락을 단순히 우리가 알고 있는 적용 방법을 제시하는 것으로만 제한하고 싶지 않다.
+단락 중 일부는 툴 개발자에게 도움이 될만한 내용일 것이다.
 
 Tools that implement these rules shall respect the following syntax to explicitly suppress a rule:
 

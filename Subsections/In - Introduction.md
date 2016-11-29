@@ -1,17 +1,3 @@
-* **types**: 타입 위반 없음 (형변환, 유니언, 가변매개변수 통해 `T`를 `U`를 재해석 하는 등)
-* **bounds**: 범위 위반 없음 (배열의 범위를 넘어서 접근 하는 등)
-* **lifetime**: 누수 없음 (`delete`나 `delete []`등이 실패하는 등), 유효하지 않은 객체에 접근하지 않음(`nullptr`나 dangling된 참조를 통해 역참조 하는 등)
-
->* **types**: No type violations (reinterpreting a `T` as a `U` through casts/unions/varargs)
->* **bounds**: No bounds violations (accessing beyond the range of an array)
->* **lifetime**: No leaks (failing to `delete` or multiple `delete`) and no access to invalid objects (dereferencing `nullptr`, using a dangling reference).
-
-프로필은 툴에서 활용할 용도로 만들었지만 직접 내용을 직접 읽어 보아도 적잖이 도움이 될 것이다.
-**Enforcement** 단락을 단순히 우리가 알고 있는 적용 방법을 제시하는 것으로만 제한하고 싶은 생각은 없다.
-이 단락을 통해서 일부 개발자는 툴 개발자에게 도움이 될만한 글을 남기고 싶을 수도 있을 것이다.
->The profiles are intended to be used by tools, but also serve as an aid to the human reader.
-We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
-
 ## <a name="SS-struct"></a> In.struct: 이 문서의 구조
 >## <a name="SS-struct"></a> In.struct: The structure of this document
 
