@@ -273,22 +273,22 @@ where "tag" is the anchor name of the item where the Enforcement rule appears (e
 name of a profile group-of-rules ("type", "bounds", or "lifetime"),
 or a specific rule in a profile ([type.4](#Pro-type-cstylecast), or [bounds.2](#Pro-bounds-arrayindex)).
 
-## <a name="SS-struct"></a>In.struct: The structure of this document
+## <a name="SS-struct"></a>In.struct(The structure of this document): 이 문서의 구조
 
-Each rule (guideline, suggestion) can have several parts:
+각 규칙(가이드라인, 제안)은 여러 부분으로 나뉜다.
 
-* The rule itself -- e.g., **no naked `new`**
-* A rule reference number -- e.g., **C.7** (the 7th rule related to classes).
-  Since the major sections are not inherently ordered, we use letters as the first part of a rule reference "number".
-  We leave gaps in the numbering to minimize "disruption" when we add or remove rules.
-* **Reason**s (rationales) -- because programmers find it hard to follow rules they don't understand
-* **Example**s -- because rules are hard to understand in the abstract; can be positive or negative
-* **Alternative**s -- for "don't do this" rules
-* **Exception**s -- we prefer simple general rules. However, many rules apply widely, but not universally, so exceptions must be listed
-* **Enforcement** -- ideas about how the rule might be checked "mechanically"
-* **See also**s -- references to related rules and/or further discussion (in this document or elsewhere)
-* **Note**s (comments) -- something that needs saying that doesn't fit the other classifications
-* **Discussion** -- references to more extensive rationale and/or examples placed outside the main lists of rules
+* 규칙 그 자체 -- 예) **`new`를 무방비 상태로 사용하지 마라**
+* 규칙 참조 번호 -- 예), **C.7** (클래스와 관련된 7번째 규칙).
+  주요 단원이 순서대로 나열되지 않았기 때문에 규칙 참조 "번호"의 첫 번째 부분은 문자로 시작한다.
+  규칙을 추가하거나 삭제할 때 혼란을 최소화하기 위해 숫자를 매길때 간격을 둔다.
+* **이유**들 (근거) -- 이해할 수 없는 규칙을 따르고 싶지는 않을 것이므로 구체적인 이유를 설명한다.
+* **예제**들 -- 추상적인 표현만으로 내용을 이해하기 어려울 경우 구체적인 예(좋은 예나 나쁜 예)를 기술한다.
+* **대안**들 -- "이런 식으로 하지 마라"에 대한 대안을 제시한다.
+* **예외**들 -- 단순하고 보편적인 규칙이 좋다. 많은 규칙들이 널리 사용되지만 만능은 아니므로 예외가 있을 경우 이를 나열한다.
+* **적용** -- "기계적으로" 규칙을 확인하는 방법에 대한 아이디어를 설명한다.
+* **참고 항목**들 -- (이 문서나 다른 문서에 대해) 규칙이나 관련 내용과 연관된 항목들을 안내한다.
+* **비고**들 (언급) -- 다른데서 다루기 적합하지 않은 부분에 대해 추가로 설명한다.
+* **논의** -- 규칙을 제시한 근본적인 이유를 담고 있는 다른 글에 대한 참조나 규칙의 주요 리스트에 포함되지 않는 예 등을 설명한다.
 
 Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
 We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
