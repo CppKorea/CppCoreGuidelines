@@ -49,7 +49,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 
 * [A(Architectural Ideas): 구조적 아이디어](#S-A)
 * [N(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
-* [RF(References): 참조](#S-references)
+* [RF(References): 참고 문헌](#S-references)
 * [Pro(Profiles): 프로파일](#S-profile)
 * [GSL(Guideline support library): 지원하는 라이브러리에 대한 가이드라인](#S-gsl)
 * [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
@@ -290,19 +290,18 @@ or a specific rule in a profile ([type.4](#Pro-type-cstylecast), or [bounds.2](#
 * **비고**들 (언급) -- 다른데서 다루기 적합하지 않은 부분에 대해 추가로 설명한다.
 * **논의** -- 규칙을 제시한 근본적인 이유를 담고 있는 다른 글에 대한 참조나 규칙의 주요 리스트에 포함되지 않는 예 등을 설명한다.
 
-Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
+일부 규칙들은 기계적으로 확인하기에 어려울 수 있으나 전문적인 프로그래머라면 손쉽게 위반 여부를 발견할 수 있다.
 We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
 Also, we assume that the rules will be refined over time to make them more precise and checkable.
 
-A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
-Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
-If you don't understand a rule or disagree with it, please visit its **Discussion**.
-If you feel that a discussion is missing or incomplete, enter an [Issue](https://github.com/isocpp/CppCoreGuidelines/issues)
-explaining your concerns and possibly a corresponding PR.
+각 규칙에 적용 가능한 모든 대안과 특별한 예외사항까지 모두 언급하기를 바라지는 않는다. 가능한 단순하게 유지되길 바란다.
+이러한 정보는 **대안** 단락과 [토론](#S-discussion) 절에서 찾을 수 있다.
+규칙을 이해할 수 없거나 동의하지 않는다면, **논의**를 살펴보기 바란다.
+또한, 논의가 없거나 불완전하다고 생각된다면 [이슈](https://github.com/isocpp/CppCoreGuidelines/issues)에 여러분이 염려하는 부분과 가능하다면 연관된 PR에 대한 설명을 적어주기 바란다.
 
-This is not a language manual.
-It is meant to be helpful, rather than complete, fully accurate on technical details, or a guide to existing code.
-Recommended information sources can be found in [the references](#S-references).
+이 문서는 언어어 대한 매뉴얼이 아니다.
+따라서 기술적인 세부 사항을 자세히 다루기보다는 기존에 작성된 코드에 대한 가이드로써의 역할을 했으면 한다.
+도움이 되는 정보의 출처는 [참고 문헌](#S-references)에서 찾을 수 있다.
 
 ## <a name="SS-sec"></a>In.sec: Major sections
 

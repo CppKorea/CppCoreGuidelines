@@ -1,28 +1,3 @@
-일부 규칙들은 기계적으로 확인하기는 어려울 수 있으나 전문성을 가진 프로그래머라면 손쉽게 위반 여부를 발견할 수 있는 것들도 있다.
-규칙들은 시간이 지남에 따라 좀더 정밀하고, 기계적으로 확인 가능하도록 개선되기를 기대한다.
->Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
-We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
-Also, we assume that the rules will be refined over time to make them more precise and checkable.
-
-각각의 규칙들이 가능한 모든 대안과 특별한 예외사항까지를 모두 언급하기를 바라지는 않는다. 이 보다 각각의 규칙들은 가능한 단순하게 유지되고,
-지엽적인 내용이나 다른 대안은 **Alternative** 단락과 [Discussion](#S-discussion) 절에서 살펴 볼 수 있도록 하였으면 한다.
-규칙을 이해할 수 없거나 동의하지 않는다면, **Discussion**을 먼저 살펴보기 바란다.
-또한, 의구심을 가지고 있는 부분이 앞서 논의되지 않았거나, 불완전하다고 생각된다면 메일을 보내주었으면 한다.
-
->A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
-Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
-If you don't understand a rule or disagree with it, please visit its **Discussion**.
-If you feel that a discussion is missing or incomplete, send us an email.
-
-이 문서는 언어어 대한 메뉴얼이 아니다.
-따라서 기술적인 세부사항을 완벽하고 정밀하게 다루기 보다는 기존에 작성 된 코드에 대한 가이드로써의 역할을 하였으면 한다.
-추천할만한 내용은 [the references](#S-references)에서 찾을 수 있다.
-
->This is not a language manual.
-It is meant to be helpful
-rather than complete, fully accurate on technical details, or a guide to existing code.
-Recommended information sources can be found in [the references](#S-references).
-
 ## <a name="SS-sec"></a> In.sec: 주 단원
 >## <a name="SS-sec"></a> In.sec: Major sections
 
