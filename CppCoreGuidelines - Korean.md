@@ -58,7 +58,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 * [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
 * [부록 C: 토론](#S-discussion)
 * [용어 설명](#S-glossary)
-* [To-do(Unclassified proto-rules): 미분류 규칙 초안](#S-unclassified)
+* [To-do(Unclassified proto-rules): 미분류 규칙](#S-unclassified)
 
 구체적인 C++ 기능은 다음을 참고하기 바란다.
 
@@ -291,7 +291,7 @@ or a specific rule in a profile ([type.4](#Pro-type-cstylecast), or [bounds.2](#
 * **논의** -- 규칙을 제시한 근본적인 이유를 담고 있는 다른 글에 대한 참조나 규칙의 주요 리스트에 포함되지 않는 예 등을 설명한다.
 
 일부 규칙들은 기계적으로 확인하기에 어려울 수 있으나 전문적인 프로그래머라면 손쉽게 위반 여부를 발견할 수 있다.
-We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
+We hope that "mechanical" tools will improve with time to approximate what <such></such> an expert programmer notices.
 Also, we assume that the rules will be refined over time to make them more precise and checkable.
 
 각 규칙에 적용 가능한 모든 대안과 특별한 예외사항까지 모두 언급하기를 바라지는 않는다. 가능한 단순하게 유지되길 바란다.
@@ -303,43 +303,43 @@ Also, we assume that the rules will be refined over time to make them more preci
 따라서 기술적인 세부 사항을 자세히 다루기보다는 기존에 작성된 코드에 대한 가이드로써의 역할을 했으면 한다.
 도움이 되는 정보의 출처는 [참고 문헌](#S-references)에서 찾을 수 있다.
 
-## <a name="SS-sec"></a>In.sec: Major sections
+## <a name="SS-sec"></a>In.sec(Major sections): 주요 목차
 
-* [In: Introduction](#S-introduction)
-* [P: Philosophy](#S-philosophy)
-* [I: Interfaces](#S-interfaces)
-* [F: Functions](#S-functions)
-* [C: Classes and class hierarchies](#S-class)
-* [Enum: Enumerations](#S-enum)
-* [R: Resource management](#S-resource)
-* [ES: Expressions and statements](#S-expr)
-* [E: Error handling](#S-errors)
-* [Con: Constants and immutability](#S-const)
-* [T: Templates and generic programming](#S-templates)
-* [CP: Concurrency](#S-concurrency)
-* [SL: The Standard library](#S-stdlib)
-* [SF: Source files](#S-source)
-* [CPL: C-style programming](#S-cpl)
-* [Pro: Profiles](#S-profile)
-* [GSL: Guideline support library](#S-gsl)
-* [FAQ: Answers to frequently asked questions](#S-faq)
+* [In(Introduction): 소개](#S-introduction)
+* [P(Philosophy): 철학](#S-philosophy)
+* [I(Interfaces): 인터페이스](#S-interfaces)
+* [F(Functions): 함수](#S-functions)
+* [C(Classes and class hierarchies): 클래스와 클래스 계층](#S-class)
+* [Enum(Enumerations): 열거형](#S-enum)
+* [R(Resource management): 리소스 관리](#S-resource)
+* [ES(Expressions and statements): 표현식과 문장](#S-expr)
+* [E(Error handling): 오류 처리](#S-errors)
+* [Con(Constants and immutability): 상수와 불변성](#S-const)
+* [T(Templates and generic programming): 템플릿과 제너릭 프로그래밍](#S-templates)
+* [CP(Concurrency): 동시성](#S-concurrency)
+* [SL(The Standard library): 표준 라이브러리](#S-stdlib)
+* [SF(Source files): 소스 파일](#S-source)
+* [CPL(C-style programming): C 스타일 프로그래밍](#S-cpl)
+* [Pro(Profiles): 프로파일](#S-profile)
+* [GSL(Guideline support library): 지원하는 라이브러리에 대한 가이드라인](#S-gsl)
+* [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
 
-Supporting sections:
+참고할 만한 내용:
 
-* [NL: Naming and layout](#S-naming)
-* [Per: Performance](#S-performance)
-* [N: Non-Rules and myths](#S-not)
-* [RF: References](#S-references)
-* [Appendix A: Libraries](#S-libraries)
-* [Appendix B: Modernizing code](#S-modernizing)
-* [Appendix C: Discussion](#S-discussion)
-* [Glossary](#S-glossary)
-* [To-do: Unclassified proto-rules](#S-unclassified)
+* [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
+* [Per(Performance): 성능](#S-performance)
+* [N(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
+* [RF(References): 참고 문헌](#S-references)
+* [부록 A: 라이브러리](#S-libraries)
+* [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
+* [부록 C: 토론](#S-discussion)
+* [용어 설명](#S-glossary)
+* [To-do(Unclassified proto-rules): 미분류 규칙](#S-unclassified)
 
-These sections are not orthogonal.
+각 목차에 있는 내용은 서로 연관되어 있다.
 
-Each section (e.g., "P" for "Philosophy") and each subsection (e.g., "C.hier" for "Class Hierarchies (OOP)") have an abbreviation for ease of searching and reference.
-The main section abbreviations are also used in rule numbers (e.g., "C.11" for "Make concrete types regular").
+각 목차("P"는 "철학(Philosophy)")와 부 목차("C.hier"는 "클래스 계층(Class Hierarchies) (OOP)")은 검색, 참조의 편의를 위해 약어로 표기한다.
+주요 목차에 대한 약어로 규칙 번호를 사용하기도 한다. (즉, "각 타입을 일반적인 타입으로 만들어라."라는 규칙을 "C.11"로 나타내기도 한다.)
 
 # <a name="S-philosophy"></a>P: Philosophy
 
