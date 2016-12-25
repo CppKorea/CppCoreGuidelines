@@ -259,7 +259,7 @@ Also, suggest an improvement.
 
 * **타입**: (캐스팅, 공용체, 가변 인수를 통해 `T`를 `U`로 재해석 하는) 타입 위반 없음
 * **한계**: (배열의 범위를 넘어서 접근하는) 범위 위반 없음
-* **수명**: (`delete`나 `delete[]`이 실패하는) 누수 없음, (`nullptr`를 역참조하고 댕글링된 참조를 사용해) 유효하지 않은 객체에 접근하지 않음
+* **수명**: (`delete`나 `delete[]`이 실패하는) 누수 없음, (`nullptr`를 역참조하고 댕글링된 참조를 사용해) 유효하지 않은 개체에 접근하지 않음
 
 프로필은 툴에서 활용할 용도로 만들었지만, 내용을 읽어보면 많은 도움이 된다.
 **적용** 단락을 단순히 우리가 알고 있는 적용 방법을 제시하는 것으로만 제한하고 싶지 않다.
@@ -363,14 +363,14 @@ Also, we assume that the rules will be refined over time to make them more preci
 그러나 철학적인 테마를 반영하는 개별적인 규칙은 검사할 수 하다.
 철학적인 기초가 없이 구체적이고/특수하고/검사 가능한 규칙은 근거가 부족하다.
 
-### <a name="Rp-direct"></a>P.1: Express ideas directly in code
+### <a name="Rp-direct"></a>P.1: 아이디어를 직접 코드로 표현하라
 
-##### Reason
+##### 이유
 
-Compilers don't read comments (or design documents) and neither do many programmers (consistently).
-What is expressed in code has defined semantics and can (in principle) be checked by compilers and other tools.
+컴파일러는 주석문(또는 디자인 문서)을 읽지 않는다. 수많은 프로그래머 또한 주석을 (일관되게) 읽지 않는다.
+코드로 표현된 내용이라면 그 의미(의도)를 이미 정의했을 것이며 (대체로) 컴파일러나 다른 도구로 검사할 수 있다.
 
-##### Example
+##### 예제
 
     class Date {
         // ...
@@ -380,10 +380,10 @@ What is expressed in code has defined semantics and can (in principle) be checke
         // ...
     };
 
-The first declaration of `month` is explicit about returning a `Month` and about not modifying the state of the `Date` object.
-The second version leaves the reader guessing and opens more possibilities for uncaught bugs.
+첫번째 `month` 함수는 명확히 `Month`를 반환하도록 선언되어 있으며, `Date` 개체의 상태를 변경하지 않을 것처럼 보인다. 
+두번째 버전은 코드를 읽는 개발자들을 고민하게 만들며, 발견하기 어려운 버그를 유발할 가능성이 있다.
 
-##### Example
+##### 예제
 
     void f(vector<string>& v)
     {
@@ -399,8 +399,8 @@ The second version leaves the reader guessing and opens more possibilities for u
         // ...
     }
 
-That loop is a restricted form of `std::find`.
-A much clearer expression of intent would be:
+위 반복문은 `std::find`를 이용해 표현 가능하다. 
+의도를 더 명확하게 드러내기 위해 아래와 같이 코드를 바꿀 수 있다.
 
     void f(vector<string>& v)
     {
@@ -411,35 +411,35 @@ A much clearer expression of intent would be:
         // ...
     }
 
-A well-designed library expresses intent (what is to be done, rather than just how something is being done) far better than direct use of language features.
+언어가 제공하는 기능을 직접 사용하기보다 잘 설계된 라이브러리를 사용해 그 의도(어떻게 수행되는지보다 무엇이 수행되는지를) 표현하는 것이 훨씬 낫다.
 
-A C++ programmer should know the basics of the standard library, and use it where appropriate.
-Any programmer should know the basics of the foundation libraries of the project being worked on, and use them appropriately.
-Any programmer using these guidelines should know the [guideline support library](#S-gsl), and use it appropriately.
+C++ 프로그래머는 표준 라이브러리의 기본 내용을 반드시 이해하고 올바른 곳에 사용해야 한다.
+어떤 프로그래머든 프로젝트에 기반하고 있는 핵심 라이브러리의 기본 내용을 반드시 이해하고 있어야 하며, 올바르게 사용할 줄 알아야 한다.
+이 가이드라인을 사용하는 프로그래머는 [지원하는 라이브러리에 대한 가이드라인](#S-gsl)을 반드시 알아야 하고 적절히 사용할 줄 알아야 한다.
 
-##### Example
+##### 예제
 
     change_speed(double s);   // bad: what does s signify?
     // ...
     change_speed(2.3);
 
-A better approach is to be explicit about the meaning of the double (new speed or delta on old speed?) and the unit used:
+더 좋은 접근법은 `double`(새 속도, 또는 이전 속도와의 차이)의 의미와 단위를 명확히 하는 것이다.
 
     change_speed(Speed s);    // better: the meaning of s is specified
     // ...
     change_speed(2.3);        // error: no unit
     change_speed(23m / 10s);  // meters per second
 
-We could have accepted a plain (unit-less) `double` as a delta, but that would have been error-prone.
-If we wanted both absolute speed and deltas, we would have defined a `Delta` type.
+(단위가 없는) 단순한 `double`을 변화량(속도의 차)으로 받아들일 수도 있겠지만, 아무래도 오류가 발생하기 쉽다.
+속도와 변화량 둘 다 필요하다면, `Delta` 타입을 정의해야 할 것이다.
 
-##### Enforcement
+##### 적용
 
-Very hard in general.
+일반적으로 매우 어렵다.
 
-* use `const` consistently (check if member functions modify their object; check if functions modify arguments passed by pointer or reference)
-* flag uses of casts (casts neuter the type system)
-* detect code that mimics the standard library (hard)
+* 일관성 있게 `const`를 사용하라. (멤버 함수가 개체를 변경하는지 확인하라. 그리고 포인터나 레퍼런스로 넘어온 인자를 변경하는지 확인하라.)
+* 타입 변환의 사용을 표시하라. (타입 변환은 타입 시스템을 무력화시킨다.)
+* 표준 라이브러리를 흉내내는 코드를 찾아라. (하지만 찾기 어렵다.)
 
 ### <a name="Rp-Cplusplus"></a>P.2: Write in ISO Standard C++
 
