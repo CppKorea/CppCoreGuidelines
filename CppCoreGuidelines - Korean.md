@@ -341,27 +341,27 @@ Also, we assume that the rules will be refined over time to make them more preci
 각 목차("P"는 "철학(Philosophy)")와 부 목차("C.hier"는 "클래스 계층(Class Hierarchies) (OOP)")은 검색, 참조의 편의를 위해 약어로 표기한다.
 주요 목차에 대한 약어로 규칙 번호를 사용하기도 한다. (즉, "각 타입을 일반적인 타입으로 만들어라."라는 규칙을 "C.11"로 나타내기도 한다.)
 
-# <a name="S-philosophy"></a>P: Philosophy
+# <a name="S-philosophy"></a>P(Philosophy): 철학
 
-The rules in this section are very general.
+이 장의 규칙은 매우 일반적이다.
 
-Philosophy rules summary:
+철학 규칙 요약
 
-* [P.1: Express ideas directly in code](#Rp-direct)
-* [P.2: Write in ISO Standard C++](#Rp-Cplusplus)
-* [P.3: Express intent](#Rp-what)
-* [P.4: Ideally, a program should be statically type safe](#Rp-typesafe)
-* [P.5: Prefer compile-time checking to run-time checking](#Rp-compile-time)
-* [P.6: What cannot be checked at compile time should be checkable at run time](#Rp-run-time)
-* [P.7: Catch run-time errors early](#Rp-early)
-* [P.8: Don't leak any resources](#Rp-leak)
-* [P.9: Don't waste time or space](#Rp-waste)
+* [P.1: 아이디어를 직접 코드로 표현하라](#Rp-direct)
+* [P.2: ISO 표준 C++로 작성하라](#Rp-Cplusplus)
+* [P.3: 의도를 표현하라](#Rp-what)
+* [P.4: 이상적으로 프로그램은 정적으로 타입이 안전해야 한다](#Rp-typesafe)
+* [P.5: 런타임 검사보다는 컴파일 타임 검사를 선호하라](#Rp-compile-time)
+* [P.6: 컴파일 타임에 검사할 수 없다면 런타임에 검사할 수 있어야 한다](#Rp-run-time)
+* [P.7: 런타임 오류는 초기에 잡아라](#Rp-early)
+* [P.8: 리소스를 새도록 하지 마라](#Rp-leak)
+* [P.9: 시간이나 공간을 낭비하지 마라](#Rp-waste)
 * [P.10: Prefer immutable data to mutable data](#Rp-mutable)
 * [P.11: Encapsulate messy constructs, rather than spreading through the code](#Rp-library)
 
-Philosophical rules are generally not mechanically checkable.
-However, individual rules reflecting these philosophical themes are.
-Without a philosophical basis the more concrete/specific/checkable rules lack rationale.
+철학적 규칙은 보통 기계적으로 검사할 수 없다.
+그러나 철학적인 테마를 반영하는 개별적인 규칙은 검사할 수 하다.
+철학적인 기초가 없이 구체적이고/특수하고/검사 가능한 규칙은 근거가 부족하다.
 
 ### <a name="Rp-direct"></a>P.1: Express ideas directly in code
 

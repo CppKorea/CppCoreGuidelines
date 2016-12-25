@@ -1,28 +1,3 @@
-# <a name="S-philosophy"></a> P: Philosophy
-
-이 단원의 규칙은 매우 일반적이다.
->The rules in this section are very general.
-
-철학 규칙 요약:
->Philosophy rules summary:
-
-* [P.1: Express ideas directly in code](#Rp-direct)
-* [P.2: Write in ISO Standard C++](#Rp-C++)
-* [P.3: Express intent](#Rp-what)
-* [P.4: Ideally, a program should be statically type safe](#Rp-typesafe)
-* [P.5: Prefer compile-time checking to run-time checking](#Rp-compile-time)
-* [P.6: What cannot be checked at compile time should be checkable at run time](#Rp-run-time)
-* [P.7: Catch run-time errors early](#Rp-early)
-* [P.8: Don't leak any resources](#Rp-leak)
-* [P.9: Don't waste time or space](#Rp-waste)
-
-철학적 규칙은 보통 기계적으로 체크할 수 없다.
-그러나 철학적인 테마를 반영하는 개별적인 규칙은 체크가능하다.
-철학적인 기초가 없이 구체적이고/특수하고/체크가능한 규칙은 근거가 부족하다.
->Philosophical rules are generally not mechanically checkable.
-However, individual rules reflecting these philosophical themes are.
-Without a philosophical basis the more concrete/specific/checkable rules lack rationale.
-
 ### <a name="Rp-direct"></a> P.1: 아이디어를 직접 코드로 표현하라.
 >### <a name="Rp-direct"></a> P.1: Express ideas directly in code
 
