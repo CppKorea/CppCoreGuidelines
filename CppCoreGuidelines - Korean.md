@@ -467,7 +467,7 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 
 ##### 비고
 
-표준 C++ 언어의 기능나 라이브러리조차 제한적으로 사용할 수 밖에 없는 환경도 있다.
+표준 C++ 언어의 기능이나 라이브러리조차 제한적으로 사용할 수 밖에 없는 환경도 있다.
 예를 들면, 항공기 제어 소프트웨어 개발 표준에는 동적 메모리 할당을 피할 것을 주문하고 있다. 
 이런 경우에는 특정 환경에 맞춘 코딩 가이드라인을 확장해서 사용하거나 사용하지 않아야 하는 기능들을 관리하라.
 
@@ -475,66 +475,67 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 
 확장을 허용하지 않도록 기능 설정이 가능한 최신 C++ 컴파일러(현재 C++11이나 C++14)를 사용하라.
 
-### <a name="Rp-what"></a>P.3: Express intent
+### <a name="Rp-what"></a>P.3: 의도를 표현하라
 
-##### Reason
+##### 이유
 
-Unless the intent of some code is stated (e.g., in names or comments), it is impossible to tell whether the code does what it is supposed to do.
+(이름이나 주석을 통해) 코드의 의도를 제대로 드러내지 못한다면, 코드가 제대로 수행되는지조차 말할 수 없을 것이다.
 
-##### Example
+##### 예제
 
     int i = 0;
     while (i < v.size()) {
         // ... do something with v[i] ...
     }
 
-The intent of "just" looping over the elements of `v` is not expressed here. The implementation detail of an index is exposed (so that it might be misused), and `i` outlives the scope of the loop, which may or may not be intended. The reader cannot know from just this section of code.
+위 코드만 보았을 때는 `v`의 각 요소를 순회하겠다는 의도가 드러나지 않는다.
+인덱스에 대한 세부적인 구현부가 노출된다 (따라서 잘못 사용될 지도 모른다). 그리고 의도적인지는 알 수 없지만 `i`를 반복문 밖에서도 여전히 사용할 수 있다. 이 부분의 코드만 읽어서는 그 의도를 알지 못한다.
 
-Better:
+개선:
 
     for (const auto& x : v) { /* do something with x */ }
 
-Now, there is no explicit mention of the iteration mechanism, and the loop operates on a reference to `const` elements so that accidental modification cannot happen. If modification is desired, say so:
+위 코드를 보면 v에 대한 순회 메커니즘을 명시적으로 언급하지 않는다. 그리고 순회하는 동안 v의 각 `const` 요소의 레퍼런스에 대해 동작이 일어나기 때문에 각 요소를 수정할 수 없다. 만약 수정이 필요한 경우라면 아래와 같이 코드를 작성해야 한다.
 
     for (auto& x : v) { /* do something with x */ }
 
-Sometimes better still, use a named algorithm:
+이전보다 개선되었지만, 이보다는 잘 알려진 알고리즘을 사용하라.
 
     for_each(v, [](int x) { /* do something with x */ });
     for_each(par, v, [](int x) { /* do something with x */ });
 
-The last variant makes it clear that we are not interested in the order in which the elements of `v` are handled.
+마지막 예는 `v`의 각 요소가 처리되는 순서에 관심이 없다는 점을 명확히 하고 있다.
 
-A programmer should be familiar with
+프로그래머라면 다음에 익숙해져야 한다.
 
-* [The guideline support library](#S-gsl)
-* [The ISO C++ standard library](#S-stdlib)
-* Whatever foundation libraries are used for the current project(s)
+* [지원하는 라이브러리에 대한 가이드라인](#S-gsl)
+* [ISO C++ 표준 라이브러리](#S-stdlib)
+* 현재 프로젝트에서 사용되고 있는 모든 기본 라이브러리들
 
-##### Note
+##### 비고
 
-Alternative formulation: Say what should be done, rather than just how it should be done.
+다른 표기: 어떻게 작업이 수행되는지를 말하지 말고 무엇이 수행될지를 말하라.
 
-##### Note
+##### 비고
 
-Some language constructs express intent better than others.
+언어의 기본 요소는 다른 무엇보다도 그 의도를 더 잘 표현한다.
 
-##### Example
+##### 예제
 
-If two `int`s are meant to be the coordinates of a 2D point, say so:
+2개의 `int` 값으로 2차원 좌표를 표현하고 싶다면, 다음과 같이 써라.
 
     draw_line(int, int, int, int);  // obscure
     draw_line(Point, Point);        // clearer
 
-##### Enforcement
+##### 적용
 
-Look for common patterns for which there are better alternatives
+좀 더 나은 대안이 있는 범용적인 패턴을 찾아보라.
 
-* simple `for` loops vs. range-`for` loops
-* `f(T*, int)` interfaces vs. `f(span<T>)` interfaces
-* loop variables in too large a scope
-* naked `new` and `delete`
-* functions with many arguments of built-in types
+* 단순한 `for`문 대 범위 기반 `for`문
+* `f(T*, int)` 인터페이스 대 `f(span<T>)` 인터페이스
+* 아주 큰 스코프에서 순회하는 변수
+* 무방비 상태의 `new`와 `delete`
+* 인자로 내장 타입을 여러개 갖는 함수
 
 There is a huge scope for cleverness and semi-automated program transformation.
 
