@@ -441,16 +441,17 @@ C++ 프로그래머는 표준 라이브러리의 기본 내용을 반드시 이�
 * 타입 변환의 사용을 표시하라. (타입 변환은 타입 시스템을 무력화시킨다.)
 * 표준 라이브러리를 흉내내는 코드를 찾아라. (하지만 찾기 어렵다.)
 
-### <a name="Rp-Cplusplus"></a>P.2: Write in ISO Standard C++
+### <a name="Rp-Cplusplus"></a>P.2: ISO 표준 C++로 작성하라
 
-##### Reason
+##### 이유
 
-This is a set of guidelines for writing ISO Standard C++.
+이 문서는 ISO 표준 C++을 만드는 가이드라인들을 모아둔 것이다.
 
-##### Note
+##### 비고
 
-There are environments where extensions are necessary, e.g., to access system resources.
-In such cases, localize the use of necessary extensions and control their use with non-core Coding Guidelines.  If possible, build interfaces that encapsulate the extensions so they can be turned off or compiled away on systems that do not support those extensions.
+시스템 리소스에 접근하는 등의 작업을 수행하기 위해서 확장 기능이 필요할 수 있다.
+이런 경우에는 필요한 확장 기능을 지역적으로 제한해서 사용하고, 비핵심 코딩 가이드라인을 활용해 관리하라.
+If possible, build interfaces that encapsulate the extensions so they can be turned off or compiled away on systems that do not support those extensions.
 
 Extensions often do not have rigorously defined semantics.  Even extensions that
 are common and implemented by multiple compilers may have slightly different
@@ -458,20 +459,21 @@ behaviors and edge case behavior as a direct result of *not* having a rigorous
 standard definition.  With sufficient use of any such extension, expected
 portability will be impacted.
 
-##### Note
+##### 비고
 
 Using valid ISO C++ does not guarantee portability (let alone correctness).
 Avoid dependence on undefined behavior (e.g., [undefined order of evaluation](#Res-order))
 and be aware of constructs with implementation defined meaning (e.g., `sizeof(int)`).
 
-##### Note
+##### 비고
 
-There are environments where restrictions on use of standard C++ language or library features are necessary, e.g., to avoid dynamic memory allocation as required by aircraft control software standards.
-In such cases, control their (dis)use with an extension of these Coding Guidelines customized to the specific environment.
+표준 C++ 언어의 기능나 라이브러리조차 제한적으로 사용할 수 밖에 없는 환경도 있다.
+예를 들면, 항공기 제어 소프트웨어 개발 표준에는 동적 메모리 할당을 피할 것을 주문하고 있다. 
+이런 경우에는 특정 환경에 맞춘 코딩 가이드라인을 확장해서 사용하거나 사용하지 않아야 하는 기능들을 관리하라.
 
-##### Enforcement
+##### 적용
 
-Use an up-to-date C++ compiler (currently C++11 or C++14) with a set of options that do not accept extensions.
+확장을 허용하지 않도록 기능 설정이 가능한 최신 C++ 컴파일러(현재 C++11이나 C++14)를 사용하라.
 
 ### <a name="Rp-what"></a>P.3: Express intent
 

@@ -1,31 +1,3 @@
-### <a name="Rp-C++"></a> P.2: ISO 표준 C++로 작성하라.
->### <a name="Rp-C++"></a> P.2: Write in ISO Standard C++
-
-##### Reason
-
-이 규칙은 ISO 표준 C++을 만드는 가이드라인의 하나이다.
->This is a set of guidelines for writing ISO Standard C++.
-
-##### Note
-
-시스템 리소스에 접근하는 등의 작업을 수행하기 위해서 확장 기능이 필요할 수 있다.
-이런 경우에는 필요한 확장 기능을 지역적으로 제한하여 사용하고, 비핵심 코딩 가이드라인을 활용하여 관리하라.
->There are environments where extensions are necessary, e.g., to access system resources.
-In such cases, localize the use of necessary extensions and control their use with non-core Coding Guidelines.
-
-##### Note
-
-표준 C++ 언어의 기능나 라이브러리 조차도 제한적으로 사용할 수 밖에 없는 환경도 있다.
-예를 들면 항공기 제어 소프트웨어 개발 표준에는 동적 메모리 할당을 피할 것을 주문하고 있다. 
-이러 경우에는 비핵심 코딩 가이드라인을 활용하여 사용하지 않아야 하는 기능을 관리하라.
->There are environments where restrictions on use of standard C++ language or library features are necessary, e.g., to avoid dynamic memory allocation as required by aircraft control software standards.
-In such cases, control their (dis)use with non-core Coding Guidelines.
-
-##### Enforcement
-
-확장을 허용하지 않도록 기능 설정이 가능한 최신의 C++ 컴파일러를 사용하라. (현재 C++11, C++14) 
->Use an up-to-date C++ compiler (currently C++11 or C++14) with a set of options that do not accept extensions.
-
 ### <a name="Rp-what"></a> P.3: 의도를 표현하라.
 >### <a name="Rp-what"></a> P.3: Express intent
 
