@@ -350,7 +350,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 * [P.1: 아이디어를 직접 코드로 표현하라](#Rp-direct)
 * [P.2: ISO 표준 C++로 작성하라](#Rp-Cplusplus)
 * [P.3: 의도를 표현하라](#Rp-what)
-* [P.4: 이상적으로 프로그램은 정적으로 타입이 안전해야 한다](#Rp-typesafe)
+* [P.4: 이상적으로 프로그램은 정적으로 타입 안전해야 한다](#Rp-typesafe)
 * [P.5: 런타임 검사보다는 컴파일 타임 검사를 선호하라](#Rp-compile-time)
 * [P.6: 컴파일 타임에 검사할 수 없다면 런타임에 검사할 수 있어야 한다](#Rp-run-time)
 * [P.7: 런타임 오류는 초기에 잡아라](#Rp-early)
@@ -539,35 +539,35 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 
 There is a huge scope for cleverness and semi-automated program transformation.
 
-### <a name="Rp-typesafe"></a>P.4: Ideally, a program should be statically type safe
+### <a name="Rp-typesafe"></a>P.4: 이상적으로 프로그램은 정적으로 타입 안전해야 한다
 
-##### Reason
+##### 이유
 
-Ideally, a program would be completely statically (compile-time) type safe.
-Unfortunately, that is not possible. Problem areas:
+이상적으로 프로그램은 완전히 정적으로 타입 안전해야 한다.
+하지만 불행하게도 불가능하다. 왜냐하면 다음처럼 문제가 되는 영역들이 존재하기 때문이다.
 
-* unions
-* casts
-* array decay
-* range errors
-* narrowing conversions
+* 공용체
+* 타입 변환
+* 배열 붕괴
+* 범위 오류
+* 축소 타입 변환
 
-##### Note
+##### 비고
 
-These areas are sources of serious problems (e.g., crashes and security violations).
-We try to provide alternative techniques.
+이러한 영역들은 심각한 문제의 원인이 된다. (예를 들어, 크래시와 보안 위반)
+따라서 다른 기법을 제공하고자 한다.
 
-##### Enforcement
+##### 적용
 
-We can ban, restrain, or detect the individual problem categories separately, as required and feasible for individual programs.
-Always suggest an alternative.
-For example:
+각 프로그램에 대해 필요하고 실현 가능하도록 각 문제 범주를 개별적으로 금지, 억제 또는 탐지할 수 있다.
+항상 대안을 제시하라.
+예를 들어,
 
-* unions -- use `variant` (in C++17)
-* casts -- minimize their use; templates can help
-* array decay -- use `span` (from the GSL)
-* range errors -- use `span`
-* narrowing conversions -- minimize their use and use `narrow` or `narrow_cast` (from the GSL) where they are necessary
+* 공용체 -- (C++17에 있는) `variant`를 사용하라.
+* 타입 변환 -- 사용을 최소화하라. 템플릿이 도움이 될 수 있다.
+* 배열 붕괴 -- (GSL에 있는) `span`을 사용하라.
+* 범위 오류 -- `span`을 사용하라.
+* 축소 타입 변환 -- 사용을 최소화하라. 필요하면 `narrow`나 (GSL에 있는) `narrow_cast`를 사용하라.
 
 ### <a name="Rp-compile-time"></a>P.5: Prefer compile-time checking to run-time checking
 
