@@ -611,17 +611,19 @@ There is a huge scope for cleverness and semi-automated program transformation.
 * 포인터 인자를 찾아라.
 * 범위 위반에 대한 런타임 검사를 찾아라.
 
-### <a name="Rp-run-time"></a>P.6: What cannot be checked at compile time should be checkable at run time
+### <a name="Rp-run-time"></a>P.6: 컴파일 타임에 검사할 수 없다면 런타임에 검사할 수 있어야 한다
 
-##### Reason
+##### 이유
 
-Leaving hard-to-detect errors in a program is asking for crashes and bad results.
+프로그램 안에 찾기 어려운 오류를 남겨둔다면 크래시나 나쁜 결과를 야기한다.
 
-##### Note
+##### 비고
 
-Ideally we catch all errors (that are not errors in the programmer's logic) at either compile-time or run-time. It is impossible to catch all errors at compile time and often not affordable to catch all remaining errors at run time. However, we should endeavor to write programs that in principle can be checked, given sufficient resources (analysis programs, run-time checks, machine resources, time).
+이상적으로 우리는 컴파일 타임, 런타임에 (프로그래머의 논리에서는 오류가 아닌) 모든 오류를 찾을 수 있다.
+컴파일 타임에 모든 오류를 찾아내는 건 불가능하고 런타임에 남아 있는 모든 오류를 찾는 것도 불가능하다.
+그러나 충분한 리소스를 준다면 원론적으로 검사 가능한 프로그램을 작성하려고 노력해야 한다. (분석 프로그램, 런타임 검사, 컴퓨터 리소스, 시간)
 
-##### Example, bad
+##### 나쁜 예제
 
     // separately compiled, possibly dynamically loaded
     extern void f(int* p);
@@ -632,11 +634,13 @@ Ideally we catch all errors (that are not errors in the programmer's logic) at e
         f(new int[n]);
     }
 
-Here, a crucial bit of information (the number of elements) has been so thoroughly "obscured" that static analysis is probably rendered infeasible and dynamic checking can be very difficult when `f()` is part of an ABI so that we cannot "instrument" that pointer. We could embed helpful information into the free store, but that requires global changes to a system and maybe to the compiler. What we have here is a design that makes error detection very hard.
+여기서 결정적인 정보(요소의 갯수)가 아주 철저하게 숨겨져 있어서, `f()`가 ABI의 일부일 때 정적 분석은 아마도 불가능해 보이고 동적 검사는 매우 어려울 수 있다. 따라서 해당 포인터를 "측정"할 수 없다.
+도움이 될만한 정보를 남은 공간에 넣을 수 있지만, 이는 시스템이나 컴파일러에게 전반적인 변경을 요구한다.
+예제에 있는 코드는 오류 발견을 아주 어렵게 만드는 디자인이다.
 
-##### Example, bad
+##### 나쁜 예제
 
-We can of course pass the number of elements along with the pointer:
+포인터와 함께 요소의 갯수도 같이 전달할 수 있다.
 
     // separately compiled, possibly dynamically loaded
     extern void f2(int* p, int n);
@@ -646,13 +650,14 @@ We can of course pass the number of elements along with the pointer:
         f2(new int[n], m);  // bad: a wrong number of elements can be passed to f()
     }
 
-Passing the number of elements as an argument is better (and far more common) than just passing the pointer and relying on some (unstated) convention for knowing or discovering the number of elements. However (as shown), a simple typo can introduce a serious error. The connection between the two arguments of `f2()` is conventional, rather than explicit.
+인자로 요소의 갯수를 전달하는 것은 포인터를 전달하면서 관례에 따라 요소의 갯수를 구하는 것보다 낫다.
+그러나, 단순히 철자 하나만 틀려도 심각한 오류를 야기한다. `f2()`에서 두 인자간의 연결은 구체적이지 않고 관례에 따른 것이다.
 
-Also, it is implicit that `f2()` is supposed to `delete` its argument (or did the caller make a second mistake?).
+게다가 `f2()`가 인자를 `delete`할 것인지 알 수 없다. (호출자가 두번째 실수를 한 것인가?)
 
-##### Example, bad
+##### 나쁜 예제
 
-The standard library resource management pointers fail to pass the size when they point to an object:
+표준 라이브러리에 있는 리소스 관리 포인터는 개체를 가리키고 있을 때 크기를 넘길 수 없다.
 
     // separately compiled, possibly dynamically loaded
     // NB: this assumes the calling code is ABI-compatible, using a
@@ -664,9 +669,9 @@ The standard library resource management pointers fail to pass the size when the
         f3(make_unique<int[]>(n), m);    // bad: pass ownership and size separately
     }
 
-##### Example
+##### 예제
 
-We need to pass the pointer and the number of elements as an integral object:
+포인터와 요소의 갯수를 하나의 개체로 합쳐서 전달해야 한다.
 
     extern void f4(vector<int>&);   // separately compiled, possibly dynamically loaded
     extern void f4(span<int>);      // separately compiled, possibly dynamically loaded
@@ -680,11 +685,11 @@ We need to pass the pointer and the number of elements as an integral object:
         f4(span<int>{v});          // pass a view, retain ownership
     }
 
-This design carries the number of elements along as an integral part of an object, so that errors are unlikely and dynamic (run-time) checking is always feasible, if not always affordable.
+이 디자인은 개체의 필수 부분으로 요소의 갯수를 전달하므로 오류가 발생하지 않고 항상 저렴하지는 않지만 동적(런타임) 검사를 할 수 있다. 
 
-##### Example
+##### 예제
 
-How do we transfer both ownership and all information needed for validating use?
+올바른 사용을 위해 어떻게 소유권과 모든 정보를 전달할 것인가?
 
     vector<int> f5(int n)    // OK: move
     {
@@ -707,15 +712,15 @@ How do we transfer both ownership and all information needed for validating use?
         return p;
     }
 
-##### Example
+##### 예제
 
 * ???
-* show how possible checks are avoided by interfaces that pass polymorphic base classes around, when they actually know what they need?
-  Or strings as "free-style" options
+* 필요한 것을 실제로 알고 있을 때, 다형 기본 클래스를 전달하는 인터페이스가 어떻게 검사를 피할 수 있는지 보여준다.
+  또는 "자유형" 옵션으로 문자열이 있다. 
 
-##### Enforcement
+##### 적용
 
-* Flag (pointer, count)-style interfaces (this will flag a lot of examples that can't be fixed for compatibility reasons)
+* (포인터, 갯수)-스타일 인터페이스라면 표시한다. (호환성을 이유로 고칠 수 없는 많은 예제를 표시할 것이다.)
 * ???
 
 ### <a name="Rp-early"></a>P.7: Catch run-time errors early
