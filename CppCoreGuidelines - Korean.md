@@ -354,7 +354,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 * [P.5: 런타임 검사보다는 컴파일 타임 검사를 선호하라](#Rp-compile-time)
 * [P.6: 컴파일 타임에 검사할 수 없다면 런타임에 검사할 수 있어야 한다](#Rp-run-time)
 * [P.7: 런타임 오류는 초기에 잡아라](#Rp-early)
-* [P.8: 리소스를 새도록 하지 마라](#Rp-leak)
+* [P.8: 리소스가 새도록 하지 마라](#Rp-leak)
 * [P.9: 시간이나 공간을 낭비하지 마라](#Rp-waste)
 * [P.10: Prefer immutable data to mutable data](#Rp-mutable)
 * [P.11: Encapsulate messy constructs, rather than spreading through the code](#Rp-library)
@@ -534,7 +534,7 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 * 단순한 `for`문 대 범위 기반 `for`문
 * `f(T*, int)` 인터페이스 대 `f(span<T>)` 인터페이스
 * 아주 큰 스코프에서 순회하는 변수
-* 무방비 상태의 `new`와 `delete`
+* 처리되지 않은 `new`와 `delete`
 * 인자로 내장 타입을 여러개 갖는 함수
 
 There is a huge scope for cleverness and semi-automated program transformation.
@@ -841,14 +841,14 @@ Similarly, don't add validity checks that change the asymptotic behavior of your
 * 문자열로 변환되고 있는 구조화된 데이터(불변 조건을 갖는 클래스의 개체)를 찾아라.
 * ???
 
-### <a name="Rp-leak"></a>P.8: Don't leak any resources
+### <a name="Rp-leak"></a>P.8: 리소스가 새도록 하지 마라
 
-##### Reason
+##### 이유
 
 Even a slow growth in resources will, over time, exhaust the availability of those resources.
 This is particularly important for long-running programs, but is an essential piece of responsible programming behavior.
 
-##### Example, bad
+##### 나쁜 예제
 
     void f(char* name)
     {
@@ -859,7 +859,7 @@ This is particularly important for long-running programs, but is an essential pi
         fclose(input);
     }
 
-Prefer [RAII](#Rr-raii):
+[RAII](#Rr-raii)를 사용해 개선:
 
     void f(char* name)
     {
@@ -869,9 +869,9 @@ Prefer [RAII](#Rr-raii):
         // ...
     }
 
-**See also**: [The resource management section](#S-resource)
+**참고 항목**: [리소스 관리](#S-resource)
 
-##### Note
+##### 비고
 
 A leak is colloquially "anything that isn't cleaned up."
 The more important classification is "anything that can no longer be cleaned up."
@@ -880,19 +880,19 @@ This rule should not be taken as requiring that allocations within long-lived ob
 For example, relying on system guaranteed cleanup such as file closing and memory deallocation upon process shutdown can simplify code.
 However, relying on abstractions that implicitly clean up can be as simple, and often safer.
 
-##### Note
+##### 비고
 
 Enforcing [the lifetime profile](#In.force) eliminates leaks.
 When combined with resource safety provided by [RAII](#Rr-raii), it eliminates the need for "garbage collection" (by generating no garbage).
 Combine this with enforcement of [the type and bounds profiles](#In.force) and you get complete type- and resource-safety, guaranteed by tools.
 
-##### Enforcement
+##### 적용
 
-* Look at pointers: Classify them into non-owners (the default) and owners.
-  Where feasible, replace owners with standard-library resource handles (as in the example above).
-  Alternatively, mark an owner as such using `owner` from [the GSL](#S-gsl).
-* Look for naked `new` and `delete`
-* Look for known resource allocating functions returning raw pointers (such as `fopen`, `malloc`, and `strdup`)
+* 포인터를 살펴봐라: 소유자와 비소유자로 구분해라.
+  가능하다면 소유자를 (위의 예제처럼) 표준 라이브러리 리소스 핸들로 바꿔라.
+  또는 [GSL](#S-gsl)에서 `owner`를 사용하는 것처럼 소유자를 표시하라.
+* 처리되지 않은 `new`, `delete`를 찾아라.
+* 처리되지 않은 포인터를 반환하는 잘 알려진 리소스 할당 함수를 찾아라. (예를 들어, `fopen`, `malloc`, `strdup`)
 
 ### <a name="Rp-waste"></a>P.9: Don't waste time or space
 
