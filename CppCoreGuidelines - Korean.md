@@ -569,14 +569,14 @@ There is a huge scope for cleverness and semi-automated program transformation.
 * 범위 오류 -- `span`을 사용하라.
 * 축소 타입 변환 -- 사용을 최소화하라. 필요하면 `narrow`나 (GSL에 있는) `narrow_cast`를 사용하라.
 
-### <a name="Rp-compile-time"></a>P.5: Prefer compile-time checking to run-time checking
+### <a name="Rp-compile-time"></a>P.5: 런타임 검사보다는 컴파일 타임 검사를 선호하라
 
-##### Reason
+##### 이유
 
-Code clarity and performance.
-You don't need to write error handlers for errors caught at compile time.
+코드 명확성, 성능 향상.
+컴파일 타임에 발견되는 오류에 대해서는 처리하는 부분을 따로 작성할 필요가 없다.
 
-##### Example
+##### 예제
 
     // Int is an alias used for integers
     int bits = 0;         // don't: avoidable code
@@ -585,31 +585,31 @@ You don't need to write error handlers for errors caught at compile time.
     if (bits < 32)
         cerr << "Int too small\n"
 
-This example is easily simplified
+이 예제는 다음과 같이 간단하게 만들 수 있다.
 
     // Int is an alias used for integers
     static_assert(sizeof(Int) >= 4);    // do: compile-time check
 
-##### Example
+##### 예제
 
     void read(int* p, int n);   // read max n integers into *p
 
     int a[100];
     read(a, 1000);    // bad
 
-better
+개선:
 
     void read(span<int> r); // read into the range of integers r
 
     int a[100];
     read(a);        // better: let the compiler figure out the number of elements
 
-**Alternative formulation**: Don't postpone to run time what can be done well at compile time.
+**대체 표현**: 컴파일 타임에 할 수 있는 것을 런타임으로 연기하지 마라.
 
-##### Enforcement
+##### 적용
 
-* Look for pointer arguments.
-* Look for run-time checks for range violations.
+* 포인터 인자를 찾아라.
+* 범위 위반에 대한 런타임 검사를 찾아라.
 
 ### <a name="Rp-run-time"></a>P.6: What cannot be checked at compile time should be checkable at run time
 
