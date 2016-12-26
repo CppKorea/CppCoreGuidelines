@@ -894,18 +894,18 @@ Combine this with enforcement of [the type and bounds profiles](#In.force) and y
 * 처리되지 않은 `new`, `delete`를 찾아라.
 * 처리되지 않은 포인터를 반환하는 잘 알려진 리소스 할당 함수를 찾아라. (예를 들어, `fopen`, `malloc`, `strdup`)
 
-### <a name="Rp-waste"></a>P.9: Don't waste time or space
+### <a name="Rp-waste"></a>P.9: 시간이나 공간을 낭비하지 마라
 
-##### Reason
+##### 이유
 
-This is C++.
+이것이 C++이다.
 
-##### Note
+##### 비고
 
-Time and space that you spend well to achieve a goal (e.g., speed of development, resource safety, or simplification of testing) is not wasted.
+개발 속도, 리소스 안정성, 테스트 단순화 등의 목표를 달성하기 위해 소모하는 시간이나 공간은 낭비가 아니다.
 "Another benefit of striving for efficiency is that the process forces you to understand the problem in more depth." - Alex Stepanov
 
-##### Example, bad
+##### 나쁜 예제
 
     struct X {
         char ch;
@@ -939,14 +939,14 @@ Time and space that you spend well to achieve a goal (e.g., speed of development
         // ...
     }
 
-Yes, this is a caricature, but we have seen every individual mistake in production code, and worse.
-Note that the layout of `X` guarantees that at least 6 bytes (and most likely more) bytes are wasted.
-The spurious definition of copy operations disables move semantics so that the return operation is slow
+그렇다. 풍자를 위한 예제이기는 하지만, 실제 코드에서 이보다 심각한 실수도 본 적이 있다.
+`X`의 레이아웃에 (더 많을지도 모르지만) 적어도 6바이트의 낭비가 있다는 점을 주목하라.
+복사 동작을 그럴싸하게 정의해 두다 보니 이동의 의미가 없어져 버렸다. 그래서 반환 동작이 느려졌다.
 (please note that the Return Value Optimization, RVO, is not guaranteed here).
-The use of `new` and `delete` for `buf` is redundant; if we really needed a local string, we should use a local `string`.
-There are several more performance bugs and gratuitous complication.
+`buf`에서 `new`, `delete`의 사용이 중복된다. 진짜 지역 문자열을 원했다면, `string` 지역 변수를 사용했을 것이다.
+더 많은 성능 버그와 상황을 더 복잡하게 만드는 불필요한 문제가 있다.
 
-##### Example, bad
+##### 나쁜 예제
 
     void lower(zstring s)
     {
@@ -956,16 +956,16 @@ There are several more performance bugs and gratuitous complication.
 Yes, this is an example from production code.
 We leave it to the reader to figure out what's wasted.
 
-##### Note
+##### 비고
 
-An individual example of waste is rarely significant, and where it is significant, it is typically easily eliminated by an expert.
-However, waste spread liberally across a code base can easily be significant and experts are not always as available as we would like.
-The aim of this rule (and the more specific rules that support it) is to eliminate most waste related to the use of C++ before it happens.
-After that, we can look at waste related to algorithms and requirements, but that is beyond the scope of these guidelines.
+낭비에 대한 각 예제는 별로 중요하지 않다. 그리고 중요했다면 이미 전문가들이 쉽게 제거했을 것이다.
+그러나 코드 전체에 걸쳐 낭비가 퍼져버리면 중요해 질 수 있고, 낭비를 제거하기 위해서 전문가들을 항상 원하는데로 데려올 수는 없다.
+이 규칙(그리고 보다 구체적인 규칙)의 목적은 C++ 사용과 관련된 대부분의 낭비를 없애기 위해서다.
+그 후에 알고리즘이나 요구 사항과 관련된 낭비를 살펴볼 수 있다. 하지만 그건 이 가이드라인의 범위를 벗어난다.
 
-##### Enforcement
+##### 적용
 
-Many more specific rules aim at the overall goals of simplicity and elimination of gratuitous waste.
+더 많은 특정 규칙들은 단순함과 쓸데없는 코드의 제거를 전반적인 목표로 하고 있다.
 
 ### <a name="Rp-mutable"></a>P.10: Prefer immutable data to mutable data
 
