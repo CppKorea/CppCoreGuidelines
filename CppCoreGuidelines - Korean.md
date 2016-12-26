@@ -723,14 +723,14 @@ There is a huge scope for cleverness and semi-automated program transformation.
 * (포인터, 갯수)-스타일 인터페이스라면 표시한다. (호환성을 이유로 고칠 수 없는 많은 예제를 표시할 것이다.)
 * ???
 
-### <a name="Rp-early"></a>P.7: Catch run-time errors early
+### <a name="Rp-early"></a>P.7: 런타임 오류는 초기에 잡아라
 
-##### Reason
+##### 이유
 
-Avoid "mysterious" crashes.
-Avoid errors leading to (possibly unrecognized) wrong results.
+"미스터리"한 크래시를 피한다.
+(아마 몰랐을 수도 있는) 잘못된 결과를 야기하는 오류를 피한다.
 
-##### Example
+##### 예제
 
     void increment1(int* p, int n)    // bad: error prone
     {
@@ -747,10 +747,10 @@ Avoid errors leading to (possibly unrecognized) wrong results.
         // ...
     }
 
-Here we made a small error in `use1` that will lead to corrupted data or a crash.
-The (pointer, count)-style interface leaves `increment1()` with no realistic way of defending itself against out-of-range errors.
-Assuming that we could check subscripts for out of range access, the error would not be discovered until `p[10]` was accessed.
-We could check earlier and improve the code:
+여기서 우리는 `use1`에 데이터가 손실되거나 크래시를 야기할 수 있는 작은 오류를 범했다.
+(포인터, 크기)-스타일 인터페이스는 범위 오류에 대해 `increment1()`에서 방어할 수 있는 현실적인 방안을 없애버린다.
+배열 첨자가 범위를 벗어나는지 검사한다고 가정하면, `p[10]`까지 오류가 발견되지 않을 것이다.
+좀 더 빨리 검사하도록 코드를 개선해 보자:
 
     void increment2(span<int> p)
     {
@@ -766,8 +766,8 @@ We could check earlier and improve the code:
         // ...
     }
 
-Now, `m<=n` can be checked at the point of call (early) rather than later.
-If all we had was a typo so that we meant to use `n` as the bound, the code could be further simplified (eliminating the possibility of an error):
+이제 `m<=n`은 호출 시점에서 (일찍) 확인할 수 있다.
+우리가 가진 모든 것이 오타이므로 `n`을 범위로 사용한다면, 코드를 더 단순하게 만들 수 있다. (오류의 가능성 제거)
 
     void use3(int m)
     {
@@ -778,9 +778,9 @@ If all we had was a typo so that we meant to use `n` as the bound, the code coul
         // ...
     }
 
-##### Example, bad
+##### 나쁜 예제
 
-Don't repeatedly check the same value. Don't pass structured data as strings:
+동일한 값을 반복적으로 검사하지 마라. 구조화된 데이터를 문자열로 넘기지 마라.
 
     Date read_date(istream& is);    // read date from istream
 
@@ -800,12 +800,13 @@ Don't repeatedly check the same value. Don't pass structured data as strings:
         // ...
     }
 
-The date is validated twice (by the `Date` constructor) and passed as a character string (unstructured data).
+(`Date` 생성자에 의해) 날짜가 두 번 계산되고 (비구조화된 데이터인) 문자열로 전달된다.
 
-##### Example
+##### 예제
 
-Excess checking can be costly.
-There are cases where checking early is dumb because you may not ever need the value, or may only need part of the value that is more easily checked than the whole.  Similarly, don't add validity checks that change the asymptotic behavior of your interface (e.g., don't add a `O(n)` check to an interface with an average complexity of `O(1)`).
+지나친 검사는 비용이 많이 든다.
+값이 필요한지도 모르기 때문에 일찍 검사하는 것이 안 좋은 경우도 있고 전체가 아닌 값의 일부만 검사하는 것이 쉬운 경우도 있다.
+Similarly, don't add validity checks that change the asymptotic behavior of your interface (e.g., don't add a `O(n)` check to an interface with an average complexity of `O(1)`).
 
     class Jet {    // Physics says: e * e < x * x + y * y + z * z
         float x;
@@ -828,16 +829,16 @@ There are cases where checking early is dumb because you may not ever need the v
         ???
     };
 
-The physical law for a jet (`e * e < x * x + y * y + z * z`) is not an invariant because of the possibility for measurement errors.
+제트기에 대한 물리적 법칙(`e * e < x * x + y * y + z * z`)은 측정 오류의 가능성 때문에 값이 바뀔 수 있다.
 
 ???
 
-##### Enforcement
+##### 적용
 
-* Look at pointers and arrays: Do range-checking early and not repeatedly
-* Look at conversions: Eliminate or mark narrowing conversions
-* Look for unchecked values coming from input
-* Look for structured data (objects of classes with invariants) being converted into strings
+* 포인터와 배열을 찾아라: 범위를 빨리 검사하고 반복되지 않게 하라.
+* 타입 변환을 찾아라: 축소 변환을 표시하거나 제거하라.
+* 입력된 값 중 검사되지 않은 값을 찾아라.
+* 문자열로 변환되고 있는 구조화된 데이터(불변 조건을 갖는 클래스의 개체)를 찾아라.
 * ???
 
 ### <a name="Rp-leak"></a>P.8: Don't leak any resources
