@@ -514,7 +514,7 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 
 ##### 비고
 
-다른 표기: 어떻게 작업이 수행되는지를 말하지 말고 무엇이 수행될지를 말하라.
+공식 대안: 어떻게 작업이 수행되는지를 말하지 말고 무엇이 수행될지를 말하라.
 
 ##### 비고
 
@@ -1064,49 +1064,49 @@ This is a variant of the [subset of superset principle](#R0) that underlies thes
 * [E: 오류 처리](#S-errors)
 * [T: 템플릿과 제너릭 프로그래밍](#S-templates)
 
-### <a name="Ri-explicit"></a>I.1: Make interfaces explicit
+### <a name="Ri-explicit"></a>I.1: 인터페이스를 명확하게 만들어라
 
-##### Reason
+##### 이유
 
-Correctness. Assumptions not stated in an interface are easily overlooked and hard to test.
+정확성. 인터페이스에 언급되지 않은 가정은 간과되기 쉽고 테스트하기 어렵다.
 
-##### Example, bad
+##### 나쁜 예제
 
-Controlling the behavior of a function through a global (namespace scope) variable (a call mode) is implicit and potentially confusing. For example:
+전역 (네임스페이스 범위에 있는) 변수를 통해 함수의 행동을 제어하는 것은 암시적이고 혼란스럽다. 예를 들어,
 
     int rnd(double d)
     {
         return (rnd_up) ? ceil(d) : d;    // don't: "invisible" dependency
     }
 
-It will not be obvious to a caller that the meaning of two calls of `rnd(7.2)` might give different results.
+`rnd(7.2)`를 두 번 호출해서 서로 다른 결과가 발생한다면 호출하는 입장에서는 함수의 의미를 명확하게 알지 못할 것이다.
 
-##### Exception
+##### 예외
 
-Sometimes we control the details of a set of operations by an environment variable, e.g., normal vs. verbose output or debug vs. optimized.
-The use of a non-local control is potentially confusing, but controls only implementation details of otherwise fixed semantics.
+때때로 우리는 환경 변수를 통해 연산의 세부 사항을 제어한다. 예를 들어, 일반적인 출력 대 상세한 출력, 디버그 대 최적화 등이 있다.
+전역 제어를 사용하면 잠재적인 문제가 있기는 하지만, 그렇게 하지 않으면 고정되었을 의도를 구현하는데 세밀하게 제어할 수 있다.
 
-##### Example, bad
+##### 나쁜 예제
 
-Reporting through non-local variables (e.g., `errno`) is easily ignored. For example:
+`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시되기 쉽다. 예를 들어,
 
     // don't: no test of printf's return value
     fprintf(connection, "logging: %d %d %d\n", x, y, s);
 
-What if the connection goes down so that no logging output is produced? See I.??.
+만약 연결(connection)이 다운되어 로그가 만들어지지 않는다면 어떨까? I.?? 규칙을 봐라.
 
-**Alternative**: Throw an exception. An exception cannot be ignored.
+**대안**: 예외를 발생시켜라. 예외는 무시할 수 없다.
 
-**Alternative formulation**: Avoid passing information across an interface through non-local or implicit state.
-Note that non-`const` member functions pass information to other member functions through their object's state.
+**공식 대안**: 전역 또는 암시적 상태의 값을 통해 인터페이스로 정보가 전달되는 것을 피하라.
+`const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라. 
 
-**Alternative formulation**: An interface should be a function or a set of functions.
-Functions can be template functions and sets of functions can be classes or class templates.
+**공식 대안**: 인터페이스는 함수나 함수의 집합이어야 한다.
+함수는 템플릿 함수일 수 있고 함수 집합은 클래스나 클래스 템플릿일 수 있다.
 
-##### Enforcement
+##### 적용
 
-* (Simple) A function should not make control-flow decisions based on the values of variables declared at namespace scope.
-* (Simple) A function should not write to variables declared at namespace scope.
+* (간단함) 함수는 네임스페이스 범위에서 선언된 변수 값에 따라 제어 흐름을 결정해서는 안된다.
+* (간단함) 함수는 네임스페이스 범위에서 선언된 변수에 값을 저장해서는 안된다.
 
 ### <a name="Ri-global"></a>I.2 Avoid global variables
 
