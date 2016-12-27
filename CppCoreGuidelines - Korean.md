@@ -345,7 +345,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 
 이 장의 규칙은 매우 일반적이다.
 
-철학 규칙 요약
+철학 규칙 요약:
 
 * [P.1: 아이디어를 직접 코드로 표현하라](#Rp-direct)
 * [P.2: ISO 표준 C++로 작성하라](#Rp-Cplusplus)
@@ -1028,41 +1028,41 @@ This is a variant of the [subset of superset principle](#R0) that underlies thes
 * Look for "messy code" such as complex pointer manipulation and casting outside the implementation of abstractions.
 
 
-# <a name="S-interfaces"></a>I: Interfaces
+# <a name="S-interfaces"></a>I(Interfaces): 인터페이스 
 
-An interface is a contract between two parts of a program. Precisely stating what is expected of a supplier of a service and a user of that service is essential.
-Having good (easy-to-understand, encouraging efficient use, not error-prone, supporting testing, etc.) interfaces is probably the most important single aspect of code organization.
+인터페이스는 프로그램 두 부분 사이의 계약이다. 서비스의 공급자와 사용자가 기대하는 바를 정확하게 기술하는 것이 핵심이다.
+(이해하기 쉽고, 효율적인 사용을 장려하고, 쉽게 오류가 발생하지 않고, 테스트를 지원하는 등) 좋은 인터페이스는 아마도 코드 구성 중에서 가장 중요한 요소 중 하나다.
 
-Interface rule summary:
+인터페이스 규칙 요약:
 
-* [I.1: Make interfaces explicit](#Ri-explicit)
-* [I.2: Avoid global variables](#Ri-global)
-* [I.3: Avoid singletons](#Ri-singleton)
-* [I.4: Make interfaces precisely and strongly typed](#Ri-typed)
-* [I.5: State preconditions (if any)](#Ri-pre)
-* [I.6: Prefer `Expects()` for expressing preconditions](#Ri-expects)
-* [I.7: State postconditions](#Ri-post)
-* [I.8: Prefer `Ensures()` for expressing postconditions](#Ri-ensures)
-* [I.9: If an interface is a template, document its parameters using concepts](#Ri-concepts)
-* [I.10: Use exceptions to signal a failure to perform a required tasks](#Ri-except)
-* [I.11: Never transfer ownership by a raw pointer (`T*`)](#Ri-raw)
-* [I.12: Declare a pointer that must not be null as `not_null`](#Ri-nullptr)
-* [I.13: Do not pass an array as a single pointer](#Ri-array)
+* [I.1: 인터페이스를 명확하게 만들어라](#Ri-explicit)
+* [I.2: 전역 변수를 피하라](#Ri-global)
+* [I.3: 싱글톤을 피하라](#Ri-singleton)
+* [I.4: 인터페이스를 정확하게, 강타입으로 만들어라](#Ri-typed)
+* [I.5: (있다면) 사전 조건을 기술하라](#Ri-pre)
+* [I.6: 사전 조건을 표현하고 싶다면 `Expects()`를 사용하라](#Ri-expects)
+* [I.7: 사후 조건을 기술하라](#Ri-post)
+* [I.8: 사후 조건을 표현하고 싶다면 `Ensures()`를 사용하라](#Ri-ensures)
+* [I.9: 인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라](#Ri-concepts)
+* [I.10: 요구된 작업의 수행 실패를 알리기 위해 예외를 사용하라](#Ri-except)
+* [I.11: 처리되지 않은 포인터(`T*`)로 소유권을 넘기지 마라](#Ri-raw)
+* [I.12: NULL이 될 수 없는 포인터는 `not_null`로 선언하라](#Ri-nullptr)
+* [I.13: 배열을 단일 포인터로 전달하지 마라](#Ri-array)
 * [I.22: Avoid complex initialization of global objects](#Ri-global-init)
-* [I.23: Keep the number of function arguments low](#Ri-nargs)
-* [I.24: Avoid adjacent unrelated parameters of the same type](#Ri-unrelated)
-* [I.25: Prefer abstract classes as interfaces to class hierarchies](#Ri-abstract)
-* [I.26: If you want a cross-compiler ABI, use a C-style subset](#Ri-abi)
+* [I.23: 함수 인자 갯수를 최소로 유지하라](#Ri-nargs)
+* [I.24: 관련없는 동일 타입의 인접한 매개 변수는 피하라](#Ri-unrelated)
+* [I.25: 인터페이스로 클래스 계층보다는 추상 클래스를 사용하라](#Ri-abstract)
+* [I.26: 크로스 컴파일러 ABI를 원한다면 C 스타일 코드를 사용하라](#Ri-abi)
 
-See also
+참고할 만한 내용:
 
-* [F: Functions](#S-functions)
-* [C.concrete: Concrete types](#SS-concrete)
-* [C.hier: Class hierarchies](#SS-hier)
-* [C.over: Overloading and overloaded operators](#SS-overload)
-* [C.con: Containers and other resource handles](#SS-containers)
-* [E: Error handling](#S-errors)
-* [T: Templates and generic programming](#S-templates)
+* [F(Functions): 함수](#S-functions)
+* [C.concrete: 실제 타입](#SS-concrete)
+* [C.hier: 클래스 계층](#SS-hier)
+* [C.over: 오버로딩과 오버로딩된 연산자](#SS-overload)
+* [C.con: 컨테이너와 다른 리소스 핸들](#SS-containers)
+* [E: 오류 처리](#S-errors)
+* [T: 템플릿과 제너릭 프로그래밍](#S-templates)
 
 ### <a name="Ri-explicit"></a>I.1: Make interfaces explicit
 
