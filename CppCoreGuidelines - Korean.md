@@ -1958,18 +1958,18 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 (Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
 
-# <a name="S-functions"></a>F: Functions
+# <a name="S-functions"></a>함수
 
-A function specifies an action or a computation that takes the system from one consistent state to the next. It is the fundamental building block of programs.
+함수는 동작 또는 일관된 상태의 변화로부터 체계를 취하는 계산을 명시한다. 함수는 프로그램을 구성하는 근간이다.
 
-It should be possible to name a function meaningfully, to specify the requirements of its argument, and clearly state the relationship between the arguments and the result. An implementation is not a specification. Try to think about what a function does as well as about how it does it.
-Functions are the most critical part in most interfaces, so see the interface rules.
+함수는 함수인자의 요구사항을 나타낼 수 있는 의미있는 이름을 가져야하고, 인자와 결과값의 관계가 명확하게 기술되어야한다. 함수의 구현은 설명서를 작성하는 것이 아니다. 함수가 무엇을 해야하고, 어떻게 해야하는지를 생각해봐야 한다.
+함수는 대부분의 인터페이스에서 가장 중요한 부분이다. 인터페이스 규칙을 참고하기 바란다.
 
-Function rule summary:
+함수 규칙 요약:
 
-Function definition rules:
+함수 정의 규칙들:
 
-* [F.1: "Package" meaningful operations as carefully named functions](#Rf-package)
+* [F.1: "패키지"란, 고심끝에 이름지어진 함수처럼 의미있는 기능들의 모음](#Rf-package)
 * [F.2: A function should perform a single logical operation](#Rf-logical)
 * [F.3: Keep functions short and simple](#Rf-single)
 * [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
@@ -1978,7 +1978,7 @@ Function definition rules:
 * [F.7: For general use, take `T*` or `T&` arguments rather than smart pointers](#Rf-smart)
 * [F.8: Prefer pure functions](#Rf-pure)
 
-Parameter passing expression rules:
+파라미터 전달 표현 규칙들:
 
 * [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
 * [F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to `const`](#Rf-in)
@@ -1989,7 +1989,7 @@ Parameter passing expression rules:
 * [F.21: To return multiple "out" values, prefer returning a tuple or struct](#Rf-out-multi)
 * [F.60: Prefer `T*` over `T&` when "no argument" is a valid option](#Rf-ptr-ref)
 
-Parameter passing semantic rules:
+파라미터 전달 의미론적 규칙들:
 
 * [F.22: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
 * [F.23: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
@@ -1998,7 +1998,7 @@ Parameter passing semantic rules:
 * [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
 * [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
 
-Value return semantic rules:
+값 반환 의미론적 규칙들:
 
 * [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
 * [F.43: Never (directly or indirectly) return a pointer or a reference to a local object](#Rf-dangle)
@@ -2007,7 +2007,7 @@ Value return semantic rules:
 * [F.46: `int` is the return type for `main()`](#Rf-main)
 * [F.47: Return `T&` from assignment operators.](#Rf-assignment-op)
 
-Other function rules:
+그 밖에 함수 규칙들:
 
 * [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
 * [F.51: Where there is a choice, prefer default arguments over overloading](#Rf-default-args)
@@ -2015,20 +2015,20 @@ Other function rules:
 * [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
 * [F.54: If you capture `this`, capture all variables explicitly (no default capture)](#Rf-this-capture)
 
-Functions have strong similarities to lambdas and function objects so see also Section ???.
+함수는 람다와 함수객체와 매우 유사하다. 그러니 ???을 참고하라.
 
-## <a name="SS-fct-def"></a>F.def: Function definitions
+## <a name="SS-fct-def"></a>F.def: 함수 정의
 
-A function definition is a function declaration that also specifies the function's implementation, the function body.
+함수 정의는 함수를 선언하고 몸체를 구현하는 것을 포함한다.
 
-### <a name="Rf-package"></a>F.1: "Package" meaningful operations as carefully named functions
+### <a name="Rf-package"></a>F.1: "패키지"란, 고심끝에 이름지어진 함수처럼 의미있는 기능들의 모음
 
-##### Reason
+##### 이유
 
-Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
-If something is a well-specified action, separate it out from its surrounding code and give it a name.
+공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 에러 발생을 제한시킨다.
+훌륭하게 기술된 동작이 있다면 주변 코드로부터 분리하고 이름을 지어라.
 
-##### Example, don't
+##### 나쁜 예,
 
     void read_and_print(istream& is)    // read and print an int
     {
@@ -2039,8 +2039,8 @@ If something is a well-specified action, separate it out from its surrounding co
             cerr << "no int on input\n";
     }
 
-Almost everything is wrong with `read_and_print`.
-It reads, it writes (to a fixed `ostream`), it writes error messages (to a fixed `ostream`), it handles only `int`s.
+`read_and_print`는 대부분이 틀렸다.
+이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 에러 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
 There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
 For a tiny example, this looks OK, but if the input operation, the output operation, and the error handling had been more complicated the tangled
 mess could become hard to understand.
