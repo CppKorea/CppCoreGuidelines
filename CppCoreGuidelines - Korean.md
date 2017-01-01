@@ -1108,13 +1108,13 @@ This is a variant of the [subset of superset principle](#R0) that underlies thes
 * (간단함) 함수는 네임스페이스 범위에서 선언된 변수 값에 따라 제어 흐름을 결정해서는 안된다.
 * (간단함) 함수는 네임스페이스 범위에서 선언된 변수에 값을 저장해서는 안된다.
 
-### <a name="Ri-global"></a>I.2 Avoid global variables
+### <a name="Ri-global"></a>I.2: 전역 변수를 피하라
 
-##### Reason
+##### 이유
 
-Non-`const` global variables hide dependencies and make the dependencies subject to unpredictable changes.
+const가 아닌 전역 변수는 의존성을 숨기고 예측하지 못한 변화에 의존하게 만든다.
 
-##### Example
+##### 예제
 
     struct Data {
         // ... lots of stuff ...
@@ -1130,30 +1130,31 @@ Non-`const` global variables hide dependencies and make the dependencies subject
         // ... use data ...
     }
 
-Who else might modify `data`?
+다른 누군가가 `data`를 수정할 수 있는가?
 
-##### Note
+##### 비고
 
-Global constants are useful.
+전역 상수는 유용하다.
 
-##### Note
+##### 비고
 
-The rule against global variables applies to namespace scope variables as well.
+전역 변수에 반하는 규칙은 네임스페이스 스코프의 변수에도 동일하게 적용한다.
 
-**Alternative**: If you use global (more generally namespace scope data) to avoid copying, consider passing the data as an object by reference to `const`.
-Another solution is to define the data as the state of some object and the operations as member functions.
+**대안**: 복사를 피하기 위해 전역 변수(좀 더 일반화해서 네임스페이스 스코프의 데이터)를 사용한다면 `const` 레퍼런스로 개체를 전달하는 것을 고려하라.
+다른 해결책은 개체의 상태로서의 데이터와 멤버 함수로서의 연산을 정의하는 것이다. 
 
-**Warning**: Beware of data races: If one thread can access nonlocal data (or data passed by reference) while another thread executes the callee, we can have a data race.
+**경고**: 데이터 경합을 조심하라. 하나의 스레드가 실행되는 동안 다른 스레드가 전역 데이터(또는 레퍼런스로 전달된 데이터)에 접근하려고 한다면, 데이터 경합이 발생할 수 있다.
 Every pointer or reference to mutable data is a potential data race.
 
-##### Note
+##### 비고
 
-You cannot have a race condition on immutable data.
+변경할 수 없는 데이터에 대해서는 경합 조건이 생기지 않는다.
 
-**References**: See the [rules for calling functions](#SS-call).
+**참고 항목**: [함수 호출에 대한 규칙](#SS-call)을 보라.
 
-##### Enforcement
+##### 적용
 
+(간단함) 네임스페이스 스코프 내에 정의된 `const`가 아닌 변수에 대해서 모두 보고하라.
 (Simple) Report all non-`const` variables declared at namespace scope.
 
 ### <a name="Ri-singleton"></a>I.3: Avoid singletons
