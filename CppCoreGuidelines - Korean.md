@@ -1155,31 +1155,30 @@ Every pointer or reference to mutable data is a potential data race.
 ##### 적용
 
 (간단함) 네임스페이스 스코프 내에 정의된 `const`가 아닌 변수에 대해서 모두 보고하라.
-(Simple) Report all non-`const` variables declared at namespace scope.
 
-### <a name="Ri-singleton"></a>I.3: Avoid singletons
+### <a name="Ri-singleton"></a>I.3: 싱글톤을 피하라
 
-##### Reason
+##### 이유
 
-Singletons are basically complicated global objects in disguise.
+싱글톤은 기본적으로 복잡한 전역 개체이다.
 
-##### Example
+##### 예제
 
     class Singleton {
         // ... lots of stuff to ensure that only one Singleton object is created,
         // that it is initialized properly, etc.
     };
 
-There are many variants of the singleton idea.
-That's part of the problem.
+싱글톤 아이디어에는 많은 변형이 있다.
+그것이 문제의 일부다.
 
-##### Note
+##### 비고
 
-If you don't want a global object to change, declare it `const` or `constexpr`.
+전역 개체가 변경되지 않게 하려면, `const`나 `constexpr`로 선언하라.
 
-##### Exception
+##### 예외
 
-You can use the simplest "singleton" (so simple that it is often not considered a singleton) to get initialization on first use, if any:
+제일 단순한 "싱글톤"(처음에는 싱글톤으로 간주하지 않으므로 간단함)을 사용해 처음 사용시 초기화를 할 수 있다.
 
     X& myX()
     {
@@ -1187,9 +1186,9 @@ You can use the simplest "singleton" (so simple that it is often not considered 
         return my_x;
     }
 
-This is one of the most effective solutions to problems related to initialization order.
-In a multi-threaded environment the initialization of the static object does not introduce a race condition
-(unless you carelessly access a shared object from within its constructor).
+이 방식은 초기화 순서와 관련된 문제에 대해 가장 효과적인 해결책 중 하나다.
+다중 스레드 환경에서 정적 개체의 초기화는 경합 조건을 유발하지 않는다.
+(단, 생성자 내에서 공유 개체에 부주의하게 접근하지 않아야 한다.)
 
 Note that the initialization of a local `static` does not imply a race condition.
 However, if the destruction of `X` involves an operation that needs to be synchronized we must use a less simple solution.
@@ -1208,14 +1207,14 @@ That's error-prone, so we don't use that technique unless
 * that `X` object needs to be destroyed (e.g., because it releases a resource), and
 * `X`'s destructor's code needs to be synchronized.
 
-If you, as many do, define a singleton as a class for which only one object is created, functions like `myX` are not singletons, and this useful technique is not an exception to the no-singleton rule.
+하나의 개체만 생성해야 하는 클래스로 싱글톤을 정의한다면 `myX`와 같은 함수는 싱글톤이 아니다. 그리고 이 유용한 테크닉은 싱글톤이 아닌 규칙에 대한 예외는 아니다.
 
-##### Enforcement
+##### 적용
 
-Very hard in general.
+일반적으로 매우 힘들다.
 
-* Look for classes with names that include `singleton`.
-* Look for classes for which only a single object is created (by counting objects or by examining constructors).
+* `singleton`을 포함하는 이름을 가진 클래스를 찾는다.
+* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾는다.
 * If a class X has a public static function that contains a function-local static of the class' type X and returns a pointer or reference to it, ban that.
 
 ### <a name="Ri-typed"></a>I.4: Make interfaces precisely and strongly typed
