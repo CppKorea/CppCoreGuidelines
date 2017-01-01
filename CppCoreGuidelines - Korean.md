@@ -14,7 +14,7 @@
 자세한 내용은 첨부된 [라이선스 파일(LICENSE)](LICENSE)을 참조하길 바란다.
 오픈 소스 프로젝트에 익숙한 사용자들이 사용, 복사, 수정, 파생 성과물들을 통해 좋은 정보를 제공해주기 바란다.
 
-개선 사항에 대한 의견과 제안은 대부분 환영한다.
+개선 사항에 대한 의견과 제안은 대부분 환영한다
 C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
 의견을 보내고 싶다면, [소개](#S-introduction)에 있는 목적과 방법을 참고하기 바란다.
 기여자 목록은 [여기](#SS-ack)를 참고하기 바란다.
@@ -2028,7 +2028,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 에러 발생을 제한시킨다.
 훌륭하게 기술된 동작이 있다면 주변 코드로부터 분리하고 이름을 지어라.
 
-##### 나쁜 예,
+##### 나쁜 예제,
 
     void read_and_print(istream& is)    // read and print an int
     {
@@ -2041,37 +2041,35 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 `read_and_print`는 대부분이 틀렸다.
 이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 에러 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
-There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
-For a tiny example, this looks OK, but if the input operation, the output operation, and the error handling had been more complicated the tangled
-mess could become hard to understand.
+재사용되는 코드가 없고 논리적으로 분리된 동작들은 섞였고 지역변수는 사용이 끝난 후에도 존재한다.
+간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 에러처리가 좀 더 복잡해지면 뒤엉킨 코드들은 이해하기 어려워 질 것이다.
 
-##### Note
+##### 비고
 
-If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
+만약 한 곳 이상에서 사용 될 중요한 람다 함수를 작성한다면 (비지역)변수에 할당하고 이름을 지어줘라.
 
-##### Example
+##### 예제
 
     sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
 
-Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
+람다에 이름을 지어주면 표현식을 논리적인 파트로 나눌 수 있고 람다의 의미를 알 수 있는 힌트가 제공된다.
 
     auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
 
     sort(a, b, lessT);
     find_if(a, b, lessT);
 
-The shortest code is not always the best for performance or maintainability.
+짧은 코드가 성능이나 유지보수에는 적절하지 않을 수 있다.
 
-##### Exception
+##### 예외
 
-Loop bodies, including lambdas used as loop bodies, rarely need to be named.
-However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
-The rule [Keep functions short](#Rf-single) implies "Keep loop bodies short."
-Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be re-usable.
+반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
+하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
+[함수를 짧게 유지하라](#Rf-single) 규칙은 "반복문 몸체를 짧게하라"도 동시에 내포한다. 콜백 인자로 사용되는 람다는 재사용되지는 않지만 때때로 중요하게 여겨진다.
 
-##### Enforcement
+##### 적용
 
-* See [Keep functions short](#Rf-single)
+* [함수를 짧게 유지하라](#Rf-single)를 참고하라.
 * Flag identical and very similar lambdas used in different places.
 
 ### <a name="Rf-logical"></a>F.2: A function should perform a single logical operation
