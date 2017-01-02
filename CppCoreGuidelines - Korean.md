@@ -1213,41 +1213,41 @@ That's error-prone, so we don't use that technique unless
 
 일반적으로 매우 힘들다.
 
-* `singleton`을 포함하는 이름을 가진 클래스를 찾는다.
-* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾는다.
+* `singleton`을 포함하는 이름을 가진 클래스를 찾아라.
+* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾아라.
 * If a class X has a public static function that contains a function-local static of the class' type X and returns a pointer or reference to it, ban that.
 
-### <a name="Ri-typed"></a>I.4: Make interfaces precisely and strongly typed
+### <a name="Ri-typed"></a>I.4: 인터페이스를 정확하게, 강타입으로 만들어라
 
-##### Reason
+##### 이유
 
-Types are the simplest and best documentation, have well-defined meaning, and are guaranteed to be checked at compile time.
-Also, precisely typed code is often optimized better.
+타입은 가장 단순하지만 최고의 문서이기도 하다. 잘 정의된 의미를 갖고 있고, 컴파일 타임 검사가 보장된다.
+또한 정확하게 입력된 코드는 더 잘 최적화된다.
 
-##### Example, don't
+##### 하지 말아야 할 예제
 
-Consider:
+다음을 고려해 보자:
 
     void pass(void* data);    // void* is suspicious
 
-Now the callee has to cast the data pointer (back) to a correct type to use it. That is error-prone and often verbose.
-Avoid `void*`, especially in interfaces.
-Consider using a `variant` or a pointer to base instead.
+이제 함수를 호출하는 곳에서 올바른 타입으로 사용하기 위해 `data` 포인터를 캐스팅해야 한다. 하지만 오류가 발생하기 쉽고, 구질구질하다.
+특히 인터페이스에서 `void*`를 피하라.
+대신 베이스 클래스를 가리키는 포인터나 `variant` 사용을 고려하라.
 
-**Alternative**: Often, a template parameter can eliminate the `void*` turning it into a `T*` or `T&`.
+**대안**: 때때로 템플릿 매개 변수는 `void*`를 제거하고 `T*`나 `T&`로 변환할 수 있다.
 For generic code these `T`s can be general or concept constrained template parameters.
 
-##### Example, bad
+##### 나쁜 예제
 
-Consider:
+다음을 고려해 보자:
 
     void draw_rect(int, int, int, int);   // great opportunities for mistakes
 
     draw_rect(p.x, p.y, 10, 20);          // what does 10, 20 mean?
 
-An `int` can carry arbitrary forms of information, so we must guess about the meaning of the four `int`s.
-Most likely, the first two are an `x`,`y` coordinate pair, but what are the last two?
-Comments and parameter names can help, but we could be explicit:
+`int`는 임의 형태의 정보를 전달할 수 있어서, 네 `int`가 각각 어떤 의미를 갖는지를 유추해야 한다.
+아마도 처음 두 `int`는 `x`, `y` 좌표일 것 같지만, 나머지 두 `int`는 무엇을 의미할까?
+주석이나 매개 변수 이름이 도움을 줄 수 있다. 보다 명확히 한다면, 다음과 같다.
 
     void draw_rectangle(Point top_left, Point bottom_right);
     void draw_rectangle(Point top_left, Size height_width);
@@ -1255,12 +1255,12 @@ Comments and parameter names can help, but we could be explicit:
     draw_rectangle(p, Point{10, 20});  // two corners
     draw_rectangle(p, Size{10, 20});   // one corner and a (height, width) pair
 
-Obviously, we cannot catch all errors through the static type system
-(e.g., the fact that a first argument is supposed to be a top-left point is left to convention (naming and comments)).
+분명히 정적 타입 시스템을 통해 모든 오류를 잡아낼 수는 없다.
+(예를 들어, 첫번째 인자가 왼쪽 상단에 있는 점이라는 사실은 이름이나 주석 등을 통해 편의상 정해져 있을 뿐이다.)
 
-##### Example, bad
+##### 나쁜 예제
 
-In the following example, it is not clear from the interface what `time_to_blink` means: Seconds? Milliseconds?
+다음 예제에서 인터페이스만 보고는 `time_to_blink`이 무엇을 의미하는지 잘 모르겠다. 초를 의미할까? 밀리초를 의미할까?
 
     void blink_led(int time_to_blink) // bad -- the unit is ambiguous
     {
@@ -1274,9 +1274,9 @@ In the following example, it is not clear from the interface what `time_to_blink
         blink_led(2);
     }
 
-##### Example, good
+##### 좋은 예제
 
-`std::chrono::duration` types (C++11) helps making the unit of time duration explicit.
+C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 명시적으로 표현하는데 도움이 된다.
 
     void blink_led(milliseconds time_to_blink) // good -- the unit is explicit
     {
@@ -1290,7 +1290,7 @@ In the following example, it is not clear from the interface what `time_to_blink
         blink_led(1500ms);
     }
 
-The function can also be written in such a way that it will accept any time duration unit.
+어떤 종류의 지속 시간의 단위도 허용하도록 함수를 다음과 같이 작성할 수도 있다.
 
     template<class rep, class period>
     void blink_led(duration<rep, period> time_to_blink) // good -- accepts any unit
@@ -1308,10 +1308,10 @@ The function can also be written in such a way that it will accept any time dura
         blink_led(1500ms);
     }
 
-##### Enforcement
+##### 적용
 
-* (Simple) Report the use of `void*` as a parameter or return type.
-* (Hard to do well) Look for member functions with many built-in type arguments.
+* (간단함) `void*`를 매개 변수나 리턴 타입으로 사용한다면 보고하라.
+* (잘하기 어려움) 다수의 내장 타입 인자를 갖는 멤버 함수를 찾아라.
 
 ### <a name="Ri-pre"></a>I.5: State preconditions (if any)
 
