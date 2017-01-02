@@ -1230,7 +1230,7 @@ That's error-prone, so we don't use that technique unless
 
     void pass(void* data);    // void* is suspicious
 
-이제 함수를 호출하는 곳에서 올바른 타입으로 사용하기 위해 `data` 포인터를 캐스팅해야 한다. 하지만 오류가 발생하기 쉽고, 구질구질하다.
+이제 피호출자에서 올바른 타입으로 사용하기 위해 `data` 포인터를 캐스팅해야 한다. 하지만 오류가 발생하기 쉽고, 구질구질하다.
 특히 인터페이스에서 `void*`를 피하라.
 대신 베이스 클래스를 가리키는 포인터나 `variant` 사용을 고려하라.
 
@@ -1313,46 +1313,46 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 * (간단함) `void*`를 매개 변수나 리턴 타입으로 사용한다면 보고하라.
 * (잘하기 어려움) 다수의 내장 타입 인자를 갖는 멤버 함수를 찾아라.
 
-### <a name="Ri-pre"></a>I.5: State preconditions (if any)
+### <a name="Ri-pre"></a>I.5: (있다면) 사전 조건을 기술하라
 
-##### Reason
+##### 이유
 
-Arguments have meaning that may constrain their proper use in the callee.
+인자는 피호출자에서 적절한 사용을 제한할 수 있는 의미를 갖는다.
 
-##### Example
+##### 예제
 
-Consider:
+다음을 고려해 보자:
 
     double sqrt(double x);
 
-Here `x` must be nonnegative. The type system cannot (easily and naturally) express that, so we must use other means. For example:
+여기서 `x`는 반드시 음수가 아니어야 한다. 타입 시스템으로는 이를 (있는 그대로 쉽게) 표현할 수 없고, 그래서 다른 수단을 사용해야 한다. 예를 들어,
 
     double sqrt(double x); // x must be nonnegative
 
-Some preconditions can be expressed as assertions. For example:
+일부 사전 조건은 단정문으로 표현하기도 한다. 예를 들어,
 
     double sqrt(double x) { Expects(x >= 0); /* ... */ }
 
-Ideally, that `Expects(x >= 0)` should be part of the interface of `sqrt()` but that's not easily done. For now, we place it in the definition (function body).
+이상적으로 `Expects(x >= 0)` 조건이 `sqrt()`의 인터페이스에 일부분이 되는게 가장 좋지만 그렇게 하기는 쉽지 않다. 따라서 지금은 함수 정의부(함수 본문)에 위치시킨다.
 
-**References**: `Expects()` is described in [GSL](#S-gsl).
+**참고 항목**: `Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
 
-##### Note
+##### 비고
 
-Prefer a formal specification of requirements, such as `Expects(p != nullptr);`.
-If that is infeasible, use English text in comments, such as `// the sequence [p:q) is ordered using <`.
+`Excepts(p != nullptr);`처럼 요구 사항의 공식적인 명세를 선호하라.
+불가능하다면, `// the sequence [p:q) is ordered using <`와 같이 영문 텍스트 주석을 사용하라.
 
-##### Note
+##### 비고
 
-Most member functions have as a precondition that some class invariant holds.
-That invariant is established by a constructor and must be reestablished upon exit by every member function called from outside the class.
-We don't need to mention it for each member function.
+대부분의 멤버 함수는 클래스의 불변 조건 중 일부에 해당하는 선행 조건을 갖고 있다.
+해당 불변 조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 멤버 함수를 통해 재구성되어야 한다.
+그래서 각 함수마다 언급할 필요는 없다.
 
-##### Enforcement
+##### 적용
 
-(Not enforceable)
+(적용 불가능)
 
-**See also**: The rules for passing pointers. ???
+**참고 항목**: 포인터 전달에 대한 규칙. ???
 
 ### <a name="Ri-expects"></a>I.6: Prefer `Expects()` for expressing preconditions
 
