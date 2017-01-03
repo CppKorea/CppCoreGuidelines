@@ -1354,13 +1354,13 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 **참고 항목**: 포인터 전달에 대한 규칙. ???
 
-### <a name="Ri-expects"></a>I.6: Prefer `Expects()` for expressing preconditions
+### <a name="Ri-expects"></a>I.6: 사전 조건을 표현하고 싶다면 `Expects()`를 사용하라
 
-##### Reason
+##### 이유
 
-To make it clear that the condition is a precondition and to enable tool use.
+사전 조건임을 명확하게 표시하고 툴 사용을 쉽게 만들기 위해서다.
 
-##### Example
+##### 예제
 
     int area(int height, int width)
     {
@@ -1369,24 +1369,23 @@ To make it clear that the condition is a precondition and to enable tool use.
         // ...
     }
 
-##### Note
+##### 비고
 
-Preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`.
-This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics (do you always want to abort in debug mode and check nothing in productions runs?).
+사전 조건은 `if`문, `assert()`문, 주석문 등으로 기술할 수 있다.
+하지만 이런 구문은 일반 코드와 구분, 갱신하거나 툴로 조작하기 어렵고 잘못된 의미를 가질 수도 있다. (디버그 모드일 때는 중단시키고, 릴리즈 모드일때는 검사하고 싶은가?)
 
-##### Note
+##### 비고
 
-Preconditions should be part of the interface rather than part of the implementation,
-but we don't yet have the language facilities to do that.
+사전 조건은 구현 부분보다는 인터페이스 부분에 포함시켜야 한다. 하지만 아직은 그렇게 할 수 있는 언어 기능이 없다.
 Once language support becomes available (e.g., see the [contract proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) we will adopt the standard version of preconditions, postconditions, and assertions.
 
-##### Note
+##### 비고
 
-`Expects()` can also be used to check a condition in the middle of an algorithm.
+`Expects()`은 알고리즘 중간에 조건을 검사하는데 사용할 수도 있다.
 
-##### Enforcement
+##### 적용
 
-(Not enforceable) Finding the variety of ways preconditions can be asserted is not feasible. Warning about those that can be easily identified (`assert()`) has questionable value in the absence of a language facility.
+(적용 불가능) 사전 조건이 단정될 수 있는 다양한 방법을 찾는 것은 실현 가능하지 않다. 쉽게 식별할 수 있는 것들에 대해 경고(`assert()`)를 할 수 있는 언어 기능이 없다면 의심의 여지가 생길 수 밖에 없다.
 
 ### <a name="Ri-post"></a>I.7: State postconditions
 
