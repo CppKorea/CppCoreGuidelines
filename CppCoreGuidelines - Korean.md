@@ -1387,22 +1387,24 @@ Once language support becomes available (e.g., see the [contract proposal](http:
 
 (적용 불가능) 사전 조건이 단정될 수 있는 다양한 방법을 찾는 것은 실현 가능하지 않다. 쉽게 식별할 수 있는 것들에 대해 경고(`assert()`)를 할 수 있는 언어 기능이 없다면 의심의 여지가 생길 수 밖에 없다.
 
-### <a name="Ri-post"></a>I.7: State postconditions
+### <a name="Ri-post"></a>I.7: 사후 조건을 기술하라
 
-##### Reason
+##### 이유
 
+결과에 대해 잘못 이해하고 있는 부분과 잘못된 구현을 찾아내기 위해서다.
 To detect misunderstandings about the result and possibly catch erroneous implementations.
 
-##### Example, bad
+##### 나쁜 예제
 
-Consider:
+다음을 고려해 보자:
 
     int area(int height, int width) { return height * width; }  // bad
 
-Here, we (incautiously) left out the precondition specification, so it is not explicit that height and width must be positive.
-We also left out the postcondition specification, so it is not obvious that the algorithm (`height * width`) is wrong for areas larger than the largest integer.
-Overflow can happen.
-Consider using:
+여기서 부주의하게 높이와 폭이 양수여야 한다는 사전 조건 명세를 빠뜨렸다.
+역시 넓이를 구하는 알고리즘(`hieght * width`)이 정수의 최댓값보다 클 수 있다는 사후 조건 명세를 빠뜨렸다.
+오버플로우가 발생할 수 있다.
+
+다음 사용을 고려해 보자:
 
     int area(int height, int width)
     {
@@ -1411,9 +1413,9 @@ Consider using:
         return res;
     }
 
-##### Example, bad
+##### 나쁜 예제
 
-Consider a famous security bug:
+악명 높은 보안 버그를 고려해 보자:
 
     void f()    // problematic
     {
@@ -1422,7 +1424,7 @@ Consider a famous security bug:
         memset(buffer, 0, MAX);
     }
 
-There was no postcondition stating that the buffer should be cleared and the optimizer eliminated the apparently redundant `memset()` call:
+버퍼가 초기화되어야 하고 최적화하면서 중복되는 `memset()`의 호출을 제거했음을 설명하는 사후 조건이 없다.
 
     void f()    // better
     {
@@ -1432,17 +1434,17 @@ There was no postcondition stating that the buffer should be cleared and the opt
         Ensures(buffer[0] == 0);
     }
 
-##### Note
+##### 비고
 
-Postconditions are often informally stated in a comment that states the purpose of a function; `Ensures()` can be used to make this more systematic, visible, and checkable.
+사후 조건은 종종 함수의 목적을 기술하는 주석문에 비공식적으로 명시되어 있다. `Ensures()`를 사용함으로서 더 시스템적으로 검사하는 모습을 보여줄 수 있다.
 
-##### Note
+##### 비고
 
-Postconditions are especially important when they relate to something that is not directly reflected in a returned result, such as a state of a data structure used.
+사후 조건은 사용되는 자료 구조의 상태처럼 반환된 결과에 간접적으로 영향을 미치는 무언가에 연관되어 있을 때 특히 중요하다.
 
-##### Example
+##### 예제
 
-Consider a function that manipulates a `Record`, using a `mutex` to avoid race conditions:
+경합 조건을 피할 목적으로 `mutex`를 사용해 `Record`를 조작하는 함수를 고려해 보자:
 
     mutex m;
 
@@ -1452,8 +1454,8 @@ Consider a function that manipulates a `Record`, using a `mutex` to avoid race c
         // ... no m.unlock() ...
     }
 
-Here, we "forgot" to state that the `mutex` should be released, so we don't know if the failure to ensure release of the `mutex` was a bug or a feature.
-Stating the postcondition would have made it clear:
+여기서 `mutex`를 해제해야 한다는 언급을 "잊어"버렸는데, `mutex` 해제를 언급하지 않은 것이 단순히 버그인지 의도한 것인지 알 수가 없다.
+사후 조건을 기술함으로서 언급을 명확하게 할 수 있다.
 
     void manipulate(Record& r)    // postcondition: m is unlocked upon exit
     {
@@ -1461,9 +1463,9 @@ Stating the postcondition would have made it clear:
         // ... no m.unlock() ...
     }
 
-The bug is now obvious (but only to a human reading comments)
+이제 버그가 분명하게 보인다. (단, 주석을 읽는 사람에게만 보인다.)
 
-Better still, use [RAII](#Rr-raii) to ensure that the postcondition ("the lock must be released") is enforced in code:
+더 나은 방법은 [RAII](#Rc-raii)를 사용해 사후 조건("락을 해제해야 함")이 코드에 적용되도록 하는 것이다.
 
     void manipulate(Record& r)    // best
     {
@@ -1471,15 +1473,15 @@ Better still, use [RAII](#Rr-raii) to ensure that the postcondition ("the lock m
         // ...
     }
 
-##### Note
+##### 비고
 
-Ideally, postconditions are stated in the interface/declaration so that users can easily see them.
-Only postconditions related to the users can be stated in the interface.
-Postconditions related only to internal state belongs in the definition/implementation.
+이상적으로, 사후 조건은 사용자들이 쉽게 볼 수 있도록 인터페이스/선언부에 기술해야 한다.
+사용자들에게 언급되어야 하는 사후 조건만 인터페이스에 기술해야 한다.
+내부 상태에 대한 사후 조건은 정의/구현부에만 기술한다.
 
-##### Enforcement
+##### 적용
 
-(Not enforceable) This is a philosophical guideline that is infeasible to check
+(적용 불가능) This is a philosophical guideline that is infeasible to check
 directly in the general case. Domain specific checkers (like lock-holding
 checkers) exist for many toolchains.
 
