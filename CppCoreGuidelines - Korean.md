@@ -14,7 +14,7 @@
 자세한 내용은 첨부된 [라이선스 파일(LICENSE)](LICENSE)을 참조하길 바란다.
 오픈 소스 프로젝트에 익숙한 사용자들이 사용, 복사, 수정, 파생 성과물들을 통해 좋은 정보를 제공해주기 바란다.
 
-개선 사항에 대한 의견과 제안은 대부분 환영한다
+개선 사항에 대한 의견과 제안은 대부분 환영한다.
 C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
 의견을 보내고 싶다면, [소개](#S-introduction)에 있는 목적과 방법을 참고하기 바란다.
 기여자 목록은 [여기](#SS-ack)를 참고하기 바란다.
@@ -1958,18 +1958,17 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 (Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
 
-# <a name="S-functions"></a>함수
+# <a name="S-functions"></a>F(Functions): 함수
 
-함수는 동작 또는 일관된 상태의 변화로부터 체계를 취하는 계산을 명시한다. 함수는 프로그램을 구성하는 근간이다.
+함수는 어떤 동작이나 계산을 명세하는데, 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 함수는 프로그램의 기초적인 설계 단위다.
 
-함수는 함수인자의 요구사항을 나타낼 수 있는 의미있는 이름을 가져야하고, 인자와 결과값의 관계가 명확하게 기술되어야한다. 함수의 구현은 설명서를 작성하는 것이 아니다. 함수가 무엇을 해야하고, 어떻게 해야하는지를 생각해봐야 한다.
-함수는 대부분의 인터페이스에서 가장 중요한 부분이다. 인터페이스 규칙을 참고하기 바란다.
+함수 이름은 인자의 요구사항, 인자간의 관계와 결과를 명확하게 기술할 수 있도록 의미있게 지어야 한다. 함수의 구현은 사양서가 아니다. 함수가 무엇을 해야하는지, 어떻게 동작하는지를 고려해야 한다. 함수는 모든 인터페이스에서 가장 중요한 부분이다. 인터페이스 규칙을 참고 하라.
 
 함수 규칙 요약:
 
-함수 정의 규칙들:
+함수 정의 규칙:
 
-* [F.1: "패키지"란, 고심끝에 이름지어진 함수처럼 의미있는 기능들의 모음](#Rf-package)
+* [F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라](#Rf-package)
 * [F.2: A function should perform a single logical operation](#Rf-logical)
 * [F.3: Keep functions short and simple](#Rf-single)
 * [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
@@ -1978,7 +1977,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 * [F.7: For general use, take `T*` or `T&` arguments rather than smart pointers](#Rf-smart)
 * [F.8: Prefer pure functions](#Rf-pure)
 
-파라미터 전달 표현 규칙들:
+매개 변수 전달 표현 규칙:
 
 * [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
 * [F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to `const`](#Rf-in)
@@ -1989,7 +1988,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 * [F.21: To return multiple "out" values, prefer returning a tuple or struct](#Rf-out-multi)
 * [F.60: Prefer `T*` over `T&` when "no argument" is a valid option](#Rf-ptr-ref)
 
-파라미터 전달 의미론적 규칙들:
+매개 변수 의미론적 규칙:
 
 * [F.22: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
 * [F.23: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
@@ -1998,7 +1997,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 * [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
 * [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
 
-값 반환 의미론적 규칙들:
+값 반환 의미론적 규칙:
 
 * [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
 * [F.43: Never (directly or indirectly) return a pointer or a reference to a local object](#Rf-dangle)
@@ -2007,7 +2006,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 * [F.46: `int` is the return type for `main()`](#Rf-main)
 * [F.47: Return `T&` from assignment operators.](#Rf-assignment-op)
 
-그 밖에 함수 규칙들:
+기타 함수 규칙:
 
 * [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
 * [F.51: Where there is a choice, prefer default arguments over overloading](#Rf-default-args)
@@ -2025,8 +2024,8 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 ##### 이유
 
-공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 에러 발생을 제한시킨다.
-훌륭하게 기술된 동작이 있다면 주변 코드로부터 분리하고 이름을 지어라.
+공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 오류 발생을 제한시킨다.
+만약 어떤 동작이 잘 정의되어 있다면 주변 코드로부터 분리하고 이름을 지어라.
 
 ##### 나쁜 예제,
 
@@ -2040,9 +2039,9 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
     }
 
 `read_and_print`는 대부분이 틀렸다.
-이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 에러 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
+이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 오류 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
 재사용되는 코드가 없고 논리적으로 분리된 동작들은 섞였고 지역변수는 사용이 끝난 후에도 존재한다.
-간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 에러처리가 좀 더 복잡해지면 뒤엉킨 코드들은 이해하기 어려워 질 것이다.
+간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 오류처리가 좀 더 복잡해지면 코드가 뒤엉켜서 이해하기 어려워 진다.
 
 ##### 비고
 
@@ -2052,25 +2051,25 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
     sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
 
-람다에 이름을 지어주면 표현식을 논리적인 파트로 나눌 수 있고 람다의 의미를 알 수 있는 힌트가 제공된다.
+람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠할 수 있다.
 
     auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
 
     sort(a, b, lessT);
     find_if(a, b, lessT);
 
-짧은 코드가 성능이나 유지보수에는 적절하지 않을 수 있다.
+유지보수나 성능을 고려하면 짧은 코드가 항상 좋은것은 아니다.
 
 ##### 예외
 
 반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
 하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
-[함수를 짧게 유지하라](#Rf-single) 규칙은 "반복문 몸체를 짧게하라"도 동시에 내포한다. 콜백 인자로 사용되는 람다는 재사용되지는 않지만 때때로 중요하게 여겨진다.
+[함수를 짧게 유지하라](#Rf-single) 규칙은 "반복문 몸체를 짧게하라"도 동시에 내포한다. 콜백 인자로 사용되는 람다는 재사용되지는 않지만 사소하게 볼 수 없는 경우도 있다.
 
 ##### 적용
 
 * [함수를 짧게 유지하라](#Rf-single)를 참고하라.
-* Flag identical and very similar lambdas used in different places.
+* 여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두어라.
 
 ### <a name="Rf-logical"></a>F.2: A function should perform a single logical operation
 
