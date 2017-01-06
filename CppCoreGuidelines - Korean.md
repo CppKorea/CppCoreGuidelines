@@ -1969,24 +1969,24 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 함수 정의 규칙:
 
 * [F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라](#Rf-package)
-* [F.2: A function should perform a single logical operation](#Rf-logical)
-* [F.3: Keep functions short and simple](#Rf-single)
-* [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
-* [F.5: If a function is very small and time-critical, declare it inline](#Rf-inline)
-* [F.6: If your function may not throw, declare it `noexcept`](#Rf-noexcept)
-* [F.7: For general use, take `T*` or `T&` arguments rather than smart pointers](#Rf-smart)
-* [F.8: Prefer pure functions](#Rf-pure)
+* [F.2: 함수는 하나의 논리적 동작만 수행하도록 하라](#Rf-logical)
+* [F.3: 함수는 간결하고 단순하게 유지시켜라](#Rf-single)
+* [F.4: 함수가 컴파일 타임에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
+* [F.5: 함수가 매우 짧고 수행시간이 중요하다면 inline으로 선언하라](#Rf-inline)
+* [F.6: 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
+* [F.7: 보편성을 고려한다면, 스마트 포인터 대신에 `T*`나 `T&`형 인자를 사용하라](#Rf-smart)
+* [F.8: 순수 함수를 선호하라](#Rf-pure)
 
 매개 변수 전달 표현 규칙:
 
-* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
-* [F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to `const`](#Rf-in)
-* [F.17: For "in-out" parameters, pass by reference to non-`const`](#Rf-inout)
-* [F.18: For "consume" parameters, pass by `X&&` and `std::move` the parameter](#Rf-consume)
-* [F.19: For "forward" parameters, pass by `TP&&` and only `std::forward` the parameter](#Rf-forward)
-* [F.20: For "out" output values, prefer return values to output parameters](#Rf-out)
-* [F.21: To return multiple "out" values, prefer returning a tuple or struct](#Rf-out-multi)
-* [F.60: Prefer `T*` over `T&` when "no argument" is a valid option](#Rf-ptr-ref)
+* [F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라](#Rf-conventional)
+* [F.16: "입력" 매개 변수는 복사 비용이 적게드는 값의 형을 사용하거나 상수 참조형으로 전달하라](#Rf-in)
+* [F.17: "입출력" 매개 변수는 비상수 참조형으로 전달하라](#Rf-inout)
+* [F.18: "소모성" 매개 변수는 `X&&`형과 `std::move`로 전달하라](#Rf-consume)
+* [F.19: "forward" 매개 변수는 `TP&&`형과 `std::forward`로만 전달하라](#Rf-forward)
+* [F.20: For "out" output values, 출력 매개 변수로 값을 반환하는 방법을 선호하라](#Rf-out)
+* [F.21: "출력"값 여러개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
+* [F.60: "인자가 없을 수도" 있다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
 매개 변수 의미론적 규칙:
 
