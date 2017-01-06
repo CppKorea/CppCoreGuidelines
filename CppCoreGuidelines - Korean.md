@@ -1958,7 +1958,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 (Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
 
-# <a name="S-functions"></a>F(Functions): 함수
+# <a name="S-functions"></a>F: 함수
 
 함수는 어떤 동작이나 계산을 명세하는데, 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 함수는 프로그램의 기초적인 설계 단위다.
 
@@ -2020,7 +2020,7 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 함수 정의는 함수를 선언하고 몸체를 구현하는 것을 포함한다.
 
-### <a name="Rf-package"></a>F.1: "패키지"란, 고심끝에 이름지어진 함수처럼 의미있는 기능들의 모음
+### <a name="Rf-package"></a>F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라
 
 ##### 이유
 
