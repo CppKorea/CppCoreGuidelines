@@ -1518,15 +1518,15 @@ Once language support becomes available (e.g., see the [contract proposal](http:
 
 (적용 불가능) 사후 조건을 단정할 수 있는 다양한 방식을 찾는 것은 실현 가능하지 않다. 언어 명세에 쉽게 확인할 수 있는 경고(`assert()`)문이 없다면 의문의 여지가 생길 수 밖에 없다.uage facility.
 
-### <a name="Ri-concepts"></a>I.9: If an interface is a template, document its parameters using concepts
+### <a name="Ri-concepts"></a>I.9: 인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라
 
-##### Reason
+##### 이유
 
-Make the interface precisely specified and compile-time checkable in the (not so distant) future.
+인터페이스를 정확하게, 그리고 (멀지 않은) 미래에 컴파일 타임 검사를 할 수 있게 만들어라.
 
-##### Example
+##### 예제
 
-Use the ISO Concepts TS style of requirements specification. For example:
+요구 사항 명세의 ISO 컨셉 TS 스타일을 사용하라. 예를 들어,
 
     template<typename Iter, typename Val>
     // requires InputIterator<Iter> && EqualityComparable<ValueType<Iter>>, Val>
@@ -1535,16 +1535,16 @@ Use the ISO Concepts TS style of requirements specification. For example:
         // ...
     }
 
-##### Note
+##### 비고
 
-Soon (maybe in 2017), most compilers will be able to check `requires` clauses once the `//` is removed.
-For now, the concept TS is supported only in GCC 6.1.
+곧 (아마도 2017년), `//`가 제거되면 대부분의 컴파일러가 `requires` 구문을 검사할 수 있을 것이다.
+현재 컨셉 TS는 GCC 6.1에서만 지원된다.
 
-**See also**: See [generic programming](#SS-GP) and [concepts](#SS-t-concepts).
+**참고 항목**: [제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 보라.
 
-##### Enforcement
+##### 적용
 
-(Not yet enforceable) A language facility is under specification. When the language facility is available, warn if any non-variadic template parameter is not constrained by a concept (in its declaration or mentioned in a `requires` clause).
+(아직 적용 불가능) 언어 명세를 작성중이다. 언어 명세가 정의된 후, 비가변 템플릿 매개 변수가 (선언이나 `requires`문에 언급되지 않은) 컨셉으로 제한되지 않는다면 경고하라.
 
 ### <a name="Ri-except"></a>I.10: Use exceptions to signal a failure to perform a required task
 
