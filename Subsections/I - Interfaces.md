@@ -1,37 +1,3 @@
-### <a name="Ri-ensures"></a> I.8: 후행조건을 표현할때 `Ensures()`를 사용해라.
->### <a name="Ri-ensures"></a> I.8: Prefer `Ensures()` for expressing postconditions
-
-##### Reason
-
-후행조건이라는 것을 분명히 하기 위해, 또 분석툴을 사용하기 위해.
->To make it clear that the condition is a postcondition and to enable tool use.
-
-##### Example
-
-	void f()
-	{
-		char buffer[MAX];
-		// ...
-		memset(buffer,0,MAX);
-		Ensures(buffer[0]==0);
-	}
-
-##### Note
-
-선행조건은 주석문, `if`문, `assert()`문 등으로 다양하게 언급되었다. 이런 여러 방식때문에 일반적인 코드와 구분이 어렵고 업데이트하기 어렵고 툴로 조작하기 어렵고 틀린 의미를 가지고 있을 수도 있다.
->preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`. This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics.
-
-**Alternative**: "이 자원은 반드시 해제되어야 한다" 형태의 후행조건은 [RAII](#Rc-raii)에 잘 정의되어 있다.
->**Alternative**: Postconditions of the form "this resource must be released" and best expressed by [RAII](#Rc-raii).
-
-이상적으로 `Ensured`는 인터페이스의 일부가 되어야 한다. 지금으로서는 함수 정의에 위치시킨다.(함수 내부)
->Ideally, that `Ensured` should be part of the interface that's not easily done. For now, we place it in the definition (function body).
-
-##### Enforcement
-
-(Not enforceable) 다양한 방식의 후행조건은 가능하지 않다. 언어명세에 포함되지 않은 채로 대충 정의(assert())한 후행조건에 대해서 경고하기는 거의 불가능하다.
->(Not enforceable) Finding the variety of ways postconditions can be asserted is not feasible. Warning about those that can be easily identfied (assert()) has questionable value in the absence of a language facility.
-
 ### <a name="Ri-concepts"></a> I.9: 인터페이스가 템플릿이라면 concept을 사용해서 매개변수를 문서화해라.
 >### <a name="Ri-concepts"></a> I.9: If an interface is a template, document its parameters using concepts
 

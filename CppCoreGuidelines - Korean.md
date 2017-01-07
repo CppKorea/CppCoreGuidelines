@@ -120,12 +120,12 @@ C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관�
 명백하거나 당연해 보이는 규칙도 일부 있을 것이다.
 하지만 이 가이드라인은 숙련되지 않은 개발자들 또는 다른 배경 지식을 갖거나 다른 언어를 알고 있는 개발자들이 C++ 언어를 빨리 익힐 수 있도록 돕기 위한 문서임을 기억해 주었으면 한다.
 
-우리는 분석 도구를 통해 지원할 수 있도록 대부분의 규칙들을 설계했다.
-분석 도구를 이용하면 참조(또는 링크)를 통해 어떤 규칙을 위반했는지 파악할 수 있다.
+우리는 분석 툴을 통해 지원할 수 있도록 대부분의 규칙들을 설계했다.
+분석 툴을 이용하면 참조(또는 링크)를 통해 어떤 규칙을 위반했는지 파악할 수 있다.
 모든 규칙을 알고 코드를 작성할 수는 없는 노릇이다.
-이러한 가이드라인은 무슨 문제가 발생했는지 파악할 수 있게 해주는 도구에 대한 명세라고 볼 수 있다.
+이러한 가이드라인은 무슨 문제가 발생했는지 파악할 수 있게 해주는 툴에 대한 명세라고 볼 수 있다.
 
-우리는 규칙들이 코드에 점진적으로 도입되길 바라며, 이를 위한 도구를 만들 계획을 갖고 있다.
+우리는 규칙들이 코드에 점진적으로 도입되길 바라며, 이를 위한 툴을 만들 계획을 갖고 있다.
 
 규칙을 개선하기 위한 의견과 제안은 언제든 환영한다. 
 C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
@@ -197,7 +197,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 일부 규칙은 반드시 적용되어야 하지만, 필요에 따라 적용 여부를 선택적으로 결정해야 하는 경우도 있다.
 
 여기서 다루는 규칙들을 책에서 다루는 것인냥 너무 심각하게 받아들을 필요는 없다. 링크를 통해서 규칙들을 가볍게 살펴보는 것도 괜찮다.
-사실 이처럼 규칙을 엄밀하게 정의한 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 도구를 만들기 위해서이다.
+사실 이처럼 규칙을 엄밀하게 정의한 이유는 규칙들을 위배한 코드를 찾고, 그에 대한 링크 정보를 보여주는 툴을 만들기 위해서이다.
 즉, 규칙이 만들어진 이유를 설명하고, 만약 규칙을 따르지 않았을 때 어떤 문제가 발생할 수 있고, 그 문제를 어떻게 해결할 수 있는지를 알려주기 위해서다.
 
 이 가이드라인은 C++ 튜토리얼을 대체할 용도로 작성된 것이 아니다.
@@ -368,7 +368,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 ##### 이유
 
 컴파일러는 주석문(또는 디자인 문서)을 읽지 않는다. 수많은 프로그래머 또한 주석을 (일관되게) 읽지 않는다.
-코드로 표현된 내용이라면 그 의미(의도)를 이미 정의했을 것이며 (대체로) 컴파일러나 다른 도구로 검사할 수 있다.
+코드로 표현된 내용이라면 그 의미(의도)를 이미 정의했을 것이며 (대체로) 컴파일러나 다른 툴로 검사할 수 있다.
 
 ##### 예제
 
@@ -1485,13 +1485,13 @@ To detect misunderstandings about the result and possibly catch erroneous implem
 directly in the general case. Domain specific checkers (like lock-holding
 checkers) exist for many toolchains.
 
-### <a name="Ri-ensures"></a>I.8: Prefer `Ensures()` for expressing postconditions
+### <a name="Ri-ensures"></a>I.8: 사후 조건을 표현하고 싶다면 `Ensures()`를 사용하라
 
-##### Reason
+##### 이유
 
-To make it clear that the condition is a postcondition and to enable tool use.
+사후 조건이라는 것을 분명히 하기 위해, 또 분석 툴을 사용하기 위해서다.
 
-##### Example
+##### 예제
 
     void f()
     {
@@ -1501,22 +1501,22 @@ To make it clear that the condition is a postcondition and to enable tool use.
         Ensures(buffer[0] == 0);
     }
 
-##### Note
+##### 비고
 
-Postconditions can be stated in many ways, including comments, `if`-statements, and `assert()`.
-This can make them hard to distinguish from ordinary code, hard to update, hard to manipulate by tools, and may have the wrong semantics.
+사후 조건은 주석문, `if`문, `assert()`문 등 다양한 방식으로 기술할 수 있다.
+이는 일반적인 코드와 구분을 어렵게 만들고, 갱신하기 어렵게 만들고, 툴로 조작하기 어렵게 만들며 틀린 의미를 가질 수도 있다.
 
-**Alternative**: Postconditions of the form "this resource must be released" are best expressed by [RAII](#Rr-raii).
+**대안**: "이 리소스는 반드시 해제되어야 한다" 형태의 사후 조건은 [RAII](#Rc-raii)를 통해 가장 잘 나타낼 수 있다.
 
-##### Note
+##### 비고
 
-Ideally, that `Ensures` should be part of the interface, but that's not easily done.
-For now, we place it in the definition (function body).
+이상적으로 `Ensures`는 인터페이스의 일부가 되어야 하지만, 쉽게 할 수 있는 작업이 아니다.
+현재로서는 정의 부분(함수 본문)에 위치시킨다.
 Once language support becomes available (e.g., see the [contract proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) we will adopt the standard version of preconditions, postconditions, and assertions.
 
-##### Enforcement
+##### 적용
 
-(Not enforceable) Finding the variety of ways postconditions can be asserted is not feasible. Warning about those that can be easily identified (`assert()`) has questionable value in the absence of a language facility.
+(적용 불가능) 사후 조건을 단정할 수 있는 다양한 방식을 찾는 것은 실현 가능하지 않다. 언어 명세에 쉽게 확인할 수 있는 경고(`assert()`)문이 없다면 의문의 여지가 생길 수 밖에 없다.uage facility.
 
 ### <a name="Ri-concepts"></a>I.9: If an interface is a template, document its parameters using concepts
 
