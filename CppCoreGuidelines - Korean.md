@@ -1546,14 +1546,14 @@ Once language support becomes available (e.g., see the [contract proposal](http:
 
 (아직 적용 불가능) 언어 명세를 작성중이다. 언어 명세가 정의된 후, 비가변 템플릿 매개 변수가 (선언이나 `requires`문에 언급되지 않은) 컨셉으로 제한되지 않는다면 경고하라.
 
-### <a name="Ri-except"></a>I.10: Use exceptions to signal a failure to perform a required task
+### <a name="Ri-except"></a>I.10: 요구된 작업의 수행 실패를 알리기 위해 예외를 사용하라
 
-##### Reason
+##### 이유
 
-It should not be possible to ignore an error because that could leave the system or a computation in an undefined (or unexpected) state.
-This is a major source of errors.
+시스템이나 계산 결과를 정의되지 않은(예측 불가능한) 상태로 둘 수 없으므로 오류를 무시해서는 안된다.
+이는 오류의 주 발생지가 된다.
 
-##### Example
+##### 예제
 
     int printf(const char* ...);    // bad: return negative number if output fails
 
@@ -1561,23 +1561,23 @@ This is a major source of errors.
     // good: throw system_error if unable to start the new thread
     explicit thread(F&& f, Args&&... args);
 
-##### Note
+##### 비고
 
-What is an error?
+오류란 무엇인가?
 
-An error means that the function cannot achieve its advertised purpose (including establishing postconditions).
-Calling code that ignores the error could lead to wrong results or undefined systems state.
-For example, not being able to connect to a remote server is not by itself an error:
-the server can refuse a connection for all kinds of reasons, so the natural thing is to return a result that the caller always has to check.
-However, if failing to make a connection is considered an error, then a failure should throw an exception.
+오류란 함수가 (사후 조건 설정을 포함해) 의도한 목적을 이룰 수 없는 것을 의미한다.
+오류를 무시하는 코드를 호출하면 정의되지 않은 시스템 상태나 잘못된 결과를 야기할 수 있다.
+예를 들어, 리모트 서버에 연결할 수 없는 경우 자체적으로 오류가 발생하지 않는다.
+서버는 다양한 이유로 연결을 거부할 수 있다. 따라서 호출하는 쪽에서 결과를 확인할 수 있도록 반환해 주는 것이 자연스럽다.
+그러나 연결에 실패하는 것을 오류로 간주할 생각이라면, 실패할 경우 예외를 던져야 한다.
 
-##### Exception
+##### 예외
 
-Many traditional interface functions (e.g., UNIX signal handlers) use error codes (e.g., `errno`) to report what are really status codes, rather than errors. You don't have a good alternative to using such, so calling these does not violate the rule.
+기존의 많은 인터페이스 함수들은 오류가 아닌 실제 상태 코드를 보고하기 위해 오류 코드(예를 들어, `errno`)를 사용한다. 이에 대해 별다른 대안이 없으므로 규칙을 위반하지는 않는다.
 
-##### Alternative
+##### 대안
 
-If you can't use exceptions (e.g. because your code is full of old-style raw-pointer use or because there are hard-real-time constraints), consider using a style that returns a pair of values:
+만약 (예를 들어, 여러분의 코드가 예전 스타일의 처리되지 않은 포인터로 가득하거나 실시간 제약이 심각하기 때문에) 예외를 사용할 수 없다면, 한 쌍의 값을 반환하는 스타일을 사용하는 것을 고려해 보라.
 
     int val;
     int error_code;
@@ -1597,22 +1597,22 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
     // ... use val ...
 
 
-##### Note
+##### 비고
 
-We don't consider "performance" a valid reason not to use exceptions.
+"성능"이 예외를 사용하지 않아야 하는 타당한 이유라고는 생각하지 않는다.
 
-* Often, explicit error checking and handling consume as much time and space as exception handling.
-* Often, cleaner code yields better performance with exceptions (simplifying the tracing of paths through the program and their optimization).
-* A good rule for performance critical code is to move checking outside the critical part of the code ([checking](#Rper-checking)).
-* In the longer term, more regular code gets better optimized.
+* 명시적인 오류 검사 및 처리는 종종 예외 처리만큼 많은 시간과 공간을 쓰기도 한다.
+* 간결한 코드는 종종 예외 처리를 포함하더라도 더 좋은 성능을 갖는다. (프로그램과 최적화를 통해 실행 경로를 단순화한다.)
+* 성능이 중요한 코드의 좋은 규칙은 오류 검사를 코드의 핵심 부분 바깥으로 옮기는 것이다 ([검사](#Rper-checking)).
+* 장기적으로 보면 정규 코드가 더 잘 최적화된다.
 * Always carefully [measure](#Rper-measure) before making performance claims.
 
-**See also**: [I.5](#Ri-pre) and [I.7](#Ri-post) for reporting precondition and postcondition violations.
+**참고 항목**: 사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
 
-##### Enforcement
+##### 적용
 
-* (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
-* Look for `errno`.
+* (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다.
+* `errno`를 살펴 봐라.
 
 ### <a name="Ri-raw"></a>I.11: Never transfer ownership by a raw pointer (`T*`)
 
