@@ -1710,40 +1710,42 @@ Viewed another way: ownership transferring APIs are relatively rare compared to 
 * (간단함) ((기초)) 함수가 모든 제어-흐름 경로에서 포인터 매개 변수에 접근하기 전에 `nullptr`인지 검사한다면, `not_null`으로 선언되어야 한다는 경고를 표시하라.
 * (복잡함) 포인터 반환 값을 갖는 함수가 모든 반환 경로에서 `nullptr`이 아닌지 확인한다면, 리턴 타입을 `not_null`으로 선언해야 된다는 경고를 표시하라.
 
-### <a name="Ri-array"></a>I.13: Do not pass an array as a single pointer
+### <a name="Ri-array"></a>I.13: 배열을 단일 포인터로 전달하지 마라
 
-##### Reason
+##### 이유
 
- (pointer, size)-style interfaces are error-prone. Also, a plain pointer (to array) must rely on some convention to allow the callee to determine the size.
+(포인터, 크기)-스타일 인터페이스는 오류가 발생하기 쉽다. 또한 (배열에 대한) 일반 포인터는 호출을 받는 곳에서 크기를 결정할 수 있도록 몇 가지 관례에 의존해야 한다.
 
-##### Example
+##### 예제
 
-Consider:
+다음을 고려해 보자:
 
     void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
 
-What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
-What if there are fewer than `n` elements in the array pointed to by `p`? Then, we read some probably unrelated memory.
-Either is undefined behavior and a potentially very nasty bug.
+만약 `q`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 덮어쓰게 된다.
+만약 `p`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 읽을 것이다.
+어느 쪽이나 정의되지 않은 동작을 수행하거나 매우 불쾌한 버그가 발생할 수 있다.
 
-##### Alternative
+##### 대안
 
-Consider using explicit spans:
+명시적인 범위 사용을 고려해 보라:
 
     void copy(span<const T> r, span<T> r2); // copy r to r2
 
-##### Example, bad
+##### 나쁜 예제
 
-Consider:
+다음을 고려해 보자:
 
     void draw(Shape* p, int n);  // poor interface; poor code
     Circle arr[10];
     // ...
     draw(arr, 10);
 
-Passing `10` as the `n` argument may be a mistake: the most common convention is to assume \[`0`:`n`) but that is nowhere stated. Worse is that the call of `draw()` compiled at all: there was an implicit conversion from array to pointer (array decay) and then another implicit conversion from `Circle` to `Shape`. There is no way that `draw()` can safely iterate through that array: it has no way of knowing the size of the elements.
+`n`의 인수로 `10`을 전달하는 것은 실수일 수 있다. 가장 일반적인 관례는 \[`0`:`n`)이라고 가정하는 것이지만, 이러한 내용이 어디에도 언급되어 있지 않다.
+더 나쁜 부분은 어쨌든 `draw()` 호출이 컴파일된다는 것이다. 배열에서 포인터로의 암시적 변환(배열 부패)이 있었고, `Circle`에서 `Shape`로의 또 다른 암시적 변환이 있었다.
+`draw()`가 그 배열을 통해 안전하게 반복문을 수행할 수 있는 방법은 없다. 왜냐하면 요소의 크기를 알 수 있는 방법이 없기 때문이다.
 
-**Alternative**: Use a support class that ensures that the number of elements is correct and prevents dangerous implicit conversions. For example:
+**대안**: 요소의 크기를 보장하고 위험한 암시적 변환을 방지하는 지원 클래스를 사용하라.
 
     void draw2(span<Circle>);
     Circle arr[10];
@@ -1754,17 +1756,17 @@ Passing `10` as the `n` argument may be a mistake: the most common convention is
     void draw3(span<Shape>);
     draw3(arr);    // error: cannot convert Circle[10] to span<Shape>
 
-This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
+이 `draw2()`는 같은 양의 정보를 `draw()`에 전달하지만, 명시적으로 `Circle`이 되어야 한다는 사실을 알 수 있다. ???을 보라.
 
-##### Exception
+##### 예외
 
-Use `zstring` and `czstring` to represent a C-style, zero-terminated strings.
+`zstring`과 `czstring`을 사용해 C-스타일의 `\0`로 끝나는 문자열을 나타내라.
 But when doing so, use `string_span` from the [GSL](#GSL) to prevent range errors.
 
-##### Enforcement
+##### 적용
 
-* (Simple) ((Bounds)) Warn for any expression that would rely on implicit conversion of an array type to a pointer type. Allow exception for zstring/czstring pointer types.
-* (Simple) ((Bounds)) Warn for any arithmetic operation on an expression of pointer type that results in a value of pointer type. Allow exception for zstring/czstring pointer types.
+* (간단함) ((경계)) 배열 타입에서 포인터 타입으로의 암시적 변환에 의존하는 표현식에 대해 경고를 표시하라. zstring/czstring 포인터 타입에 대해서는 예외를 허용한다.
+* (간단함) ((경계)) 포인터 타입의 값을 가져오는 포인터 타입의 표현식에 대한 산술 연산에 대해 경고를 표시하라. zstring/czstring 포인터 타입에 대해서는 예외를 허용한다.
 
 ### <a name="Ri-global-init"></a>I.22: Avoid complex initialization of global objects
 
