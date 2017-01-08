@@ -1614,15 +1614,15 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
 * (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다.
 * `errno`를 살펴 봐라.
 
-### <a name="Ri-raw"></a>I.11: Never transfer ownership by a raw pointer (`T*`)
+### <a name="Ri-raw"></a>I.11: 처리되지 않은 포인터(`T*`)로 소유권을 넘기지 마라
 
-##### Reason
+##### 이유
 
-If there is any doubt whether the caller or the callee owns an object, leaks or premature destruction will occur.
+호출하는 쪽이나 받는 쪽 중 누가 개체를 소유할 것인지 모른다면, 메모리 누수나 조기 파괴가 발생할 것이다.
 
-##### Example
+##### 예제
 
-Consider:
+다음을 고려해 보자:
 
     X* compute(args)    // don't
     {
@@ -1631,8 +1631,8 @@ Consider:
         return res;
     }
 
-Who deletes the returned `X`? The problem would be harder to spot if compute returned a reference.
-Consider returning the result by value (use move semantics if the result is large):
+반환된 `X`를 누가 삭제할 것인가? 만약 레퍼런스를 반환한다면 문제는 더 어려워질 것이다.
+결과가 값으로 반환되었다고 고려해 보자 (결과로 반환되는 값의 크기가 크다면 이동 문법을 사용하라).
 
     vector<double> compute(args)  // good
     {
@@ -1641,11 +1641,11 @@ Consider returning the result by value (use move semantics if the result is larg
         return res;
     }
 
-**Alternative**: Pass ownership using a "smart pointer", such as `unique_ptr` (for exclusive ownership) and `shared_ptr` (for shared ownership).
-However that is less elegant and less efficient unless reference semantics are needed.
+**대안**: (독점적인 소유를 위한) `unique_ptr` 또는 (소유권 공유를 위한) `shared_ptr`와 같이 "스마트 포인터"를 사용해서 소유권을 넘겨라.
+그러나 레퍼런스 의미가 필요하지 않다면 덜 우아하고 덜 효율적일 것이다.
 
-**Alternative**: Sometimes older code can't be modified because of ABI compatibility requirements or lack of resources.
-In that case, mark owning pointers using `owner` from [guideline support library](#S-gsl):
+**대안**: ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코드를 수정할 수 없는 경우가 있다.
+이 경우, [지원하는 라이브러리에 대한 가이드라인](#S-gsl)의 `owner`를 사용해 포인터의 소유권을 표시하라.
 
     owner<X*> compute(args)    // It is now clear that ownership is transferred
     {
@@ -1654,25 +1654,23 @@ In that case, mark owning pointers using `owner` from [guideline support library
         return res;
     }
 
-This tells analysis tools that `res` is an owner.
-That is, its value must be `delete`d or transferred to another owner, as is done here by the `return`.
+위의 코드는 분석 툴에게 `res`가 소유권자라고 알려준다.
+즉, 이 값은 `return`을 통해 행해진 것처럼 `delete`되거나 다른 소유권자에게 넘겨줘야 한다.
 
-`owner` is used similarly in the implementation of resource handles.
+`owner`는 리소스 핸들의 구현에서 비슷하게 사용된다.
 
-##### Note
+##### 비고
 
-Every object passed as a raw pointer (or iterator) is assumed to be owned by the
-caller, so that its lifetime is handled by the caller. Viewed another way:
-ownership transferring APIs are relatively rare compared to pointer-passing APIs,
-so the default is "no ownership transfer."
+처리되지 않은 포인터(또는 반복자)로 전달된 모든 개체는 호출자가 소유한 것으로 간주되므로 호출자가 수명을 처리한다.
+Viewed another way: ownership transferring APIs are relatively rare compared to pointer-passing APIs, so the default is "no ownership transfer."
 
-**See also**: [Argument passing](#Rf-conventional) and [value return](#Rf-T-return).
+**참고 항목**: [인수 전달](#Rf-conventional) 및 [값 반환](#Rf-T-return).
 
-##### Enforcement
+##### 적용
 
-* (Simple) Warn on `delete` of a raw pointer that is not an `owner`.
-* (Simple) Warn on failure to either `reset` or explicitly `delete` an `owner` pointer on every code path.
-* (Simple) Warn if the return value of `new` or a function call with return value of pointer type is assigned to a raw pointer.
+* (간단함) `owner`가 아닌 처리되지 않은 포인터의 `delete`에 대해 경고를 표시하라.
+* (간단함) 모든 코드 경로에서 `owner` 포인터를 `reset`하거나 명시적으로 `delete`를 실패하게 되면 경고를 표시하라.
+* (간단함) `new`의 반환 값이나 포인터 타입의 반환 값을 갖는 함수 호출이 처리되지 않은 포인터에 할당되면 경고를 표시하라.
 
 ### <a name="Ri-nullptr"></a>I.12: Declare a pointer that must not be null as `not_null`
 
