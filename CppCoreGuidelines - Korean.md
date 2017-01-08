@@ -51,7 +51,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 * [N(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
 * [RF(References): 참고 문헌](#S-references)
 * [Pro(Profiles): 프로파일](#S-profile)
-* [GSL(Guideline support library): 지원하는 라이브러리에 대한 가이드라인](#S-gsl)
+* [GSL(Guideline support library): 가이드라인 지원 라이브러리](#S-gsl)
 * [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
 * [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
 * [부록 A: 라이브러리](#S-libraries)
@@ -321,7 +321,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 * [SF(Source files): 소스 파일](#S-source)
 * [CPL(C-style programming): C 스타일 프로그래밍](#S-cpl)
 * [Pro(Profiles): 프로파일](#S-profile)
-* [GSL(Guideline support library): 지원하는 라이브러리에 대한 가이드라인](#S-gsl)
+* [GSL(Guideline support library): 가이드라인 지원 라이브러리](#S-gsl)
 * [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
 
 참고할 만한 내용:
@@ -415,7 +415,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 
 C++ 프로그래머는 표준 라이브러리의 기본 내용을 반드시 이해하고 올바른 곳에 사용해야 한다.
 어떤 프로그래머든 프로젝트에 기반하고 있는 핵심 라이브러리의 기본 내용을 반드시 이해하고 있어야 하며, 올바르게 사용할 줄 알아야 한다.
-이 가이드라인을 사용하는 프로그래머는 [지원하는 라이브러리에 대한 가이드라인](#S-gsl)을 반드시 알아야 하고 적절히 사용할 줄 알아야 한다.
+이 가이드라인을 사용하는 프로그래머는 [가이드라인 지원 라이브러리](#S-gsl)을 반드시 알아야 하고 적절히 사용할 줄 알아야 한다.
 
 ##### 예제
 
@@ -508,7 +508,7 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 
 프로그래머라면 다음에 익숙해져야 한다.
 
-* [지원하는 라이브러리에 대한 가이드라인](#S-gsl)
+* [가이드라인 지원 라이브러리](#S-gsl)
 * [ISO C++ 표준 라이브러리](#S-stdlib)
 * 현재 프로젝트에서 사용되고 있는 모든 기본 라이브러리들
 
@@ -1645,7 +1645,7 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
 그러나 레퍼런스 의미가 필요하지 않다면 덜 우아하고 덜 효율적일 것이다.
 
 **대안**: ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코드를 수정할 수 없는 경우가 있다.
-이 경우, [지원하는 라이브러리에 대한 가이드라인](#S-gsl)의 `owner`를 사용해 포인터의 소유권을 표시하라.
+이 경우, [가이드라인 지원 라이브러리](#S-gsl)의 `owner`를 사용해 포인터의 소유권을 표시하라.
 
     owner<X*> compute(args)    // It is now clear that ownership is transferred
     {
@@ -1672,14 +1672,14 @@ Viewed another way: ownership transferring APIs are relatively rare compared to 
 * (간단함) 모든 코드 경로에서 `owner` 포인터를 `reset`하거나 명시적으로 `delete`를 실패하게 되면 경고를 표시하라.
 * (간단함) `new`의 반환 값이나 포인터 타입의 반환 값을 갖는 함수 호출이 처리되지 않은 포인터에 할당되면 경고를 표시하라.
 
-### <a name="Ri-nullptr"></a>I.12: Declare a pointer that must not be null as `not_null`
+### <a name="Ri-nullptr"></a>I.12: NULL이 될 수 없는 포인터는 `not_null`로 선언하라
 
-##### Reason
+##### 이유
 
-To help avoid dereferencing `nullptr` errors.
-To improve performance by avoiding redundant checks for `nullptr`.
+`nullptr` 역참조 오류를 피하기 위해서다.
+그리고 `nullptr`를 반복해서 검사하는 경우를 피해 성능을 향상시키기 위해서다.
 
-##### Example
+##### 예제
 
     int length(const char* p);            // it is not clear whether length(nullptr) is valid
 
@@ -1689,26 +1689,26 @@ To improve performance by avoiding redundant checks for `nullptr`.
 
     int length(const char* p);            // we must assume that p can be nullptr
 
-By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
+소스 코드에 의도를 명시함으로써, 컴파일러와 툴이 정적 분석을 통해 일부 오류 클래스를 찾아내는 등의 보다 나은 진단을 제공하고 분기 및 널(NULL) 검사를 제거하는 등의 최적화 작업을 수행할 수 있다.
 
-##### Note
+##### 비고
 
-`not_null` is defined in the [guideline support library](#S-gsl)
+`not_null`은 [가이드라인 지원 라이브러리](#S-gsl)에 정의되어 있다.
 
-##### Note
+##### 비고
 
-The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `zstring` in preference to `const char*`.
+`char`에 대한 포인터가 C-스타일 문자열(`\0`으로 끝나는 문자열)을 가리키고 있다는 가정은 여전히 암묵적이며 혼란과 오류를 발생시키는 원인이 될 수 있다. `const char*`보다는 `zstring`을 사용하라.
 
     // we can assume that p cannot be nullptr
     // we can assume that p points to a zero-terminated array of characters
     int length(not_null<zstring> p);
 
-Note: `length()` is, of course, `std::strlen()` in disguise.
+비고: 물론 `length()`는 `std::strlen()`이다.
 
-##### Enforcement
+##### 적용
 
-* (Simple) ((Foundation)) If a function checks a pointer parameter against `nullptr` before access, on all control-flow paths, then warn it should be declared `not_null`.
-* (Complex) If a function with pointer return value ensures it is not `nullptr` on all return paths, then warn the return type should be declared `not_null`.
+* (간단함) ((기초)) 함수가 모든 제어-흐름 경로에서 포인터 매개 변수에 접근하기 전에 `nullptr`인지 검사한다면, `not_null`으로 선언되어야 한다는 경고를 표시하라.
+* (복잡함) 포인터 반환 값을 갖는 함수가 모든 반환 경로에서 `nullptr`이 아닌지 확인한다면, 리턴 타입을 `not_null`으로 선언해야 된다는 경고를 표시하라.
 
 ### <a name="Ri-array"></a>I.13: Do not pass an array as a single pointer
 
