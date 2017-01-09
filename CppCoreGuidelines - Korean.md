@@ -1960,38 +1960,37 @@ If you use a single compiler, you can use full C++ in interfaces. That may requi
 
 (Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
 
-# <a name="S-functions"></a>F: Functions
+# <a name="S-functions"></a>F: 함수
 
-A function specifies an action or a computation that takes the system from one consistent state to the next. It is the fundamental building block of programs.
+함수는 어떤 동작이나 계산을 명세하는데, 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 함수는 프로그램의 기초적인 설계 단위다.
 
-It should be possible to name a function meaningfully, to specify the requirements of its argument, and clearly state the relationship between the arguments and the result. An implementation is not a specification. Try to think about what a function does as well as about how it does it.
-Functions are the most critical part in most interfaces, so see the interface rules.
+함수 이름은 인자의 요구사항, 인자간의 관계와 결과를 명확하게 기술할 수 있도록 의미있게 지어야 한다. 함수의 구현은 사양서가 아니다. 함수가 무엇을 해야하는지, 어떻게 동작하는지를 고려해야 한다. 함수는 모든 인터페이스에서 가장 중요한 부분이다. 인터페이스 규칙을 참고 하라.
 
-Function rule summary:
+함수 규칙 요약:
 
-Function definition rules:
+함수 정의 규칙:
 
-* [F.1: "Package" meaningful operations as carefully named functions](#Rf-package)
-* [F.2: A function should perform a single logical operation](#Rf-logical)
-* [F.3: Keep functions short and simple](#Rf-single)
-* [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
-* [F.5: If a function is very small and time-critical, declare it inline](#Rf-inline)
-* [F.6: If your function may not throw, declare it `noexcept`](#Rf-noexcept)
-* [F.7: For general use, take `T*` or `T&` arguments rather than smart pointers](#Rf-smart)
-* [F.8: Prefer pure functions](#Rf-pure)
+* [F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라](#Rf-package)
+* [F.2: 함수는 하나의 논리적 동작만 수행하도록 하라](#Rf-logical)
+* [F.3: 함수는 간결하고 단순하게 유지시켜라](#Rf-single)
+* [F.4: 함수가 컴파일 타임에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
+* [F.5: 함수가 매우 짧고 수행시간이 중요하다면 inline으로 선언하라](#Rf-inline)
+* [F.6: 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
+* [F.7: 보편성을 고려한다면, 스마트 포인터 대신에 `T*`나 `T&`형 인자를 사용하라](#Rf-smart)
+* [F.8: 순수 함수를 선호하라](#Rf-pure)
 
-Parameter passing expression rules:
+매개 변수 전달 표현 규칙:
 
-* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
-* [F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to `const`](#Rf-in)
-* [F.17: For "in-out" parameters, pass by reference to non-`const`](#Rf-inout)
-* [F.18: For "consume" parameters, pass by `X&&` and `std::move` the parameter](#Rf-consume)
-* [F.19: For "forward" parameters, pass by `TP&&` and only `std::forward` the parameter](#Rf-forward)
-* [F.20: For "out" output values, prefer return values to output parameters](#Rf-out)
-* [F.21: To return multiple "out" values, prefer returning a tuple or struct](#Rf-out-multi)
-* [F.60: Prefer `T*` over `T&` when "no argument" is a valid option](#Rf-ptr-ref)
+* [F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라](#Rf-conventional)
+* [F.16: "입력" 매개 변수는 복사 비용이 적게드는 값의 형을 사용하거나 상수 참조형으로 전달하라](#Rf-in)
+* [F.17: "입출력" 매개 변수는 비상수 참조형으로 전달하라](#Rf-inout)
+* [F.18: "소모성" 매개 변수는 `X&&`형과 `std::move`로 전달하라](#Rf-consume)
+* [F.19: "forward" 매개 변수는 `TP&&`형과 `std::forward`로만 전달하라](#Rf-forward)
+* [F.20: For "out" output values, 출력 매개 변수로 값을 반환하는 방법을 선호하라](#Rf-out)
+* [F.21: "출력"값 여러개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
+* [F.60: "인자가 없을 수도" 있다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
-Parameter passing semantic rules:
+매개 변수 의미론적 규칙:
 
 * [F.22: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
 * [F.23: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
@@ -2000,7 +1999,7 @@ Parameter passing semantic rules:
 * [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
 * [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
 
-Value return semantic rules:
+값 반환 의미론적 규칙:
 
 * [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
 * [F.43: Never (directly or indirectly) return a pointer or a reference to a local object](#Rf-dangle)
@@ -2009,7 +2008,7 @@ Value return semantic rules:
 * [F.46: `int` is the return type for `main()`](#Rf-main)
 * [F.47: Return `T&` from assignment operators.](#Rf-assignment-op)
 
-Other function rules:
+기타 함수 규칙:
 
 * [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
 * [F.51: Where there is a choice, prefer default arguments over overloading](#Rf-default-args)
@@ -2017,20 +2016,20 @@ Other function rules:
 * [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
 * [F.54: If you capture `this`, capture all variables explicitly (no default capture)](#Rf-this-capture)
 
-Functions have strong similarities to lambdas and function objects so see also Section ???.
+함수는 람다와 함수객체와 매우 유사하다. 그러니 ???을 참고하라.
 
-## <a name="SS-fct-def"></a>F.def: Function definitions
+## <a name="SS-fct-def"></a>F.def: 함수 정의
 
-A function definition is a function declaration that also specifies the function's implementation, the function body.
+함수 정의는 함수를 선언하고 몸체를 구현하는 것을 포함한다.
 
-### <a name="Rf-package"></a>F.1: "Package" meaningful operations as carefully named functions
+### <a name="Rf-package"></a>F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라
 
-##### Reason
+##### 이유
 
-Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
-If something is a well-specified action, separate it out from its surrounding code and give it a name.
+공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 오류 발생을 제한시킨다.
+만약 어떤 동작이 잘 정의되어 있다면 주변 코드로부터 분리하고 이름을 지어라.
 
-##### Example, don't
+##### 나쁜 예제,
 
     void read_and_print(istream& is)    // read and print an int
     {
@@ -2041,40 +2040,38 @@ If something is a well-specified action, separate it out from its surrounding co
             cerr << "no int on input\n";
     }
 
-Almost everything is wrong with `read_and_print`.
-It reads, it writes (to a fixed `ostream`), it writes error messages (to a fixed `ostream`), it handles only `int`s.
-There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
-For a tiny example, this looks OK, but if the input operation, the output operation, and the error handling had been more complicated the tangled
-mess could become hard to understand.
+`read_and_print`는 대부분이 틀렸다.
+이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 오류 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
+재사용되는 코드가 없고 논리적으로 분리된 동작들은 섞였고 지역변수는 사용이 끝난 후에도 존재한다.
+간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 오류처리가 좀 더 복잡해지면 코드가 뒤엉켜서 이해하기 어려워 진다.
 
-##### Note
+##### 비고
 
-If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
+만약 한 곳 이상에서 사용 될 중요한 람다 함수를 작성한다면 (비지역)변수에 할당하고 이름을 지어줘라.
 
-##### Example
+##### 예제
 
     sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
 
-Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
+람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠할 수 있다.
 
     auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
 
     sort(a, b, lessT);
     find_if(a, b, lessT);
 
-The shortest code is not always the best for performance or maintainability.
+유지보수나 성능을 고려하면 짧은 코드가 항상 좋은것은 아니다.
 
-##### Exception
+##### 예외
 
-Loop bodies, including lambdas used as loop bodies, rarely need to be named.
-However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
-The rule [Keep functions short](#Rf-single) implies "Keep loop bodies short."
-Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be re-usable.
+반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
+하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
+[함수를 짧게 유지하라](#Rf-single) 규칙은 "반복문 몸체를 짧게하라"도 동시에 내포한다. 콜백 인자로 사용되는 람다는 재사용되지는 않지만 사소하게 볼 수 없는 경우도 있다.
 
-##### Enforcement
+##### 적용
 
-* See [Keep functions short](#Rf-single)
-* Flag identical and very similar lambdas used in different places.
+* [함수를 짧게 유지하라](#Rf-single)를 참고하라.
+* 여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두어라.
 
 ### <a name="Rf-logical"></a>F.2: A function should perform a single logical operation
 
