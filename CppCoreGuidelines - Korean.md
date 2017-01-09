@@ -1802,55 +1802,56 @@ It is usually best to avoid global (namespace scope) objects altogether.
 * Flag initializers of globals that call non-`constexpr` functions
 * Flag initializers of globals that access `extern` objects
 
-### <a name="Ri-nargs"></a>I.23: Keep the number of function arguments low
+### <a name="Ri-nargs"></a>I.23: 함수 인자 갯수를 최소로 유지하라
 
-##### Reason
+##### 이유
 
-Having many arguments opens opportunities for confusion. Passing lots of arguments is often costly compared to alternatives.
+인자 갯수가 많으면 혼란을 일으킬 수 있다.
+인자를 많이 전달하는 것은 제시할 대안에 비해 비용이 많이 든다.
 
-##### Example
+##### 예제
 
-The standard-library `merge()` is at the limit of what we can comfortably handle
+표준 라이브러리 `merge()`는 편하게 처리할 수 있는 한계에 있다.
 
     template<class InputIterator1, class InputIterator2, class OutputIterator, class Compare>
     OutputIterator merge(InputIterator1 first1, InputIterator1 last1,
                          InputIterator2 first2, InputIterator2 last2,
                          OutputIterator result, Compare comp);
 
-Here, we have four template arguments and six function arguments.
-To simplify the most frequent and simplest uses, the comparison argument can be defaulted to `<`:
+여기에 4개의 템플릿 인자와 6개의 함수 인자가 있다.
+단순화하기 위해 가장 빈번하게 사용하는 많이 쓰는 방식으로 비교 인수의 디폴트 값인 `<`을 사용해 보자.
 
     template<class InputIterator1, class InputIterator2, class OutputIterator>
     OutputIterator merge(InputIterator1 first1, InputIterator1 last1,
                          InputIterator2 first2, InputIterator2 last2,
                          OutputIterator result);
 
-This doesn't reduce the total complexity, but it reduces the surface complexity presented to many users.
-To really reduce the number of arguments, we need to bundle the arguments into higher-level abstractions:
+이렇게 한다고 해서 전체적인 복잡성이 줄어들지는 않지만 사용자 입장에서 볼 때는 복잡성이 줄어든 것처럼 보인다.
+실제로 인자 갯수를 줄이려면 인자를 좀 더 높은 수준의 추상화로 묶어야 한다.
 
     template<class InputRange1, class InputRange2, class OutputIterator>
     OutputIterator merge(InputRange1 r1, InputRange2 r2, OutputIterator result);
 
-Grouping arguments into "bundles" is a general technique to reduce the number of arguments and to increase the opportunities for checking.
+인자를 "묶어서" 그룹화하는 것은 인자의 갯수를 줄이고 검사할 기회를 늘리는 일반적인 기법이다.
 
 Alternatively, we could use concepts (as defined by the ISO TS) to define the notion of three types that must be usable for merging:
 
     Mergeable{In1 In2, Out}
     OutputIterator merge(In1 r1, In2 r2, Out result);
 
-##### Note
+##### 비고
 
-How many arguments are too many? Four arguments is a lot.
-There are functions that are best expressed with four individual arguments, but not many.
+얼마나 많은 인자가 있어야 너무 많다고 말할 수 있을까? 인자가 4개라면 많다고 말할 수 있다.
+4개의 인자로 가장 잘 표현할 수 있는 함수들도 있지만, 많지는 않다.
 
-**Alternative**: Group arguments into meaningful objects and pass the objects (by value or by reference).
+**대안**: 인자를 의미있는 개체로 그룹화하고 개체를 전달하라. (값에 의한 전달 또는 레퍼런스에 의한 전달)
 
-**Alternative**: Use default arguments or overloads to allow the most common forms of calls to be done with fewer arguments.
+**대안**: 더 적은 인자 갯수로 가장 일반적인 형태의 호출을 할 수 있는 디폴트 인자나 오버로드를 사용하라.
 
-##### Enforcement
+##### 적용
 
-* Warn when a functions declares two iterators (including pointers) of the same type instead of a range or a view.
-* (Not enforceable) This is a philosophical guideline that is infeasible to check directly.
+* 범위 또는 뷰가 아닌 동일한 타입의 반복자(포인터 포함)를 2개 이상 선언하는 함수가 있다면 경고를 표시하라.
+* (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다.
 
 ### <a name="Ri-unrelated"></a>I.24: Avoid adjacent unrelated parameters of the same type
 
