@@ -1853,37 +1853,37 @@ Alternatively, we could use concepts (as defined by the ISO TS) to define the no
 * 범위 또는 뷰가 아닌 동일한 타입의 반복자(포인터 포함)를 2개 이상 선언하는 함수가 있다면 경고를 표시하라.
 * (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다.
 
-### <a name="Ri-unrelated"></a>I.24: Avoid adjacent unrelated parameters of the same type
+### <a name="Ri-unrelated"></a>I.24: 관련없는 동일 타입의 인접한 매개 변수는 피하라
 
-##### Reason
+##### 이유
 
-Adjacent arguments of the same type are easily swapped by mistake.
+실수로 동일 타입의 인접한 인수를 쉽게 바꿀 수 있다.
 
-##### Example, bad
+##### 나쁜 예제
 
-Consider:
+다음을 고려해 보자:
 
     void copy_n(T* p, T* q, int n);  // copy from [p:p+n) to [q:q+n)
 
-This is a nasty variant of a K&R C-style interface. It is easy to reverse the "to" and "from" arguments.
+위 코드는 K&R C-스타일 인터페이스의 적절하지 못한 변형이다. "to"와 "from" 인수를 쉽게 바꿀 수 있다.
 
-Use `const` for the "from" argument:
+"from" 인자에 `const`를 사용하라.
 
     void copy_n(const T* p, T* q, int n);  // copy from [p:p+n) to [q:q+n)
 
-##### Exception
+##### 예외
 
 If the order of the parameters is not important, there is no problem:
 
     int max(int a, int b);
 
-##### Alternative
+##### 대안
 
-Don't pass arrays as pointers, pass an object representing a range (e.g., a `span`):
+배열을 포인터로 전달하지 말고 범위를 나타내는 개체(예를 들어, `span`)로 전달하라.
 
     void copy_n(span<const T> p, span<T> q);  // copy from p to q
 
-##### Alternative
+##### 대안
 
 Define a `struct` as the parameter type and name the fields for those parameters accordingly:
 
@@ -1897,9 +1897,9 @@ Define a `struct` as the parameter type and name the fields for those parameters
 This has a tendency to make invocations of this clear to future readers, as the parameters
 are often filled in by name at the call site.
 
-##### Enforcement
+##### 적용
 
-(Simple) Warn if two consecutive parameters share the same type.
+(간단함) 연속하는 두 매개 변수가 동일한 타입을 공유하는 경우 경고를 표시하라.
 
 ### <a name="Ri-abstract"></a>I.25: Prefer abstract classes as interfaces to class hierarchies
 

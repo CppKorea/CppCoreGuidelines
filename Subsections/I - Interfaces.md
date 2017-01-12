@@ -1,37 +1,3 @@
-### <a name="Ri-unrelated"></a> I.15: 동일 타입이지만 관련없는 인접한 매개변수는 피하라.
->### <a name="Ri-unrelated"></a> I.15: Avoid adjacent unrelated parameters of the same type
-
-##### Reason
-
-동일 타입의 인접한 매개변수는 실수로 쉽게 바뀐다.
->Adjacent arguments of the same type are easily swapped by mistake.
-
-##### Example, bad
-
-Consider:
-
-   void copy_n(T* p, T* q, int n);  // copy from [p:p+n) to [q:q+n)
-
-&R C 스타일 인터페이스인데 "to"와 "from" 매개변수가 쉽게 뒤바뀐다.
->This is a nasty variant of a K&R C-style interface. It is easy to reverse the "to" and "from" arguments.
-
-"from" 인자에 `const`를 사용해라.
->Use `const` for the "from" argument:
-
-   void copy_n(const T* p, T* q, int n);  // copy from [p:p+n) to [q:q+n)
-
-##### Alternative
-
-포인터로 배열을 인자로 넘기지 말고 오브젝트로 인자를 넘겨라.(e.g., `array_view`):
->Don't pass arrays as pointers, pass an object representing a range (e.g., an `array_view`):
-
-   void copy_n(array_view<const T> p, array_view<T> q);  // copy from p to q
-
-##### Enforcement
-
-(Simple) 연속된 2개 매개변수가 동일한 타입을 가진다면 경고하라.
->(Simple) Warn if two consecutive parameters share the same type.
-
 ### <a name="Ri-abstract"></a> I.16: 클래스 상속보다 인터페이스로 추상 클래스(abstract class)를 선호하라.
 >### <a name="Ri-abstract"></a> I.16: Prefer abstract classes as interfaces to class hierarchies
 
