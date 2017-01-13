@@ -1941,27 +1941,27 @@ are often filled in by name at the call site.
 
 (간단함) `C` 클래스를 가리키는 포인터가 `C`의 베이스를 가리키는 포인터에 할당되고 베이스 클래스에 데이터 멤버가 있으면 경고를 표시하라.
 
-### <a name="Ri-abi"></a>I.26: If you want a cross-compiler ABI, use a C-style subset
+### <a name="Ri-abi"></a>I.26: 크로스 컴파일러 ABI를 원한다면 C 스타일 코드를 사용하라
 
-##### Reason
+##### 이유
 
-Different compilers implement different binary layouts for classes, exception handling, function names, and other implementation details.
+컴파일러마다 클래스, 예외 처리, 함수 이름 및 기타 구현 세부 사항에 대해 서로 다른 바이너리 레이아웃을 구현한다.
 
-##### Exception
+##### 예외
 
-You can carefully craft an interface using a few carefully selected higher-level C++ types. See ???.
+신중하게 선택한 몇 가지 고급 수준의 C++ 타입을 사용해 인터페이스를 신중하게 만들 수 있다. ???을 보라.
 
-##### Exception
+##### 예외
 
-Common ABIs are emerging on some platforms freeing you from the more draconian restrictions.
+일반적인 ABI는 일부 플랫폼에서 점점 더 엄격한 제한으로부터 벗어나고 있다.
 
-##### Note
+##### 비고
 
-If you use a single compiler, you can use full C++ in interfaces. That may require recompilation after an upgrade to a new compiler version.
+단일 컴파일러를 사용하는 경우 인터페이스에서 C++ 전체를 사용할 수 있다. 새 컴파일러 버전으로 업그레이드 한 후에는 다시 컴파일해야 할 수 있다.
 
-##### Enforcement
+##### 적용
 
-(Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
+(적용 불가능) 인터페이스가 ABI의 일부가 되는 부분을 확실하게 식별하기는 어렵다.
 
 # <a name="S-functions"></a>F: 함수
 
