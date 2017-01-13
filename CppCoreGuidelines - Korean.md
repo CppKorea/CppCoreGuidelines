@@ -1901,15 +1901,15 @@ are often filled in by name at the call site.
 
 (간단함) 연속하는 두 매개 변수가 동일한 타입을 공유하는 경우 경고를 표시하라.
 
-### <a name="Ri-abstract"></a>I.25: Prefer abstract classes as interfaces to class hierarchies
+### <a name="Ri-abstract"></a>I.25: 인터페이스로 클래스 계층보다는 추상 클래스를 사용하라
 
-##### Reason
+##### 이유
 
-Abstract classes are more likely to be stable than base classes with state.
+추상 클래스는 상태가 있는 베이스 클래스보다 안정적이다.
 
-##### Example, bad
+##### 나쁜 예제
 
-You just knew that `Shape` would turn up somewhere :-)
+당신은 `Shape`가 어디선가 나타날 것이라고 믿고 있었을 것이다. :-)
 
     class Shape {  // bad: interface class loaded with data
     public:
@@ -1923,7 +1923,10 @@ You just knew that `Shape` would turn up somewhere :-)
         Color col;
     };
 
-This will force every derived class to compute a center -- even if that's non-trivial and the center is never used. Similarly, not every `Shape` has a `Color`, and many `Shape`s are best represented without an outline defined as a sequence of `Point`s. Abstract classes were invented to discourage users from writing such classes:
+이렇게 하면 파생된 모든 클래스가 중심을 계산하게 된다.
+비록 중요하지 않고 중심이 사용되지 않더라도 말이다.
+비슷하게, 모든 `Shape`가 `Color`를 갖고 있는 것은 아니며 많은 `Shape`들은 일련의 `Point`로 정의된 윤곽선없이 가장 잘 표현된다.
+추상 클래스는 사용자가 그러한 클래스를 작성하지 못하도록 만들기 위해 고안되었다.
 
     class Shape {    // better: Shape is a pure interface
     public:
@@ -1934,9 +1937,9 @@ This will force every derived class to compute a center -- even if that's non-tr
         // ... no data members ...
     };
 
-##### Enforcement
+##### 적용
 
-(Simple) Warn if a pointer to a class `C` is assigned to a pointer to a base of `C` and the base class contains data members.
+(간단함) `C` 클래스를 가리키는 포인터가 `C`의 베이스를 가리키는 포인터에 할당되고 베이스 클래스에 데이터 멤버가 있으면 경고를 표시하라.
 
 ### <a name="Ri-abi"></a>I.26: If you want a cross-compiler ABI, use a C-style subset
 
