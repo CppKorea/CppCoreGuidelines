@@ -16564,11 +16564,11 @@ C standard library rule summary:
 * [???](#???)
 
 
-# <a name="S-A"></a>A: Architectural Ideas
+# <a name="S-A"></a>A(Architectural Ideas): 구조적 아이디어
 
-This section contains ideas about higher-level architectural ideas and libraries.
+이 절은 보다 고수준의 구조적 아이디어와 라이브러리에 대한 아이디어를 포함한다.
 
-Architectural rule summary:
+구조적 아이디어 규칙 요약:
 
 * [A.1 Separate stable from less stable part of code](#Ra-stable)
 * [A.2 Express potentially reusable parts as a library](#Ra-lib)

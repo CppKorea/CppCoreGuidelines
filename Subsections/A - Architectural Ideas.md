@@ -1,8 +1,3 @@
-# <a name="S-A"></a> A: Architectural Ideas
-
-이 단락은 ??에 대한 아이디어를 포함한다.
->This section contains ideas about ???
-
 ### <a name="Ra-stable"></a> A.1 코드에서 안정적인 부분과 덜 안정적인 부분을 분리하라.
 >### <a name="Ra-stable"></a> A.1 Separate stable from less stable part of code
 
