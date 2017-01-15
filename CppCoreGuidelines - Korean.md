@@ -48,7 +48,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 참고할 만한 내용:
 
 * [A(Architectural Ideas): 구조적 아이디어](#S-A)
-* [N(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
+* [NR(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
 * [RF(References): 참고 문헌](#S-references)
 * [Pro(Profiles): 프로파일](#S-profile)
 * [GSL(Guideline support library): 가이드라인 지원 라이브러리](#S-gsl)
@@ -328,7 +328,7 @@ Also, we assume that the rules will be refined over time to make them more preci
 
 * [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
 * [Per(Performance): 성능](#S-performance)
-* [N(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
+* [NR(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
 * [RF(References): 참고 문헌](#S-references)
 * [부록 A: 라이브러리](#S-libraries)
 * [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
@@ -16611,11 +16611,11 @@ For example:
 However, a library should not depend on another that depends on it.
 
 
-# <a name="S-not"></a>NR: Non-Rules and myths
+# <a name="S-not"></a>NR(Non-Rules and myths): 규칙이 아닌 미신
 
-This section contains rules and guidelines that are popular somewhere, but that we deliberately don't recommend.
+이 절은 어디선가 인기있는 규칙과 가이드라인을 포함한다. 하지만 우리는 이러한 규칙과 가이드라인을 의도적으로 추천하지는 않는다.
 We know full well that there have been times and places where these rules made sense, and we have used them ourselves at times.
-However, in the context of the styles of programming we recommend and support with the guidelines, these "non-rules" would do harm.
+그러나, 가이드라인에서 추천하고 지원하는 프로그래밍 스타일의 맥락에서 "규칙이 아닌 미신"은 여러분에게 해를 입힐 수 있따.
 
 Even today, there can be contexts where the rules make sense.
 For example, lack of suitable tool support can make exceptions unsuitable in hard-real-time systems,
@@ -16625,7 +16625,7 @@ such "wisdom" may be based on decades-old information or experienced from langua
 
 The positive arguments for alternatives to these non-rules are listed in the rules offered as "Alternatives".
 
-Non-rule summary:
+규칙이 아닌 미신 요약:
 
 * [NR.1: Don't: All declarations should be at the top of a function](#Rnr-top)
 * [NR.2: Don't: Have only a single single `return`-statement in a function](#Rnr-single-return)
