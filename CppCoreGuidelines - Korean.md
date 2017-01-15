@@ -16571,7 +16571,7 @@ C standard library rule summary:
 구조적 아이디어 규칙 요약:
 
 * [A.1 코드의 덜 안정적인 부분에서 안정적인 부분을 분리하라](#Ra-stable)
-* [A.2 Express potentially reusable parts as a library](#Ra-lib)
+* [A.2 잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라](#Ra-lib)
 * [A.4 There should be no cycles among libraries](#?Ra-dag)
 * [???](#???)
 * [???](#???)
@@ -16584,16 +16584,15 @@ C standard library rule summary:
 
 ???
 
-### <a name="Ra-lib"></a>A.2 Express potentially reusable parts as a library
+### <a name="Ra-lib"></a>A.2 잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라
 
-##### Reason
+##### 이유
 
-##### Note
+##### 비고
 
 A library is a collection of declarations and definitions maintained, documented, and shipped together.
 A library could be a set of headers (a "header only library") or a set of headers plus a set of object files.
 A library can be statically or dynamically linked into a program, or it may be `#included`
-
 
 ### <a name="Ra-dag"></a>A.4 There should be no cycles among libraries
 
