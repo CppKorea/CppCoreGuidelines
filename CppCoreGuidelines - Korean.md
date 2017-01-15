@@ -18379,11 +18379,11 @@ No. It is a placeholder for language support for contract preconditions.
 
 No. It is a placeholder for language support for contract postconditions.
 
-# <a name="S-libraries"></a>Appendix A: Libraries
+# <a name="S-libraries"></a>부록 A: 라이브러리
 
-This section lists recommended libraries, and explicitly recommends a few.
+이 절에서는 추천할만한 라이브러리를 나열하고 명시적으로 몇 가지 라이브러리를 추천하고자 한다.
 
-??? Suitable for the general guide? I think not ???
+??? 일반적인 가이드로 적합할까? 나는 그렇게 생각하지 않는다 ???
 
 # <a name="S-modernizing"></a>Appendix B: Modernizing code
 
