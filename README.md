@@ -1,4 +1,4 @@
-#[C++ 핵심 가이드라인](http://cppkorea.github.io/CppCoreGuidelines/CppCoreGuidelines)
+# [C++ 핵심 가이드라인](http://cppkorea.github.io/CppCoreGuidelines/CppCoreGuidelines)
 
 > "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다."
 > -- <cite>비야네 스트롭스트룹 (Bjarne Stroustrup)</cite>
