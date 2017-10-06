@@ -2069,22 +2069,22 @@ are often filled in by name at the call site.
 
 반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
 하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
-[함수를 짧게 유지하라](#Rf-single) 규칙은 "반복문 몸체를 짧게하라"도 동시에 내포한다. 콜백 인자로 사용되는 람다는 재사용되지는 않지만 사소하게 볼 수 없는 경우도 있다.
+[함수를 간결하게 유지하라](#Rf-single) 규칙은 "반복문을 간결하게 유지하라"는 규칙을 내포한다. 콜백 인자로 사용되는 람다는 재사용하지 않지만 사소하게 볼 수 없는 경우도 있다.
 
 ##### 적용
 
-* [함수를 짧게 유지하라](#Rf-single)를 참고하라.
+* [함수를 간결하게 유지하라](#Rf-single)를 참고하라.
 * 여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두어라.
 
-### <a name="Rf-logical"></a>F.2: A function should perform a single logical operation
+### <a name="Rf-logical"></a>F.2: 함수는 논리적으로 한 가지 작업만 수행해야 한다
 
-##### Reason
+##### 이유
 
-A function that performs a single operation is simpler to understand, test, and reuse.
+하나의 작업만 수행하는 함수는 이해하기 쉽고, 테스트하기 쉽고, 재사용하기 쉽다.
 
-##### Example
+##### 예제
 
-Consider:
+다음을 고려해 보자:
 
     void read_and_print()    // bad
     {
@@ -2094,7 +2094,7 @@ Consider:
         cout << x << "\n";
     }
 
-This is a monolith that is tied to a specific input and will never find a another (different) use. Instead, break functions up into suitable logical parts and parameterize:
+위 함수는 특정한 입력에 속박되어 있고 다른 쓰임새는 찾을 수 없다. 대신, 함수를 의미있는 논리적 작업으로 나누고 매개 변수화하라.
 
     int read(istream& is)    // better
     {
@@ -2109,7 +2109,7 @@ This is a monolith that is tied to a specific input and will never find a anothe
         os << x << "\n";
     }
 
-These can now be combined where needed:
+필요하다면 두 함수를 결합하면 된다:
 
     void read_and_print()
     {
@@ -2117,7 +2117,7 @@ These can now be combined where needed:
         print(cout, x);
     }
 
-If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, the response to errors, etc. Example:
+또한 필요하다면 `read()`와 `print()`에서 사용하는 데이터 타입, 입력 메커니즘, 오류에 대한 응답 등을 템플릿화 할 수 있다. 예를 들어:
 
     auto read = [](auto& input, auto& value)    // better
     {
@@ -2130,11 +2130,11 @@ If there was a need, we could further templatize `read()` and `print()` on the d
         output << value << "\n";
     }
 
-##### Enforcement
+##### 적용
 
-* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
-* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
-* Consider functions with 7 or more parameters suspicious.
+* 출력 매개 변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다. 
+* 편집기 화면에 다 나오지 않을 만큼 큰 함수를 의심하라. 이런 함수는 세부 동작을 갖는 더 작은 함수들로 (이름을 잘 지어서) 나누도록 한다.
+* 7개 이상의 매개 변수를 갖는 함수를 의심하라.
 
 ### <a name="Rf-single"></a>F.3: Keep functions short and simple
 
