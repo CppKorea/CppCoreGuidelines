@@ -18987,15 +18987,15 @@ When is a class a container? ???
 
 # <a name="S-tools"></a>부록 D: 유용한 도구
 
-C++ 핵심 가이드라인을 적용하는데 직접적으로 도움을 주는 도구들을 이 섹션에 나열 하였습니다. 하지만 좋은 C++ 코드를 작성하는데 도움을 주는 도구들의 완벽한 모음을 만드려는 의도는 아닙니다. C++ 핵심 가이드라인을 지원하는 도구라면 이 문서에 링크를 남겨주세요. 문서에 기록 될 후보가 됩니다.
+이 절에는 C++ 핵심 가이드라인을 적용하는데 도움을 주는 도구들을 소개합니다. 하지만 세상의 모든 유용한 C++ 도구를 소개하려는건 아닙니다. C++ 핵심 가이드라인을 적용하는데 유용한 도구가 있다면 링크를 남겨주세요.
 
 ### <a name="St-clangtidy"></a>도구: [Clang-tidy](http://clang.llvm.org/extra/clang-tidy/checks/list.html)
 
-Clang-tidy는 C++ 핵심 가이드라인을 강조하는 규칙들을 포함하고 있습니다. 이 규칙들은 `cppcoreguidelines-*` 형태로 이름이 지어졌습니다.
+Clang-tidy는 C++ 핵심 가이드라인을 강제하는 규칙들을 포함하고 있습니다. 이 규칙들은 `cppcoreguidelines-*` 형태로 이름이 지어졌습니다.
 
 ### <a name="St-cppcorecheck"></a>도구: [CppCoreCheck](https://docs.microsoft.com/en-us/visualstudio/code-quality/using-the-cpp-core-guidelines-checkers)
 
-마이크로소프트 컴파일러의 코드 분석기는 C++ 핵심 가이드라인을 따를 수 있도록 강조해주는 규칙들을 포함하고 있습니다.
+마이크로소프트 컴파일러의 코드 분석기는 C++ 핵심 가이드라인을 따를 수 있도록 강제하는 규칙들을 포함하고 있습니다.
 
 # <a name="S-glossary"></a>Glossary
 
