@@ -57,6 +57,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 * [부록 A: 라이브러리](#S-libraries)
 * [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
 * [부록 C: 토론](#S-discussion)
+* [부록 D: 유용한 도구](#S-tools)
 * [용어 설명](#S-glossary)
 * [To-do(Unclassified proto-rules): 미분류 규칙](#S-unclassified)
 
@@ -18983,6 +18984,18 @@ It is common to need an initial set of elements.
 ##### Enforcement
 
 When is a class a container? ???
+
+# <a name="S-tools"></a>부록 D: 유용한 도구
+
+이 절에는 C++ 핵심 가이드라인을 적용하는데 도움을 주는 도구들을 소개합니다. 하지만 세상의 모든 유용한 C++ 도구를 소개하려는건 아닙니다. C++ 핵심 가이드라인을 적용하는데 유용한 도구가 있다면 링크를 남겨주세요.
+
+### <a name="St-clangtidy"></a>도구: [Clang-tidy](http://clang.llvm.org/extra/clang-tidy/checks/list.html)
+
+Clang-tidy는 C++ 핵심 가이드라인을 강제하는 규칙들을 포함하고 있습니다. 이 규칙들은 `cppcoreguidelines-*` 형태로 이름이 지어졌습니다.
+
+### <a name="St-cppcorecheck"></a>도구: [CppCoreCheck](https://docs.microsoft.com/en-us/visualstudio/code-quality/using-the-cpp-core-guidelines-checkers)
+
+마이크로소프트 컴파일러의 코드 분석기는 C++ 핵심 가이드라인을 따를 수 있도록 강제하는 규칙들을 포함하고 있습니다.
 
 # <a name="S-glossary"></a>Glossary
 
