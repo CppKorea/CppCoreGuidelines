@@ -103,12 +103,12 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 
 C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관리, 동시성와 같이 상대적으로 고수준의 내용을 다루고 있으며,
 이러한 내용들은 대체로 애플리케이션 아키텍쳐나 라이브러리 디자인에 영향을 미친다.
-가이드라인에 나오는 규칙들을 준수하면 코드가 정적 타입 안정성을 갖도록 할 수 있으며, 리소스의 누수가 없고, 
+가이드라인에 나오는 규칙들을 준수하면 코드가 정적 타입 안정성을 갖도록 할 수 있으며, 리소스의 누수가 없고,
 흔히 저지르는 수많은 프로그래밍 로직 오류를 잡아낼 수 있으며, 더욱 빠르게 수행되는 코드를 작성할 수 있을 것이다.
 즉, 올바른 코드를 만들 수 있다.
 
 이름 지정 규칙이나 들여쓰기 스타일과 같이 세부적인 내용에 대해서는 크게 언급하지 않을 것이다.
-하지만, 프로그래머에게 도움을 줄 수 있는 주제가 있다면 다루도록 하겠다. 
+하지만, 프로그래머에게 도움을 줄 수 있는 주제가 있다면 다루도록 하겠다.
 
 초기의 규칙들은 (다양한 형태의) 안정성과 간결함을 과도하게 강조한 측면이 있다.
 실용성을 위해 여러 예외 사항들이 도입되기를 바란다. 또한 더 많은 규칙들이 필요하다.
@@ -128,7 +128,7 @@ C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관�
 
 우리는 규칙들이 코드에 점진적으로 도입되길 바라며, 이를 위한 툴을 만들 계획을 갖고 있다.
 
-규칙을 개선하기 위한 의견과 제안은 언제든 환영한다. 
+규칙을 개선하기 위한 의견과 제안은 언제든 환영한다.
 C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러리들이 많아지므로 이 문서를 지속적으로 수정하고 확장해 규칙들에 대한 이해를 돕고자 한다.
 
 # <a name="S-introduction"></a>In(Introduction): 소개
@@ -156,13 +156,13 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 이 문서에서 다루고 있는 규칙들이 모든 코드에 효과적으로 적용할 수 있다고 생각하지는 않는다.
 오래된 시스템을 새롭게 업그레이드하는 것은 쉽지 않은 일이다. 하지만 여기서 다루는 규칙들을 적용한다면 기존의 방식보다 오류가 발생할 가능성이 낮고, 유지 보수가 편리한 코드를 작성할 수 있을 것이라 확신한다.
 또한 이러한 규칙들은 개발 초기에 좀 더 빠르고 쉽게 개발을 진행하는 데도 도움이 될 것이다.
-분명히 말할 수 있는 것은, 이러한 규칙들을 적용하면 제로-비용 원칙(Zero-overhead principle)에 입각해 이전보다 더 나은 동작을 수행되는 코드를 만들 수 있다는 점이다. 
+분명히 말할 수 있는 것은, 이러한 규칙들을 적용하면 제로-비용 원칙(Zero-overhead principle)에 입각해 이전보다 더 나은 동작을 수행되는 코드를 만들 수 있다는 점이다.
 (제로-비용 원칙이란 "사용하지 않는 부분에 비용을 낭비하지 마라.", 또는 "올바른 추상화 메커니즘을 사용했을 경우, 적어도 저수준 언어로 하드코딩한 것 만큼의 성능을 얻을 수 있다." 정도로 설명할 수 있다.)
 새로운 코드를 작성하거나 기존 코드를 개선할 여지가 생겼다면, 적용 가능한 수준에서 규칙들을 적용해 보기 바란다.
 
-### <a name="R0"></a>In.0(Don't panic!): 당황하지 마라! 
+### <a name="R0"></a>In.0(Don't panic!): 당황하지 마라!
 
-여러분의 프로그램에 가이드라인에 나온 규칙을 적용한다면, 어떤 영향을 줄 지 충분히 고려해야 한다. 
+여러분의 프로그램에 가이드라인에 나온 규칙을 적용한다면, 어떤 영향을 줄 지 충분히 고려해야 한다.
 
 가이드라인은 "상위 집합의 하위 집합(Subset of superset)" ([Stroustrup05](#Stroustrup05)) 원리에 따라 구성되어 있다.
 우리는 신뢰성, 안정성, 성능 등을 고려해 단순히 C++의 한 부분 집합을 정의하지 않는다.
@@ -175,10 +175,10 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 
 많은 규칙들은 규범적인 성격을 띄고 있다.
 대안도 없이 그저 "그렇게 하지 마라!"라고만 하는 규칙들은 불편할 수 밖에 없다.
-일부 규칙들은 기계적으로 정밀 검증할 수 있다기 보다는 경험에 근거하여 작성되었다. 
+일부 규칙들은 기계적으로 정밀 검증할 수 있다기 보다는 경험에 근거하여 작성되었다.
 다른 부류의 규칙들은 일반적인 원칙을 논리적으로 정리한 것이며, 널리 사용될 것이라 생각되는 규칙들은 더욱 자세하게, 그리고 부분적으로나마 검증이 가능하도록 구체적으로 설명했다.
 
-또한 이 가이드라인은 C++에서 핵심이 되는 내용과 그 사용법을 다루고 있기도 하다. 
+또한 이 가이드라인은 C++에서 핵심이 되는 내용과 그 사용법을 다루고 있기도 하다.
 조직의 규모가 매우 크거나, 특화된 분야의 애플리케이션을 개발하거나, 프로젝트의 규모가 매우 크다면 여기서 다루는 내용보다 더 다양한 규칙과 제약, 라이브러리가 필요할 것이다.
 예를 들어 고도의 실시간 애플리케이션을 개발하는 경우라면 자유 저장소(Free Store, 동적 메모리)를 아무렇게나 사용하면 안되기 때문에, 라이브러리를 선택하는데 제약이 있을 수 밖에 없다.
 이처럼 특화된 개발 분야에만 적용 할 수 있는 규칙들은 핵심 가이드라인의 부록에 담았다.
@@ -209,7 +209,7 @@ C++ 언어에 새로운 기능들이 추가되고 사용 가능한 라이브러�
 따라서 기존 코드를 모던하게, 젊고 활기차게, 업그레이드 하고 싶다면 [모던화](#S-modernizing)를 참조하기 바란다.
 중요한 것은 이 문서에서 다루고 있는 규칙들을 점진적으로 적용할 수 있다는 점이다. 엄청난 양의 코드를 단번에 바꿀 수는 없는 노릇이다.
 
-이 가이드라인이 언어의 기술 세부 사항을 완벽하게, 또는 정확하게 설명하지는 않는다. 
+이 가이드라인이 언어의 기술 세부 사항을 완벽하게, 또는 정확하게 설명하지는 않는다.
 언어의 명세, 일반 규칙에 대한 예외 사항, 그 외 세부 기능들에 대해서는 ISO C++ 표준을 참조하기 바란다.
 
 규칙들을 작성할 때 C++의 일부 기능만을 이용해 코드를 작성하도록 의도하지는 않았다.
@@ -249,7 +249,7 @@ Also, suggest an improvement.
 바라건대 모든 규칙들을 적용하는 것이 좋다고 생각한다. 그렇게 해야만 최고의 이득을 본다고 생각하기 때문이다.
 
 이는 꽤나 심각한 딜레마가 아닐 수 없는데, 우리는 이러한 딜레마의 해결책이 툴을 개발하는 것이라고 생각했다.
-각각의 규칙들은 적용 방법을 설명하고 있는 **적용** 단락을 갖고 있는데, 
+각각의 규칙들은 적용 방법을 설명하고 있는 **적용** 단락을 갖고 있는데,
 코드 리뷰, 정적 분석, 컴파일러, 런타임 체크 등의 방법을 나열하고 있다.
 어떤 방식이든 우리는 "기계적"이며(사람은 느리기도 하고, 쉽게 지루해 할 수 있으므로) 일관된 방법으로 개별 규칙들이 적용되기를 원했다.
 이런 이유로 런타임 체크는 다른 대안이 없을 경우에 한해서만 언급했다.
@@ -381,7 +381,7 @@ Also, we assume that the rules will be refined over time to make them more preci
         // ...
     };
 
-첫번째 `month` 함수는 명확히 `Month`를 반환하도록 선언되어 있으며, `Date` 개체의 상태를 변경하지 않을 것처럼 보인다. 
+첫번째 `month` 함수는 명확히 `Month`를 반환하도록 선언되어 있으며, `Date` 개체의 상태를 변경하지 않을 것처럼 보인다.
 두번째 버전은 코드를 읽는 개발자들을 고민하게 만들며, 발견하기 어려운 버그를 유발할 가능성이 있다.
 
 ##### 예제
@@ -400,7 +400,7 @@ Also, we assume that the rules will be refined over time to make them more preci
         // ...
     }
 
-위 반복문은 `std::find`를 이용해 표현 가능하다. 
+위 반복문은 `std::find`를 이용해 표현 가능하다.
 의도를 더 명확하게 드러내기 위해 아래와 같이 코드를 바꿀 수 있다.
 
     void f(vector<string>& v)
@@ -469,7 +469,7 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
 ##### 비고
 
 표준 C++ 언어의 기능이나 라이브러리조차 제한적으로 사용할 수 밖에 없는 환경도 있다.
-예를 들면, 항공기 제어 소프트웨어 개발 표준에는 동적 메모리 할당을 피할 것을 주문하고 있다. 
+예를 들면, 항공기 제어 소프트웨어 개발 표준에는 동적 메모리 할당을 피할 것을 주문하고 있다.
 이런 경우에는 특정 환경에 맞춘 코딩 가이드라인을 확장해서 사용하거나 사용하지 않아야 하는 기능들을 관리하라.
 
 ##### 적용
@@ -686,7 +686,7 @@ There is a huge scope for cleverness and semi-automated program transformation.
         f4(span<int>{v});          // pass a view, retain ownership
     }
 
-이 디자인은 개체의 필수 부분으로 요소의 갯수를 전달하므로 오류가 발생하지 않고 항상 저렴하지는 않지만 동적(런타임) 검사를 할 수 있다. 
+이 디자인은 개체의 필수 부분으로 요소의 갯수를 전달하므로 오류가 발생하지 않고 항상 저렴하지는 않지만 동적(런타임) 검사를 할 수 있다.
 
 ##### 예제
 
@@ -717,7 +717,7 @@ There is a huge scope for cleverness and semi-automated program transformation.
 
 * ???
 * 필요한 것을 실제로 알고 있을 때, 다형 기본 클래스를 전달하는 인터페이스가 어떻게 검사를 피할 수 있는지 보여준다.
-  또는 "자유형" 옵션으로 문자열이 있다. 
+  또는 "자유형" 옵션으로 문자열이 있다.
 
 ##### 적용
 
@@ -1029,7 +1029,7 @@ This is a variant of the [subset of superset principle](#R0) that underlies thes
 * Look for "messy code" such as complex pointer manipulation and casting outside the implementation of abstractions.
 
 
-# <a name="S-interfaces"></a>I(Interfaces): 인터페이스 
+# <a name="S-interfaces"></a>I(Interfaces): 인터페이스
 
 인터페이스는 프로그램 두 부분 사이의 계약이다. 서비스의 공급자와 사용자가 기대하는 바를 정확하게 기술하는 것이 핵심이다.
 (이해하기 쉽고, 효율적인 사용을 장려하고, 쉽게 오류가 발생하지 않고, 테스트를 지원하는 등) 좋은 인터페이스는 아마도 코드 구성 중에서 가장 중요한 요소 중 하나다.
@@ -1099,7 +1099,7 @@ This is a variant of the [subset of superset principle](#R0) that underlies thes
 **대안**: 예외를 발생시켜라. 예외는 무시할 수 없다.
 
 **공식 대안**: 전역 또는 암시적 상태의 값을 통해 인터페이스로 정보가 전달되는 것을 피하라.
-`const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라. 
+`const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라.
 
 **공식 대안**: 인터페이스는 함수나 함수의 집합이어야 한다.
 함수는 템플릿 함수일 수 있고 함수 집합은 클래스나 클래스 템플릿일 수 있다.
@@ -1142,7 +1142,7 @@ const가 아닌 전역 변수는 의존성을 숨기고 예측하지 못한 변�
 전역 변수에 반하는 규칙은 네임스페이스 스코프의 변수에도 동일하게 적용한다.
 
 **대안**: 복사를 피하기 위해 전역 변수(좀 더 일반화해서 네임스페이스 스코프의 데이터)를 사용한다면 `const` 레퍼런스로 개체를 전달하는 것을 고려하라.
-다른 해결책은 개체의 상태로서의 데이터와 멤버 함수로서의 연산을 정의하는 것이다. 
+다른 해결책은 개체의 상태로서의 데이터와 멤버 함수로서의 연산을 정의하는 것이다.
 
 **경고**: 데이터 경합을 조심하라. 하나의 스레드가 실행되는 동안 다른 스레드가 전역 데이터(또는 레퍼런스로 전달된 데이터)에 접근하려고 한다면, 데이터 경합이 발생할 수 있다.
 Every pointer or reference to mutable data is a potential data race.
@@ -2133,7 +2133,7 @@ are often filled in by name at the call site.
 
 ##### 적용
 
-* 출력 매개 변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다. 
+* 출력 매개 변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다.
 * 편집기 화면에 다 나오지 않을 만큼 큰 함수를 의심하라. 이런 함수는 세부 동작을 갖는 더 작은 함수들로 (이름을 잘 지어서) 나누도록 한다.
 * 7개 이상의 매개 변수를 갖는 함수를 의심하라.
 
@@ -7334,9 +7334,9 @@ But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
 ##### Example
 
     // Short string optimization
-    
+
     constexpr size_t buffer_size = 16; // Slightly larger than the size of a pointer
-    
+
     class Immutable_string {
     public:
         Immutable_string(const char* str) :
@@ -7349,18 +7349,18 @@ But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
                 strcpy_s(string_ptr, size + 1, str);
             }
         }
-    
+
         ~Immutable_string()
         {
             if (size >= buffer_size)
                 delete string_ptr;
         }
-    
+
         const char* get_str() const
         {
             return (size < buffer_size) ? string_buffer : string_ptr;
         }
-    
+
     private:
         // If the string is short enough, we store the string itself
         // instead of a pointer to the string.
@@ -7368,7 +7368,7 @@ But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
             char* string_ptr;
             char string_buffer[buffer_size];
         };
-    
+
         const size_t size;
     };
 
@@ -11466,73 +11466,56 @@ Performance is very sensitive to cache performance and cache algorithms favor si
 
 ???
 
-# <a name="S-concurrency"></a>CP: Concurrency and Parallelism
+# <a name="S-concurrency"></a>CP: 동시성과 병렬성
 
-We often want our computers to do many tasks at the same time (or at least make them appear to do them at the same time).
-The reasons for doing so varies (e.g., wanting to wait for many events using only a single processor, processing many data streams simultaneously, or utilizing many hardware facilities)
-and so does the basic facilities for expressing concurrency and parallelism.
-Here, we articulate a few general principles and rules for using the ISO standard C++ facilities for expressing basic concurrency and parallelism.
+우리는 컴퓨터가 동시에 많은 작업을 하기를 원하고, 그렇게 동작하는 것처럼 보이게 만들기도 한다.
+이렇게 하는 이유는 다양한데, '단일 프로세서만을 사용해 많은 이벤트를 기다리게 만들기 위해', '많은 데이터 스트림을 동시에 처리하기 위해', 또는 '많은 하드웨어 기능을 활용하기 위해' 등이 있다.
+이러한 문제를 해결하기 위해서 C++은 동시성과 병렬성을 위한 다양한 기능을 제공한다.
+이 절에서는 ISO 표준 C++로 동시성과 병렬성을 구현하는데 필요한 일반적인 원칙과 규칙을 설명한다.
 
-The core machine support for concurrent and parallel programming is the thread.
-Threads allow you to run multiple instances of your program independently, while sharing
-the same memory. Concurrent programming is tricky for many reasons, most
-importantly that it is undefined behavior to read data in one thread after it
-was written by another thread, if there is no proper synchronization between
-those threads. Making existing single-threaded code execute concurrently can be
-as trivial as adding `std::async` or `std::thread` strategically, or it can
-necessitate a full rewrite, depending on whether the original code was written
-in a thread-friendly way.
+동시성 프로그래밍과 병렬 프로그래밍의 핵심은 스레드다. 스레드 덕분에 동일한 메모리를 공유하면서 프로그램의 여러 인스턴스를 독립적으로 실행할 수 있다.
+동시성 프로그래밍은 여러 가지 이유로 인해 작업하기 까다롭다. 대표적으로 하나의 스레드에서 데이터를 읽는 동안 다른 스레드에서 같은 데이터를 덮어쓸 경우에 발생하는 정의되지 않은 동작(undefined behavior)이 있다. 기존의 단일 스레드 코드를 동시성 코드로 변경하기 위해서는 `std::async`나 `std::thread`를 추가하면 쉽게 해결되지만, 동시성이 고려되지 않은 코드라면 코드 전체를 다시 작성해야 할 수도 있다.
 
-The concurrency/parallelism rules in this document are designed with three goals
-in mind:
+이 문서의 동시성/병렬성 규칙은 3가지 목표를 염두에 두고 설계했다.
 
-* To help you write code that is amenable to being used in a threaded
-  environment
-* To show clean, safe ways to use the threading primitives offered by the
-  standard library
-* To offer guidance on what to do when concurrency and parallelism aren't giving
-  you the performance gains you need
+* 스레드를 쉽게 제어할 수 있도록 한다.
+* C++ 표준 라이브러리로 안전하고 명료하게 스레드를 제어하는 방법을 제시한다.
+* 동시성, 병렬성을 사용해 원하는 성능을 얻을 수 없을 경우, 무엇을 해야하는지에 대한 지침을 제공한다.
 
-It is also important to note that concurrency in C++ is an unfinished
-story. C++11 introduced many core concurrency primitives, C++14 improved on
-them, and it seems that there is much interest in making the writing of
-concurrent programs in C++ even easier. We expect some of the library-related
-guidance here to change significantly over time.
+C++이 제공하는 동시성은 지금도 계속 발전하고 있다. 특히 중요한 동시성 기능들이 C++11에 많이 도입되었고, C++14에서는 이 기능들을 개선했다. 그 결과, C++로 동시성 프로그램을 더욱 쉽고 재밌게 만들 수 있게 되었다.
+일부 스레드 관련 라이브러리의 사용 지침은 점차 가치있는 방향으로 변화할 것이다.
 
-This section needs a lot of work (obviously).
-Please note that we start with rules for relative non-experts.
-Real experts must wait a bit;
-contributions are welcome,
-but please think about the majority of programmers who are struggling to get their concurrent programs correct and performant.
+이 절은 많은 시간과 노력이 필요하다.
+우선은 동시성/병렬성에 익숙하지 않은 사용자들을 위한 규칙으로 시작하려고 한다. 전문가라면 좀 더 기다려주기 바란다.
+문서에 대한 기여는 환영하지만, 올바른 동작을 하며 속도가 빠른 동시성 프로그램을 만들기 위해 고군분투하고 있는 대다수의 프로그래머를 배려해주길 바란다.
 
-Concurrency and parallelism rule summary:
+동시성과 병렬성 규칙 요약:
 
-* [CP.1: Assume that your code will run as part of a multi-threaded program](#Rconc-multi)
-* [CP.2: Avoid data races](#Rconc-races)
-* [CP.3: Minimize explicit sharing of writable data](#Rconc-data)
-* [CP.4: Think in terms of tasks, rather than threads](#Rconc-task)
-* [CP.8 Don't try to use `volatile` for synchronization](#Rconc-volatile)
+* [CP.1: 코드가 멀티스레드 프로그램의 일부로 동작할 것이라 가정하라](#Rconc-multi)
+* [CP.2: 데이터 경쟁을 피하라](#Rconc-races)
+* [CP.3: 쓰기 가능한 데이터의 명시적인 공유를 최소화하라](#Rconc-data)
+* [CP.4: 스레드보단 작업 단위로 생각하라](#Rconc-task)
+* [CP.8: 동기화를 위해 `volatile`을 사용하지 말아라](#Rconc-volatile)
+* [CP.9: 가능할 때마다 도구를 사용하여 동시성 코드의 유효성을 검사하라.](#Rconc-tools)
 
-See also:
+참고 항목:
 
-* [CP.con: Concurrency](#SScp-con)
-* [CP.par: Parallelism](#SScp-par)
-* [CP.mess: Message passing](#SScp-mess)
-* [CP.vec: Vectorization](#SScp-vec)
-* [CP.free: Lock-free programming](#SScp-free)
-* [CP.etc: Etc. concurrency rules](#SScp-etc)
+* [CP.con: 동시성(Concurrency)](#SScp-con)
+* [CP.par: 병렬성(Parallelism)](#SScp-par)
+* [CP.mess: 메세지 전달(Message passing)](#SScp-mess)
+* [CP.vec: 벡터화(Vectorization)](#SScp-vec)
+* [CP.free: 무잠금 프로그래밍(Lock-free programming)](#SScp-free)
+* [CP.etc: 기타 동시성 규칙들(Etc. concurrency rules)](#SScp-etc)
 
-### <a name="Rconc-multi"></a>CP.1: Assume that your code will run as part of a multi-threaded program
+### <a name="Rconc-multi"></a>CP.1: 코드가 멀티스레드 프로그램의 일부로 동작할 것이라 가정하라
 
-##### Reason
+##### 근거
 
-It is hard to be certain that concurrency isn't used now or will be sometime in the future.
-Code gets re-used.
-Libraries using threads may be used from some other part of the program.
-Note that this applies most urgently to library code and least urgently to stand-alone applications.
-However, thanks to the magic of cut-and-paste, code fragments can turn up in unexpected places.
+동시성 프로그래밍을 지금하지 않는다고해서 앞으로도 계속 그럴거라고는 장담할 수 없다.
+코드뿐 아니라 스레드를 사용한 라이브러리가 프로그램의 일부로 재활용된다는 사실은 단일 응용 프로그램보다는 라이브러리 코드에 더 적합한 원칙이다.
+특히나, 잘라서 붙여 넣기 덕분에 이런 코드 조각들은 예기치 못한 곳에서 불쑥 나타나기 때문에 주의해야 한다.
 
-##### Example
+##### 예
 
     double cached_computation(double x)
     {
@@ -11548,25 +11531,23 @@ However, thanks to the magic of cut-and-paste, code fragments can turn up in une
         return result;
     }
 
-Although `cached_computation` works perfectly in a single-threaded environment, in a multi-threaded environment the two `static` variables result in data races and thus undefined behavior.
+`cached_computation`함수는 단일 스레드 환경에선 완벽하게 동작하지만, 다중 스레드 환경에선 두 개의 `static` 변수가 데이터 경쟁에 빠져서 정의되지 않은 동작이 발생한다.
 
-There are several ways that this example could be made safe for a multi-threaded environment:
+위 예시를 다중 스레드 환경에서도 안전하게 동작시키는 몇 가지 방법이 있다.
 
-* Delegate concurrency concerns upwards to the caller.
-* Mark the `static` variables as `thread_local` (which might make caching less effective).
-* Implement concurrency control, for example, protecting the two `static` variables with a `static` lock (which might reduce performance).
-* Have the caller provide the memory to be used for the cache, thereby delegating both memory allocation and concurrency concerns upwards to the caller.
-* Refuse to build and/or run in a multi-threaded environment.
-* Provide two implementations, one which is used in single-threaded environments and another which is used in multi-threaded environments.
+* 동시성 프로그래밍의 고려사항을 호출자에게 위임한다.
+* `static` 변수들을 `thread_local`로 만든다. (대신, 캐쉬를 사용해서 얻은 이득은 줄어든다)
+* 두 `static`변수를 `static` 잠금(lock)을 사용해서 동시성 상황을 제어한다. (대신, 성능을 감소시킬 수 있다)
+* 호출자가 캐시로 사용 할 메모리를 제공하도록 한다. 그러면 호출자에게 메모리 관리(할당과 해제)와 동시성 프로그래밍의 고려사항을 위임할 수 있다.
+* 다중 스레드 환경에서는 빌드되거나 실행되지 않도록 한다.
+* 단일 스레드 환경과 다중 스레드 환경을 위한 구현을 각각 제공한다.
 
-##### Exception
+##### 예외 사항
 
-Code that is never run in a multi-threaded environment.
+다중 스레드 환경에서는 절대 실행되지 않을 코드.
 
-Be careful: there are many examples where code that was "known" to never run in a multi-threaded program
-was run as part of a multi-threaded program. Often years later.
-Typically, such programs lead to a painful effort to remove data races.
-Therefore, code that is never intended to run in a multi-threaded environment should be clearly labeled as such and ideally come with compile or run-time enforcement mechanisms to catch those usage bugs early.
+주의: 다중 스레드 프로그램에서 절대로 실행되지 않을 줄 "알았던" 코드가 몇 년 뒤엔 다중 스레드 프로그램의 일부가 된 사례가 많이 있다.
+보통 그런 프로그램은 데이터 경쟁을 없애는데 많은 노력이 들어간다. 따라서, 다중 스레드 환경에 적합하지 않은 코드는 분명하게 제약 사항이 기술되어야 하고, 컴파일 또는 실행시간에 이 문제를 찾을 수 있는 메커니즘이 함께 사용되는 것이 이상적이다.
 
 ### <a name="Rconc-races"></a>CP.2: Avoid data races
 
@@ -11611,7 +11592,7 @@ Local static variables are a common source of data races.
         // ...
         auto h1 = async([&]{ sort(par, s); });     // spawn a task to sort
         // ...
-        auto h2 = async([&]{ return find_all(buf, sz, pat); });   // span a task to find matches
+        auto h2 = async([&]{ return find_all(buf, sz, pat); });   // spawn a task to find matches
         // ...
     }
 
@@ -11646,15 +11627,18 @@ this can be a security risk.
 ##### Enforcement
 
 Some is possible, do at least something.
-There are commercial and open-source tools that try to address this problem, but static tools often have many false positives and run-time tools often have a significant cost.
+There are commercial and open-source tools that try to address this problem,
+but be aware that solutions have costs and blind spots.
+Static tools often have many false positives and run-time tools often have a significant cost.
 We hope for better tools.
+Using multiple tools can catch more problems than a single one.
 
-Help the tools:
+There are other ways you can mitigate the chance of data races:
 
-* less global data
-* fewer `static` variables
-* more use of stack memory (and don't pass pointers around too much)
-* more immutable data (literals, `constexpr`, and `const`)
+* Avoid global data
+* Avoid `static` variables
+* More use of value types on the stack (and don't pass pointers around too much)
+* More use of immutable data (literals, `constexpr`, and `const`)
 
 ### <a name="Rconc-data"></a>CP.3: Minimize explicit sharing of writable data
 
@@ -11671,23 +11655,20 @@ The less sharing you do, the less chance you have to wait on a lock (so performa
     Image altitude_map(const vector<Reading>&);
     // ...
 
-    void process_readings(istream& socket1)
+    void process_readings(const vector<Reading>& surface_readings)
     {
-        vector<Reading> surface_readings;
-        socket1 >> surface_readings;
-        if (!socket1) throw Bad_input{};
-
-        auto h1 = async([&] { if (!validate(surface_readings) throw Invalide_data{}; });
+        auto h1 = async([&] { if (!validate(surface_readings)) throw Invalid_data{}; });
         auto h2 = async([&] { return temperature_gradiants(surface_readings); });
         auto h3 = async([&] { return altitude_map(surface_readings); });
         // ...
-        auto v1 = h1.get();
+        h1.get();
         auto v2 = h2.get();
         auto v3 = h3.get();
         // ...
     }
 
 Without those `const`s, we would have to review every asynchronously invoked function for potential data races on `surface_readings`.
+Making `surface_readings` be `const` (with respect to this function) allow reasoning using only the function body.
 
 ##### Note
 
@@ -11721,7 +11702,7 @@ This is a potent argument for using higher level, more applications-oriented lib
 
 ???
 
-### <a name="Rconc-volatile"></a>CP.8 Don't try to use `volatile` for synchronization
+### <a name="Rconc-volatile"></a>CP.8: Don't try to use `volatile` for synchronization
 
 ##### Reason
 
@@ -11739,7 +11720,7 @@ It simply has nothing to do with concurrency.
     }
 
 Here we have a problem:
-This is perfectly good code in a single-threaded program, but have two treads execute this and
+This is perfectly good code in a single-threaded program, but have two threads execute this and
 there is a race condition on `free_slots` so that two threads might get the same value and `free_slots`.
 That's (obviously) a bad data race, so people trained in other languages may try to fix it like this:
 
@@ -11773,6 +11754,44 @@ Use a `mutex` for more complicated examples.
 
 [(rare) proper uses of `volatile`](#Rconc-volatile2)
 
+### <a name="Rconc-tools"></a>CP.9: Whenever feasible use tools to validate your concurrent code
+
+Experience shows that concurrent code is exceptionally hard to get right
+and that compile-time checking, run-time checks, and testing are less effective at finding concurrency errors
+than they are at finding errors in sequential code.
+Subtle concurrency errors can have dramatically bad effects, including memory corruption and deadlocks.
+
+##### Example
+
+    ???
+
+##### Note
+
+Thread safety is challenging, often getting the better of experienced programmers: tooling is an important strategy to mitigate those risks.
+There are many tools "out there", both commercial and open-source tools, both research and production tools.
+Unfortunately people's needs and constraints differ so dramatically that we cannot make specific recommendations,
+but we can mention:
+
+* Static enforcement tools: both [clang](http://clang.llvm.org/docs/ThreadSafetyAnalysis.html)
+and some older versions of [GCC](https://gcc.gnu.org/wiki/ThreadSafetyAnnotation)
+have some support for static annotation of thread safety properties.
+Consistent use of this technique turns many classes of thread-safety errors into compile-time errors.
+The annotations are generally local (marking a particular member variable as guarded by a particular mutex),
+and are usually easy to learn. However, as with many static tools, it can often present false negatives;
+cases that should have been caught but were allowed.
+
+* dynamic enforcement tools: Clang's [Thread Sanitizer](http://clang.llvm.org/docs/ThreadSanitizer.html) (aka TSAN)
+is a powerful example of dynamic tools: it changes the build and execution of your program to add bookkeeping on memory access,
+absolutely identifying data races in a given execution of your binary.
+The cost for this is both memory (5-10x in most cases) and CPU slowdown (2-20x).
+Dynamic tools like this are best when applied to integration tests, canary pushes, or unittests that operate on multiple threads.
+Workload matters: When TSAN identifies a problem, it is effectively always an actual data race,
+but it can only identify races seen in a given execution.
+
+##### Enforcement
+
+It is up to an application builder to choose which support tools are valuable for a particular applications.
+
 ## <a name="SScp-con"></a>CP.con: Concurrency
 
 This section focuses on relatively ad-hoc uses of multiple threads communicating through shared data.
@@ -11785,15 +11804,12 @@ This section focuses on relatively ad-hoc uses of multiple threads communicating
 Concurrency rule summary:
 
 * [CP.20: Use RAII, never plain `lock()`/`unlock()`](#Rconc-raii)
-* [CP.21: Use `std::lock()` to acquire multiple `mutex`es](#Rconc-lock)
+* [CP.21: Use `std::lock()` or `std::scoped_lock` to acquire multiple `mutex`es](#Rconc-lock)
 * [CP.22: Never call unknown code while holding a lock (e.g., a callback)](#Rconc-unknown)
 * [CP.23: Think of a joining `thread` as a scoped container](#Rconc-join)
-* [CP.24: Think of a detached `thread` as a global container](#Rconc-detach)
-* [CP.25: Prefer `gsl::raii_thread` over `std::thread` unless you plan to `detach()`](#Rconc-raii_thread)
-* [CP.26: Prefer `gsl::detached_thread` over `std::thread` if you plan to `detach()`](#Rconc-detached_thread)
-* [CP.27: Use plain `std::thread` for `thread`s that detach based on a run-time condition (only)](#Rconc-thread)
-* [CP.28: Remember to join scoped `thread`s that are not `detach()`ed](#Rconc-join-undetached)
-* [CP.30: Do not pass pointers to local variables to non-`raii_thread's](#Rconc-pass)
+* [CP.24: Think of a `thread` as a global container](#Rconc-detach)
+* [CP.25: Prefer `gsl::joining_thread` over `std::thread`](#Rconc-joining_thread)
+* [CP.26: Don't `detach()` a thread](#Rconc-detached_thread)
 * [CP.31: Pass small amounts of data between threads by value, rather than by reference or pointer](#Rconc-data-by-value)
 * [CP.32: To share ownership between unrelated `thread`s use `shared_ptr`](#Rconc-shared)
 * [CP.40: Minimize context switching](#Rconc-switch)
@@ -11840,11 +11856,11 @@ Sooner or later, someone will forget the `mtx.unlock()`, place a `return` in the
 Flag calls of member `lock()` and `unlock()`.  ???
 
 
-### <a name="Rconc-lock"></a>CP.21: Use `std::lock()` to acquire multiple `mutex`es
+### <a name="Rconc-lock"></a>CP.21: Use `std::lock()` or `std::scoped_lock` to acquire multiple `mutex`es
 
 ##### Reason
 
-To avoid deadlocks on multiple `mutex`s
+To avoid deadlocks on multiple `mutex`es.
 
 ##### Example
 
@@ -11861,14 +11877,22 @@ This is asking for deadlock:
 Instead, use `lock()`:
 
     // thread 1
-    lock_guard<mutex> lck1(m1, defer_lock);
-    lock_guard<mutex> lck2(m2, defer_lock);
-    lock(lck1, lck2);
+    lock(m1, m2);
+    lock_guard<mutex> lck1(m1, adopt_lock);
+    lock_guard<mutex> lck2(m2, adopt_lock);
 
     // thread 2
-    lock_guard<mutex> lck2(m2, defer_lock);
-    lock_guard<mutex> lck1(m1, defer_lock);
-    lock(lck2, lck1);
+    lock(m2, m1);
+    lock_guard<mutex> lck2(m2, adopt_lock);
+    lock_guard<mutex> lck1(m1, adopt_lock);
+
+or (better, but C++17 only):
+
+    // thread 1
+    scoped_lock<mutex, mutex> lck1(m1, m2);
+
+    // thread 2
+    scoped_lock<mutex, mutex> lck2(m2, m1);
 
 Here, the writers of `thread1` and `thread2` are still not agreeing on the order of the `mutex`es, but order no longer matters.
 
@@ -11877,9 +11901,9 @@ Here, the writers of `thread1` and `thread2` are still not agreeing on the order
 In real code, `mutex`es are rarely named to conveniently remind the programmer of an intended relation and intended order of acquisition.
 In real code, `mutex`es are not always conveniently acquired on consecutive lines.
 
-I'm really looking forward to be able to write plain
+In C++17 it's possible to write plain
 
-    lock_guard lck1(m1, defer_lock);
+    lock_guard lck1(m1, adopt_lock);
 
 and have the `mutex` type deduced.
 
@@ -11942,7 +11966,7 @@ If a `thread` joins, we can safely pass pointers to objects in the scope of the 
 
 ##### Example
 
-    void f(int * p)
+    void f(int* p)
     {
         // ...
         *p = 99;
@@ -11953,26 +11977,25 @@ If a `thread` joins, we can safely pass pointers to objects in the scope of the 
     void some_fct(int* p)
     {
         int x = 77;
-        raii_thread t0(f, &x);           // OK
-        raii_thread t1(f, p);            // OK
-        raii_thread t2(f, &glob);        // OK
+        joining_thread t0(f, &x);           // OK
+        joining_thread t1(f, p);            // OK
+        joining_thread t2(f, &glob);        // OK
         auto q = make_unique<int>(99);
-        raii_thread t3(f, q.get());      // OK
+        joining_thread t3(f, q.get());      // OK
         // ...
     }
 
-An `raii_thread` is a `std::thread` with a destructor that joined and cannot be `detached()`.
+A `gsl::joining_thread` is a `std::thread` with a destructor that joins and that cannot be `detached()`.
 By "OK" we mean that the object will be in scope ("live") for as long as a `thread` can use the pointer to it.
 The fact that `thread`s run concurrently doesn't affect the lifetime or ownership issues here;
 these `thread`s can be seen as just a function object called from `some_fct`.
 
 ##### Enforcement
 
-Ensure that `raii_thread`s don't `detach()`.
+Ensure that `joining_thread`s don't `detach()`.
 After that, the usual lifetime and ownership (for local objects) enforcement applies.
 
-
-### <a name="Rconc-detach"></a>CP.24: Think of a detached `thread` as a global container
+### <a name="Rconc-detach"></a>CP.24: Think of a `thread` as a global container
 
 ##### Reason
 
@@ -11981,7 +12004,7 @@ If a `thread` is detached, we can safely pass pointers to static and free store 
 
 ##### Example
 
-    void f(int * p)
+    void f(int* p)
     {
         // ...
         *p = 99;
@@ -12011,87 +12034,34 @@ By "bad" we mean that a `thread` may use a pointer after the pointed-to object i
 The fact that `thread`s run concurrently doesn't affect the lifetime or ownership issues here;
 these `thread`s can be seen as just a function object called from `some_fct`.
 
-##### Enforcement
+##### Note
+
+Even objects with static storage duration can be problematic if used from detached threads: if the
+thread continues until the end of the program, it might be running concurrently with the destruction
+of objects with static storage duration, and thus accesses to such objects might race.
+
+##### Note
+
+This rule is redundant if you [don't `detach()`](#Rconc-detached_thread) and [use `gsl::joining_thread`](#Rconc-joining_thread).
+However, converting code to follow those guidelines could be difficult and even impossible for third-party libraries.
+In such cases, the rule becomes essential for lifetime safety and type safety.
+
 
 In general, it is undecidable whether a `detach()` is executed for a `thread`, but simple common cases are easily detected.
 If we cannot prove that a `thread` does not `detach()`, we must assume that it does and that it outlives the scope in which it was constructed;
 After that, the usual lifetime and ownership (for global objects) enforcement applies.
 
+##### Enforcement
 
-### <a name="Rconc-raii_thread"></a>CP.25: Prefer `gsl::raii_thread` over `std::thread` unless you plan to `detach()`
+Flag attempts to pass local variables to a thread that might `detach()`.
+
+### <a name="Rconc-joining_thread"></a>CP.25: Prefer `gsl::joining_thread` over `std::thread`
 
 ##### Reason
 
-An `raii_thread` is a thread that joins at the end of its scope.
-
+A `joining_thread` is a thread that joins at the end of its scope.
 Detached threads are hard to monitor.
-
-??? Place all "immortal threads" on the free store rather than `detach()`?
-
-##### Example
-
-    ???
-
-##### Enforcement
-
-???
-
-### <a name="Rconc-detached_thread"></a>CP.26: Prefer `gsl::detached_thread` over `std::thread` if you plan to `detach()`
-
-##### Reason
-
-Often, the need to `detach` is inherent in the `thread`s task.
-Documenting that aids comprehension and helps static analysis.
-
-##### Example
-
-    void heartbeat();
-
-    void use()
-    {
-        gsl::detached_thread t1(heartbeat);    // obviously need not be joined
-        std::thread t2(heartbeat);             // do we need to join? (read the code for heartbeat())
-        // ...
-    }
-
-Flag unconditional `detach` on a plain `thread`
-
-
-### <a name="Rconc-thread"></a>CP.27: Use plain `std::thread` for `thread`s that detach based on a run-time condition (only)
-
-##### Reason
-
-`thread`s that are supposed to unconditionally `join` or unconditionally `detach` can be clearly identified as such.
-The plain `thread`s should be assumed to use the full generality of `std::thread`.
-
-##### Example
-
-    void tricky(thread* t, int n)
-    {
-        // ...
-        if (is_odd(n))
-            t->detach();
-        // ...
-    }
-
-    void use(int n)
-    {
-        thread t { tricky, this, n };
-        // ...
-        // ... should I join here? ...
-    }
-
-##### Enforcement
-
-???
-
-
-
-### <a name="Rconc-join-undetached"></a>CP.28: Remember to join scoped `thread`s that are not `detach()`ed
-
-##### Reason
-
-A `thread` that has not been `detach()`ed when it is destroyed terminates the program.
+It is harder to ensure absence of errors in detached threads (and potentially detached threads)
 
 ##### Example, bad
 
@@ -12124,40 +12094,97 @@ A `thread` that has not been `detach()`ed when it is destroyed terminates the pr
         t2.join();
     }  // one bad bug left
 
-??? Is `cout` synchronized?
+
+##### Example, bad
+
+The code determining whether to `join()` or `detach()` may be complicated and even decided in the thread of functions called from it or functions called by the function that creates a thread:
+
+    void tricky(thread* t, int n)
+    {
+        // ...
+        if (is_odd(n))
+            t->detach();
+        // ...
+    }
+
+    void use(int n)
+    {
+        thread t { tricky, this, n };
+        // ...
+        // ... should I join here? ...
+    }
+
+This seriously complicates lifetime analysis, and in not too unlikely cases makes lifetime analysis impossible.
+This implies that we cannot safely refer to local objects in `use()` from the thread or refer to local objects in the thread from `use()`.
+
+##### Note
+
+Make "immortal threads" globals, put them in an enclosing scope, or put them on the on the free store rather than `detach()`.
+[don't `detach`](#Rconc-detached_thread).
+
+##### Note
+
+Because of old code and third party libraries using `std::thread` this rule can be hard to introduce.
 
 ##### Enforcement
 
-* Flag `join`s for `raii_thread`s ???
-* Flag `detach`s for `detached_thread`s
+Flag uses of `std::thread`:
 
+* Suggest use of `gsl::joining_thread`.
+* Suggest ["exporting ownership"](#Rconc-detached_thread) to an enclosing scope if it detaches.
+* Seriously warn if it is not obvious whether if joins of detaches.
 
-### <a name="RRconc-pass"></a>CP.30: Do not pass pointers to local variables to non-`raii_thread's
+### <a name="Rconc-detached_thread"></a>CP.26: Don't `detach()` a thread
 
 ##### Reason
 
-In general, you cannot know whether a non-`raii_thread` will outlive the scope of the variables, so that those pointers will become invalid.
+Often, the need to outlive the scope of its creation is inherent in the `thread`s task,
+but implementing that idea by `detach` makes it harder to monitor and communicate with the detached thread.
+In particular, it is harder (though not impossible) to ensure that the thread completed as expected or lives for as long as expected.
 
-##### Example, bad
+##### Example
+
+    void heartbeat();
 
     void use()
     {
-        int x = 7;
-        thread t0 { f, ref(x) };
+        std::thread t(heartbeat);             // don't join; heartbeat is meant to run forever
+        t.detach();
         // ...
-        t0.detach();
     }
 
-The `detach` may not be so easy to spot.
-Use a `raii_thread` or don't pass the pointer.
+This is a reasonable use of a thread, for which `detach()` is commonly used.
+There are problems, though.
+How do we monitor the detached thread to see if it is alive?
+Something might go wrong with the heartbeat, and losing a heartbeat can be very serious in a system for which it is needed.
+So, we need to communicate with the heartbeat thread
+(e.g., through a stream of messages or notification events using a `condition_variable`).
 
-##### Example, bad
+An alternative, and usually superior solution is to control its lifetime by placing it in a scope outside its point of creation (or activation).
+For example:
 
-    ??? put pointer to a local on a queue that is read by a longer-lived thread ???
+    void heartbeat();
 
-##### Enforcement
+    gsl::joining_thread t(heartbeat);             // heartbeat is meant to run "forever"
 
-Flag pointers to locals passed in the constructor of a plain `thread`.
+This heartbeat will (barring error, hardware problems, etc.) run for as long as the program does.
+
+Sometimes, we need to separate the point of creation from the point of ownership:
+
+    void heartbeat();
+
+    unique_ptr<gsl::joining_thread> tick_tock {nullptr};
+
+    void use()
+    {
+        // heartbeat is meant to run as long as tick_tock lives
+        tick_tock = make_unique<gsl::joining_thread>(heartbeat);
+        // ...
+    }
+
+#### Enforcement
+
+Flag `detach()`.
 
 
 ### <a name="Rconc-data-by-value"></a>CP.31: Pass small amounts of data between threads by value, rather than by reference or pointer
@@ -12197,7 +12224,7 @@ message passing or shared memory.
 ???
 
 
-### <a name="Rconc-shared"></a>[CP.32: To share ownership between unrelated `thread`s use `shared_ptr`
+### <a name="Rconc-shared"></a>CP.32: To share ownership between unrelated `thread`s use `shared_ptr`
 
 ##### Reason
 
@@ -12263,7 +12290,7 @@ Instead, we could have a set of pre-created worker threads processing the messag
     void master(istream& is)
     {
         for (Message m; is >> m; )
-            work.put(n);
+            work.put(m);
     }
 
     void worker()
@@ -12275,10 +12302,10 @@ Instead, we could have a set of pre-created worker threads processing the messag
 
     void workers()  // set up worker threads (specifically 4 worker threads)
     {
-        raii_thread w1 {worker};
-        raii_thread w2 {worker};
-        raii_thread w3 {worker};
-        raii_thread w4 {worker};
+        joining_thread w1 {worker};
+        joining_thread w2 {worker};
+        joining_thread w3 {worker};
+        joining_thread w4 {worker};
     }
 
 ##### Note
@@ -12430,17 +12457,27 @@ Flag all unnamed `lock_guard`s and `unique_lock`s.
 
 
 
-### <a name="Rconc-mutex"></a>P.50: Define a `mutex` together with the data it guards
+### <a name="Rconc-mutex"></a>P.50: Define a `mutex` together with the data it guards. Use `synchronized_value<T>` where possible
 
 ##### Reason
 
-It should be obvious to a reader that the data is to be guarded and how.
+It should be obvious to a reader that the data is to be guarded and how. This decreases the chance of the wrong mutex being locked, or the mutex not being locked.
+
+Using a `synchronized_value<T>` ensures that the data has a mutex, and the right mutex is locked when the data is accessed.
+See the [WG21 proposal](http://wg21.link/p0290)) to add `synchronized_value` to a future TS or revision of the C++ standard.
 
 ##### Example
 
     struct Record {
         std::mutex m;   // take this mutex before accessing other members
         // ...
+    };
+
+    class MyClass {
+        struct DataRecord {
+           // ...
+        };
+        synchronized_value<DataRecord> data; // Protect the data with a mutex
     };
 
 ##### Enforcement
@@ -12463,7 +12500,7 @@ Parallelism rule summary:
 
 ## <a name="SScp-mess"></a>CP.mess: Message passing
 
-The standard-library facilities are quite low level, focused on the needs of close-to the hardware critical programming using `thread`s, `mutex`es, `atomic` types, etc.
+The standard-library facilities are quite low-level, focused on the needs of close-to the hardware critical programming using `thread`s, `mutex`es, `atomic` types, etc.
 Most people shouldn't work at this level: it's error-prone and development is slow.
 If possible, use a higher level facility: messaging libraries, parallel algorithms, and vectorization.
 This section looks at passing messages so that a programmer doesn't have to do explicit synchronization.
@@ -12541,7 +12578,7 @@ Synchronization using `mutex`es and `condition_variable`s can be relatively expe
 Furthermore, it can lead to deadlock.
 For performance and to eliminate the possibility of deadlock, we sometimes have to use the tricky low-level "lock-free" facilities
 that rely on briefly gaining exclusive ("atomic") access to memory.
-Lock free programming is also used to implement higher-level concurrency mechanisms, such as `thread`s and `mutex`es.
+Lock-free programming is also used to implement higher-level concurrency mechanisms, such as `thread`s and `mutex`es.
 
 Lock-free programming rule summary:
 
@@ -12550,7 +12587,7 @@ Lock-free programming rule summary:
 * [CP.102: Carefully study the literature](#Rconc-literature)
 * how/when to use atomics
 * avoid starvation
-* use a lock free data structure rather than hand-crafting specific lock-free access
+* use a lock-free data structure rather than hand-crafting specific lock-free access
 * [CP.110: Do not write your own double-checked locking for initialization](#Rconc-double)
 * [CP.111: Use a conventional pattern if you really need double-checked locking](#Rconc-double-pattern)
 * how/when to compare and swap
@@ -12580,7 +12617,7 @@ Read up on the ABA problem.
 
 ##### Exception
 
-[Atomic variables](#???) can be used simply and safely.
+[Atomic variables](#???) can be used simply and safely, as long as you are using the sequentially consistent memory model (memory_order_seq_cst), which is the default.
 
 ##### Note
 
@@ -12602,7 +12639,7 @@ If you are doing lock-free programming for performance, you need to check for re
 Instruction reordering (static and dynamic) makes it hard for us to think effectively at this level (especially if you use relaxed memory models).
 Experience, (semi)formal models and model checking can be useful.
 Testing - often to an extreme extent - is essential.
-"Don't fly too close to the wind."
+"Don't fly too close to the sun."
 
 ##### Enforcement
 
@@ -12657,13 +12694,13 @@ Example with thread-safe static local variables of C++11.
         static My_class my_object; // Constructor called only once
         // ...
     }
-    
+
     class My_class
     {
     public:
         My_class()
         {
-            // ...
+            // do this only once
         }
     };
 
@@ -12678,42 +12715,48 @@ Example with thread-safe static local variables of C++11.
 
 Double-checked locking is easy to mess up. If you really need to write your own double-checked locking, in spite of the rules [CP.110: Do not write your own double-checked locking for initialization](#Rconc-double) and [CP.100: Don't use lock-free programming unless you absolutely have to](#Rconc-lockfree), then do it in a conventional pattern.
 
+The uses of the double-checked locking pattern that are not in violation of [CP.110: Do not write your own double-checked locking for initialization](#Rconc-double) arise when a non-thread-safe action is both hard and rare, and there exists a fast thread-safe test that can be used to guarantee that the action is not needed, but cannot be used to guarantee the converse.
+
 ##### Example, bad
 
-Even if the following example works correctly on most hardware platforms, it is not guaranteed to work by the C++ standard. The x_init.load(memory_order_relaxed) call may see a value from outside of the lock guard. 
+The use of volatile does not make the first check thread-safe, see also [CP.200: Use `volatile` only to talk to non-C++ memory](#Rconc-volatile2)
 
-    atomic<bool> x_init;
+    mutex action_mutex;
+    volatile bool action_needed;
 
-    if (!x_init.load(memory_order_acquire)) {
-        lock_guard<mutex> lck(x_mutex);
-        if (!x_init.load(memory_order_relaxed)) {
-            // ... initialize x ...
-            x_init.store(true, memory_order_release);
+    if (action_needed) {
+        std::lock_guard<std::mutex> lock(action_mutex);
+        if (action_needed) {
+            take_action();
+            action_needed = false;
         }
     }
 
 ##### Example, good
 
-One of the conventional patterns is below.
+    mutex action_mutex;
+    atomic<bool> action_needed;
 
-    std::atomic<int> state;
-    
-    // If state == SOME_ACTION_NEEDED maybe an action is needed, maybe not, we need to
-    // check again in a lock. However, if state != SOME_ACTION_NEEDED, then we can be
-    // sure that an action is not needed. This is the basic assumption of double-checked
-    // locking.
-    
-    if (state == SOME_ACTION_NEEDED)
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        if (state == SOME_ACTION_NEEDED)
-        {
-            // do something
-            state = NO_ACTION_NEEDED;
+    if (action_needed) {
+        std::lock_guard<std::mutex> lock(action_mutex);
+        if (action_needed) {
+            take_action();
+            action_needed = false;
         }
     }
 
-In the example above (state == SOME_ACTION_NEEDED) could be any condition. It doesn't necessarily needs to be equality comparison. For example, it could as well be (size > MIN_SIZE_TO_TAKE_ACTION).
+Fine-tuned memory order may be beneficial where acquire load is more efficient than sequentially-consistent load
+
+    mutex action_mutex;
+    atomic<bool> action_needed;
+
+    if (action_needed.load(memory_order_acquire)) {
+        lock_guard<std::mutex> lock(action_mutex);
+        if (action_needed.load(memory_order_relaxed)) {
+            take_action();
+            action_needed.store(false, memory_order_release);
+        }
+    }
 
 ##### Enforcement
 
@@ -12791,7 +12834,6 @@ In C++, unlike in some other languages, `volatile` has [nothing to do with synch
 ### <a name="Rconc-signal"></a>CP.201: ??? Signals
 
 ???UNIX signal handling???. May be worth reminding how little is async-signal-safe, and how to communicate with a signal handler (best is probably "not at all")
-
 
 # <a name="S-errors"></a>E: Error handling
 
