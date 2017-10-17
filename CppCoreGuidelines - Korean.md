@@ -287,7 +287,7 @@ or a specific rule in a profile ([type.4](#Pro-type-cstylecast), or [bounds.2](#
 * **대안**들 -- "이런 식으로 하지 마라"에 대한 대안을 제시한다.
 * **예외**들 -- 단순하고 보편적인 규칙이 좋다. 많은 규칙들이 널리 사용되지만 만능은 아니므로 예외가 있을 경우 이를 나열한다.
 * **적용** -- "기계적으로" 규칙을 확인하는 방법에 대한 아이디어를 설명한다.
-* **참고 항목**들 -- (이 문서나 다른 문서에 대해) 규칙이나 관련 내용과 연관된 항목들을 안내한다.
+* **참고할 만한 내용**들 -- (이 문서나 다른 문서에 대해) 규칙이나 관련 내용과 연관된 항목들을 안내한다.
 * **비고**들 (언급) -- 다른데서 다루기 적합하지 않은 부분에 대해 추가로 설명한다.
 * **논의** -- 규칙을 제시한 근본적인 이유를 담고 있는 다른 글에 대한 참조나 규칙의 주요 리스트에 포함되지 않는 예 등을 설명한다.
 
@@ -870,7 +870,7 @@ This is particularly important for long-running programs, but is an essential pi
         // ...
     }
 
-**참고 항목**: [리소스 관리](#S-resource)
+**참고할 만한 내용**: [리소스 관리](#S-resource)
 
 ##### 비고
 
@@ -1151,7 +1151,7 @@ Every pointer or reference to mutable data is a potential data race.
 
 변경할 수 없는 데이터에 대해서는 경합 조건이 생기지 않는다.
 
-**참고 항목**: [함수 호출에 대한 규칙](#SS-call)을 보라.
+**참고할 만한 내용**: [함수 호출에 대한 규칙](#SS-call)을 보라.
 
 ##### 적용
 
@@ -1336,7 +1336,7 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 이상적으로 `Expects(x >= 0)` 조건이 `sqrt()`의 인터페이스에 일부분이 되는게 가장 좋지만 그렇게 하기는 쉽지 않다. 따라서 지금은 함수 정의부(함수 본문)에 위치시킨다.
 
-**참고 항목**: `Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
+**참고할 만한 내용**: `Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
 
 ##### 비고
 
@@ -1353,7 +1353,7 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 (적용 불가능)
 
-**참고 항목**: 포인터 전달에 대한 규칙. ???
+**참고할 만한 내용**: 포인터 전달에 대한 규칙. ???
 
 ### <a name="Ri-expects"></a>I.6: 사전 조건을 표현하고 싶다면 `Expects()`를 사용하라
 
@@ -1541,7 +1541,7 @@ Once language support becomes available (e.g., see the [contract proposal](http:
 곧 (아마도 2017년), `//`가 제거되면 대부분의 컴파일러가 `requires` 구문을 검사할 수 있을 것이다.
 현재 컨셉 TS는 GCC 6.1에서만 지원된다.
 
-**참고 항목**: [제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 보라.
+**참고할 만한 내용**: [제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 보라.
 
 ##### 적용
 
@@ -1608,7 +1608,7 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
 * 장기적으로 보면 정규 코드가 더 잘 최적화된다.
 * Always carefully [measure](#Rper-measure) before making performance claims.
 
-**참고 항목**: 사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
+**참고할 만한 내용**: 사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
 
 ##### 적용
 
@@ -1665,7 +1665,7 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
 처리되지 않은 포인터(또는 반복자)로 전달된 모든 개체는 호출자가 소유한 것으로 간주되므로 호출자가 수명을 처리한다.
 Viewed another way: ownership transferring APIs are relatively rare compared to pointer-passing APIs, so the default is "no ownership transfer."
 
-**참고 항목**: [인수 전달](#Rf-conventional) 및 [값 반환](#Rf-T-return).
+**참고할 만한 내용**: [인수 전달](#Rf-conventional) 및 [값 반환](#Rf-T-return).
 
 ##### 적용
 
