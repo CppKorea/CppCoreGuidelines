@@ -11551,40 +11551,35 @@ C++이 제공하는 동시성은 지금도 계속 발전하고 있다. 특히 �
 주의: 다중 스레드 프로그램에서 절대로 실행되지 않을 줄 "알았던" 코드가 몇 년 뒤엔 다중 스레드 프로그램의 일부가 된 사례가 많이 있다.
 보통 이런 프로그램은 데이터 경쟁을 없애는데 많은 노력이 든다. 따라서, 다중 스레드 환경에 적합하지 않은 코드는 제약 사항을 명확하게 기술해야 하고, 이상적으로는 컴파일 타임 또는 런타임에 버그를 조기에 발견할 수 있는 메커니즘이 있는게 좋다.
 
-### <a name="Rconc-races"></a>CP.2: Avoid data races
+### <a name="Rconc-races"></a>CP.2: 데이터 경쟁을 피하라
 
-##### Reason
+##### 이유
 
-Unless you do, nothing is guaranteed to work and subtle errors will persist.
+데이터 경쟁을 피하지 못 하면, 제대로 동작한다고 보장할 수도 없고 분석하기 어려운 미묘한 오류들이 계속 발생한다.
 
-##### Note
+##### 참고할 만한 내용
 
-In a nutshell, if two threads can access the same object concurrently (without synchronization), and at least one is a writer (performing a non-`const` operation), you have a data race.
-For further information of how to use synchronization well to eliminate data races, please consult a good book about concurrency.
+간단한 예로, 두 스레드가 동일한 객체를 동기화 없이 동시에 접근할 수 있고, 최소 한 스레드에서 쓰기(non-`const` 연산 사용)를 한다면, 데이터 경쟁 상태다.
+어떻게 동기화를 사용하고 데이터 경쟁을 없앨지 알려주는 좋은 책이 많이 있다. 꼭 참고하기 바란다.
 
-##### Example, bad
+##### 나쁜 예,
 
-There are many examples of data races that exist, some of which are running in
-production software at this very moment. One very simple example:
+데이터 경쟁에 대한 예는 많이 있는데, 어떤 코드는 지금 이 순간에도 상용 제품에서 실행되고 있다.
+아래 아주 간단한 예를 보면,
 
     int get_id() {
       static int id = 1;
       return id++;
     }
 
-The increment here is an example of a data race. This can go wrong in many ways,
-including:
+id를 증가시키는 부분에서 데이터 경쟁이 발생하는데, 아래와 같은 문제를 포함해서 여러가지 문제가 발생한다.
 
-* Thread A loads the value of `id`, the OS context switches A out for some
-  period, during which other threads create hundreds of IDs. Thread A is then
-  allowed to run again, and `id` is written back to that location as A's read of
-  `id` plus one.
-* Thread A and B load `id` and increment it simultaneously.  They both get the
-  same ID.
+* 스레드 A가 `id`를 로드하고, 운영체제가 다른 스레드를 실행하려고 A를 중지시킨다. 그 사이 다른 스레드가 ID를 수백 개 생성한다. 그 후에 A는 다시 실행되고, A의 문맥에서는 `id`를 하나 증가시킨 값을 읽는다.
+* 스레드 A와 B가 `id`를 로드하고 동시에 증가시킨다. 그 결과 두 스레드는 같은 ID값을 가진다.
 
-Local static variables are a common source of data races.
+일반적으로 지역 정적 변수는 데이터 경쟁을 발생시키는 원인이 된다.
 
-##### Example, bad:
+##### 나쁜 예
 
     void f(fstream&  fs, regex pat)
     {
@@ -11598,12 +11593,12 @@ Local static variables are a common source of data races.
         // ...
     }
 
-Here, we have a (nasty) data race on the elements of `buf` (`sort` will both read and write).
-All data races are nasty.
-Here, we managed to get a data race on data on the stack.
-Not all data races are as easy to spot as this one.
+이 코드에서는, `buf`의 원소들에 대한 위험한 데이터 경쟁이 있다. (`sort`가 읽기와 쓰기를 수행한다).
+모든 데이터 경쟁은 위험하다.
+이 코드는 스택 상의 데이터에서 발생하는 데이터 경쟁을 처리하고 있다.
+모든 데이터 경쟁이 이 예처럼 찾아내기 쉬운 것은 아니다.
 
-##### Example, bad:
+##### 나쁜 예,
 
     // code not controlled by a lock
 
@@ -11620,27 +11615,25 @@ Not all data races are as easy to spot as this one.
         }
     }
 
-Now, a compiler that does not know that `val` can change will  most likely implement that `switch` using a jump table with five entries.
-Then, a `val` outside the `[0..4]` range will cause a jump to an address that could be anywhere in the program, and execution would proceed there.
-Really, "all bets are off" if you get a data race.
-Actually, it can be worse still: by looking at the generated code you may be able to determine where the stray jump will go for a given value;
-this can be a security risk.
+이 경우, `val`이 바뀔 수도 있다는 것을 모르는 컴파일러는 `switch`를 5개의 엔트리를 지닌 이동 테이블로 구현할 것이다. 그러면, `[0..4]` 범위 밖의 값을 가진 `val`은 프로그램의 어딘가로 이동해서 그 지점부터 실행될 것이다.
+데이터 경쟁이 있으면 그 무엇도 장담할 수 없다.
+실제로, 더 나쁜 결과로 이어질 수도 있다: 생성된 코드를 살펴보면 주어진 값에 따라서 어디로 이동할지 알 수 있겠지만, 이는 보안에 위험요소다.
 
-##### Enforcement
+##### 적용
 
-Some is possible, do at least something.
-There are commercial and open-source tools that try to address this problem,
-but be aware that solutions have costs and blind spots.
-Static tools often have many false positives and run-time tools often have a significant cost.
-We hope for better tools.
-Using multiple tools can catch more problems than a single one.
+무엇이든 좋으니 일단 하라.
+이 문제를 해결하기 위한 상업 및 오픈소스 도구가 있다. 하지만 해결책은 비용과 알아채지 못 한 문제점을 수반한다.
+정적 도구들은 오용탐지(false positive)를 하는 경우가 있고, 런타임 도두들은 비용이 많이 들어가는 문제가 있다.
+우리는 더 나은 도구들이 나오기를 바란다.
+여러 가지 도구를 사용하면 한 가지 도구를 사용하는 것보다 많은 문제를 발견할 수 있다.
 
-There are other ways you can mitigate the chance of data races:
+데이터 경쟁을 줄일 수 있는 다른 방법:
 
-* Avoid global data
-* Avoid `static` variables
-* More use of value types on the stack (and don't pass pointers around too much)
-* More use of immutable data (literals, `constexpr`, and `const`)
+* 전역 데이터 사용하지 않기
+* `static`변수 사용하지 않기
+* 스택 상에서 값형식을 더 많이 사용하기 (포인터를 너무 많이 전달하지 말아라)
+* 불변형(상수형) 데이터 많이 사용하기 (리터럴, `constexpr`, `const`)
+
 
 ### <a name="Rconc-data"></a>CP.3: Minimize explicit sharing of writable data
 
