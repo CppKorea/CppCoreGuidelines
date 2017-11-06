@@ -199,18 +199,22 @@
 **잘못된 예**:
 
 	#include<vector>
+
+	// ... 코드는 여기에 위치한다 ...
+
 	#include<algorithms>
 	#include<string>
 
-	// ... 코드는 여기에 위치한다 ...
+
 
 **Example, bad**:
 
 	#include<vector>
+
+	// ... my code here ...	
+
 	#include<algorithms>
 	#include<string>
-
-	// ... my code here ...
 
 **참고 사항**: 이 내용은 `.h` 와 `.cpp` 파일 모두에 해당한다.
 >**Note**: This applies to both `.h` and `.cpp` files.
