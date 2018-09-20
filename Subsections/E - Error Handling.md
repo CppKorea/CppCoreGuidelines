@@ -1,4 +1,4 @@
-# <a name="S-errors"></a>E: 에러 처리
+# <a name="S-errors"></a>E(Error handling): 오류 처리
 > [원문 링크](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-errors)  
 
 > 역주 : 에러 처리(Error handling)
