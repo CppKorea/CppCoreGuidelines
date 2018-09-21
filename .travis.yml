@@ -1,7 +1,8 @@
-# This is the configuration for Travis CI, a free github-integrated service that runs this script for each pull request (if configured)
-
-# Be nice to travis, allow docker builds, must not use sudo below
 sudo: false
+
+git:
+  submodules: false
+  depth: 1
 
 # provides gcc, clang, make, scons, cmake
 language: c++
@@ -12,14 +13,16 @@ compiler: clang
 addons:
   apt:
     packages:
-    - hunspell
+     - hunspell
 
-install:
- -
+# install:
+#  -
 
 script:
- - cd scripts; make -k
- - cd ..
+ - pushd scripts; 
+ - make -k;
+ - popd;
 
 notifications:
-  email: false
+  email: 
+    - luncliff@gmail.com
