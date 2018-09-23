@@ -33,10 +33,10 @@ Ease of comprehension.
 If data is related (for fundamental reasons), that fact should be reflected in code.
 
 ##### Example
-
+```c++
     void draw(int x, int y, int x2, int y2);  // BAD: unnecessary implicit relationships
     void draw(Point from, Point to);          // better
-
+```
 ##### Note
 
 A simple class without virtual functions implies no space or time overhead.
@@ -67,14 +67,14 @@ An invariant can be stated informally (e.g., in a comment) or more formally usin
 If all data members can vary independently of each other, no invariant is possible.
 
 ##### Example
-
+```c++
     struct Pair {  // the members can vary independently
         string name;
         int volume;
     };
-
+```
 but:
-
+```c++
     class Date {
     public:
         // validate that {yy, mm, dd} is a valid date and initialize
@@ -85,6 +85,7 @@ but:
         Month m;
         char d;    // day
     };
+```
 
 ##### Note
 
@@ -110,7 +111,7 @@ Look for `struct`s with all data private and `class`es with public members.
 An explicit distinction between interface and implementation improves readability and simplifies maintenance.
 
 ##### Example
-
+```c++
     class Date {
         // ... some representation ...
     public:
@@ -122,7 +123,7 @@ An explicit distinction between interface and implementation improves readabilit
         Month month() const;
         // ...
     };
-
+```
 For example, we can now change the representation of a `Date` without affecting its users (recompilation is likely, though).
 
 ##### Note
@@ -143,7 +144,7 @@ Ideally, and typically, an interface is far more stable than its implementation(
 Less coupling than with member functions, fewer functions that can cause trouble by modifying object state, reduces the number of functions that needs to be modified after a change in representation.
 
 ##### Example
-
+```c++
     class Date {
         // ... relatively small interface ...
     };
@@ -151,7 +152,7 @@ Less coupling than with member functions, fewer functions that can cause trouble
     // helper functions:
     Date next_weekday(Date);
     bool operator==(Date, Date);
-
+```
 The "helper functions" have no need for direct access to the representation of a `Date`.
 
 ##### Note
@@ -172,7 +173,7 @@ The language requires operators `=`, `()`, `[]`, and `->` to be members.
 ##### Exception
 
 An overload set may have some members that do not directly access `private` data:
-
+```c++
     class Foobar {
     public:
         void foo(long x)    { /* manipulate private data */ }
@@ -181,11 +182,11 @@ An overload set may have some members that do not directly access `private` data
     private:
         // ...
     };
-
+```
 Similarly, a set of functions may be designed to be used in a chain:
-
+```c++
     x.scale(0.5).rotate(45).set_color(Color::red);
-
+```
 Typically, some but not all of such functions directly access `private` data.
 
 ##### Enforcement
@@ -204,7 +205,7 @@ A helper function is a function (usually supplied by the writer of a class) that
 Placing them in the same namespace as the class makes their relationship to the class obvious and allows them to be found by argument dependent lookup.
 
 ##### Example
-
+```c++
     namespace Chrono { // here we keep time-related services
 
         class Time { /* ... */ };
@@ -215,7 +216,7 @@ Placing them in the same namespace as the class makes their relationship to the 
         Date next_weekday(Date);
         // ...
     }
-
+```
 ##### Note
 
 This is especially important for [overloaded operators](#Ro-namespace).
@@ -231,14 +232,14 @@ This is especially important for [overloaded operators](#Ro-namespace).
 Mixing a type definition and the definition of another entity in the same declaration is confusing and unnecessary.
 
 ##### Example; bad
-
+```c++
     struct Data { /*...*/ } data{ /*...*/ };
-
+```
 ##### Example; good
-
+```c++
     struct Data { /*...*/ };
     Data data{ /*...*/ };
-
+```
 ##### Enforcement
 
 * Flag if the `}` of a class or enumeration definition is not followed by a `;`. The `;` is missing.
@@ -252,7 +253,7 @@ To make it clear that something is being hidden/abstracted.
 This is a useful convention.
 
 ##### Example, bad
-
+```c++
     struct Date {
         int d, m;
 
@@ -261,7 +262,7 @@ This is a useful convention.
     private:
         int y;  // year
     };
-
+```
 There is nothing wrong with this code as far as the C++ language rules are concerned,
 but nearly everything is wrong from a design perspective.
 The private data is hidden far from the public data.
@@ -287,20 +288,20 @@ Minimize the chance of unintended access.
 This simplifies maintenance.
 
 ##### Example
-
+```c++
     template<typename T, typename U>
     struct pair {
         T a;
         U b;
         // ...
     };
-
+```
 Whatever we do in the `//`-part, an arbitrary user of a `pair` can arbitrarily and independently change its `a` and `b`.
 In a large code base, we cannot easily find which code does what to the members of `pair`.
 This may be exactly what we want, but if we want to enforce a relation among members, we need to make them `private`
 and enforce that relation (invariant) through constructors and member functions.
 For example:
-
+```c++
     class Distance {
     public:
         // ...
@@ -316,7 +317,7 @@ For example:
         double magnitude;
         double unit;    // 1 is meters, 1000 is kilometers, 0.001 is millimeters, etc.
     };
-
+```
 ##### Note
 
 If the set of direct users of a set of variables cannot be easily determined, the type or usage of that set cannot be (easily) changed/improved.
@@ -327,7 +328,7 @@ For `public` and `protected` data, that's usually the case.
 A class can provide two interfaces to its users.
 One for derived classes (`protected`) and one for general users (`public`).
 For example, a derived class might be allowed to skip a run-time check because it has already guaranteed correctness:
-
+```c++
     class Foo {
     public:
         int bar(int x) { check(x); return do_bar(x); }
@@ -354,7 +355,7 @@ For example, a derived class might be allowed to skip a run-time check because i
         int r2 = x.do_bar(2);   // error: would bypass check
         // ...
     }
-
+```
 ##### Note
 
 [`protected` data is a bad idea](#Rh-protected).
@@ -392,7 +393,7 @@ easier to design, easier to implement, easier to use, easier to reason about, sm
 You need a reason (use cases) for using a hierarchy.
 
 ##### Example
-
+```c++
     class Point1 {
         int x, y;
         // ... operations ...
@@ -414,7 +415,7 @@ You need a reason (use cases) for using a hierarchy.
         auto p22 = p21.clone();                 // make a copy
         // ...
     }
-
+```
 If a class can be part of a hierarchy, we (in real code if not necessarily in small examples) must manipulate its objects through pointers or references.
 That implies more memory overhead, more allocations and deallocations, and more run-time overhead to perform the resulting indirections.
 
@@ -440,7 +441,7 @@ This is done where dynamic allocation is prohibited (e.g. hard-real-time) and to
 Regular types are easier to understand and reason about than types that are not regular (irregularities requires extra effort to understand and use).
 
 ##### Example
-
+```c++
     struct Bundle {
         string name;
         vector<Record> vr;
@@ -456,7 +457,7 @@ Regular types are easier to understand and reason about than types that are not 
     if (!(b1 == b2)) error("impossible!");
     b2.name = "the other bundle";
     if (b1 == b2) error("No!");
-
+```
 In particular, if a concrete type has an assignment also give it an equals operator so that `a = b` implies `a == b`.
 
 ##### Enforcement
@@ -549,7 +550,7 @@ However, a programmer can disable or replace these defaults.
 It's the simplest and gives the cleanest semantics.
 
 ##### Example
-
+```c++
     struct Named_map {
     public:
         // ... no default operations declared ...
@@ -560,7 +561,7 @@ It's the simplest and gives the cleanest semantics.
 
     Named_map nm;        // default construct
     Named_map nm2 {nm};  // copy construct
-
+```
 Since `std::map` and `string` have all the special functions, no further work is needed.
 
 ##### Note
@@ -593,7 +594,7 @@ all be declared to avoid unwanted effects like turning all potential moves
 into more expensive copies, or making a class move-only.
 
 ##### Example, bad
-
+```c++
     struct M2 {   // bad: incomplete set of default operations
     public:
         // ...
@@ -611,7 +612,7 @@ into more expensive copies, or making a class move-only.
         x = y;   // the default assignment
         // ...
     }
-
+```
 Given that "special attention" was needed for the destructor (here, to deallocate), the likelihood that copy and move assignment (both will implicitly destroy an object) are correct is low (here, we would get double deletion).
 
 ##### Note
@@ -629,7 +630,7 @@ When a destructor needs to be declared just to make it `virtual`, it can be
 defined as defaulted. To avoid suppressing the implicit move operations
 they must also be declared, and then to avoid the class becoming move-only
 (and not copyable) the copy operations must be declared:
-
+```c++
     class AbstractBase {
     public:
       virtual ~AbstractBase() = default;
@@ -638,10 +639,10 @@ they must also be declared, and then to avoid the class becoming move-only
       AbstractBase(AbstractBase&&) = default;
       AbstractBase& operator=(AbstractBase&&) = default;
     };
-
+```
 Alternatively to prevent slicing as per [C.67](#Rc-copy-virtual),
 the copy and move operations can all be deleted:
-
+```c++
     class ClonableBase {
     public:
       virtual unique_ptr<ClonableBase> clone() const;
@@ -651,7 +652,7 @@ the copy and move operations can all be deleted:
       ClonableBase(ClonableBase&&) = delete;
       ClonableBase& operator=(ClonableBase&&) = delete;
     };
-
+```
 Defining only the move operations or only the copy operations would have the
 same effect here, but stating the intent explicitly for each special member
 makes it more obvious to the reader.
@@ -668,7 +669,7 @@ Relying on an implicitly generated copy operation in a class with a destructor i
 
 Writing the six special member functions can be error prone.
 Note their argument types:
-
+```c++
     class X {
     public:
         // ...
@@ -678,7 +679,7 @@ Note their argument types:
         X(X&&) = default;                  // move constructor
         X& operator=(X&&) = default;       // move assignment
     };
-
+```
 A minor mistake (such as a misspelling, leaving out a `const`, using `&` instead of `&&`, or leaving out a special function) can lead to errors or warnings.
 To avoid the tedium and the possibility of errors, try to follow the [rule of zero](#Rc-zero).
 
@@ -694,7 +695,7 @@ The default operations are conceptually a matched set. Their semantics are inter
 Users will be surprised if copy/move construction and copy/move assignment do logically different things. Users will be surprised if constructors and destructors do not provide a consistent view of resource management. Users will be surprised if copy and move don't reflect the way constructors and destructors work.
 
 ##### Example, bad
-
+```c++
     class Silly {   // BAD: Inconsistent copy operations
         class Impl {
             // ...
@@ -705,7 +706,7 @@ Users will be surprised if copy/move construction and copy/move assignment do lo
         Silly& operator=(const Silly& a) { p = a.p; }   // shallow copy
         // ...
     };
-
+```
 These operations disagree about copy semantics. This will lead to confusion and bugs.
 
 ##### Enforcement
@@ -731,7 +732,7 @@ If the default destructor is sufficient, use it.
 Only define a non-default destructor if a class needs to execute code that is not already part of its members' destructors.
 
 ##### Example
-
+```c++
     template<typename A>
     struct final_action {   // slightly simplified
         A act;
@@ -752,7 +753,7 @@ Only define a non-default destructor if a class needs to execute code that is no
         if (something) return;   // act done here
         // ...
     } // act done here
-
+```
 The whole purpose of `final_action` is to get a piece of code (usually a lambda) executed upon destruction.
 
 ##### Note
@@ -763,7 +764,7 @@ There are two general categories of classes that need a user-defined destructor:
 * A class that exists primarily to execute an action upon destruction, such as a tracer or `final_action`.
 
 ##### Example, bad
-
+```c++
     class Foo {   // bad; use the default destructor
     public:
         // ...
@@ -773,7 +774,7 @@ There are two general categories of classes that need a user-defined destructor:
         int i;
         vector<int> vi;
     };
-
+```
 The default destructor does it better, more efficiently, and can't get it wrong.
 
 ##### Note
@@ -795,21 +796,21 @@ Prevention of resource leaks, especially in error cases.
 For resources represented as classes with a complete set of default operations, this happens automatically.
 
 ##### Example
-
+```c++
     class X {
         ifstream f;   // may own a file
         // ... no default operations defined or =deleted ...
     };
-
+```
 `X`'s `ifstream` implicitly closes any file it may have open upon destruction of its `X`.
 
 ##### Example, bad
-
+```c++
     class X2 {     // bad
         FILE* f;   // may own a file
         // ... no default operations defined or =deleted ...
     };
-
+```
 `X2` may leak a file handle.
 
 ##### Note
@@ -827,11 +828,11 @@ If at all possible, consider failure to close/cleanup a fundamental design error
 A class can hold pointers and references to objects that it does not own.
 Obviously, such objects should not be `delete`d by the class's destructor.
 For example:
-
+```c++
     Preprocessor pp { /* ... */ };
     Parser p { pp, /* ... */ };
     Type_checker tc { p, /* ... */ };
-
+```
 Here `p` refers to `pp` but does not own it.
 
 ##### Enforcement
@@ -871,7 +872,7 @@ An owned object must be `deleted` upon destruction of the object that owns it.
 A pointer member may represent a resource.
 [A `T*` should not do so](#Rr-ptr), but in older code, that's common.
 Consider a `T*` a possible owner and therefore suspect.
-
+```c++
     template<typename T>
     class Smart_ptr {
         T* p;   // BAD: vague about ownership of *p
@@ -885,9 +886,9 @@ Consider a `T*` a possible owner and therefore suspect.
         // error: p2.p leaked (if not nullptr and not owned by some other code)
         auto p2 = p1;
     }
-
+```
 Note that if you define a destructor, you must define or delete [all default operations](#Rc-five):
-
+```c++
     template<typename T>
     class Smart_ptr2 {
         T* p;   // BAD: vague about ownership of *p
@@ -901,9 +902,9 @@ Note that if you define a destructor, you must define or delete [all default ope
     {
         auto p2 = p1;   // error: double deletion
     }
-
+```
 The default copy operation will just copy the `p1.p` into `p2.p` leading to a double destruction of `p1.p`. Be explicit about ownership:
-
+```c++
     template<typename T>
     class Smart_ptr3 {
         owner<T*> p;   // OK: explicit about ownership of *p
@@ -918,7 +919,7 @@ The default copy operation will just copy the `p1.p` into `p2.p` leading to a do
     {
         auto p2 = p1;   // error: double deletion
     }
-
+```
 ##### Note
 
 Often the simplest way to get a destructor is to replace the pointer with a smart pointer (e.g., `std::unique_ptr`) and let the compiler arrange for proper destruction to be done implicitly.
@@ -948,7 +949,7 @@ In general, the writer of a base class does not know the appropriate action to b
 See [this in the Discussion section](#Sd-dtor).
 
 ##### Example, bad
-
+```c++
     struct Base {  // BAD: no virtual destructor
         virtual void f();
     };
@@ -964,7 +965,7 @@ See [this in the Discussion section](#Sd-dtor).
         unique_ptr<Base> p = make_unique<D>();
         // ...
     } // p's destruction calls ~Base(), not ~D(), which leaks D::s and possibly more
-
+```
 ##### Note
 
 A virtual function defines an interface to derived classes that can be used without looking at the derived classes.
@@ -973,7 +974,7 @@ If the interface allows destroying, it should be safe to do so.
 ##### Note
 
 A destructor must be nonprivate or it will prevent using the type :
-
+```c++
     class X {
         ~X();   // private destructor
         // ...
@@ -984,7 +985,7 @@ A destructor must be nonprivate or it will prevent using the type :
         X a;                        // error: cannot destroy
         auto p = make_unique<X>();  // error: cannot destroy
     }
-
+```
 ##### Exception
 
 We can imagine one case where you could want a protected virtual destructor: When an object of a derived type (and only of such a type) should be allowed to destroy *another* object (not itself) through a pointer to base. We haven't seen such a case in practice, though.
@@ -1001,7 +1002,7 @@ In general we do not know how to write error-free code if a destructor should fa
 The standard library requires that all classes it deals with have destructors that do not exit by throwing.
 
 ##### Example
-
+```c++
     class X {
     public:
         ~X() noexcept;
@@ -1014,7 +1015,7 @@ The standard library requires that all classes it deals with have destructors th
         if (cannot_release_a_resource) terminate();
         // ...
     }
-
+```
 ##### Note
 
 Many have tried to devise a fool-proof scheme for dealing with failure in destructors.
@@ -1060,13 +1061,13 @@ A destructor (either user-defined or compiler-generated) is implicitly declared 
 ##### Example
 
 Not all destructors are noexcept by default; one throwing member poisons the whole class hierarchy
-
+```c++
     struct X {
         Details x;  // happens to have a throwing destructor
         // ...
         ~X() { }    // implicitly noexcept(false); aka can throw
     };
-
+```
 So, if in doubt, declare a destructor noexcept.
 
 ##### Note
@@ -1089,7 +1090,7 @@ A constructor defines how an object is initialized (constructed).
 That's what constructors are for.
 
 ##### Example
-
+```c++
     class Date {  // a Date represents a valid date
                   // in the January 1, 1900 to December 31, 2100 range
         Date(int dd, int mm, int yy)
@@ -1101,7 +1102,7 @@ That's what constructors are for.
     private:
         int d, m, y;
     };
-
+```
 It is often a good idea to express the invariant as an `Ensures` on the constructor.
 
 ##### Note
@@ -1121,7 +1122,7 @@ A constructor can be used for convenience even if a class does not have an invar
 ##### Note
 
 The C++11 initializer list rule eliminates the need for many constructors. For example:
-
+```c++
     struct Rec2{
         string s;
         int i;
@@ -1130,7 +1131,7 @@ The C++11 initializer list rule eliminates the need for many constructors. For e
 
     Rec2 r1 {"Foo", 7};
     Rec2 r2 {"Bar"};
-
+```
 The `Rec2` constructor is redundant.
 Also, the default for `int` would be better done as a [member initializer](#Rc-in-class-initializer).
 
@@ -1147,7 +1148,7 @@ Also, the default for `int` would be better done as a [member initializer](#Rc-i
 A constructor establishes the invariant for a class. A user of a class should be able to assume that a constructed object is usable.
 
 ##### Example, bad
-
+```c++
     class X1 {
         FILE* f;   // call init() before any other function
         // ...
@@ -1166,7 +1167,7 @@ A constructor establishes the invariant for a class. A user of a class should be
         file.init();   // too late
         // ...
     }
-
+```
 Compilers do not read comments.
 
 ##### Exception
@@ -1190,7 +1191,7 @@ The idiom of having constructors acquire resources and destructors release them 
 Leaving behind an invalid object is asking for trouble.
 
 ##### Example
-
+```c++
     class X2 {
         FILE* f;
         // ...
@@ -1212,9 +1213,9 @@ Leaving behind an invalid object is asking for trouble.
         file.read();      // fine
         // ...
     }
-
+```
 ##### Example, bad
-
+```c++
     class X3 {     // bad: the constructor leaves a non-valid object behind
         FILE* f;   // call is_valid() before any other function
         bool valid;
@@ -1246,7 +1247,7 @@ Leaving behind an invalid object is asking for trouble.
         }
         // ...
     }
-
+```
 ##### Note
 
 For a variable definition (e.g., on the stack or as a member of another object) there is no explicit function call from which an error code could be returned.
@@ -1285,7 +1286,7 @@ A [value type](#SS-concrete) is a class that is copyable (and usually also compa
 It is closely related to the notion of Regular type from [EoP](http://elementsofprogramming.com/) and [the Palo Alto TR](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3351.pdf).
 
 ##### Example
-
+```c++
     class Date { // BAD: no default constructor
     public:
         Date(int dd, int mm, int yyyy);
@@ -1294,7 +1295,7 @@ It is closely related to the notion of Regular type from [EoP](http://elementsof
 
     vector<Date> vd1(1000);   // default Date needed here
     vector<Date> vd2(1000, Date{Month::October, 7, 1885});   // alternative
-
+```
 The default constructor is only auto-generated if there is no user-declared constructor, hence it's impossible to initialize the vector `vd1` in the example above.
 The absence of a default value can cause surprises for users and complicate its use, so if one can be reasonably defined, it should be.
 
@@ -1302,7 +1303,7 @@ The absence of a default value can cause surprises for users and complicate its 
 There is no "natural" default date (the big bang is too far back in time to be useful for most people), so this example is non-trivial.
 `{0, 0, 0}` is not a valid date in most calendar systems, so choosing that would be introducing something like floating-point's `NaN`.
 However, most realistic `Date` classes have a "first date" (e.g. January 1, 1970 is popular), so making that the default is usually trivial.
-
+```c++
     class Date {
     public:
         Date(int dd, int mm, int yyyy);
@@ -1316,20 +1317,20 @@ However, most realistic `Date` classes have a "first date" (e.g. January 1, 1970
     };
 
     vector<Date> vd1(1000);
-
+```
 ##### Note
 
 A class with members that all have default constructors implicitly gets a default constructor:
-
+```c++
     struct X {
         string s;
         vector<int> v;
     };
 
     X x; // means X{{}, {}}; that is the empty string and the empty vector
-
+```
 Beware that built-in types are not properly default constructed:
-
+```c++
     struct X {
         string s;
         int i;
@@ -1342,23 +1343,23 @@ Beware that built-in types are not properly default constructed:
         cout << x.s << ' ' << x.i << '\n';
         ++x.i;
     }
-
+```
 Statically allocated objects of built-in types are by default initialized to `0`, but local built-in variables are not.
 Beware that your compiler may default initialize local built-in variables, whereas an optimized build will not.
 Thus, code like the example above may appear to work, but it relies on undefined behavior.
 Assuming that you want initialization, an explicit default initialization can help:
-
+```c++
     struct X {
         string s;
         int i {};   // default initialize (to 0)
     };
-
+```
 ##### Notes
 
 Classes that don't have a reasonable default construction are usually not copyable either, so they don't fall under this guideline.
 
 For example, a base class is not a value type (base classes should not be copyable) and so does not necessarily need a default constructor:
-
+```c++
     // Shape is an abstract base class, not a copyable value type.
     // It may or may not need a default constructor.
     struct Shape {
@@ -1367,24 +1368,24 @@ For example, a base class is not a value type (base classes should not be copyab
         // =delete copy/move functions
         // ...
     };
-
+```
 A class that must acquire a caller-provided resource during construction often cannot have a default constructor, but it does not fall under this guideline because such a class is usually not copyable anyway:
-
+```c++
     // std::lock_guard is not a copyable value type.
     // It does not have a default constructor.
     lock_guard g {mx};  // guard the mutex mx
     lock_guard g2;      // error: guarding nothing
-
+```
 A class that has a "special state" that must be handled separately from other states by member functions or users causes extra work
 (and most likely more errors). Such a type can naturally use the special state as a default constructed value, whether or not it is copyable:
-
+```c++
     // std::ofstream is not a copyable value type.
     // It does happen to have a default constructor
     // that goes along with a special "not open" state.
     ofstream out {"Foobar"};
     // ...
     out << log(time, transaction);
-
+```
 Similar special-state types that are copyable, such as copyable smart pointers that have the special state "==nullptr", should use the special state as their default constructed value.
 
 However, it is preferable to have a default constructor default to a meaningful state such as `std::string`s `""` and `std::vector`s `{}`.
@@ -1402,7 +1403,7 @@ However, it is preferable to have a default constructor default to a meaningful 
 Being able to set a value to "the default" without operations that might fail simplifies error handling and reasoning about move operations.
 
 ##### Example, problematic
-
+```c++
     template<typename T>
     // elem points to space-elem element allocated using new
     class Vector0 {
@@ -1415,13 +1416,13 @@ Being able to set a value to "the default" without operations that might fail si
         T* space;
         T* last;
     };
-
+```
 This is nice and general, but setting a `Vector0` to empty after an error involves an allocation, which may fail.
 Also, having a default `Vector` represented as `{new T[0], 0, 0}` seems wasteful.
 For example, `Vector0<int> v[100]` costs 100 allocations.
 
 ##### Example
-
+```c++
     template<typename T>
     // elem is nullptr or elem points to space-elem element allocated using new
     class Vector1 {
@@ -1435,7 +1436,7 @@ For example, `Vector0<int> v[100]` costs 100 allocations.
         T* space = nullptr;
         T* last = nullptr;
     };
-
+```
 Using `{nullptr, nullptr, nullptr}` makes `Vector1{}` cheap, but a special case and implies run-time checks.
 Setting a `Vector1` to empty after detecting an error is trivial.
 
@@ -1450,7 +1451,7 @@ Setting a `Vector1` to empty after detecting an error is trivial.
 Using in-class member initializers lets the compiler generate the function for you. The compiler-generated function can be more efficient.
 
 ##### Example, bad
-
+```c++
     class X1 { // BAD: doesn't use member initializers
         string s;
         int i;
@@ -1458,9 +1459,9 @@ Using in-class member initializers lets the compiler generate the function for y
         X1() :s{"default"}, i{1} { }
         // ...
     };
-
+```
 ##### Example
-
+```c++
     class X2 {
         string s = "default";
         int i = 1;
@@ -1468,7 +1469,7 @@ Using in-class member initializers lets the compiler generate the function for y
         // use compiler-generated default constructor
         // ...
     };
-
+```
 ##### Enforcement
 
 (Simple) A default constructor should do more than just initialize member variables with constants.
@@ -1480,7 +1481,7 @@ Using in-class member initializers lets the compiler generate the function for y
 To avoid unintended conversions.
 
 ##### Example, bad
-
+```c++
     class String {
         // ...
     public:
@@ -1489,11 +1490,11 @@ To avoid unintended conversions.
     };
 
     String s = 10;   // surprise: string of size 10
-
+```
 ##### Exception
 
 If you really want an implicit conversion from the constructor argument type to the class type, don't use `explicit`:
-
+```c++
     class Complex {
         // ...
     public:
@@ -1502,7 +1503,7 @@ If you really want an implicit conversion from the constructor argument type to 
     };
 
     Complex z = 10.7;   // unsurprising conversion
-
+```
 **See also**: [Discussion of implicit conversions](#Ro-conversion)
 
 ##### Note
@@ -1520,7 +1521,7 @@ Copy and move constructors should not be made `explicit` because they do not per
 To minimize confusion and errors. That is the order in which the initialization happens (independent of the order of member initializers).
 
 ##### Example, bad
-
+```c++
     class Foo {
         int m1;
         int m2;
@@ -1530,7 +1531,7 @@ To minimize confusion and errors. That is the order in which the initialization 
     };
 
     Foo x(1); // surprise: x.m1 == x.m2 == 2
-
+```
 ##### Enforcement
 
 (Simple) A member initializer list should mention the members in the same order they are declared.
@@ -1544,7 +1545,7 @@ To minimize confusion and errors. That is the order in which the initialization 
 Makes it explicit that the same value is expected to be used in all constructors. Avoids repetition. Avoids maintenance problems. It leads to the shortest and most efficient code.
 
 ##### Example, bad
-
+```c++
     class X {   // BAD
         int i;
         string s;
@@ -1554,11 +1555,11 @@ Makes it explicit that the same value is expected to be used in all constructors
         X(int ii) :i{ii} {}         // s is "" and j is uninitialized
         // ...
     };
-
+```
 How would a maintainer know whether `j` was deliberately uninitialized (probably a poor idea anyway) and whether it was intentional to give `s` the default value `""` in one case and `qqq` in another (almost certainly a bug)? The problem with `j` (forgetting to initialize a member) often happens when a new member is added to an existing class.
 
 ##### Example
-
+```c++
     class X2 {
         int i {666};
         string s {"qqq"};
@@ -1568,9 +1569,9 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
         X2(int ii) :i{ii} {}   // s and j initialized to their defaults
         // ...
     };
-
+```
 **Alternative**: We can get part of the benefits from default arguments to constructors, and that is not uncommon in older code. However, that is less explicit, causes more arguments to be passed, and is repetitive when there is more than one constructor:
-
+```c++
     class X3 {   // BAD: inexplicit, argument passing overhead
         int i;
         string s;
@@ -1580,7 +1581,7 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
             :i{ii}, s{ss}, j{jj} { }   // all members are initialized to their defaults
         // ...
     };
-
+```
 ##### Enforcement
 
 * (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
@@ -1593,16 +1594,16 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 An initialization explicitly states that initialization, rather than assignment, is done and can be more elegant and efficient. Prevents "use before set" errors.
 
 ##### Example, good
-
+```c++
     class A {   // Good
         string s1;
     public:
         A() : s1{"Hello, "} { }    // GOOD: directly construct
         // ...
     };
-
+```
 ##### Example, bad
-
+```c++
     class B {   // BAD
         string s1;
     public:
@@ -1616,7 +1617,7 @@ An initialization explicitly states that initialization, rather than assignment,
         C() { cout << *p; p = new int{10}; }   // accidental use before initialized
         // ...
     };
-
+```
 ### <a name="Rc-factory"></a>C.50: Use a factory function if you need "virtual behavior" during initialization
 
 ##### Reason
@@ -1628,7 +1629,7 @@ If the state of a base class object must depend on the state of a derived part o
 The return type of the factory should normally be `unique_ptr` by default; if some uses are shared, the caller can `move` the `unique_ptr` into a `shared_ptr`. However, if the factory author knows that all uses of the returned object will be shared uses, return `shared_ptr` and use `make_shared` in the body to save an allocation.
 
 ##### Example, bad
-
+```c++
     class B {
     public:
         B()
@@ -1642,9 +1643,9 @@ The return type of the factory should normally be `unique_ptr` by default; if so
 
         // ...
     };
-
+```
 ##### Example
-
+```c++
     class B {
     protected:
         B() { /* ... */ }              // create an imperfectly initialized object
@@ -1671,7 +1672,7 @@ The return type of the factory should normally be `unique_ptr` by default; if so
     class D : public B { /* ... */ };  // some derived class
 
     shared_ptr<D> p = D::Create<D>();  // creating a D object
-
+```
 By making the constructor `protected` we avoid an incompletely constructed object escaping into the wild.
 By providing the factory function `Create()`, we make construction (on the free store) convenient.
 
@@ -1688,7 +1689,7 @@ Conventional factory functions allocate on the free store, rather than on the st
 To avoid repetition and accidental differences.
 
 ##### Example, bad
-
+```c++
     class Date {   // BAD: repetitive
         int d;
         Month m;
@@ -1703,11 +1704,11 @@ To avoid repetition and accidental differences.
             { if (!valid(i, m, y)) throw Bad_date{}; }
         // ...
     };
-
+```
 The common action gets tedious to write and may accidentally not be common.
 
 ##### Example
-
+```c++
     class Date2 {
         int d;
         Month m;
@@ -1721,7 +1722,7 @@ The common action gets tedious to write and may accidentally not be common.
             :Date2{ii, mm, current_year()} {}
         // ...
     };
-
+```
 **See also**: If the "repeated action" is a simple initialization, consider [an in-class member initializer](#Rc-in-class-initializer).
 
 ##### Enforcement
@@ -1737,7 +1738,7 @@ If you need those constructors for a derived class, re-implementing them is tedi
 ##### Example
 
 `std::vector` has a lot of tricky constructors, so if I want my own `vector`, I don't want to reimplement them:
-
+```c++
     class Rec {
         // ... data and lots of nice constructors ...
     };
@@ -1747,9 +1748,9 @@ If you need those constructors for a derived class, re-implementing them is tedi
         // ... no data members ...
         // ... lots of nice utility functions ...
     };
-
+```
 ##### Example, bad
-
+```c++
     struct Rec2 : public Rec {
         int x;
         using Rec::Rec;
@@ -1757,7 +1758,7 @@ If you need those constructors for a derived class, re-implementing them is tedi
 
     Rec2 r {"foo", 7};
     int val = r.x;   // uninitialized
-
+```
 ##### Enforcement
 
 Make sure that every member of the derived class is initialized.
@@ -1775,7 +1776,7 @@ Types can be defined to move for logical as well as performance reasons.
 It is simple and efficient. If you want to optimize for rvalues, provide an overload that takes a `&&` (see [F.18](#Rf-consume)).
 
 ##### Example
-
+```c++
     class Foo {
     public:
         Foo& operator=(const Foo& x)
@@ -1794,7 +1795,7 @@ It is simple and efficient. If you want to optimize for rvalues, provide an over
 
     a = b;    // assign lvalue: copy
     a = f();  // assign rvalue: potentially move
-
+```
 ##### Note
 
 The `swap` implementation technique offers the [strong guarantee](#Abrahams01).
@@ -1802,7 +1803,7 @@ The `swap` implementation technique offers the [strong guarantee](#Abrahams01).
 ##### Example
 
 But what if you can get significantly better performance by not making a temporary copy? Consider a simple `Vector` intended for a domain where assignment of large, equal-sized `Vector`s is common. In this case, the copy of elements implied by the `swap` implementation technique could cause an order of magnitude increase in cost:
-
+```c++
     template<typename T>
     class Vector {
     public:
@@ -1825,7 +1826,7 @@ But what if you can get significantly better performance by not making a tempora
         }
         return *this;
     }
-
+```
 By writing directly to the target elements, we will get only [the basic guarantee](#Abrahams01) rather than the strong guarantee offered by the `swap` technique. Beware of [self-assignment](#Rc-copy-self).
 
 **Alternatives**: If you think you need a `virtual` assignment operator, and understand why that's deeply problematic, don't call it `operator=`. Make it a named function like `virtual void assign(const Foo&)`.
@@ -1846,7 +1847,7 @@ That is the generally assumed semantics. After `x = y`, we should have `x == y`.
 After a copy `x` and `y` can be independent objects (value semantics, the way non-pointer built-in types and the standard-library types work) or refer to a shared object (pointer semantics, the way pointers work).
 
 ##### Example
-
+```c++
     class X {   // OK: value semantics
     public:
         X();
@@ -1875,9 +1876,9 @@ After a copy `x` and `y` can be independent objects (value semantics, the way no
     if (x != y) throw Bad{};
     x.modify();
     if (x == y) throw Bad{};   // assume value semantics
-
+```
 ##### Example
-
+```c++
     class X2 {  // OK: pointer semantics
     public:
         X2();
@@ -1900,7 +1901,7 @@ After a copy `x` and `y` can be independent objects (value semantics, the way no
     if (x != y) throw Bad{};
     x.modify();
     if (x != y) throw Bad{};  // assume pointer semantics
-
+```
 ##### Note
 
 Prefer copy semantics unless you are building a "smart pointer". Value semantics is the simplest to reason about and what the standard-library facilities expect.
@@ -1918,15 +1919,15 @@ If `x = x` changes the value of `x`, people will be surprised and bad errors wil
 ##### Example
 
 The standard-library containers handle self-assignment elegantly and efficiently:
-
+```c++
     std::vector<int> v = {3, 1, 4, 1, 5, 9};
     v = v;
     // the value of v is still {3, 1, 4, 1, 5, 9}
-
+```
 ##### Note
 
 The default assignment generated from members that handle self-assignment correctly handles self-assignment.
-
+```c++
     struct Bar {
         vector<pair<int, int>> v;
         map<string, int> m;
@@ -1936,11 +1937,11 @@ The default assignment generated from members that handle self-assignment correc
     Bar b;
     // ...
     b = b;   // correct and efficient
-
+```
 ##### Note
 
 You can handle self-assignment by explicitly testing for self-assignment, but often it is faster and more elegant to cope without such a test (e.g., [using `swap`](#Rc-swap)).
-
+```c++
     class Foo {
         string s;
         int i;
@@ -1956,19 +1957,19 @@ You can handle self-assignment by explicitly testing for self-assignment, but of
         i = a.i;
         return *this;
     }
-
+```
 This is obviously safe and apparently efficient.
 However, what if we do one self-assignment per million assignments?
 That's about a million redundant tests (but since the answer is essentially always the same, the computer's branch predictor will guess right essentially every time).
 Consider:
-
+```c++
     Foo& Foo::operator=(const Foo& a)   // simpler, and probably much better
     {
         s = a.s;
         i = a.i;
         return *this;
     }
-
+```
 `std::string` is safe for self-assignment and so are `int`. All the cost is carried by the (rare) case of self-assignment.
 
 ##### Enforcement
@@ -1999,7 +2000,7 @@ That is the generally assumed semantics.
 After `y = std::move(x)` the value of `y` should be the value `x` had and `x` should be in a valid state.
 
 ##### Example
-
+```c++
     template<typename T>
     class X {   // OK: value semantics
     public:
@@ -2028,7 +2029,7 @@ After `y = std::move(x)` the value of `y` should be the value `x` had and `x` sh
         X y = std::move(x);
         x = X{};   // OK
     } // OK: x can be destroyed
-
+```
 ##### Note
 
 Ideally, that moved-from should be the default value of the type.
@@ -2053,7 +2054,7 @@ Unless there is an exceptionally strong reason not to, make `x = std::move(y); y
 If `x = x` changes the value of `x`, people will be surprised and bad errors may occur. However, people don't usually directly write a self-assignment that turn into a move, but it can occur. However, `std::swap` is implemented using move operations so if you accidentally do `swap(a, b)` where `a` and `b` refer to the same object, failing to handle self-move could be a serious and subtle error.
 
 ##### Example
-
+```c++
     class Foo {
         string s;
         int i;
@@ -2069,7 +2070,7 @@ If `x = x` changes the value of `x`, people will be surprised and bad errors may
         i = a.i;
         return *this;
     }
-
+```
 The one-in-a-million argument against `if (this == &a) return *this;` tests from the discussion of [self-assignment](#Rc-copy-self) is even more relevant for self-move.
 
 ##### Note
@@ -2083,13 +2084,13 @@ The ISO standard guarantees only a "valid but unspecified" state for the standar
 ##### Example
 
 Here is a way to move a pointer without a test (imagine it as code in the implementation a move assignment):
-
+```c++
     // move from other.ptr to this->ptr
     T* temp = other.ptr;
     other.ptr = nullptr;
     delete ptr;
     ptr = temp;
-
+```
 ##### Enforcement
 
 * (Moderate) In the case of self-assignment, a move assignment operator should not leave the object holding pointer members that have been `delete`d or set to `nullptr`.
@@ -2103,7 +2104,7 @@ A throwing move violates most people's reasonably assumptions.
 A non-throwing move will be used more efficiently by standard-library and language facilities.
 
 ##### Example
-
+```c++
     template<typename T>
     class Vector {
         // ...
@@ -2114,11 +2115,11 @@ A non-throwing move will be used more efficiently by standard-library and langua
         T* elem;
         int sz;
     };
-
+```
 These operations do not throw.
 
 ##### Example, bad
-
+```c++
     template<typename T>
     class Vector2 {
         // ...
@@ -2129,7 +2130,7 @@ These operations do not throw.
         T* elem;
         int sz;
     };
-
+```
 This `Vector2` is not just inefficient, but since a vector copy requires allocation, it can throw.
 
 ##### Enforcement
@@ -2143,7 +2144,7 @@ This `Vector2` is not just inefficient, but since a vector copy requires allocat
 A *polymorphic class* is a class that defines or inherits at least one virtual function. It is likely that it will be used as a base class for other derived classes with polymorphic behavior. If it is accidentally passed by value, with the implicitly generated copy constructor and assignment, we risk slicing: only the base portion of a derived object will be copied, and the polymorphic behavior will be corrupted.
 
 ##### Example, bad
-
+```c++
     class B { // BAD: polymorphic base class doesn't suppress copying
     public:
         virtual char m() { return 'B'; }
@@ -2162,9 +2163,9 @@ A *polymorphic class* is a class that defines or inherits at least one virtual f
 
     D d;
     f(d);
-
+```
 ##### Example
-
+```c++
     class B { // GOOD: polymorphic class suppresses copying
     public:
         B(const B&) = delete;
@@ -2185,7 +2186,7 @@ A *polymorphic class* is a class that defines or inherits at least one virtual f
 
     D d;
     f(d);
-
+```
 ##### Note
 
 If you need to create deep copies of polymorphic objects, use `clone()` functions: see [C.130](#Rh-copy).
@@ -2212,7 +2213,7 @@ comparisons, `swap`, and `hash`.
 The compiler is more likely to get the default semantics right and you cannot implement these functions better than the compiler.
 
 ##### Example
-
+```c++
     class Tracer {
         string message;
     public:
@@ -2224,11 +2225,11 @@ The compiler is more likely to get the default semantics right and you cannot im
         Tracer(Tracer&&) = default;
         Tracer& operator=(Tracer&&) = default;
     };
-
+```
 Because we defined the destructor, we must define the copy and move operations. The `= default` is the best and simplest way of doing that.
 
 ##### Example, bad
-
+```c++
     class Tracer2 {
         string message;
     public:
@@ -2240,7 +2241,7 @@ Because we defined the destructor, we must define the copy and move operations. 
         Tracer2(Tracer2&& a) :message{a.message} {}
         Tracer2& operator=(Tracer2&& a) { message = a.message; return *this; }
     };
-
+```
 Writing out the bodies of the copy and move operations is verbose, tedious, and error-prone. A compiler does it better.
 
 ##### Enforcement
@@ -2254,7 +2255,7 @@ Writing out the bodies of the copy and move operations is verbose, tedious, and 
 In a few cases, a default operation is not desirable.
 
 ##### Example
-
+```c++
     class Immortal {
     public:
         ~Immortal() = delete;   // do not allow destruction
@@ -2267,11 +2268,11 @@ In a few cases, a default operation is not desirable.
         Immortal* p = new Immortal{};
         delete p;       // error: cannot destroy *p
     }
-
+```
 ##### Example
 
 A `unique_ptr` can be moved, but not copied. To achieve that its copy operations are deleted. To avoid copying it is necessary to `=delete` its copy operations from lvalues:
-
+```c++
     template <class T, class D = default_delete<T>> class unique_ptr {
     public:
         // ...
@@ -2292,7 +2293,7 @@ A `unique_ptr` can be moved, but not copied. To achieve that its copy operations
         auto pi2 {pi};      // error: no move constructor from lvalue
         auto pi3 {make()};  // OK, move: the result of make() is an rvalue
     }
-
+```
 Note that deleted functions should be public.
 
 ##### Enforcement
@@ -2308,7 +2309,7 @@ This can be most confusing.
 Worse, a direct or indirect call to an unimplemented pure virtual function from a constructor or destructor results in undefined behavior.
 
 ##### Example, bad
-
+```c++
     class Base {
     public:
         virtual void f() = 0;   // not implemented
@@ -2336,7 +2337,7 @@ Worse, a direct or indirect call to an unimplemented pure virtual function from 
             h();
         }
     };
-
+```
 Note that calling a specific explicitly qualified function is not a virtual call even if the function is `virtual`.
 
 **See also** [factory functions](#Rc-factory) for how to achieve the effect of a call to a derived class function without risking undefined behavior.
@@ -2358,7 +2359,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 A `swap` can be handy for implementing a number of idioms, from smoothly moving objects around to implementing assignment easily to providing a guaranteed commit function that enables strongly error-safe calling code. Consider using swap to implement copy assignment in terms of copy construction. See also [destructors, deallocation, and swap must never fail](#Re-never-fail).
 
 ##### Example, good
-
+```c++
     class Foo {
         // ...
     public:
@@ -2371,14 +2372,14 @@ A `swap` can be handy for implementing a number of idioms, from smoothly moving 
         Bar m1;
         int m2;
     };
-
+```
 Providing a nonmember `swap` function in the same namespace as your type for callers' convenience.
-
+```c++
     void swap(Foo& a, Foo& b)
     {
         a.swap(b);
     }
-
+```
 ##### Enforcement
 
 * (Simple) A class without virtual functions should have a `swap` member function declared.
@@ -2391,14 +2392,14 @@ Providing a nonmember `swap` function in the same namespace as your type for cal
  `swap` is widely used in ways that are assumed never to fail and programs cannot easily be written to work correctly in the presence of a failing `swap`. The standard-library containers and algorithms will not work correctly if a swap of an element type fails.
 
 ##### Example, bad
-
+```c++
     void swap(My_vector& x, My_vector& y)
     {
         auto tmp = x;   // copy elements
         x = y;
         y = tmp;
     }
-
+```
 This is not just slow, but if a memory allocation occurs for the elements in `tmp`, this `swap` may throw and would make STL algorithms fail if used with them.
 
 ##### Enforcement
@@ -2424,7 +2425,7 @@ Asymmetric treatment of operands is surprising and a source of errors where conv
 `==` is a fundamental operations and programmers should be able to use it without fear of failure.
 
 ##### Example
-
+```c++
     struct X {
         string name;
         int number;
@@ -2433,9 +2434,9 @@ Asymmetric treatment of operands is surprising and a source of errors where conv
     bool operator==(const X& a, const X& b) noexcept {
         return a.name == b.name && a.number == b.number;
     }
-
+```
 ##### Example, bad
-
+```c++
     class B {
         string name;
         int number;
@@ -2444,7 +2445,7 @@ Asymmetric treatment of operands is surprising and a source of errors where conv
         }
         // ...
     };
-
+```
 `B`'s comparison accepts conversions for its second operand, but not its first.
 
 ##### Note
@@ -2468,7 +2469,7 @@ This rule applies to all the usual comparison operators: `!=`, `<`, `<=`, `>`, a
 It is really hard to write a foolproof and useful `==` for a hierarchy.
 
 ##### Example, bad
-
+```c++
     class B {
         string name;
         int number;
@@ -2478,9 +2479,9 @@ It is really hard to write a foolproof and useful `==` for a hierarchy.
         }
         // ...
     };
-
+```
 `B`'s comparison accepts conversions for its second operand, but not its first.
-
+```c++
     class D :B {
         char character;
         virtual bool operator==(const D& a) const
@@ -2498,7 +2499,7 @@ It is really hard to write a foolproof and useful `==` for a hierarchy.
     d == d2;   // compares name, number, and character
     B& b2 = d2;
     b2 == d;   // compares name and number, ignores d2's and d's character
-
+```
 Of course there are ways of making `==` work in a hierarchy, but the naive approaches do not scale
 
 #### Note
@@ -2517,7 +2518,7 @@ Users of hashed containers use hash indirectly and don't expect simple access to
 It's a standard-library requirement.
 
 ##### Example, bad
-
+```c++
     template<>
     struct hash<My_type> {  // thoroughly bad hash specialization
         using result_type = size_t;
@@ -2538,7 +2539,7 @@ It's a standard-library requirement.
         m[mt] = 7;
         cout << m[My_type{ "asdfg" }] << '\n';
     }
-
+```
 If you have to define a `hash` specialization, try simply to let it combine standard-library `hash` specializations with `^` (xor).
 That tends to work better than "cleverness" for non-specialists.
 
@@ -2628,7 +2629,7 @@ Direct representation of ideas in code eases comprehension and maintenance. Make
 Do *not* use inheritance when simply having a data member will do. Usually this means that the derived type needs to override a base virtual function or needs access to a protected member.
 
 ##### Example
-
+```c++
     class DrawableUIElement {
     public:
         virtual void render() const = 0;
@@ -2650,11 +2651,11 @@ Do *not* use inheritance when simply having a data member will do. Usually this 
     class Checkbox : public AbstractButton {
     // ...
     };
-
+```
 ##### Example, bad
 
 Do *not* represent non-hierarchical domain concepts as class hierarchies.
-
+```c++
     template<typename T>
     class Container {
     public:
@@ -2671,7 +2672,7 @@ Do *not* represent non-hierarchical domain concepts as class hierarchies.
         virtual void balance() = 0;
         // ...
     };
-
+```
 Here most overriding classes cannot implement most of the functions required in the interface well.
 Thus the base class becomes an implementation burden.
 Furthermore, the user of `Container` cannot rely on the member functions actually performing a meaningful operations reasonably efficiently;
@@ -2692,15 +2693,15 @@ A class is more stable (less brittle) if it does not contain data.
 Interfaces should normally be composed entirely of public pure virtual functions and a default/empty virtual destructor.
 
 ##### Example
-
+```c++
     class My_interface {
     public:
         // ...only pure virtual functions here ...
         virtual ~My_interface() {}   // or =default
     };
-
+```
 ##### Example, bad
-
+```c++
     class Goof {
     public:
         // ...only pure virtual functions here ...
@@ -2718,7 +2719,7 @@ Interfaces should normally be composed entirely of public pure virtual functions
         f(p.get()); // use Derived through the Goof interface
         g(p.get()); // use Derived through the Goof interface
     } // leak
-
+```
 The `Derived` is `delete`d through its `Goof` interface, so its `string` is leaked.
 Give `Goof` a virtual destructor and all is well.
 
@@ -2734,7 +2735,7 @@ Give `Goof` a virtual destructor and all is well.
 Such as on an ABI (link) boundary.
 
 ##### Example
-
+```c++
     struct Device {
         virtual ~Device() = default;
         virtual void write(span<const char> outbuf) = 0;
@@ -2754,7 +2755,7 @@ Such as on an ABI (link) boundary.
         void write(span<const char> outbuf) override;
         void read(span<char> inbuf) override;
     };
-
+```
 A user can now use `D1`s and `D2`s interchangeably through the interface provided by `Device`.
 Furthermore, we can update `D1` and `D2` in a ways that are not binary compatible with older versions as long as all access goes through `Device`.
 
@@ -2791,7 +2792,7 @@ Flag abstract classes with constructors.
 A class with a virtual function is usually (and in general) used via a pointer to base. Usually, the last user has to call delete on a pointer to base, often via a smart pointer to base, so the destructor should be public and virtual. Less commonly, if deletion through a pointer to base is not intended to be supported, the destructor should be protected and nonvirtual; see [C.35](#Rc-dtor-virtual).
 
 ##### Example, bad
-
+```c++
     struct B {
         virtual int f() = 0;
         // ... no user-written destructor, defaults to public nonvirtual ...
@@ -2807,7 +2808,7 @@ A class with a virtual function is usually (and in general) used via a pointer t
         unique_ptr<B> p = make_unique<D>();
         // ...
     } // undefined behavior. May call B::~B only and leak the string
-
+```
 ##### Note
 
 There are people who don't follow this rule because they plan to use a class only through a `shared_ptr`: `std::shared_ptr<B> p = std::make_shared<D>(args);` Here, the shared pointer will take care of deletion, so no leak will occur from an inappropriate `delete` of the base. People who do this consistently can get a false positive, but the rule is important -- what if one was allocated using `make_unique`? It's not safe unless the author of `B` ensures that it can never be misused, such as by making all constructors private and providing a factory function to enforce the allocation with `make_shared`.
@@ -2833,7 +2834,7 @@ It's simple and clear:
 If a base class destructor is declared `virtual`, one should avoid declaring derived class destructors  `virtual` or `override`. Some code base and tools might insist on `override` for destructors, but that is not the recommendation of these guidelines.
 
 ##### Example, bad
-
+```c++
     struct B {
         void f1(int);
         virtual void f2(int) const;
@@ -2847,16 +2848,16 @@ If a base class destructor is declared `virtual`, one should avoid declaring der
         void f3(double);     // bad (hope for a warning): D::f3() hides B::f3()
         // ...
     };
-
+```
 ##### Example, good
-
+```c++
     struct Better : B {
         void f1(int) override;        // error (caught): D::f1() hides B::f1()
         void f2(int) const override;
         void f3(double) override;     // error (caught): D::f3() hides B::f3()
         // ...
     };
-
+```
 #### Discussion
 
 We want to eliminate two particular classes of errors:
@@ -2903,7 +2904,7 @@ The importance of keeping the two kinds of inheritance increases
 
 
 ##### Example, bad
-
+```c++
     class Shape {   // BAD, mixed interface and implementation
     public:
         Shape();
@@ -2937,7 +2938,7 @@ The importance of keeping the two kinds of inheritance increases
         Triangle(Point p1, Point p2, Point p3); // calculate center
         // ...
     };
-
+```
 Problems:
 
 * As the hierarchy grows and more data is added to `Shape`, the constructors gets harder to write and maintain.
@@ -2953,7 +2954,7 @@ the more benefits we gain - and the less stable the hierarchy is.
 ##### Example
 
 This Shape hierarchy can be rewritten using interface inheritance:
-
+```c++
     class Shape {  // pure interface
     public:
         virtual Point center() const = 0;
@@ -2966,9 +2967,9 @@ This Shape hierarchy can be rewritten using interface inheritance:
 
         // ...
     };
-
+```
 Note that a pure interface rarely have constructors: there is nothing to construct.
-
+```c++
     class Circle : public Shape {
     public:
         Circle(Point c, int r, Color c) :cent{c}, rad{r}, col{c} { /* ... */ }
@@ -2982,7 +2983,7 @@ Note that a pure interface rarely have constructors: there is nothing to constru
         int rad;
         Color col;
     };
-
+```
 The interface is now less brittle, but there is more work in implementing the member functions.
 For example, `center` has to be implemented by every class derived from `Shape`.
 
@@ -2993,7 +2994,7 @@ One popular technique is dual hierarchies.
 There are many ways of implementing the idea of dual hierarchies; here, we use a multiple-inheritance variant.
 
 First we devise a hierarchy of interface classes:
-
+```c++
     class Shape {   // pure interface
     public:
         virtual Point center() const = 0;
@@ -3012,9 +3013,9 @@ First we devise a hierarchy of interface classes:
         virtual int radius() = 0;
         // ...
     };
-
+```
 To make this interface useful, we must provide its implementation classes (here, named equivalently, but in the `Impl` namespace):
-
+```c++
     class Impl::Shape : public Shape { // implementation
     public:
         // constructors, destructor
@@ -3029,10 +3030,10 @@ To make this interface useful, we must provide its implementation classes (here,
 
         // ...
     };
-
+```
 Now `Shape` is a poor example of a class with an implementation,
 but bear with us because this is just a simple example of a technique aimed at more complex hierarchies.
-
+```c++
     class Impl::Circle : public Circle, public Impl::Shape {   // implementation
     public:
         // constructors, destructor
@@ -3040,9 +3041,9 @@ but bear with us because this is just a simple example of a technique aimed at m
         int radius() override { /* ... */ }
         // ...
     };
-
+```
 And we could extend the hierarchies by adding a Smiley class (:-)):
-
+```c++
     class Smiley : public Circle { // pure interface
     public:
         // ...
@@ -3053,23 +3054,23 @@ And we could extend the hierarchies by adding a Smiley class (:-)):
         // constructors, destructor
         // ...
     }
-
+```
 There are now two hierarchies:
 
 * interface: Smiley -> Circle -> Shape
 * implementation: Impl::Smiley -> Impl::Circle -> Impl::Shape
 
 Since each implementation derived from its interface as well as its implementation base class we get a lattice (DAG):
-
+```
     Smiley     ->         Circle     ->  Shape
       ^                     ^               ^
       |                     |               |
     Impl::Smiley -> Impl::Circle -> Impl::Shape
-
+```
 As mentioned, this is just one way to construct a dual hierarchy.
 
 The implementation hierarchy can be used directly, rather than through the abstract interface.
-
+```c++
     void work_with_shape(Shape&);
 
     int user()
@@ -3081,7 +3082,7 @@ The implementation hierarchy can be used directly, rather than through the abstr
         work_with_shape(my_smiley);     // use implementation through abstract interface
         // ...
     }
-
+```
 This can be useful when the implementation class has members that are not offered in the abstract interface
 or if direct use of a member offers optimization opportunities (e.g., if an implementation member function is `final`)
 
@@ -3110,7 +3111,7 @@ at the cost of the functionality being available only to users of the hierarchy.
 Copying a polymorphic class is discouraged due to the slicing problem, see [C.67](#Rc-copy-virtual). If you really need copy semantics, copy deeply: Provide a virtual `clone` function that will copy the actual most-derived type and return an owning pointer to the new object, and then in derived classes return the derived type (use a covariant return type).
 
 ##### Example
-
+```c++
     class B {
     public:
         virtual owner<B*> clone() = 0;
@@ -3125,7 +3126,7 @@ Copying a polymorphic class is discouraged due to the slicing problem, see [C.67
         owner<D*> clone() override;
         virtual ~D() override;
     };
-
+```
 Generally, it is recommended to use smart pointers to represent ownership (see [R.20](#Rr-owner)). However, because of language rules, the covariant return type cannot be a smart pointer: `D::clone` can't return a `unique_ptr<D>` while `B::clone` returns `unique_ptr<B>`. Therefore, you either need to consistently return `unique_ptr<B>` in all overrides, or use `owner<>` utility from the [Guidelines Support Library](#SS-views).
 
 
@@ -3137,7 +3138,7 @@ Generally, it is recommended to use smart pointers to represent ownership (see [
 A trivial getter or setter adds no semantic value; the data item could just as well be `public`.
 
 ##### Example
-
+```c++
     class Point {   // Bad: verbose
         int x;
         int y;
@@ -3149,14 +3150,14 @@ A trivial getter or setter adds no semantic value; the data item could just as w
         void set_y(int yy) { y = yy; }
         // no behavioral member functions
     };
-
+```
 Consider making such a class a `struct` -- that is, a behaviorless bunch of variables, all public data and no member functions.
-
+```c++
     struct Point {
         int x {0};
         int y {0};
     };
-
+```
 Note that we can put default initializers on member variables: [C.49: Prefer initialization to assignment in constructors](#Rc-initialize).
 
 ##### Note
@@ -3176,7 +3177,7 @@ A virtual function can be overridden and is thus open to mistakes in a derived c
 A virtual function ensures code replication in a templated hierarchy.
 
 ##### Example, bad
-
+```c++
     template<class T>
     class Vector {
     public:
@@ -3186,7 +3187,7 @@ A virtual function ensures code replication in a templated hierarchy.
         T* elem;   // the elements
         int sz;    // number of elements
     };
-
+```
 This kind of "vector" isn't meant to be used as a base class at all.
 
 ##### Enforcement
@@ -3203,7 +3204,7 @@ This kind of "vector" isn't meant to be used as a base class at all.
 `protected` data inherently violates the guidance against putting data in base classes, which usually leads to having to deal with virtual inheritance as well.
 
 ##### Example, bad
-
+```c++
     class Shape {
     public:
         // ... interface functions ...
@@ -3213,7 +3214,7 @@ This kind of "vector" isn't meant to be used as a base class at all.
         Color edge_color;
         Style st;
     };
-
+```
 Now it is up to every derived `Shape` to manipulate the protected data correctly.
 This has been popular, but also a major source of maintenance problems.
 In a large class hierarchy, the consistent use of protected data is hard to maintain because there can be a lot of code,
@@ -3281,11 +3282,11 @@ Not all classes will necessarily support all interfaces, and not all callers wil
 Especially to break apart monolithic interfaces into "aspects" of behavior supported by a given derived class.
 
 ##### Example
-
+```c++
     class iostream : public istream, public ostream {   // very simplified
         // ...
     };
-
+```
 `istream` provides the interface to input operations; `ostream` provides the interface to output operations.
 `iostream` provides the union of the `istream` and `ostream` interfaces and the synchronization needed to allow both on a single stream.
 
@@ -3310,11 +3311,11 @@ Some forms of mixins have state and often operations on that state.
 If the operations are virtual the use of inheritance is necessary, if not using inheritance can avoid boilerplate and forwarding.
 
 ##### Example
-
+```c++
     class iostream : public istream, public ostream {   // very simplified
         // ...
     };
-
+```
 `istream` provides the interface to input operations (and some data); `ostream` provides the interface to output operations (and some data).
 `iostream` provides the union of the `istream` and `ostream` interfaces and the synchronization needed to allow both on a single stream.
 
@@ -3341,7 +3342,7 @@ or various bases from boost.intrusive (e.g. `list_base_hook` or `intrusive_ref_c
  To avoid all shared data to being put into an ultimate base class.
 
 ##### Example
-
+```c++
     struct Interface {
         virtual void f();
         virtual int g();
@@ -3367,7 +3368,7 @@ or various bases from boost.intrusive (e.g. `list_base_hook` or `intrusive_ref_c
         // Maybe override Utility virtual functions
         // ...
     };
-
+```
 Factoring out `Utility` makes sense if many derived classes share significant "implementation details."
 
 
@@ -3393,7 +3394,7 @@ Flag mixed interface and implementation hierarchies.
 Without a using declaration, member functions in the derived class hide the entire inherited overload sets.
 
 ##### Example, bad
-
+```c++
     #include <iostream>
     class B {
     public:
@@ -3410,26 +3411,26 @@ Without a using declaration, member functions in the derived class hide the enti
         std::cout << d.f(2) << '\n';   // prints "f(int): 3"
         std::cout << d.f(2.3) << '\n'; // prints "f(int): 3"
     }
-
+```
 ##### Example, good
-
+```c++
     class D: public B {
     public:
         int f(int i) override { std::cout << "f(int): "; return i + 1; }
         using B::f; // exposes f(double)
     };
-
+```
 ##### Note
 
 This issue affects both virtual and nonvirtual member functions
 
 For variadic bases, C++17 introduced a variadic form of the using-declaration,
-
+```c++
     template <class... Ts>
     struct Overloader : Ts... {
         using Ts::operator()...; // exposes operator() from every base
     };
-
+```
 ##### Enforcement
 
 Diagnose name hiding
@@ -3441,14 +3442,14 @@ Diagnose name hiding
 Capping a hierarchy with `final` is rarely needed for logical reasons and can be damaging to the extensibility of a hierarchy.
 
 ##### Example, bad
-
+```c++
     class Widget { /* ... */ };
 
     // nobody will ever want to improve My_widget (or so you thought)
     class My_widget final : public Widget { /* ... */ };
 
     class My_improved_widget : public My_widget { /* ... */ };  // error: can't do that
-
+```
 ##### Note
 
 Not every class is meant to be a base class.
@@ -3482,7 +3483,7 @@ Flag uses of `final`.
 That can cause confusion: An overrider does not inherit default arguments.
 
 ##### Example, bad
-
+```c++
     class Base {
     public:
         virtual int multiply(int value, int factor = 2) = 0;
@@ -3498,7 +3499,7 @@ That can cause confusion: An overrider does not inherit default arguments.
 
     b.multiply(10);  // these two calls will call the same function but
     d.multiply(10);  // with different arguments and so different results
-
+```
 ##### Enforcement
 
 Flag default arguments on virtual functions if they differ between base and derived declarations.
@@ -3512,7 +3513,7 @@ Flag default arguments on virtual functions if they differ between base and deri
 If you have a class with a virtual function, you don't (in general) know which class provided the function to be used.
 
 ##### Example
-
+```c++
     struct B { int a; virtual int f(); };
     struct D : B { int b; int f() override; };
 
@@ -3528,19 +3529,19 @@ If you have a class with a virtual function, you don't (in general) know which c
         D d;
         use(d);   // slice
     }
-
+```
 Both `d`s are sliced.
 
 ##### Exception
 
 You can safely access a named polymorphic object in the scope of its definition, just don't slice it.
-
+```c++
     void use3()
     {
         D d;
         d.f();   // OK
     }
-
+```
 ##### Enforcement
 
 Flag all slicing.
@@ -3552,7 +3553,7 @@ Flag all slicing.
 `dynamic_cast` is checked at run time.
 
 ##### Example
-
+```c++
     struct B {   // an interface
         virtual void f();
         virtual void g();
@@ -3572,9 +3573,9 @@ Flag all slicing.
             // ... make do with B's interface ...
         }
     }
-
+```
 Use of the other casts can violate type safety and cause the program to access a variable that is actually of type `X` to be accessed as if it were of an unrelated type `Z`:
-
+```c++
     void user2(B* pb)   // bad
     {
         D* pd = static_cast<D*>(pb);    // I know that pb really points to a D; trust me
@@ -3599,7 +3600,7 @@ Use of the other casts can violate type safety and cause the program to access a
         user2(&b);  // bad error
         user3(&b);  // OK *if* the programmer got the some_condition check right
     }
-
+```
 ##### Note
 
 Like other casts, `dynamic_cast` is overused.
@@ -3617,7 +3618,7 @@ The latter (`typeid`) is easily hand-crafted if necessary (e.g., if working on a
 the former (`dynamic_cast`) is far harder to implement correctly in general.
 
 Consider:
-
+```c++
     struct B {
         const char* name {"B"};
         // if pb1->id() == pb2->id() *pb1 is the same type as *pb2
@@ -3646,7 +3647,7 @@ Consider:
         }
         // ...
     }
-
+```
 The result of `pb2->id() == "D"` is actually implementation defined.
 We added it to warn of the dangers of home-brew RTTI.
 This code may work as expected for years, just to fail on a new machine, new compiler, or a new linker that does not unify character literals.
@@ -3670,12 +3671,12 @@ In very rare cases, if you have measured that the `dynamic_cast` overhead is mat
 ##### Exception
 
 Consider:
-
+```c++
     template<typename B>
     class Dx : B {
         // ...
     };
-
+```
 ##### Enforcement
 
 * Flag all uses of `static_cast` for downcasts, including C-style casts that perform a `static_cast`.
@@ -3707,7 +3708,7 @@ Contrast with [C.147](#Rh-ptr-cast), where failure is an error, and should not b
 
 The example below describes the `add` function of a `Shape_owner` that takes ownership of constructed `Shape` objects. The objects are also sorted into views, according to their geometric attributes.
 In this example, `Shape` does not inherit from `Geometric_attributes`. Only its subclasses do.
-
+```c++
     void add(Shape* const item)
     {
       // Ownership is always taken
@@ -3725,7 +3726,7 @@ In this example, `Shape` does not inherit from `Geometric_attributes`. Only its 
         view_of_trisyms.emplace_back(trisym);
       }
     }
-
+```
 ##### Notes
 
 A failure to find the required class will cause `dynamic_cast` to return a null value, and de-referencing a null-valued pointer will lead to undefined behavior.
@@ -3742,7 +3743,7 @@ Therefore the result of the `dynamic_cast` should always be treated as if it may
 Avoid resource leaks.
 
 ##### Example
-
+```c++
     void use(int i)
     {
         auto p = new int {7};           // bad: initialize local pointers with new
@@ -3750,7 +3751,7 @@ Avoid resource leaks.
         if (0 < i) return;              // maybe return and leak
         delete p;                       // too late
     }
-
+```
 ##### Enforcement
 
 * Flag initialization of a naked pointer with the result of a `new`
@@ -3764,7 +3765,7 @@ Avoid resource leaks.
 It also ensures exception safety in complex expressions.
 
 ##### Example
-
+```c++
     unique_ptr<Foo> p {new<Foo>{7}};   // OK: but repetitive
 
     auto q = make_unique<Foo>(7);      // Better: no repetition of Foo
@@ -3781,7 +3782,7 @@ It also ensures exception safety in complex expressions.
 
     // Exception-safe: calls to functions are never interleaved.
     f(make_unique<Foo>(), bar());
-
+```
 ##### Enforcement
 
 * Flag the repetitive usage of template specialization list `<Foo>`
@@ -3795,14 +3796,14 @@ It also ensures exception safety in complex expressions.
 It also gives an opportunity to eliminate a separate allocation for the reference counts, by placing the `shared_ptr`'s use counts next to its object.
 
 ##### Example
-
+```c++
     void test() {
         // OK: but repetitive; and separate allocations for the Bar and shared_ptr's use count
         shared_ptr<Bar> p {new<Bar>{7}};
 
         auto q = make_shared<Bar>(7);   // Better: no repetition of Bar; one object
     }
-
+```
 ##### Enforcement
 
 * Flag the repetitive usage of template specialization list`<Bar>`
@@ -3815,7 +3816,7 @@ It also gives an opportunity to eliminate a separate allocation for the referenc
 Subscripting the resulting base pointer will lead to invalid object access and probably to memory corruption.
 
 ##### Example
-
+```c++
     struct B { int x; };
     struct D : B { int y; };
 
@@ -3826,7 +3827,7 @@ Subscripting the resulting base pointer will lead to invalid object access and p
     p[1].x = 7;   // overwrite D[0].y
 
     use(a);       // bad: a decays to &a[0] which is converted to a B*
-
+```
 ##### Enforcement
 
 * Flag all combinations of array decay and base to derived conversions.
@@ -3874,7 +3875,7 @@ Overload rule summary:
 Minimize surprises.
 
 ##### Example
-
+```c++
     class X {
     public:
         // ...
@@ -3883,13 +3884,13 @@ Minimize surprises.
                                                     // after a = b we have a == b
         // ...
     };
-
+```
 Here, the conventional semantics is maintained: [Copies compare equal](#SS-copy).
 
 ##### Example, bad
-
+```c++
     X operator+(X a, X b) { return a.v - b.v; }   // bad: makes + subtract
-
+```
 ##### Note
 
 Nonmember operators should be either friends or defined in [the same namespace as their operands](#Ro-namespace).
@@ -3907,9 +3908,9 @@ If you use member functions, you need two.
 Unless you use a nonmember function for (say) `==`, `a == b` and `b == a` will be subtly different.
 
 ##### Example
-
+```c++
     bool operator==(Point a, Point b) { return a.x == b.x && a.y == b.y; }
-
+```
 ##### Enforcement
 
 Flag member operator functions.
@@ -3923,17 +3924,17 @@ Having different names for logically equivalent operations on different argument
 ##### Example
 
 Consider:
-
+```c++
     void print(int a);
     void print(int a, int base);
     void print(const string&);
-
+```
 These three functions all print their arguments (appropriately). Conversely:
-
+```c++
     void print_int(int a);
     void print_based(int a, int base);
     void print_string(const string&);
-
+```
 These three functions all print their arguments (appropriately). Adding to the name just introduced verbosity and inhibits generic code.
 
 ##### Enforcement
@@ -3949,15 +3950,15 @@ Having the same name for logically different functions is confusing and leads to
 ##### Example
 
 Consider:
-
+```c++
     void open_gate(Gate& g);   // remove obstacle from garage exit lane
     void fopen(const char* name, const char* mode);   // open file
-
+```
 The two operations are fundamentally different (and unrelated) so it is good that their names differ. Conversely:
-
+```c++
     void open(Gate& g);   // remove obstacle from garage exit lane
     void open(const char* name, const char* mode ="r");   // open file
-
+```
 The two operations are still fundamentally different (and unrelated) but the names have been reduced to their (common) minimum, opening opportunities for confusion.
 Fortunately, the type system will catch many such mistakes.
 
@@ -3983,7 +3984,7 @@ and frequently needed. Do not introduce implicit conversions (through conversion
 just to gain a minor convenience.
 
 ##### Example
-
+```c++
     struct S1 {
         string s;
         // ...
@@ -4002,16 +4003,16 @@ just to gain a minor convenience.
         char* x2 = s2;     // error (and that's usually a good thing)
         char* x3 = static_cast<char*>(s2); // we can be explicit (on your head be it)
     }
-
+```
 The surprising and potentially damaging implicit conversion can occur in arbitrarily hard-to spot contexts, e.g.,
-
+```c++
     S1 ff();
 
     char* g()
     {
         return ff();
     }
-
+```
 The string returned by `ff()` is destroyed before the returned pointer into it can be used.
 
 ##### Enforcement
@@ -4029,7 +4030,7 @@ To find function objects and functions defined in a separate namespace to "custo
 Consider `swap`. It is a general (standard-library) function with a definition that will work for just about any type.
 However, it is desirable to define specific `swap()`s for specific types.
 For example, the general `swap()` will copy the elements of two `vector`s being swapped, whereas a good specific implementation will not copy elements at all.
-
+```c++
     namespace N {
         My_type X { /* ... */ };
         void swap(X&, X&);   // optimized swap for N::X
@@ -4040,26 +4041,26 @@ For example, the general `swap()` will copy the elements of two `vector`s being 
     {
         std::swap(a, b);   // probably not what we wanted: calls std::swap()
     }
-
+```
 The `std::swap()` in `f1()` does exactly what we asked it to do: it calls the `swap()` in namespace `std`.
 Unfortunately, that's probably not what we wanted.
 How do we get `N::X` considered?
-
+```c++
     void f2(N::X& a, N::X& b)
     {
         swap(a, b);   // calls N::swap
     }
-
+```c
 But that may not be what we wanted for generic code.
 There, we typically want the specific function if it exists and the general function if not.
 This is done by including the general function in the lookup for the function:
-
+```c++
     void f3(N::X& a, N::X& b)
     {
         using std::swap;  // make std::swap available
         swap(a, b);        // calls N::swap if it exists, otherwise std::swap
     }
-
+```
 ##### Enforcement
 
 Unlikely, except for known customization points, such as `swap`.
@@ -4073,7 +4074,7 @@ The `&` operator is fundamental in C++.
 Many parts of the C++ semantics assumes its default meaning.
 
 ##### Example
-
+```c++
     class Ptr { // a somewhat smart pointer
         Ptr(X* pp) :p(pp) { /* check */ }
         X* operator->() { /* check */ return p; }
@@ -4087,7 +4088,7 @@ Many parts of the C++ semantics assumes its default meaning.
         Ptr operator&() { return Ptr{this}; }
         // ...
     };
-
+```
 ##### Note
 
 If you "mess with" operator `&` be sure that its definition has matching meanings for `->`, `[]`, `*`, and `.` on the result type.
@@ -4106,7 +4107,7 @@ Tricky. Warn if `&` is user-defined without also defining `->` for the result ty
 Readability. Convention. Reusability. Support for generic code
 
 ##### Example
-
+```c++
     void cout_my_class(const My_class& c) // confusing, not conventional,not generic
     {
         std::cout << /* class members here */;
@@ -4116,13 +4117,13 @@ Readability. Convention. Reusability. Support for generic code
     {
         return os << /* class members here */;
     }
-
+```
 By itself, `cout_my_class` would be OK, but it is not usable/composable with code that rely on the `<<` convention for output:
-
+```c++
     My_class var { /* ... */ };
     // ...
     cout << "var = " << var << '\n';
-
+```
 ##### Note
 
 There are strong and vigorous conventions for the meaning most operators, such as
@@ -4147,17 +4148,17 @@ Ability for find operators using ADL.
 Avoiding inconsistent definition in different namespaces
 
 ##### Example
-
+```c++
     struct S { };
     bool operator==(S, S);   // OK: in the same namespace as S, and even next to S
     S s;
 
     bool x = (s == s);
-
+```
 This is what a default `==` would do, if we had such defaults.
 
 ##### Example
-
+```c++
     namespace N {
         struct S { };
         bool operator==(S, S);   // OK: in the same namespace as S, and even next to S
@@ -4166,9 +4167,9 @@ This is what a default `==` would do, if we had such defaults.
     N::S s;
 
     bool x = (s == s);  // finds N::operator==() by ADL
-
+```
 ##### Example, bad
-
+```c++
     struct S { };
     S s;
 
@@ -4181,7 +4182,7 @@ This is what a default `==` would do, if we had such defaults.
         S::operator!(S a) { return false; }
         S not_s = !s;
     }
-
+```
 Here, the meaning of `!s` differs in `N` and `M`.
 This can be most confusing.
 Remove the definition of `namespace M` and the confusion is replaced by an opportunity to make the mistake.
@@ -4190,9 +4191,9 @@ Remove the definition of `namespace M` and the confusion is replaced by an oppor
 
 If a binary operator is defined for two types that are defined in different namespaces, you cannot follow this rule.
 For example:
-
+```c++
     Vec::Vector operator*(const Vec::Vector&, const Mat::Matrix&);
-
+```
 This may be something best avoided.
 
 ##### See also
@@ -4210,7 +4211,7 @@ This is a special case of the rule that [helper functions should be defined in t
 You cannot overload by defining two different lambdas with the same name.
 
 ##### Example
-
+```c++
     void f(int);
     void f(double);
     auto f = [](char);   // error: cannot overload variable and function
@@ -4219,7 +4220,7 @@ You cannot overload by defining two different lambdas with the same name.
     auto g = [](double) { /* ... */ };   // error: cannot overload variables
 
     auto h = [](auto) { /* ... */ };   // OK
-
+```
 ##### Enforcement
 
 The compiler catches the attempt to overload a lambda.
@@ -4248,7 +4249,7 @@ A `union` allows a single piece of memory to be used for different types of obje
 Consequently, it can be used to save memory when we have several objects that are never used at the same time.
 
 ##### Example
-
+```c++
     union Value {
         int x;
         double d;
@@ -4258,11 +4259,11 @@ Consequently, it can be used to save memory when we have several objects that ar
     cout << v.x << '\n';    // write 123
     v.d = 987.654;  // now v holds a double
     cout << v.d << '\n';    // write 987.654
-
+```
 But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
 
 ##### Example
-
+```c++
     // Short-string optimization
 
     constexpr size_t buffer_size = 16; // Slightly larger than the size of a pointer
@@ -4301,7 +4302,7 @@ But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
 
         const size_t size;
     };
-
+```
 ##### Enforcement
 
 ???
@@ -4315,7 +4316,7 @@ so that the programmer has to keep track.
 Naked unions are a source of type errors.
 
 ##### Example, bad
-
+```c++
     union Value {
         int x;
         double d;
@@ -4323,32 +4324,32 @@ Naked unions are a source of type errors.
 
     Value v;
     v.d = 987.654;  // v holds a double
-
+```
 So far, so good, but we can easily misuse the `union`:
-
+```c++
     cout << v.x << '\n';    // BAD, undefined behavior: v holds a double, but we read it as an int
-
+```
 Note that the type error happened without any explicit cast.
 When we tested that program the last value printed was `1683627180` which it the integer value for the bit pattern for `987.654`.
 What we have here is an "invisible" type error that happens to give a result that could easily look innocent.
 
 And, talking about "invisible", this code produced no output:
-
+```c++
     v.x = 123;
     cout << v.d << '\n';    // BAD: undefined behavior
-
+```
 ##### Alternative
 
 Wrap a `union` in a class together with a type field.
 
 The soon-to-be-standard `variant` type (to be found in `<variant>`) does that for you:
-
+```c++
     variant<int, double> v;
     v = 123;        // v holds an int
     int x = get<int>(v);
     v = 123.456;    // v holds a double
     w = get<double>(v);
-
+```
 ##### Enforcement
 
 ???
@@ -4368,7 +4369,7 @@ You can look there for an explanation.
 The code is somewhat elaborate.
 Handling a type with user-defined assignment and destructor is tricky.
 Saving programmers from having to write such code is one reason for including `variant` in the standard.
-
+```c++
     class Value { // two alternative representations represented as a union
     private:
         enum class Tag { number, text };
@@ -4449,7 +4450,7 @@ Saving programmers from having to write such code is one reason for including `v
     {
         if (type == Tag::text) s.~string(); // explicit destroy
     }
-
+```
 ##### Enforcement
 
 ???
@@ -4463,29 +4464,29 @@ Such punning is invisible, or at least harder to spot than using a named cast.
 Type punning using a `union` is a source of errors.
 
 ##### Example, bad
-
+```c++
     union Pun {
         int x;
         unsigned char c[sizeof(int)];
     };
-
+```
 The idea of `Pun` is to be able to look at the character representation of an `int`.
-
+```c++
     void bad(Pun& u)
     {
         u.x = 'x';
         cout << u.c[0] << '\n';     // undefined behavior
     }
-
+```
 If you wanted to see the bytes of an `int`, use a (named) cast:
-
+```c++
     void if_you_must_pun(int& x)
     {
         auto p = reinterpret_cast<unsigned char*>(&x);
         cout << p[0] << '\n';     // OK; better
         // ...
     }
-
+```
 Accessing the result of an `reinterpret_cast` to a different type from the objects declared type is defined behavior (even though `reinterpret_cast` is discouraged),
 but at least we can see that something tricky is going on.
 

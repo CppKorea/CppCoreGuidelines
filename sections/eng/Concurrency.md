@@ -67,7 +67,7 @@ Note that this applies most urgently to library code and least urgently to stand
 However, thanks to the magic of cut-and-paste, code fragments can turn up in unexpected places.
 
 ##### Example
-
+```c++
     double cached_computation(double x)
     {
         static double cached_x = 0.0;
@@ -81,7 +81,7 @@ However, thanks to the magic of cut-and-paste, code fragments can turn up in une
         cached_result = result;
         return result;
     }
-
+```
 Although `cached_computation` works perfectly in a single-threaded environment, in a multi-threaded environment the two `static` variables result in data races and thus undefined behavior.
 
 There are several ways that this example could be made safe for a multi-threaded environment:
@@ -117,12 +117,12 @@ For further information of how to use synchronization well to eliminate data rac
 
 There are many examples of data races that exist, some of which are running in
 production software at this very moment. One very simple example:
-
+```c++
     int get_id() {
       static int id = 1;
       return id++;
     }
-
+```
 The increment here is an example of a data race. This can go wrong in many ways,
 including:
 
@@ -136,7 +136,7 @@ including:
 Local static variables are a common source of data races.
 
 ##### Example, bad:
-
+```c++
     void f(fstream&  fs, regex pat)
     {
         array<double, max> buf;
@@ -148,14 +148,14 @@ Local static variables are a common source of data races.
         auto h2 = async([&]{ return find_all(buf, sz, pat); });   // spawn a task to find matches
         // ...
     }
-
+```
 Here, we have a (nasty) data race on the elements of `buf` (`sort` will both read and write).
 All data races are nasty.
 Here, we managed to get a data race on data on the stack.
 Not all data races are as easy to spot as this one.
 
 ##### Example, bad:
-
+```c++
     // code not controlled by a lock
 
     unsigned val;
@@ -170,7 +170,7 @@ Not all data races are as easy to spot as this one.
         case 4: // ...
         }
     }
-
+```
 Now, a compiler that does not know that `val` can change will  most likely implement that `switch` using a jump table with five entries.
 Then, a `val` outside the `[0..4]` range will cause a jump to an address that could be anywhere in the program, and execution would proceed there.
 Really, "all bets are off" if you get a data race.
@@ -202,7 +202,7 @@ The less sharing you do, the less chance you have to forget to synchronize acces
 The less sharing you do, the less chance you have to wait on a lock (so performance can improve).
 
 ##### Example
-
+```c++
     bool validate(const vector<Reading>&);
     Graph<Temp_node> temperature_gradiants(const vector<Reading>&);
     Image altitude_map(const vector<Reading>&);
@@ -219,7 +219,7 @@ The less sharing you do, the less chance you have to wait on a lock (so performa
         auto v3 = h3.get();
         // ...
     }
-
+```
 Without those `const`s, we would have to review every asynchronously invoked function for potential data races on `surface_readings`.
 Making `surface_readings` be `const` (with respect to this function) allow reasoning using only the function body.
 
@@ -243,7 +243,7 @@ A task is an application notion, something you'd like to do, preferably concurre
 Application concepts are easier to reason about.
 
 ##### Example
-
+```c++
     void some_fun() {
         std::string  msg, msg2;
         std::thread publisher([&] { msg = "Hello"; });       // bad: less expressive
@@ -252,7 +252,7 @@ Application concepts are easier to reason about.
         // ...
         publisher.join();
     }
-
+```
 ##### Note
 
 With the exception of `async()`, the standard-library facilities are low-level, machine-oriented, threads-and-lock level.
@@ -272,37 +272,37 @@ and does not prevent instruction reordering (neither compiler nor hardware).
 It simply has nothing to do with concurrency.
 
 ##### Example, bad:
-
+```c++
     int free_slots = max_slots; // current source of memory for objects
 
     Pool* use()
     {
         if (int n = free_slots--) return &pool[n];
     }
-
+```
 Here we have a problem:
 This is perfectly good code in a single-threaded program, but have two threads execute this and
 there is a race condition on `free_slots` so that two threads might get the same value and `free_slots`.
 That's (obviously) a bad data race, so people trained in other languages may try to fix it like this:
-
+```c++
     volatile int free_slots = max_slots; // current source of memory for objects
 
     Pool* use()
     {
         if (int n = free_slots--) return &pool[n];
     }
-
+```
 This has no effect on synchronization: The data race is still there!
 
 The C++ mechanism for this is `atomic` types:
-
+```c++
     atomic<int> free_slots = max_slots; // current source of memory for objects
 
     Pool* use()
     {
         if (int n = free_slots--) return &pool[n];
     }
-
+```
 Now the `--` operation is atomic,
 rather than a read-increment-write sequence where another thread might get in-between the individual operations.
 
@@ -392,7 +392,7 @@ Concurrency rule summary:
 Avoids nasty errors from unreleased locks.
 
 ##### Example, bad
-
+```c++
     mutex mtx;
 
     void do_stuff()
@@ -401,9 +401,9 @@ Avoids nasty errors from unreleased locks.
         // ... do stuff ...
         mtx.unlock();
     }
-
+```
 Sooner or later, someone will forget the `mtx.unlock()`, place a `return` in the `... do stuff ...`, throw an exception, or something.
-
+```c++
     mutex mtx;
 
     void do_stuff()
@@ -411,7 +411,7 @@ Sooner or later, someone will forget the `mtx.unlock()`, place a `return` in the
         unique_lock<mutex> lck {mtx};
         // ... do stuff ...
     }
-
+```
 ##### Enforcement
 
 Flag calls of member `lock()` and `unlock()`.  ???
@@ -426,7 +426,7 @@ To avoid deadlocks on multiple `mutex`es.
 ##### Example
 
 This is asking for deadlock:
-
+```c++
     // thread 1
     lock_guard<mutex> lck1(m1);
     lock_guard<mutex> lck2(m2);
@@ -434,9 +434,9 @@ This is asking for deadlock:
     // thread 2
     lock_guard<mutex> lck2(m2);
     lock_guard<mutex> lck1(m1);
-
+```
 Instead, use `lock()`:
-
+```c++
     // thread 1
     lock(m1, m2);
     lock_guard<mutex> lck1(m1, adopt_lock);
@@ -446,15 +446,15 @@ Instead, use `lock()`:
     lock(m2, m1);
     lock_guard<mutex> lck2(m2, adopt_lock);
     lock_guard<mutex> lck1(m1, adopt_lock);
-
+```
 or (better, but C++17 only):
-
+```c++
     // thread 1
     scoped_lock<mutex, mutex> lck1(m1, m2);
 
     // thread 2
     scoped_lock<mutex, mutex> lck2(m2, m1);
-
+```
 Here, the writers of `thread1` and `thread2` are still not agreeing on the order of the `mutex`es, but order no longer matters.
 
 ##### Note
@@ -463,9 +463,9 @@ In real code, `mutex`es are rarely named to conveniently remind the programmer o
 In real code, `mutex`es are not always conveniently acquired on consecutive lines.
 
 In C++17 it's possible to write plain
-
+```c++
     lock_guard lck1(m1, adopt_lock);
-
+```
 and have the `mutex` type deduced.
 
 ##### Enforcement
@@ -481,7 +481,7 @@ This is undecidable in general, but catching common simple examples (like the on
 If you don't know what a piece of code does, you are risking deadlock.
 
 ##### Example
-
+```c++
     void do_this(Foo* p)
     {
         lock_guard<mutex> lck {my_mutex};
@@ -489,7 +489,7 @@ If you don't know what a piece of code does, you are risking deadlock.
         p->act(my_data);
         // ...
     }
-
+```
 If you don't know what `Foo::act` does (maybe it is a virtual function invoking a derived class member of a class not yet written),
 it may call `do_this` (recursively) and cause a deadlock on `my_mutex`.
 Maybe it will lock on a different mutex and not return in a reasonable time, causing delays to any code calling `do_this`.
@@ -498,7 +498,7 @@ Maybe it will lock on a different mutex and not return in a reasonable time, cau
 
 A common example of the "calling unknown code" problem is a call to a function that tries to gain locked access to the same object.
 Such problem can often be solved by using a `recursive_mutex`. For example:
-
+```c++
     recursive_mutex my_mutex;
 
     template<typename Action>
@@ -509,7 +509,7 @@ Such problem can often be solved by using a `recursive_mutex`. For example:
         f(this);    // f will do something to *this
         // ...
     }
-
+```
 If, as it is likely, `f()` invokes operations on `*this`, we must make sure that the object's invariant holds before the call.
 
 ##### Enforcement
@@ -526,7 +526,7 @@ To maintain pointer safety and avoid leaks, we need to consider what pointers ar
 If a `thread` joins, we can safely pass pointers to objects in the scope of the `thread` and its enclosing scopes.
 
 ##### Example
-
+```c++
     void f(int* p)
     {
         // ...
@@ -545,7 +545,7 @@ If a `thread` joins, we can safely pass pointers to objects in the scope of the 
         joining_thread t3(f, q.get());      // OK
         // ...
     }
-
+```
 A `gsl::joining_thread` is a `std::thread` with a destructor that joins and that cannot be `detached()`.
 By "OK" we mean that the object will be in scope ("live") for as long as a `thread` can use the pointer to it.
 The fact that `thread`s run concurrently doesn't affect the lifetime or ownership issues here;
@@ -564,7 +564,7 @@ To maintain pointer safety and avoid leaks, we need to consider what pointers ar
 If a `thread` is detached, we can safely pass pointers to static and free store objects (only).
 
 ##### Example
-
+```c++
     void f(int* p)
     {
         // ...
@@ -589,7 +589,7 @@ If a `thread` is detached, we can safely pass pointers to static and free store 
         t3.detach();
         // ...
     }
-
+```
 By "OK" we mean that the object will be in scope ("live") for as long as a `thread` can use the pointers to it.
 By "bad" we mean that a `thread` may use a pointer after the pointed-to object is destroyed.
 The fact that `thread`s run concurrently doesn't affect the lifetime or ownership issues here;
@@ -625,7 +625,7 @@ Detached threads are hard to monitor.
 It is harder to ensure absence of errors in detached threads (and potentially detached threads)
 
 ##### Example, bad
-
+```c++
     void f() { std::cout << "Hello "; }
 
     struct F {
@@ -637,9 +637,9 @@ It is harder to ensure absence of errors in detached threads (and potentially de
         std::thread t1{f};      // f() executes in separate thread
         std::thread t2{F()};    // F()() executes in separate thread
     }  // spot the bugs
-
+```
 ##### Example
-
+```c++
     void f() { std::cout << "Hello "; }
 
     struct F {
@@ -654,12 +654,12 @@ It is harder to ensure absence of errors in detached threads (and potentially de
         t1.join();
         t2.join();
     }  // one bad bug left
-
+```
 
 ##### Example, bad
 
 The code determining whether to `join()` or `detach()` may be complicated and even decided in the thread of functions called from it or functions called by the function that creates a thread:
-
+```c++
     void tricky(thread* t, int n)
     {
         // ...
@@ -674,7 +674,7 @@ The code determining whether to `join()` or `detach()` may be complicated and ev
         // ...
         // ... should I join here? ...
     }
-
+```
 This seriously complicates lifetime analysis, and in not too unlikely cases makes lifetime analysis impossible.
 This implies that we cannot safely refer to local objects in `use()` from the thread or refer to local objects in the thread from `use()`.
 
@@ -704,7 +704,7 @@ but implementing that idea by `detach` makes it harder to monitor and communicat
 In particular, it is harder (though not impossible) to ensure that the thread completed as expected or lives for as long as expected.
 
 ##### Example
-
+```c++
     void heartbeat();
 
     void use()
@@ -713,7 +713,7 @@ In particular, it is harder (though not impossible) to ensure that the thread co
         t.detach();
         // ...
     }
-
+```
 This is a reasonable use of a thread, for which `detach()` is commonly used.
 There are problems, though.
 How do we monitor the detached thread to see if it is alive?
@@ -723,15 +723,15 @@ So, we need to communicate with the heartbeat thread
 
 An alternative, and usually superior solution is to control its lifetime by placing it in a scope outside its point of creation (or activation).
 For example:
-
+```c++
     void heartbeat();
 
     gsl::joining_thread t(heartbeat);             // heartbeat is meant to run "forever"
-
+```
 This heartbeat will (barring error, hardware problems, etc.) run for as long as the program does.
 
 Sometimes, we need to separate the point of creation from the point of ownership:
-
+```c++
     void heartbeat();
 
     unique_ptr<gsl::joining_thread> tick_tock {nullptr};
@@ -742,7 +742,7 @@ Sometimes, we need to separate the point of creation from the point of ownership
         tick_tock = make_unique<gsl::joining_thread>(heartbeat);
         // ...
     }
-
+```
 #### Enforcement
 
 Flag `detach()`.
@@ -760,7 +760,7 @@ Copying naturally gives unique ownership (simplifies code) and eliminates the po
 Defining "small amount" precisely is impossible.
 
 ##### Example
-
+```c++
     string modify1(string);
     void modify2(string&);
 
@@ -769,7 +769,7 @@ Defining "small amount" precisely is impossible.
         auto res = async(modify1, s);
         async(modify2, s);
     }
-
+```
 The call of `modify1` involves copying two `string` values; the call of `modify2` does not.
 On the other hand, the implementation of `modify1` is exactly as we would have written it for single-threaded code,
 whereas the implementation of `modify2` will need some form of locking to avoid data races.
@@ -830,7 +830,7 @@ Context switches are expensive.
 Thread creation is expensive.
 
 ##### Example
-
+```c++
     void worker(Message m)
     {
         // process
@@ -841,11 +841,11 @@ Thread creation is expensive.
         for (Message m; is >> m; )
             run_list.push_back(new thread(worker, m));
     }
-
+```
 This spawns a `thread` per message, and the `run_list` is presumably managed to destroy those tasks once they are finished.
 
 Instead, we could have a set of pre-created worker threads processing the messages
-
+```c++
     Sync_queue<Message> work;
 
     void master(istream& is)
@@ -868,7 +868,7 @@ Instead, we could have a set of pre-created worker threads processing the messag
         joining_thread w3 {worker};
         joining_thread w4 {worker};
     }
-
+```
 ##### Note
 
 If your system has a good thread pool, use it.
@@ -886,7 +886,7 @@ If your system has a good message queue, use it.
 A `wait` without a condition can miss a wakeup or wake up simply to find that there is no work to do.
 
 ##### Example, bad
-
+```c++
     std::condition_variable cv;
     std::mutex mx;
 
@@ -907,11 +907,11 @@ A `wait` without a condition can miss a wakeup or wake up simply to find that th
             // do work ...
         }
     }
-
+```
 Here, if some other `thread` consumes `thread1`'s notification, `thread2` can wait forever.
 
 ##### Example
-
+```c++
     template<typename T>
     class Sync_queue {
     public:
@@ -940,7 +940,7 @@ Here, if some other `thread` consumes `thread1`'s notification, `thread2` can wa
         val = q.front();
         q.pop_front();
     }
-
+```
 Now if the queue is empty when a thread executing `get()` wakes up (e.g., because another thread has gotten to `get()` before it),
 it will immediately go back to sleep, waiting.
 
@@ -957,7 +957,7 @@ The less time is spent with a `mutex` taken, the less chance that another `threa
 and `thread` suspension and resumption are expensive.
 
 ##### Example
-
+```c++
     void do_something() // bad
     {
         unique_lock<mutex> lck(my_lock);
@@ -965,11 +965,11 @@ and `thread` suspension and resumption are expensive.
         do1();  // transaction: needs locking
         do2();  // cleanup: does not need locking
     }
-
+```
 Here, we are holding the lock for longer than necessary:
 We should not have taken the lock before we needed it and should have released it again before starting the cleanup.
 We could rewrite this to
-
+```c++
     void do_something() // bad
     {
         do0();  // preparation: does not need lock
@@ -978,10 +978,10 @@ We could rewrite this to
         my_lock.unlock();
         do2();  // cleanup: does not need locking
     }
-
+```
 But that compromises safety and violates the [use RAII](#Rconc-raii) rule.
 Instead, add a block for the critical section:
-
+```c++
     void do_something() // OK
     {
         do0();  // preparation: does not need lock
@@ -991,7 +991,7 @@ Instead, add a block for the critical section:
         }
         do2();  // cleanup: does not need locking
     }
-
+```
 ##### Enforcement
 
 Impossible in general.
@@ -1005,11 +1005,11 @@ Flag "naked" `lock()` and `unlock()`.
 An unnamed local objects is a temporary that immediately goes out of scope.
 
 ##### Example
-
+```c++
     unique_lock<mutex>(m1);
     lock_guard<mutex> {m2};
     lock(m1, m2);
-
+```
 This looks innocent enough, but it isn't.
 
 ##### Enforcement
@@ -1028,7 +1028,7 @@ Using a `synchronized_value<T>` ensures that the data has a mutex, and the right
 See the [WG21 proposal](http://wg21.link/p0290)) to add `synchronized_value` to a future TS or revision of the C++ standard.
 
 ##### Example
-
+```c++
     struct Record {
         std::mutex m;   // take this mutex before accessing other members
         // ...
@@ -1040,7 +1040,7 @@ See the [WG21 proposal](http://wg21.link/p0290)) to add `synchronized_value` to 
         };
         synchronized_value<DataRecord> data; // Protect the data with a mutex
     };
-
+```
 ##### Enforcement
 
 ??? Possible?
@@ -1161,7 +1161,7 @@ Lock-free programming rule summary:
 It's error-prone and requires expert level knowledge of language features, machine architecture, and data structures.
 
 ##### Example, bad
-
+```c++
     extern atomic<Link*> head;        // the shared head of a linked list
 
     Link* nh = new Link(data, nullptr);    // make a link ready for insertion
@@ -1171,7 +1171,7 @@ It's error-prone and requires expert level knowledge of language features, machi
         if (h->data <= data) break;        // if so, insert elsewhere
         nh->next = h;                      // next element is the previous head
     } while (!head.compare_exchange_weak(h, nh));    // write nh to head or to h
-
+```
 Spot the bug.
 It would be really hard to find through testing.
 Read up on the ABA problem.
@@ -1236,7 +1236,7 @@ Since C++11, static local variables are now initialized in a thread-safe way. Wh
 ##### Example
 
 Example with std::call_once.
-
+```c++
     void f()
     {
         static std::once_flag my_once_flag;
@@ -1246,9 +1246,9 @@ Example with std::call_once.
         });
         // ...
     }
-
+```
 Example with thread-safe static local variables of C++11.
-
+```c++
     void f()
     {
         // Assuming the compiler is compliant with C++11
@@ -1264,7 +1264,7 @@ Example with thread-safe static local variables of C++11.
             // do this only once
         }
     };
-
+```
 ##### Enforcement
 
 ??? Is it possible to detect the idiom?
@@ -1281,7 +1281,7 @@ The uses of the double-checked locking pattern that are not in violation of [CP.
 ##### Example, bad
 
 The use of volatile does not make the first check thread-safe, see also [CP.200: Use `volatile` only to talk to non-C++ memory](#Rconc-volatile2)
-
+```c++
     mutex action_mutex;
     volatile bool action_needed;
 
@@ -1292,9 +1292,9 @@ The use of volatile does not make the first check thread-safe, see also [CP.200:
             action_needed = false;
         }
     }
-
+```
 ##### Example, good
-
+```c++
     mutex action_mutex;
     atomic<bool> action_needed;
 
@@ -1305,9 +1305,9 @@ The use of volatile does not make the first check thread-safe, see also [CP.200:
             action_needed = false;
         }
     }
-
+```
 Fine-tuned memory order may be beneficial where acquire load is more efficient than sequentially-consistent load
-
+```c++
     mutex action_mutex;
     atomic<bool> action_needed;
 
@@ -1318,7 +1318,7 @@ Fine-tuned memory order may be beneficial where acquire load is more efficient t
             action_needed.store(false, memory_order_release);
         }
     }
-
+```
 ##### Enforcement
 
 ??? Is it possible to detect the idiom?
@@ -1338,17 +1338,17 @@ These rules defy simple categorization:
 `volatile` is used to refer to objects that are shared with "non-C++" code or hardware that does not follow the C++ memory model.
 
 ##### Example
-
+```c++
     const volatile long clock;
-
+```
 This describes a register constantly updated by a clock circuit.
 `clock` is `volatile` because its value will change without any action from the C++ program that uses it.
 For example, reading `clock` twice will often yield two different values, so the optimizer had better not optimize away the second read in this code:
-
+```c++
     long t1 = clock;
     // ... no use of clock here ...
     long t2 = clock;
-
+```
 `clock` is `const` because the program should not try to write to `clock`.
 
 ##### Note
@@ -1358,21 +1358,21 @@ Unless you are writing the lowest level code manipulating hardware directly, con
 ##### Example
 
 Usually C++ code receives `volatile` memory that is owned Elsewhere (hardware or another language):
-
+```c++
     int volatile* vi = get_hardware_memory_location();
         // note: we get a pointer to someone else's memory here
         // volatile says "treat this with extra respect"
-
+```
 Sometimes C++ code allocates the `volatile` memory and shares it with "elsewhere" (hardware or another language) by deliberately escaping a pointer:
-
+```c++
     static volatile long vl;
     please_use_this(&vl);   // escape a reference to this to "elsewhere" (not C++)
-
+```
 ##### Example; bad
 
 `volatile` local variables are nearly always wrong -- how can they be shared with other languages or hardware if they're ephemeral?
 The same applies almost as strongly to member variables, for the same reason.
-
+```c++
     void f() {
         volatile int i = 0; // bad, volatile local variable
         // etc.
@@ -1382,7 +1382,7 @@ The same applies almost as strongly to member variables, for the same reason.
         volatile int i = 0; // suspicious, volatile member variable
         // etc.
     };
-
+```
 ##### Note
 
 In C++, unlike in some other languages, `volatile` has [nothing to do with synchronization](#Rconc-volatile).

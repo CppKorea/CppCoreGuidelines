@@ -20,12 +20,12 @@ C++ provides better type checking and more notational support.
 It provides better support for high-level programming and often generates faster code.
 
 ##### Example
-
+```c++
     char ch = 7;
     void* pv = &ch;
     int* pi = pv;   // not C++
     *pi = 999;      // overwrite sizeof(int) bytes near &ch
-
+```
 The rules for implicit casting to and from `void*` in C are subtle and unenforced.
 In particular, this example violates a rule against converting to a type with stricter alignment.
 
@@ -40,12 +40,12 @@ Use a C++ compiler.
 That subset can be compiled with both C and C++ compilers, and when compiled as C++ is better type checked than "pure C."
 
 ##### Example
-
+```c++
     int* p1 = malloc(10 * sizeof(int));                      // not C++
     int* p2 = static_cast<int*>(malloc(10 * sizeof(int)));   // not C, C-style C++
     int* p3 = new int[10];                                   // not C
     int* p4 = (int*) malloc(10 * sizeof(int));               // both C and C++
-
+```
 ##### Enforcement
 
 * Flag if using a build mode that compiles code as C.
@@ -66,7 +66,7 @@ Whenever possible encapsulate the low-level interface in an interface that follo
 ##### Example
 
 You can call C from C++:
-
+```c++
     // in C:
     double sqrt(double);
 
@@ -74,11 +74,11 @@ You can call C from C++:
     extern "C" double sqrt(double);
 
     sqrt(2);
-
+```
 ##### Example
 
 You can call C++ from C:
-
+```c++
     // in C:
     X call_f(struct Y*, int);
 
@@ -87,7 +87,7 @@ You can call C++ from C:
     {
         return p->f(i);   // possibly a virtual function call
     }
-
+```
 ##### Enforcement
 
 None needed

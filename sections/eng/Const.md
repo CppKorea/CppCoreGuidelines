@@ -21,19 +21,19 @@ Immutable objects are easier to reason about, so make objects non-`const` only w
 Prevents accidental or hard-to-notice change of value.
 
 ##### Example
-
+```c++
     for (const int i : c) cout << i << '\n';    // just reading: const
 
     for (int i : c) cout << i << '\n';          // BAD: just reading
-
+```
 ##### Exception
 
 Function arguments are rarely mutated, but also rarely declared const.
 To avoid confusion and lots of false positives, don't enforce this rule for function arguments.
-
+```c++
     void f(const char* const p); // pedantic
     void g(const int i);        // pedantic
-
+```
 Note that function parameter is a local variable so changes to it are local.
 
 ##### Enforcement
@@ -48,7 +48,7 @@ A member function should be marked `const` unless it changes the object's observ
 This gives a more precise statement of design intent, better readability, more errors caught by the compiler, and sometimes more optimization opportunities.
 
 ##### Example; bad
-
+```c++
     class Point {
         int x, y;
     public:
@@ -59,7 +59,7 @@ This gives a more precise statement of design intent, better readability, more e
     void f(const Point& pt) {
         int x = pt.getx();          // ERROR, doesn't compile because getx was not marked const
     }
-
+```
 ##### Note
 
 It is not inherently bad to pass a pointer or reference to non-`const`,
@@ -79,10 +79,10 @@ You can
 * provide a wrapper function
 
 Example:
-
+```c++
     void f(int* p);   // old code: f() does not modify `*p`
     void f(const int* p) { f(const_cast<int*>(p)); } // wrapper
-
+```
 Note that this wrapper solution is a patch that should be used only when the declaration of `f()` cannot be modified,
 e.g. because it is in a library that you cannot modify.
 
@@ -91,7 +91,7 @@ e.g. because it is in a library that you cannot modify.
 A `const` member function can modify the value of an object that is `mutable` or accessed through a pointer member.
 A common use is to maintain a cache rather than repeatedly do a complicated computation.
 For example, here is a `Date` that caches (mnemonizes) its string representation to simplify repeated uses:
-
+```c++
     class Date {
     public:
         // ...
@@ -106,7 +106,7 @@ For example, here is a `Date` that caches (mnemonizes) its string representation
         mutable string string_val;
         // ...
     };
-
+```
 Another way of saying this is that `const`ness is not transitive.
 It is possible for a `const` member function to change the value of `mutable` members and the value of objects accessed
 through non-`const` pointers.
@@ -127,10 +127,10 @@ it offers to its users.
  It's far easier to reason about programs when called functions don't modify state.
 
 ##### Example
-
+```c++
     void f(char* p);        // does f modify *p? (assume it does)
     void g(const char* p);  // g does not modify *p
-
+```
 ##### Note
 
 It is not inherently bad to pass a pointer or reference to non-`const`,
@@ -152,7 +152,7 @@ but that should be done only when the called function is supposed to modify the 
  Prevent surprises from unexpectedly changed object values.
 
 ##### Example
-
+```c++
     void f()
     {
         int x = 7;
@@ -163,7 +163,7 @@ but that should be done only when the called function is supposed to modify the 
         }
         // ...
     }
-
+```
 As `x` is not `const`, we must assume that it is modified somewhere in the loop.
 
 ##### Enforcement
@@ -177,11 +177,11 @@ As `x` is not `const`, we must assume that it is modified somewhere in the loop.
 Better performance, better compile-time checking, guaranteed compile-time evaluation, no possibility of race conditions.
 
 ##### Example
-
+```c++
     double x = f(2);            // possible run-time evaluation
     const double y = f(2);      // possible run-time evaluation
     constexpr double z = f(2);  // error unless f(2) can be evaluated at compile time
-
+```
 ##### Note
 
 See F.4.
