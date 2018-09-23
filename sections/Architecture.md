@@ -1,12 +1,12 @@
 
-# <a name="S-A"></a>A: Architectural ideas
+# <a name="S-A"></a>A: 설계 아이디어
 
-This section contains ideas about higher-level architectural ideas and libraries.
+이 절은 보다 고수준의 구조와 라이브러리에 대한 아이디어를 포함한다.
 
-Architectural rule summary:
+구조적 아이디어 규칙 요약:
 
-* [A.1: Separate stable from less stable part of code](#Ra-stable)
-* [A.2: Express potentially reusable parts as a library](#Ra-lib)
+* [A.1: 코드의 덜 안정적인 부분에서 안정적인 부분을 분리하라](#Ra-stable)
+* [A.2:잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라](#Ra-lib)
 * [A.4: There should be no cycles among libraries](#?Ra-dag)
 * [???](#???)
 * [???](#???)
@@ -15,11 +15,11 @@ Architectural rule summary:
 * [???](#???)
 * [???](#???)
 
-### <a name="Ra-stable"></a>A.1: Separate stable from less stable part of code
+### <a name="Ra-stable"></a>A.1: 코드의 덜 안정적인 부분에서 안정적인 부분을 분리하라
 
 ???
 
-### <a name="Ra-lib"></a>A.2: Express potentially reusable parts as a library
+### <a name="Ra-lib"></a>A.2: 잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라
 
 ##### Reason
 

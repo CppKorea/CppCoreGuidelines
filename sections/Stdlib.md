@@ -1,8 +1,7 @@
 
 # <a name="S-stdlib"></a>SL: The Standard Library
 
-Using only the bare language, every task is tedious (in any language).
-Using a suitable library any task can be reasonably simple.
+단순히 언어 자체만 사용하게 되면 모든 작업이 더디게 된다(어떤 언어라도). 적절한 라이브러리를 사용하게 되면 어떤 작업도 상당히 간단해진다. 
 
 The standard library has steadily grown over the years.
 Its description in the standard is now larger than that of the language features.
@@ -21,28 +20,21 @@ C++ Standard Library component summary:
 
 Standard-library rule summary:
 
-* [SL.1: Use libraries wherever possible](#Rsl-lib)
-* [SL.2: Prefer the standard library to other libraries](#Rsl-sl)
+* [SL.1: 가능한 라이브러리를 사용하라](#Rsl-lib)
+* [SL.2: 가능하다면 표준 라이브러리를 우선 사용하라](#Rsl-sl)
 * [SL.3: Do not add non-standard entities to namespace `std`](#sl-std)
 * [SL.4: Use the standard library in a type-safe manner](#sl-safe)
 * ???
 
-### <a name="Rsl-lib"></a>SL.1:  Use libraries wherever possible
+### <a name="Rsl-lib"></a>SL.1: 가능한 라이브러리를 사용하라
 
 ##### Reason
+시간을 절약하고,처음부터 다시 만들지 않아도 된다. 다른 사람들이 이미 작업해 놓은 바를 중복작업할 필요가 없고, 다른 사람들이 향후 개선을 하게 되면 그 혜택을 누릴 수 있다. 또한 내가 직접 개선함으로서 다른 사람들을 도울 수 있다.
 
-Save time. Don't re-invent the wheel.
-Don't replicate the work of others.
-Benefit from other people's work when they make improvements.
-Help other people when you make improvements.
-
-### <a name="Rsl-sl"></a>SL.2: Prefer the standard library to other libraries
+### <a name="Rsl-sl"></a>SL.2: 가능하다면 표준 라이브러리를 우선 사용하라
 
 ##### Reason
-
-More people know the standard library.
-It is more likely to be stable, well-maintained, and widely available than your own code or most other libraries.
-
+많은 사람들이 표준 라이브러리를 알고있다. 스스로 작성한 코드나 다른 라이브러리 보다 더 안정적이고, 더 잘 관리되고, 더 광범위한 곳에 사용할 수 있다.
 
 ### <a name="sl-std"></a>SL.3: Do not add non-standard entities to namespace `std`
 
