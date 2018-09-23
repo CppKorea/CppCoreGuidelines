@@ -52,9 +52,9 @@ Comments are less precise than code.
 Comments are not updated as consistently as code.
 
 ##### Example, bad
-
+```c++
     auto x = m * v1 + vv;   // multiply m with v1 and add the result to vv
-
+```
 ##### Enforcement
 
 Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
@@ -66,14 +66,14 @@ Build an AI program that interprets colloquial English text and see if what is s
 Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
 
 ##### Example
-
+```c++
     void stable_sort(Sortable& c)
         // sort c in the order determined by <, keep equal elements (as defined by ==) in
         // their original relative order
     {
         // ... quite a few lines of non-trivial code ...
     }
-
+```
 ##### Note
 
 If the comment and the code disagree, both are likely to be wrong.
@@ -102,21 +102,21 @@ not possible.
 Readability. Avoidance of "silly mistakes."
 
 ##### Example, bad
-
+```c++
     int i;
     for (i = 0; i < max; ++i); // bug waiting to happen
     if (i == j)
         return i;
-
+```
 ##### Note
 
 Always indenting the statement after `if (...)`, `for (...)`, and `while (...)` is usually a good idea:
-
+```c++
     if (i < 0) error("negative argument");
 
     if (i < 0)
         error("negative argument");
-
+```
 ##### Enforcement
 
 Use a tool.
@@ -130,35 +130,35 @@ Also, if the type of a variable is changed, code using it will have to be modifi
 Minimize unintentional conversions.
 
 ##### Example, bad
-
+```c++
     void print_int(int i);
     void print_string(const char*);
 
     print_int(1);          // repetitive, manual type matching
     print_string("xyzzy"); // repetitive, manual type matching
-
+```
 ##### Example, good
-
+```c++
     void print(int i);
     void print(string_view);    // also works on any string-like sequence
 
     print(1);              // clear, automatic type matching
     print("xyzzy");        // clear, automatic type matching
-
+```
 ##### Note
 
 Names with types encoded are either verbose or cryptic.
-
+```
     printS  // print a std::string
     prints  // print a C-style string
     printi  // print an int
-
+```
 Requiring techniques like Hungarian notation to encode a type in a name is needed in C, but is generally unnecessary and actively harmful in a strongly statically-typed language like C++, because the annotations get out of date (the warts are just like comments and rot just like them) and they interfere with good use of the language (use the same name and overload resolution instead).
 
 ##### Note
 
 Some styles use very general (not type-specific) prefixes to denote the general use of a variable.
-
+```c++
     auto p = new User();
     auto p = make_unique<User>();
     // note: "p" is not being used to say "raw pointer to type User,"
@@ -167,32 +167,32 @@ Some styles use very general (not type-specific) prefixes to denote the general 
     auto cntHits = calc_total_of_hits(/*...*/);
     // note: "cnt" is not being used to encode a type,
     //       just generally to say "this is a count of something"
-
+```
 This is not harmful and does not fall under this guideline because it does not encode type information.
 
 ##### Note
 
 Some styles distinguishes members from local variable, and/or from global variable.
-
+```c++
     struct S {
         int m_;
         S(int m) :m_{abs(m)} { }
     };
-
+```
 This is not harmful and does not fall under this guideline because it does not encode type information.
 
 ##### Note
 
 Like C++, some styles distinguishes types from non-types.
 For example, by capitalizing type names, but not the names of functions and variables.
-
+```c++
     typename<typename T>
     class HashTable {   // maps string to T
         // ...
     };
 
     HashTable<int> index;
-
+```
 This is not harmful and does not fall under this guideline because it does not encode type information.
 
 ### <a name="Rl-name-length"></a>NL.7: Make the length of a name roughly proportional to the length of its scope
@@ -200,7 +200,7 @@ This is not harmful and does not fall under this guideline because it does not e
 **Rationale**: The larger the scope the greater the chance of confusion and of an unintended name clash.
 
 ##### Example
-
+```c++
     double sqrt(double x);   // return the square root of x; x must be non-negative
 
     int length(const char* p);  // return the number of characters in a zero-terminated C-style string
@@ -210,7 +210,7 @@ This is not harmful and does not fall under this guideline because it does not e
     int g;      // bad: global variable with a cryptic name
 
     int open;   // bad: global variable with a short, popular name
-
+```
 The use of `p` for pointer and `x` for a floating-point variable is conventional and non-confusing in a restricted scope.
 
 ##### Enforcement
@@ -259,10 +259,10 @@ Some conventions capitalize the first letter, some don't.
 ##### Note
 
 Try to be consistent in your use of acronyms and lengths of identifiers:
-
+```c++
     int mtbf {12};
     int mean_time_between_failures {12}; // make up your mind
-
+```
 ##### Enforcement
 
 Would be possible except for the use of libraries with varying conventions.
@@ -274,19 +274,19 @@ Would be possible except for the use of libraries with varying conventions.
 To avoid confusing macros with names that obey scope and type rules.
 
 ##### Example
-
+```c++
     void f()
     {
         const int SIZE{1000};  // Bad, use 'size' instead
         int v[SIZE];
     }
-
+```
 ##### Note
 
 This rule applies to non-macro symbolic constants:
-
+```c++
     enum bad { BAD, WORSE, HORRIBLE }; // BAD
-
+```
 ##### Enforcement
 
 * Flag macros with lower-case letters
@@ -327,23 +327,23 @@ Impossible.
 Too much space makes the text larger and distracts.
 
 ##### Example, bad
-
+```c++
     #include < map >
 
     int main(int argc, char * argv [ ])
     {
         // ...
     }
-
+```
 ##### Example
-
+```c++
     #include <map>
 
     int main(int argc, char* argv[])
     {
         // ...
     }
-
+```
 ##### Note
 
 Some IDEs have their own opinions and add distracting space.
@@ -364,19 +364,19 @@ Readability.
 ##### Example
 
 Use digit separators to avoid long strings of digits
-
+```c++
     auto c = 299'792'458; // m/s2
     auto q2 = 0b0000'1111'0000'0000;
     auto ss_number = 123'456'7890;
-
+```
 ##### Example
 
 Use literal suffixes where clarification is needed
-
+```c++
     auto hello = "Hello!"s; // a std::string
     auto world = "world";   // a C-style string
     auto interval = 100ms;  // using <chrono>
-
+```
 ##### Note
 
 Literals should not be sprinkled all over the code as ["magic constants"](#Res-magic),
@@ -406,7 +406,7 @@ This is a recommendation for [when you have no constraints or better ideas](#S-n
 Thus rule was added after many requests for guidance.
 
 ##### Example
-
+```c++
     class X {
     public:
         // interface
@@ -415,12 +415,12 @@ Thus rule was added after many requests for guidance.
     private:
         // implementation details
     };
-
+```
 ##### Example
 
 Sometimes, the default order of members conflicts with a desire to separate the public interface from implementation details.
 In such cases, private types and functions can be placed with private data.
-
+```c++
     class X {
     public:
         // interface
@@ -429,11 +429,11 @@ In such cases, private types and functions can be placed with private data.
     private:
         // implementation details (types, functions, and data)
     };
-
+```
 ##### Example, bad
 
 Avoid multiple blocks of declarations of one access (e.g., `public`) dispersed among blocks of declarations with different access (e.g. `private`).
-
+```c++
     class X {   // bad
     public:
         void f();
@@ -441,7 +441,7 @@ Avoid multiple blocks of declarations of one access (e.g., `public`) dispersed a
         int g();
         // ...
     };
-
+```
 The use of macros to declare groups of members often leads to violation of any ordering rules.
 However, macros obscures what is being expressed anyway.
 
@@ -463,7 +463,7 @@ This is a recommendation for [when you have no constraints or better ideas](#S-n
 Thus rule was added after many requests for guidance.
 
 ##### Example
-
+```c++
     struct Cable {
         int x;
         // ...
@@ -497,7 +497,7 @@ Thus rule was added after many requests for guidance.
 
         return some_value;
     }
-
+```
 Note the space between `if` and `(`
 
 ##### Note
@@ -528,11 +528,11 @@ The C-style layout emphasizes use in expressions and grammar, whereas the C++-st
 The use in expressions argument doesn't hold for references.
 
 ##### Example
-
+```c++
     T& operator[](size_t);   // OK
     T &operator[](size_t);   // just strange
     T & operator[](size_t);   // undecided
-
+```
 ##### Note
 
 This is a recommendation for [when you have no constraints or better ideas](#S-naming).
@@ -552,12 +552,12 @@ Not everyone has screens and printers that make it easy to distinguish all chara
 We easily confuse similarly spelled and slightly misspelled words.
 
 ##### Example
-
+```c++
     int oO01lL = 6; // bad
 
     int splunk = 7;
     int splonk = 8; // bad: splunk and splonk are easily confused
-
+```
 ##### Enforcement
 
 ???
@@ -570,10 +570,10 @@ Readability.
 It is really easy to overlook a statement when there is more on a line.
 
 ##### Example
-
+```c++
     int x = 7; char* p = 29;    // don't
     int x = 7; f(x);  ++x;      // don't
-
+```
 ##### Enforcement
 
 Easy.
@@ -597,19 +597,19 @@ For details, see [ES.10](#Res-name-one).
 It's verbose and only needed where C compatibility matters.
 
 ##### Example
-
+```c++
     void f(void);   // bad
 
     void g();       // better
-
+```
 ##### Note
 
 Even Dennis Ritchie deemed `void f(void)` an abomination.
 You can make an argument for that abomination in C when function prototypes were rare so that banning:
-
+```c++
     int f();
     f(1, 2, "weird but valid C89");   // hope that f() is defined int f(a, b, c) char* c; { /* ... */ }
-
+```
 would have caused major problems, but not in the 21st century and in C++.
 
 ### <a name="Rl-const"></a>NL.26: Use conventional `const` notation
@@ -620,13 +620,13 @@ Conventional notation is more familiar to more programmers.
 Consistency in large code bases.
 
 ##### Example
-
+```c++
     const int x = 7;    // OK
     int const y = 9;    // bad
 
     const int *const p = nullptr;   // OK, constant pointer to constant int
     int const *const p = nullptr;   // bad, constant pointer to constant int
-
+```
 ##### Note
 
 We are well aware that you could claim the "bad" examples more logical than the ones marked "OK",

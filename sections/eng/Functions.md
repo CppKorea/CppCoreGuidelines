@@ -75,7 +75,7 @@ Factoring out common code makes code more readable, more likely to be reused, an
 If something is a well-specified action, separate it out from its surrounding code and give it a name.
 
 ##### Example, don't
-
+```c++
     void read_and_print(istream& is)    // read and print an int
     {
         int x;
@@ -84,7 +84,7 @@ If something is a well-specified action, separate it out from its surrounding co
         else
             cerr << "no int on input\n";
     }
-
+```
 Almost everything is wrong with `read_and_print`.
 It reads, it writes (to a fixed `ostream`), it writes error messages (to a fixed `ostream`), it handles only `int`s.
 There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
@@ -96,16 +96,16 @@ mess could become hard to understand.
 If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
 
 ##### Example
-
+```c++
     sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
-
+```
 Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
-
+```c++
     auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
 
     sort(a, b, lessT);
     find_if(a, b, lessT);
-
+```
 The shortest code is not always the best for performance or maintainability.
 
 ##### Exception
@@ -129,7 +129,7 @@ A function that performs a single operation is simpler to understand, test, and 
 ##### Example
 
 Consider:
-
+```c++
     void read_and_print()    // bad
     {
         int x;
@@ -137,9 +137,9 @@ Consider:
         // check for errors
         cout << x << "\n";
     }
-
+```
 This is a monolith that is tied to a specific input and will never find another (different) use. Instead, break functions up into suitable logical parts and parameterize:
-
+```c++
     int read(istream& is)    // better
     {
         int x;
@@ -152,17 +152,17 @@ This is a monolith that is tied to a specific input and will never find another 
     {
         os << x << "\n";
     }
-
+```
 These can now be combined where needed:
-
+```c++
     void read_and_print()
     {
         auto x = read(cin);
         print(cout, x);
     }
-
+```
 If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, the response to errors, etc. Example:
-
+```c++
     auto read = [](auto& input, auto& value)    // better
     {
         input >> value;
@@ -173,7 +173,7 @@ If there was a need, we could further templatize `read()` and `print()` on the d
     {
         output << value << "\n";
     }
-
+```
 ##### Enforcement
 
 * Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
@@ -190,7 +190,7 @@ Functions with complex control structures are more likely to be long and more li
 ##### Example
 
 Consider:
-
+```c++
     double simple_func(double val, int flag1, int flag2)
         // simple_func: takes a value and calculates the expected ASIC output,
         // given the two mode flags.
@@ -218,13 +218,13 @@ Consider:
         }
         return finalize(intermediate, 0.);
     }
-
+```
 This is too complex (and long).
 How would you know if all possible alternatives have been correctly handled?
 Yes, it breaks other rules also.
 
 We can refactor:
-
+```c++
     double func1_muon(double val, int flag)
     {
         // ???
@@ -246,7 +246,7 @@ We can refactor:
             return func1_tau(-val, flag1, flag2);
         return 0.;
     }
-
+```
 ##### Note
 
 "It doesn't fit on a screen" is often a good practical definition of "far too large."
@@ -273,7 +273,7 @@ Small simple functions are easily inlined where the cost of a function call is s
 ##### Example
 
 The (in)famous factorial:
-
+```c++
     constexpr int fac(int n)
     {
         constexpr int max_exp = 17;      // constexpr enables max_exp to be used in Expects
@@ -282,7 +282,7 @@ The (in)famous factorial:
         for (int i = 2; i <= n; ++i) x *= i;
         return x;
     }
-
+```
 This is C++14.
 For C++11, use a recursive formulation of `fac()`.
 
@@ -290,7 +290,7 @@ For C++11, use a recursive formulation of `fac()`.
 
 `constexpr` does not guarantee compile-time evaluation;
 it just guarantees that the function can be evaluated at compile time for constant expression arguments if the programmer requires it or the compiler decides to do so to optimize.
-
+```c++
     constexpr int min(int x, int y) { return x < y ? x : y; }
 
     void test(int v)
@@ -300,18 +300,18 @@ it just guarantees that the function can be evaluated at compile time for consta
         int m3 = min(-1, v);            // run-time evaluation
         constexpr int m4 = min(-1, v);  // error: cannot evaluate at compile time
     }
-
+```
 ##### Note
 
 `constexpr` functions are pure: they can have no side effects.
-
+```c++
     int dcount = 0;
     constexpr int double(int v)
     {
         ++dcount;   // error: attempted side effect from constexpr function
         return v + v;
     }
-
+```
 This is usually a very good thing.
 
 When given a non-constant argument, a `constexpr` function can throw.
@@ -347,9 +347,9 @@ We are still waiting.
 Specifying `inline` encourages the compiler to do a better job.
 
 ##### Example
-
+```c++
     inline string cat(const string& s, const string& s2) { return s + s2; }
-
+```
 ##### Exception
 
 Do not put an `inline` function in what is meant to be a stable interface unless you are certain that it will not change.
@@ -389,7 +389,7 @@ The C++ Standard Library does that implicitly for all functions in the C Standar
 ##### Example
 
 You can use `noexcept` even on functions that can throw:
-
+```c++
     vector<string> collect(istream& is) noexcept
     {
         vector<string> res;
@@ -397,7 +397,7 @@ You can use `noexcept` even on functions that can throw:
             res.push_back(s);
         return res;
     }
-
+```
 If `collect()` runs out of memory, the program crashes.
 Unless the program is crafted to survive memory exhaustion, that may be just the right thing to do;
 `terminate()` may generate suitable error log information (but after memory runs out it is hard to do anything clever).
@@ -441,7 +441,7 @@ Passing by smart pointer restricts the use of a function to callers that use sma
 Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost.
 
 ##### Example
-
+```c++
     // accepts any int*
     void f(int*);
 
@@ -456,9 +456,9 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
 
     // accepts any int
     void h(int&);
-
+```
 ##### Example, bad
-
+```c++
     // callee
     void f(shared_ptr<widget>& w)
     {
@@ -466,7 +466,7 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
         use(*w); // only use of w -- the lifetime is not used at all
         // ...
     };
-
+```
 See further in [R.30](#Rr-smartptrparam).
 
 ##### Note
@@ -493,10 +493,10 @@ that is
 Pure functions are easier to reason about, sometimes easier to optimize (and even parallelize), and sometimes can be memoized.
 
 ##### Example
-
+```c++
     template<class T>
     auto square(T t) { return t * t; }
-
+```
 ##### Note
 
 `constexpr` functions are pure.
@@ -519,9 +519,9 @@ Readability.
 Suppression of unused parameter warnings.
 
 ##### Example
-
+```c++
     X* find(map<Blob>& m, const string& s, Hint);   // once upon a time, a hint was used
-
+```
 ##### Note
 
 Allowing parameters to be unnamed was introduced in the early 1980 to address this problem.
@@ -563,7 +563,7 @@ What is "cheap to copy" depends on the machine architecture, but two or three wo
 When copying is cheap, nothing beats the simplicity and safety of copying, and for small objects (up to two or three words) it is also faster than passing by reference because it does not require an extra indirection to access from the function.
 
 ##### Example
-
+```c++
     void f1(const string& s);  // OK: pass by reference to const; always cheap
 
     void f2(string s);         // bad: potentially expensive
@@ -571,7 +571,7 @@ When copying is cheap, nothing beats the simplicity and safety of copying, and f
     void f3(int x);            // OK: Unbeatable
 
     void f4(const int& x);     // bad: overhead on access in f4()
-
+```
 For advanced uses (only), where you really need to optimize for rvalues passed to "input-only" parameters:
 
 * If the function is going to unconditionally move from the argument, take it by `&&`. See [F.18](#Rf-consume).
@@ -580,14 +580,14 @@ For advanced uses (only), where you really need to optimize for rvalues passed t
 * In special cases, such as multiple "input + copy" parameters, consider using perfect forwarding. See [F.19](#Rf-forward).
 
 ##### Example
-
+```c++
     int multiply(int, int); // just input ints, pass by value
 
     // suffix is input-only but not as cheap as an int, pass by const&
     string& concatenate(string&, const string& suffix);
 
     void sink(unique_ptr<widget>);  // input only, and moves ownership of the widget
-
+```
 Avoid "esoteric techniques" such as:
 
 * Passing arguments as `T&&` "for efficiency".
@@ -597,7 +597,7 @@ Avoid "esoteric techniques" such as:
 ##### Example
 
 Assuming that `Matrix` has move operations (possibly by keeping its elements in a `std::vector`):
-
+```c++
     Matrix operator+(const Matrix& a, const Matrix& b)
     {
         Matrix res;
@@ -608,7 +608,7 @@ Assuming that `Matrix` has move operations (possibly by keeping its elements in 
     Matrix x = m1 + m2;  // move constructor
 
     y = m3 + m3;         // move assignment
-
+```
 ##### Notes
 
 The return value optimization doesn't handle the assignment case, but the move assignment does.
@@ -631,14 +631,14 @@ If you need the notion of an optional value, use a pointer, `std::optional`, or 
 This makes it clear to callers that the object is assumed to be modified.
 
 ##### Example
-
+```c++
     void update(Record& r);  // assume that update writes to r
-
+```
 ##### Note
 
 A `T&` argument can pass information into a function as well as out of it.
 Thus `T&` could be an in-out-parameter. That can in itself be a problem and a source of errors:
-
+```c++
     void f(string& s)
     {
         s = "New York";  // non-obvious error
@@ -650,7 +650,7 @@ Thus `T&` could be an in-out-parameter. That can in itself be a problem and a so
         f(buffer);
         // ...
     }
-
+```
 Here, the writer of `g()` is supplying a buffer for `f()` to fill, but `f()` simply replaces it (at a somewhat higher cost than a simple copy of the characters).
 A bad logic error can happen if the writer of `g()` incorrectly assumes the size of the `buffer`.
 
@@ -666,13 +666,13 @@ A bad logic error can happen if the writer of `g()` incorrectly assumes the size
 It's efficient and eliminates bugs at the call site: `X&&` binds to rvalues, which requires an explicit `std::move` at the call site if passing an lvalue.
 
 ##### Example
-
+```c++
     void sink(vector<int>&& v) {   // sink takes ownership of whatever the argument owned
         // usually there might be const accesses of v here
         store_somewhere(std::move(v));
         // usually no more use of v here; it is moved-from
     }
-
+```
 Note that the `std::move(v)` makes it possible for `store_somewhere()` to leave `v` in a moved-from state.
 [That could be dangerous](#Rc-move-semantic).
 
@@ -682,12 +682,12 @@ Note that the `std::move(v)` makes it possible for `store_somewhere()` to leave 
 Unique owner types that are move-only and cheap-to-move, such as `unique_ptr`, can also be passed by value which is simpler to write and achieves the same effect. Passing by value does generate one extra (cheap) move operation, but prefer simplicity and clarity first.
 
 For example:
-
+```c++
     template <class T>
     void sink(std::unique_ptr<T> p) {
         // use p ... possibly std::move(p) onward somewhere else
     }   // p gets destroyed
-
+```
 ##### Enforcement
 
 * Flag all `X&&` parameters (where `X` is not a template type parameter name) where the function body uses them without `std::move`.
@@ -703,14 +703,14 @@ If the object is to be passed onward to other code and not directly used by this
 In that case, and only that case, make the parameter `TP&&` where `TP` is a template type parameter -- it both *ignores* and *preserves* `const`-ness and rvalue-ness. Therefore any code that uses a `TP&&` is implicitly declaring that it itself doesn't care about the variable's `const`-ness and rvalue-ness (because it is ignored), but that intends to pass the value onward to other code that does care about `const`-ness and rvalue-ness (because it is preserved). When used as a parameter `TP&&` is safe because any temporary objects passed from the caller will live for the duration of the function call. A parameter of type `TP&&` should essentially always be passed onward via `std::forward` in the body of the function.
 
 ##### Example
-
+```c++
     template <class F, class... Args>
     inline auto invoke(F f, Args&&... args) {
         return f(forward<Args>(args)...);
     }
 
     ??? calls ???
-
+```
 ##### Enforcement
 
 * Flag a function that takes a `TP&&` parameter (where `TP` is a template type parameter name) and does anything with it other than `std::forward`ing it exactly once on every static path.
@@ -726,20 +726,20 @@ This includes large objects like standard containers that use implicit move oper
 If you have multiple values to return, [use a tuple](#Rf-out-multi) or similar multi-member type.
 
 ##### Example
-
+```c++
     // OK: return pointers to elements with the value x
     vector<const int*> find_all(const vector<int>&, int x);
 
     // Bad: place pointers to elements with value x in-out
     void find_all(const vector<int>&, vector<const int*>& out, int x);
-
+```
 ##### Note
 
 A `struct` of many (individually cheap-to-move) elements may be in aggregate expensive to move.
 
 It is not recommended to return a `const` value.
 Such older advice is now obsolete; it does not add value, and it interferes with move semantics.
-
+```c++
     const vector<int> fct();    // bad: that "const" is more trouble than it is worth
 
     vector<int> g(const vector<int>& vx)
@@ -749,7 +749,7 @@ Such older advice is now obsolete; it does not add value, and it interferes with
         // ...
         return fct(); // expensive copy: move semantics suppressed by the "const"
     }
-
+```
 The argument for adding `const` to a return value is that it prevents (very rare) accidental access to a temporary.
 The argument against is prevents (very frequent) use of move semantics.
 
@@ -760,7 +760,7 @@ The argument against is prevents (very frequent) use of move semantics.
 * To reuse an object that carries capacity (e.g., `std::string`, `std::vector`) across multiple calls to the function in an inner loop: [treat it as an in/out parameter and pass by reference](#Rf-out-multi).
 
 ##### Example
-
+```c++
     struct Package {      // exceptional case: expensive-to-move object
         char header[16];
         char load[2024 - 16];
@@ -771,7 +771,7 @@ The argument against is prevents (very frequent) use of move semantics.
 
     int val();            // OK
     void val(int&);       // Bad: Is val reading its argument
-
+```
 ##### Enforcement
 
 * Flag reference to non-`const` parameters that are not read before being written to and are a type that could be cheaply returned; they should be "out" return values.
@@ -787,7 +787,7 @@ possibly with the extra convenience of `tie` at the call site.
 Prefer using a named struct where there are semantics to the returned value. Otherwise, a nameless `tuple` is useful in generic code.
 
 ##### Example
-
+```c++
     // BAD: output-only parameter documented in a comment
     int f(const string& input, /*output only*/ string& output_data)
     {
@@ -802,39 +802,39 @@ Prefer using a named struct where there are semantics to the returned value. Oth
         // ...
         return make_tuple(status, something());
     }
-
+```
 C++98's standard library already used this style, because a `pair` is like a two-element `tuple`.
 For example, given a `set<string> my_set`, consider:
-
+```c++
     // C++98
     result = my_set.insert("Hello");
     if (result.second) do_something_with(result.first);    // workaround
-
+```
 With C++11 we can write this, putting the results directly in existing local variables:
-
+```c++
     Sometype iter;                                // default initialize if we haven't already
     Someothertype success;                        // used these variables for some other purpose
 
     tie(iter, success) = my_set.insert("Hello");   // normal return value
     if (success) do_something_with(iter);
-
+```
 With C++17 we should be able to use "structured bindings" to declare and initialize the multiple variables:
-
+```c++
     if (auto [ iter, success ] = my_set.insert("Hello"); success) do_something_with(iter);
-
+```
 ##### Exception
 
 Sometimes, we need to pass an object to a function to manipulate its state.
 In such cases, passing the object by reference [`T&`](#Rf-inout) is usually the right technique.
 Explicitly passing an in-out parameter back out again as a return value is often not necessary.
 For example:
-
+```c++
     istream& operator>>(istream& is, string& s);    // much like std::operator>>()
 
     for (string s; cin >> s; ) {
         // do something with line
     }
-
+```
 Here, both `s` and `cin` are used as in-out parameters.
 We pass `cin` by (non-`const`) reference to be able to manipulate its state.
 We pass `s` to avoid repeated allocations.
@@ -843,7 +843,7 @@ This technique is sometimes called the "caller-allocated out" pattern and is par
 such as `string` and `vector`, that needs to do free store allocations.
 
 To compare, if we passed out all values as return values, we would something like this:
-
+```c++
     pair<istream&, string> get_string(istream& is);  // not recommended
     {
         string s;
@@ -854,7 +854,7 @@ To compare, if we passed out all values as return values, we would something lik
     for (auto p = get_string(cin); p.first; ) {
         // do something with p.second
     }
-
+```
 We consider that significantly less elegant with significantly less performance.
 
 For a truly strict reading of this rule (F.21), the exception isn't really an exception because it relies on in-out parameters,
@@ -865,7 +865,7 @@ However, we prefer to be explicit, rather than subtle.
 
 In many cases, it may be useful to return a specific, user-defined type.
 For example:
-
+```c++
     struct Distance {
         int value;
         int unit = 1;   // 1 means meters
@@ -876,6 +876,7 @@ For example:
     auto [value, unit] = measure(obj3); // access value and unit; somewhat redundant
                                         // to people who know measure()
     auto [x, y] = measure(obj4);        // don't; it's likely to be confusing
+```
 
 The overly-generic `pair` and `tuple` should be used only when the value returned represents to independent entities rather than an abstraction.
 
@@ -908,7 +909,7 @@ This makes it hard to understand what the code does and is supposed to do.
 It complicates checking and tool support.
 
 ##### Example
-
+```c++
     void use(int* p, int n, char* s, int* q)
     {
         p[n - 1] = 666; // Bad: we don't know if p points to n elements;
@@ -918,16 +919,16 @@ It complicates checking and tool support.
         delete q;       // Bad: we don't know if *q is allocated on the free store;
                         // assume it does not or use owner
     }
-
+```
 better
-
+```c++
     void use2(span<int> p, zstring s, owner<int*> q)
     {
         p[p.size() - 1] = 666; // OK, a range error can be caught
         cout << s; // OK
         delete q;  // OK
     }
-
+```
 ##### Note
 
 `owner<T*>` represents ownership, `zstring` represents a C-style string.
@@ -955,17 +956,17 @@ Similarly, a function with a return value of `not_null<T>` makes it clear that t
 Additionally, when debugging, `owner<T*>` and `not_null<T>` can be instrumented to check for correctness.
 
 Consider:
-
+```c++
     int length(Record* p);
-
+```
 When I call `length(p)` should I check if `p` is `nullptr` first? Should the implementation of `length()` check if `p` is `nullptr`?
-
+```c++
     // it is the caller's job to make sure p != nullptr
     int length(not_null<Record*> p);
 
     // the implementor of length() must assume that p == nullptr is possible
     int length(Record* p);
-
+```
 ##### Note
 
 A `not_null<T*>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`; both can be represented in memory as a `T*` (so no run-time overhead is implied).
@@ -987,13 +988,13 @@ A `not_null<T*>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`
 Informal/non-explicit ranges are a source of errors.
 
 ##### Example
-
+```c++
     X* find(span<X> r, const X& v);    // find v in r
 
     vector<X> vec;
     // ...
     auto p = find({vec.begin(), vec.end()}, X{});  // find X{} in vec
-
+```
 ##### Note
 
 Ranges are extremely common in C++ code. Typically, they are implicit and their correct use is very hard to ensure.
@@ -1004,7 +1005,7 @@ it is in general impossible to know if there really are `n` elements to access f
 ##### Example
 
 A `span` represents a range of elements, but how do we manipulate elements of that range?
-
+```c++
     void f(span<int> s)
     {
         // range traversal (guaranteed correct)
@@ -1019,7 +1020,7 @@ A `span` represents a range of elements, but how do we manipulate elements of th
         // extract pointers (potentially checked)
         std::sort(&s[0], &s[s.size() / 2]);
     }
-
+```
 ##### Note
 
 A `span<T>` object does not own its elements and is so small that it can be passed by value.
@@ -1042,17 +1043,17 @@ We must distinguish C-style strings from a pointer to a single character or an o
 ##### Example
 
 Consider:
-
+```c++
     int length(const char* p);
-
+```
 When I call `length(s)` should I check if `s` is `nullptr` first? Should the implementation of `length()` check if `p` is `nullptr`?
-
+```c++
     // the implementor of length() must assume that p == nullptr is possible
     int length(zstring p);
 
     // it is the caller's job to make sure p != nullptr
     int length(not_null<zstring> p);
-
+```
 ##### Note
 
 `zstring` do not represent ownership.
@@ -1068,7 +1069,7 @@ Using `unique_ptr` is the cheapest way to pass a pointer safely.
 **See also**: [C.50](#Rc-factory) regarding when to return a `shared_ptr` from a factory.
 
 ##### Example
-
+```c++
     unique_ptr<Shape> get_shape(istream& is)  // assemble shape from input stream
     {
         auto kind = read_header(is); // read header and identify the next shape on input
@@ -1080,7 +1081,7 @@ Using `unique_ptr` is the cheapest way to pass a pointer safely.
         // ...
         }
     }
-
+```
 ##### Note
 
 You need to pass a pointer rather than an object if what you are transferring is an object from a class hierarchy that is to be used through an interface (base class).
@@ -1096,7 +1097,7 @@ You need to pass a pointer rather than an object if what you are transferring is
 Using `std::shared_ptr` is the standard way to represent shared ownership. That is, the last owner deletes the object.
 
 ##### Example
-
+```c++
     shared_ptr<const Image> im { read_image(somewhere) };
 
     std::thread t0 {shade, args0, top_left, im};
@@ -1106,7 +1107,7 @@ Using `std::shared_ptr` is the standard way to represent shared ownership. That 
 
     // detach threads
     // last thread to finish deletes the image
-
+```
 ##### Note
 
 Prefer a `unique_ptr` over a `shared_ptr` if there is never more than one owner at a time.
@@ -1130,7 +1131,7 @@ A pointer (`T*`) can be a `nullptr` and a reference (`T&`) cannot, there is no v
 Sometimes having `nullptr` as an alternative to indicated "no object" is useful, but if it is not, a reference is notationally simpler and might yield better code.
 
 ##### Example
-
+```c++
     string zstring_to_string(zstring p) // zstring is a char*; that is a C-style string
     {
         if (!p) return string{};    // p might be nullptr; remember to check
@@ -1141,7 +1142,7 @@ Sometimes having `nullptr` as an alternative to indicated "no object" is useful,
     {
         // r refers to a vector<int>; no check needed
     }
-
+```
 ##### Note
 
 It is possible, but not valid C++ to construct a reference that is essentially a `nullptr` (e.g., `T* p = nullptr; T& r = (T&)*p;`).
@@ -1163,7 +1164,7 @@ That's what pointers are good for.
 Returning a `T*` to transfer ownership is a misuse.
 
 ##### Example
-
+```c++
     Node* find(Node* t, const string& s)  // find s in a binary tree of Nodes
     {
         if (!t || t->name == s) return t;
@@ -1171,7 +1172,7 @@ Returning a `T*` to transfer ownership is a misuse.
         if ((auto p = find(t->right, s))) return p;
         return nullptr;
     }
-
+```
 If it isn't the `nullptr`, the pointer returned by `find` indicates a `Node` holding `s`.
 Importantly, that does not imply a transfer of ownership of the pointed-to object to the caller.
 
@@ -1202,7 +1203,7 @@ To avoid the crashes and data corruption that can result from the use of such a 
 ##### Example, bad
 
 After the return from a function its local objects no longer exist:
-
+```c++
     int* f()
     {
         int fx = 9;
@@ -1223,12 +1224,12 @@ After the return from a function its local objects no longer exist:
         int z = *p;  // read from abandoned stack frame (bad)
         g(p);        // pass pointer to abandoned stack frame to function (bad)
     }
-
+```
 Here on one popular implementation I got the output:
-
+```c++
     *p == 999
     gx == 999
-
+```
 I expected that because the call of `g()` reuses the stack space abandoned by the call of `f()` so `*p` refers to the space now occupied by `gx`.
 
 * Imagine what would happen if `fx` and `gx` were of different types.
@@ -1241,14 +1242,14 @@ Fortunately, most (all?) modern compilers catch and warn against this simple cas
 ##### Note
 
 This applies to references as well:
-
+```c++
     int& f()
     {
         int x = 7;
         // ...
         return x;  // Bad: returns reference to object that is about to be destroyed
     }
-
+```
 ##### Note
 
 This applies only to non-`static` local variables.
@@ -1257,7 +1258,7 @@ All `static` variables are (as their name indicates) statically allocated, so th
 ##### Example, bad
 
 Not all examples of leaking a pointer to a local variable are that obvious:
-
+```c++
     int* glob;       // global variables are bad in so many ways
 
     template<class T>
@@ -1277,7 +1278,7 @@ Not all examples of leaking a pointer to a local variable are that obvious:
         f();
         cout << *glob << '\n';
     }
-
+```
 Here I managed to read the location abandoned by the call of `f`.
 The pointer stored in `glob` could be used much later and cause trouble in unpredictable ways.
 
@@ -1310,7 +1311,7 @@ The language guarantees that a `T&` refers to an object, so that testing for `nu
 [discussion of dangling pointer prevention](#???) and [discussion of ownership](#???).
 
 ##### Example
-
+```c++
     class Car
     {
         array<wheel, 4> w;
@@ -1325,7 +1326,7 @@ The language guarantees that a `T&` refers to an object, so that testing for `nu
         Car c;
         wheel& w0 = c.get_wheel(0); // w0 has the same lifetime as c
     }
-
+```
 ##### Enforcement
 
 Flag functions where no `return` expression could yield `nullptr`
@@ -1340,10 +1341,10 @@ A `&&` is a magnet for temporary objects.
 ##### Example 
 
 A returned rvalue reference goes out of scope at the end of the full expression to which it is returned:
-
+```c++
     auto&& x = max(0, 1);   // OK, so far
     foo(x);                 // Undefined behavior
-
+```
 This kind of use is a frequent source of bugs, often incorrectly reported as a compiler bug.
 An implementer of a function should avoid setting such traps for users.
 
@@ -1358,23 +1359,23 @@ However, it's not fine when passing such a reference "upward" to a larger caller
 For passthrough functions that pass in parameters (by ordinary reference or by perfect forwarding) and want to return values, use simple `auto` return type deduction (not `auto&&`).
 
 Assume that `F` returns by value:
-
+```c++
     template<class F>
     auto&& wrapper(F f)
     {
         log_call(typeid(f)); // or whatever instrumentation
         return f();          // BAD: returns a reference to a temporary
     }
-
+```
 Better:
-
+```c++
     template<class F>
     auto wrapper(F f)
     {
         log_call(typeid(f)); // or whatever instrumentation
         return f();          // OK
     }
-
+```
 
 ##### Exception
 
@@ -1392,14 +1393,14 @@ It's a language rule, but violated through "language extensions" so often that i
 Declaring `main` (the one global `main` of a program) `void` limits portability.
 
 ##### Example
-
-        void main() { /* ... */ };  // bad, not C++
-
-        int main()
-        {
-            std::cout << "This is the way to do it\n";
-        }
-
+```c++
+	void main() { /* ... */ };  // bad, not C++
+	
+	int main()
+    {
+		std::cout << "This is the way to do it\n";
+	}
+```
 ##### Note
 
 We mention this only because of the persistence of this error in the community.
@@ -1424,7 +1425,7 @@ Historically there was some guidance to make the assignment operator return `con
 This was primarily to avoid code of the form `(a = b) = c` -- such code is not common enough to warrant violating consistency with standard types.
 
 ##### Example
-
+```c++
     class Foo
     {
      public:
@@ -1435,7 +1436,7 @@ This was primarily to avoid code of the form `(a = b) = c` -- such code is not c
           return *this;
         }
     };
-
+```
 ##### Enforcement
 
 This should be enforced by tooling by checking the return type (and return
@@ -1449,21 +1450,21 @@ value) of any assignment operator.
 With guaranteed copy elision, it is now almost always a pessimization to expressly use `std::move` in a return statement.
 
 ##### Example; bad
-
+```c++
     S f()
     {
       S result;
       return std::move(result);
     }
-
+```
 ##### Example; good
-
+```c++
     S f()
     {
       S result;
       return result;
     }
-
+```
 ##### Enforcement
 
 This should be enforced by tooling by checking the return expression .
@@ -1476,7 +1477,7 @@ This should be enforced by tooling by checking the return expression .
 Functions can't capture local variables or be declared at local scope; if you need those things, prefer a lambda where possible, and a handwritten function object where not. On the other hand, lambdas and function objects don't overload; if you need to overload, prefer a function (the workarounds to make lambdas overload are ornate). If either will work, prefer writing a function; use the simplest tool necessary.
 
 ##### Example
-
+```c++
     // writing a function that should only take an int or a string
     // -- overloading is natural
     void f(int);
@@ -1495,7 +1496,7 @@ Functions can't capture local variables or be declared at local scope; if you ne
         });
     }
     pool.join();
-
+```
 ##### Exception
 
 Generic lambdas offer a concise way to write function templates and so can be useful even when a normal function template would do equally well with a little more syntax. This advantage will probably disappear in the future once all functions gain the ability to have Concept parameters.
@@ -1516,20 +1517,20 @@ The use of default arguments can avoid code replication.
 
 There is a choice between using default argument and overloading when the alternatives are from a set of arguments of the same types.
 For example:
-
+```c++
     void print(const string& s, format f = {});
-
+```
 as opposed to
-
+```c++
     void print(const string& s);  // use default format
     void print(const string& s, format f);
-
+```
 There is not a choice when a set of functions are used to do a semantically equivalent operation to a set of types. For example:
-
+```c++
     void print(const char&);
     void print(int);
     void print(zstring);
-
+```
 ##### See also
 
 
@@ -1558,16 +1559,16 @@ Unfortunately, there is no simple way to capture by reference to `const` to get 
 ##### Example
 
 Here, a large object (a network message) is passed to an iterative algorithm, and is it not efficient or correct to copy the message (which may not be copyable):
-
+```c++
     std::for_each(begin(sockets), end(sockets), [&message](auto& socket)
     {
         socket.send(message);
     });
-
+```
 ##### Example
 
 This is a simple three-stage parallel pipeline. Each `stage` object encapsulates a worker thread and a queue, has a `process` function to enqueue work, and in its destructor automatically blocks waiting for the queue to empty before ending the thread.
-
+```c++
     void send_packets(buffers& bufs)
     {
         stage encryptor([] (buffer& b){ encrypt(b); });
@@ -1575,7 +1576,7 @@ This is a simple three-stage parallel pipeline. Each `stage` object encapsulates
         stage decorator([&](buffer& b){ decorate(b); compressor.process(b); });
         for (auto& b : bufs) { decorator.process(b); }
     }  // automatically blocks waiting for pipeline to finish
-
+```
 ##### Enforcement
 
 Flag a lambda that captures by reference, but is used other than locally within the function scope or passed to a function by reference. (Note: This rule is an approximation, but does flag passing by pointer as those are more likely to be stored by the callee, writing to a heap location accessed via a parameter, returning the lambda, etc. The Lifetime rules will also provide general rules that flag escaping pointers and references including via lambdas.)
@@ -1587,7 +1588,7 @@ Flag a lambda that captures by reference, but is used other than locally within 
 Pointers and references to locals shouldn't outlive their scope. Lambdas that capture by reference are just another place to store a reference to a local object, and shouldn't do so if they (or a copy) outlive the scope.
 
 ##### Example, bad
-
+```c++
     int local = 42;
 
     // Want a reference to local.
@@ -1595,15 +1596,15 @@ Pointers and references to locals shouldn't outlive their scope. Lambdas that ca
     // local no longer exists, therefore
     // process() call will have undefined behavior!
     thread_pool.queue_work([&]{ process(local); });
-
+```
 ##### Example, good
-
+```c++
     int local = 42;
     // Want a copy of local.
     // Since a copy of local is made, it will
     // always be available for the call.
     thread_pool.queue_work([=]{ process(local); });
-
+```
 ##### Enforcement
 
 * (Simple) Warn when capture-list contains a reference to a locally declared variable
@@ -1616,7 +1617,7 @@ Pointers and references to locals shouldn't outlive their scope. Lambdas that ca
 It's confusing. Writing `[=]` in a member function appears to capture by value, but actually captures data members by reference because it actually captures the invisible `this` pointer by value. If you meant to do that, write `this` explicitly.
 
 ##### Example
-
+```c++
     class My_class {
         int x = 0;
         // ...
@@ -1641,7 +1642,7 @@ It's confusing. Writing `[=]` in a member function appears to capture by value, 
             // ...
         }
     };
-
+```
 ##### Note
 
 This is under active discussion in standardization, and may be addressed in a future version of the standard by adding a new capture mode or possibly adjusting the meaning of `[=]`. For now, just be explicit.
@@ -1659,7 +1660,7 @@ Passing to varargs assumes the correct type will be read.
 This is fragile because it cannot generally be enforced to be safe in the language and so relies on programmer discipline to get it right.
 
 ##### Example
-
+```c++
     int sum(...) {
         // ...
         while (/*...*/)
@@ -1677,7 +1678,7 @@ This is fragile because it cannot generally be enforced to be safe in the langua
 
     sum(3, 2); // ok: 5
     sum(3.14159, 2.71828); // ok: ~5.85987
-
+```
 ##### Alternatives
 
 * overloading

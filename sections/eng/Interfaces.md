@@ -46,12 +46,12 @@ Correctness. Assumptions not stated in an interface are easily overlooked and ha
 ##### Example, bad
 
 Controlling the behavior of a function through a global (namespace scope) variable (a call mode) is implicit and potentially confusing. For example:
-
+```c++
     int round(double d)
     {
         return (round_up) ? ceil(d) : d;    // don't: "invisible" dependency
     }
-
+```
 It will not be obvious to a caller that the meaning of two calls of `round(7.2)` might give different results.
 
 ##### Exception
@@ -62,10 +62,10 @@ The use of a non-local control is potentially confusing, but controls only imple
 ##### Example, bad
 
 Reporting through non-local variables (e.g., `errno`) is easily ignored. For example:
-
+```c++
     // don't: no test of printf's return value
     fprintf(connection, "logging: %d %d %d\n", x, y, s);
-
+```
 What if the connection goes down so that no logging output is produced? See I.???.
 
 **Alternative**: Throw an exception. An exception cannot be ignored.
@@ -88,7 +88,7 @@ Functions can be template functions and sets of functions can be classes or clas
 Non-`const` global variables hide dependencies and make the dependencies subject to unpredictable changes.
 
 ##### Example
-
+```c++
     struct Data {
         // ... lots of stuff ...
     } data;            // non-const data
@@ -102,7 +102,7 @@ Non-`const` global variables hide dependencies and make the dependencies subject
     {
         // ... use data ...
     }
-
+```
 Who else might modify `data`?
 
 ##### Note
@@ -140,12 +140,12 @@ The rule is "avoid", not "don't use." Of course there will be (rare) exceptions,
 Singletons are basically complicated global objects in disguise.
 
 ##### Example
-
+```c++
     class Singleton {
         // ... lots of stuff to ensure that only one Singleton object is created,
         // that it is initialized properly, etc.
     };
-
+```
 There are many variants of the singleton idea.
 That's part of the problem.
 
@@ -156,13 +156,13 @@ If you don't want a global object to change, declare it `const` or `constexpr`.
 ##### Exception
 
 You can use the simplest "singleton" (so simple that it is often not considered a singleton) to get initialization on first use, if any:
-
+```c++
     X& myX()
     {
         static X my_x {3};
         return my_x;
     }
-
+```
 This is one of the most effective solutions to problems related to initialization order.
 In a multi-threaded environment, the initialization of the static object does not introduce a race condition
 (unless you carelessly access a shared object from within its constructor).
@@ -170,13 +170,13 @@ In a multi-threaded environment, the initialization of the static object does no
 Note that the initialization of a local `static` does not imply a race condition.
 However, if the destruction of `X` involves an operation that needs to be synchronized we must use a less simple solution.
 For example:
-
+```c++
     X& myX()
     {
         static auto p = new X {3};
         return *p;  // potential leak
     }
-
+```
 Now someone must `delete` that object in some suitably thread-safe way.
 That's error-prone, so we don't use that technique unless
 
@@ -204,9 +204,9 @@ Also, precisely typed code is often optimized better.
 ##### Example, don't
 
 Consider:
-
+```c++
     void pass(void* data);    // void* is suspicious
-
+```
 Now the callee must cast the data pointer (back) to a correct type to use it. That is error-prone and often verbose.
 Avoid `void*`, especially in interfaces.
 Consider using a `variant` or a pointer to base instead.
@@ -217,28 +217,28 @@ For generic code these `T`s can be general or concept constrained template param
 ##### Example, bad
 
 Consider:
-
+```c++
     void draw_rect(int, int, int, int);   // great opportunities for mistakes
 
     draw_rect(p.x, p.y, 10, 20);          // what does 10, 20 mean?
-
+```
 An `int` can carry arbitrary forms of information, so we must guess about the meaning of the four `int`s.
 Most likely, the first two are an `x`,`y` coordinate pair, but what are the last two?
 Comments and parameter names can help, but we could be explicit:
-
+```c++
     void draw_rectangle(Point top_left, Point bottom_right);
     void draw_rectangle(Point top_left, Size height_width);
 
     draw_rectangle(p, Point{10, 20});  // two corners
     draw_rectangle(p, Size{10, 20});   // one corner and a (height, width) pair
-
+```
 Obviously, we cannot catch all errors through the static type system
 (e.g., the fact that a first argument is supposed to be a top-left point is left to convention (naming and comments)).
 
 ##### Example, bad
 
 In the following example, it is not clear from the interface what `time_to_blink` means: Seconds? Milliseconds?
-
+```c++
     void blink_led(int time_to_blink) // bad -- the unit is ambiguous
     {
         // ...
@@ -250,11 +250,11 @@ In the following example, it is not clear from the interface what `time_to_blink
     {
         blink_led(2);
     }
-
+```
 ##### Example, good
 
 `std::chrono::duration` types (C++11) helps making the unit of time duration explicit.
-
+```c++
     void blink_led(milliseconds time_to_blink) // good -- the unit is explicit
     {
         // ...
@@ -266,9 +266,9 @@ In the following example, it is not clear from the interface what `time_to_blink
     {
         blink_led(1500ms);
     }
-
+```
 The function can also be written in such a way that it will accept any time duration unit.
-
+```c++
     template<class rep, class period>
     void blink_led(duration<rep, period> time_to_blink) // good -- accepts any unit
     {
@@ -284,7 +284,7 @@ The function can also be written in such a way that it will accept any time dura
         blink_led(2s);
         blink_led(1500ms);
     }
-
+```
 ##### Enforcement
 
 * (Simple) Report the use of `void*` as a parameter or return type.
@@ -299,17 +299,17 @@ Arguments have meaning that may constrain their proper use in the callee.
 ##### Example
 
 Consider:
-
+```c++
     double sqrt(double x);
-
+```
 Here `x` must be nonnegative. The type system cannot (easily and naturally) express that, so we must use other means. For example:
-
+```c++
     double sqrt(double x); // x must be nonnegative
-
+```
 Some preconditions can be expressed as assertions. For example:
-
+```c++
     double sqrt(double x) { Expects(x >= 0); /* ... */ }
-
+```
 Ideally, that `Expects(x >= 0)` should be part of the interface of `sqrt()` but that's not easily done. For now, we place it in the definition (function body).
 
 **References**: `Expects()` is described in [GSL](#S-gsl).
@@ -338,14 +338,14 @@ We don't need to mention it for each member function.
 To make it clear that the condition is a precondition and to enable tool use.
 
 ##### Example
-
+```c++
     int area(int height, int width)
     {
         Expects(height > 0 && width > 0);            // good
         if (height <= 0 || width <= 0) my_error();   // obscure
         // ...
     }
-
+```
 ##### Note
 
 Preconditions can be stated in many ways, including comments, `if`-statements, and `assert()`.
@@ -378,34 +378,34 @@ To detect misunderstandings about the result and possibly catch erroneous implem
 ##### Example, bad
 
 Consider:
-
+```c++
     int area(int height, int width) { return height * width; }  // bad
-
+```
 Here, we (incautiously) left out the precondition specification, so it is not explicit that height and width must be positive.
 We also left out the postcondition specification, so it is not obvious that the algorithm (`height * width`) is wrong for areas larger than the largest integer.
 Overflow can happen.
 Consider using:
-
+```c++
     int area(int height, int width)
     {
         auto res = height * width;
         Ensures(res > 0);
         return res;
     }
-
+```
 ##### Example, bad
 
 Consider a famous security bug:
-
+```c++
     void f()    // problematic
     {
         char buffer[MAX];
         // ...
         memset(buffer, 0, sizeof(buffer));
     }
-
+```
 There was no postcondition stating that the buffer should be cleared and the optimizer eliminated the apparently redundant `memset()` call:
-
+```c++
     void f()    // better
     {
         char buffer[MAX];
@@ -413,7 +413,7 @@ There was no postcondition stating that the buffer should be cleared and the opt
         memset(buffer, 0, sizeof(buffer));
         Ensures(buffer[0] == 0);
     }
-
+```
 ##### Note
 
 Postconditions are often informally stated in a comment that states the purpose of a function; `Ensures()` can be used to make this more systematic, visible, and checkable.
@@ -425,7 +425,7 @@ Postconditions are especially important when they relate to something that is no
 ##### Example
 
 Consider a function that manipulates a `Record`, using a `mutex` to avoid race conditions:
-
+```c++
     mutex m;
 
     void manipulate(Record& r)    // don't
@@ -433,26 +433,26 @@ Consider a function that manipulates a `Record`, using a `mutex` to avoid race c
         m.lock();
         // ... no m.unlock() ...
     }
-
+```
 Here, we "forgot" to state that the `mutex` should be released, so we don't know if the failure to ensure release of the `mutex` was a bug or a feature.
 Stating the postcondition would have made it clear:
-
+```c++
     void manipulate(Record& r)    // postcondition: m is unlocked upon exit
     {
         m.lock();
         // ... no m.unlock() ...
     }
-
+```
 The bug is now obvious (but only to a human reading comments).
 
 Better still, use [RAII](#Rr-raii) to ensure that the postcondition ("the lock must be released") is enforced in code:
-
+```c++
     void manipulate(Record& r)    // best
     {
         lock_guard<mutex> _ {m};
         // ...
     }
-
+```
 ##### Note
 
 Ideally, postconditions are stated in the interface/declaration so that users can easily see them.
@@ -472,7 +472,7 @@ checkers) exist for many toolchains.
 To make it clear that the condition is a postcondition and to enable tool use.
 
 ##### Example
-
+```c++
     void f()
     {
         char buffer[MAX];
@@ -480,7 +480,7 @@ To make it clear that the condition is a postcondition and to enable tool use.
         memset(buffer, 0, MAX);
         Ensures(buffer[0] == 0);
     }
-
+```
 ##### Note
 
 Postconditions can be stated in many ways, including comments, `if`-statements, and `assert()`.
@@ -507,14 +507,14 @@ Make the interface precisely specified and compile-time checkable in the (not so
 ##### Example
 
 Use the ISO Concepts TS style of requirements specification. For example:
-
+```c++
     template<typename Iter, typename Val>
     // requires InputIterator<Iter> && EqualityComparable<ValueType<Iter>>, Val>
     Iter find(Iter first, Iter last, Val v)
     {
         // ...
     }
-
+```
 ##### Note
 
 Soon (maybe in 2018), most compilers will be able to check `requires` clauses once the `//` is removed.
@@ -534,13 +534,13 @@ It should not be possible to ignore an error because that could leave the system
 This is a major source of errors.
 
 ##### Example
-
+```c++
     int printf(const char* ...);    // bad: return negative number if output fails
 
     template <class F, class ...Args>
     // good: throw system_error if unable to start the new thread
     explicit thread(F&& f, Args&&... args);
-
+```
 ##### Note
 
 What is an error?
@@ -558,7 +558,7 @@ Many traditional interface functions (e.g., UNIX signal handlers) use error code
 ##### Alternative
 
 If you can't use exceptions (e.g., because your code is full of old-style raw-pointer use or because there are hard-real-time constraints), consider using a style that returns a pair of values:
-
+```c++
     int val;
     int error_code;
     tie(val, error_code) = do_something();
@@ -566,16 +566,16 @@ If you can't use exceptions (e.g., because your code is full of old-style raw-po
         // ... handle the error or exit ...
     }
     // ... use val ...
-
+```
 This style unfortunately leads to uninitialized variables.
 A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0144r1.pdf) to deal with that will become available in C++17.
-
+```c++
     auto [val, error_code] = do_something();
     if (error_code) {
         // ... handle the error or exit ...
     }
     // ... use val ...
-
+```
 ##### Note
 
 We don't consider "performance" a valid reason not to use exceptions.
@@ -602,38 +602,38 @@ If there is any doubt whether the caller or the callee owns an object, leaks or 
 ##### Example
 
 Consider:
-
+```c++
     X* compute(args)    // don't
     {
         X* res = new X{};
         // ...
         return res;
     }
-
+```
 Who deletes the returned `X`? The problem would be harder to spot if `compute` returned a reference.
 Consider returning the result by value (use move semantics if the result is large):
-
+```c++
     vector<double> compute(args)  // good
     {
         vector<double> res(10000);
         // ...
         return res;
     }
-
+```
 **Alternative**: [Pass ownership](#Rr-smartptrparam) using a "smart pointer", such as `unique_ptr` (for exclusive ownership) and `shared_ptr` (for shared ownership).
 However, that is less elegant and often less efficient than returning the object itself,
 so use smart pointers only if reference semantics are needed.
 
 **Alternative**: Sometimes older code can't be modified because of ABI compatibility requirements or lack of resources.
 In that case, mark owning pointers using `owner` from the [guidelines support library](#S-gsl):
-
+```c++
     owner<X*> compute(args)    // It is now clear that ownership is transferred
     {
         owner<X*> res = new X{};
         // ...
         return res;
     }
-
+```
 This tells analysis tools that `res` is an owner.
 That is, its value must be `delete`d or transferred to another owner, as is done here by the `return`.
 
@@ -662,7 +662,7 @@ To help avoid dereferencing `nullptr` errors.
 To improve performance by avoiding redundant checks for `nullptr`.
 
 ##### Example
-
+```c++
     int length(const char* p);            // it is not clear whether length(nullptr) is valid
 
     length(nullptr);                      // OK?
@@ -670,7 +670,7 @@ To improve performance by avoiding redundant checks for `nullptr`.
     int length(not_null<const char*> p);  // better: we can assume that p cannot be nullptr
 
     int length(const char* p);            // we must assume that p can be nullptr
-
+```
 By stating the intent in source, implementers and tools can provide better diagnostics, such as finding some classes of errors through static analysis, and perform optimizations, such as removing branches and null tests.
 
 ##### Note
@@ -680,11 +680,11 @@ By stating the intent in source, implementers and tools can provide better diagn
 ##### Note
 
 The assumption that the pointer to `char` pointed to a C-style string (a zero-terminated string of characters) was still implicit, and a potential source of confusion and errors. Use `czstring` in preference to `const char*`.
-
+```c++
     // we can assume that p cannot be nullptr
     // we can assume that p points to a zero-terminated array of characters
     int length(not_null<zstring> p);
-
+```
 Note: `length()` is, of course, `std::strlen()` in disguise.
 
 ##### Enforcement
@@ -701,9 +701,9 @@ Note: `length()` is, of course, `std::strlen()` in disguise.
 ##### Example
 
 Consider:
-
+```c++
     void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
-
+```
 What if there are fewer than `n` elements in the array pointed to by `q`? Then, we overwrite some probably unrelated memory.
 What if there are fewer than `n` elements in the array pointed to by `p`? Then, we read some probably unrelated memory.
 Either is undefined behavior and a potentially very nasty bug.
@@ -711,22 +711,22 @@ Either is undefined behavior and a potentially very nasty bug.
 ##### Alternative
 
 Consider using explicit spans:
-
+```c++
     void copy(span<const T> r, span<T> r2); // copy r to r2
-
+```
 ##### Example, bad
 
 Consider:
-
+```c++
     void draw(Shape* p, int n);  // poor interface; poor code
     Circle arr[10];
     // ...
     draw(arr, 10);
-
+```
 Passing `10` as the `n` argument may be a mistake: the most common convention is to assume `[0:n)` but that is nowhere stated. Worse is that the call of `draw()` compiled at all: there was an implicit conversion from array to pointer (array decay) and then another implicit conversion from `Circle` to `Shape`. There is no way that `draw()` can safely iterate through that array: it has no way of knowing the size of the elements.
 
 **Alternative**: Use a support class that ensures that the number of elements is correct and prevents dangerous implicit conversions. For example:
-
+```c++
     void draw2(span<Circle>);
     Circle arr[10];
     // ...
@@ -735,7 +735,7 @@ Passing `10` as the `n` argument may be a mistake: the most common convention is
 
     void draw3(span<Shape>);
     draw3(arr);    // error: cannot convert Circle[10] to span<Shape>
-
+```
 This `draw2()` passes the same amount of information to `draw()`, but makes the fact that it is supposed to be a range of `Circle`s explicit. See ???.
 
 ##### Exception
@@ -755,7 +755,7 @@ But when doing so, use `string_span` from the [GSL](#GSL) to prevent range error
 Complex initialization can lead to undefined order of execution.
 
 ##### Example
-
+```c++
     // file1.c
 
     extern const X x;
@@ -767,7 +767,7 @@ Complex initialization can lead to undefined order of execution.
     extern const Y y;
 
     const X x = g(y);   // read y; write x
-
+```
 Since `x` and `y` are in different translation units the order of calls to `f()` and `g()` is undefined;
 one will access an uninitialized `const`.
 This shows that the order-of-initialization problem for global (namespace scope) objects is not limited to global *variables*.
@@ -804,45 +804,45 @@ The two most common reasons why functions have too many parameters are:
 ##### Example
 
 The standard-library `merge()` is at the limit of what we can comfortably handle:
-
+```c++
     template<class InputIterator1, class InputIterator2, class OutputIterator, class Compare>
     OutputIterator merge(InputIterator1 first1, InputIterator1 last1,
                          InputIterator2 first2, InputIterator2 last2,
                          OutputIterator result, Compare comp);
-
+```
 Note that this is because of problem 1 above -- missing abstraction. Instead of passing a range (abstraction), STL passed iterator pairs (unencapsulated component values).
 
 Here, we have four template arguments and six function arguments.
 To simplify the most frequent and simplest uses, the comparison argument can be defaulted to `<`:
-
+```c++
     template<class InputIterator1, class InputIterator2, class OutputIterator>
     OutputIterator merge(InputIterator1 first1, InputIterator1 last1,
                          InputIterator2 first2, InputIterator2 last2,
                          OutputIterator result);
-
+```
 This doesn't reduce the total complexity, but it reduces the surface complexity presented to many users.
 To really reduce the number of arguments, we need to bundle the arguments into higher-level abstractions:
-
+```c++
     template<class InputRange1, class InputRange2, class OutputIterator>
     OutputIterator merge(InputRange1 r1, InputRange2 r2, OutputIterator result);
-
+```
 Grouping arguments into "bundles" is a general technique to reduce the number of arguments and to increase the opportunities for checking.
 
 Alternatively, we could use concepts (as defined by the ISO TS) to define the notion of three types that must be usable for merging:
-
+```c++
     Mergeable{In1, In2, Out}
     OutputIterator merge(In1 r1, In2 r2, Out result);
-
+```
 ##### Example
 
 The safety Profiles recommend replacing
-
+```c++
     void f(int* some_ints, int some_ints_length);  // BAD: C style, unsafe
-
+```
 with
-
+```c++
     void f(gsl::span<int> some_ints);              // GOOD: safe, bounds-checked
-
+```
 Here, using an abstraction has safety and robustness benefits, and naturally also reduces the number of parameters.
 
 ##### Note
@@ -868,38 +868,38 @@ Adjacent arguments of the same type are easily swapped by mistake.
 ##### Example, bad
 
 Consider:
-
+```c++
     void copy_n(T* p, T* q, int n);  // copy from [p:p + n) to [q:q + n)
-
+```
 This is a nasty variant of a K&R C-style interface. It is easy to reverse the "to" and "from" arguments.
 
 Use `const` for the "from" argument:
-
+```c++
     void copy_n(const T* p, T* q, int n);  // copy from [p:p + n) to [q:q + n)
-
+```
 ##### Exception
 
 If the order of the parameters is not important, there is no problem:
-
+```c++
     int max(int a, int b);
-
+```
 ##### Alternative
 
 Don't pass arrays as pointers, pass an object representing a range (e.g., a `span`):
-
+```c++
     void copy_n(span<const T> p, span<T> q);  // copy from p to q
-
+```
 ##### Alternative
 
 Define a `struct` as the parameter type and name the fields for those parameters accordingly:
-
+```c++
     struct SystemParams {
         string config_file;
         string output_path;
         seconds timeout;
     };
     void initialize(SystemParams p);
-
+```
 This tends to make invocations of this clear to future readers, as the parameters
 are often filled in by name at the call site.
 
@@ -916,7 +916,7 @@ Abstract classes are more likely to be stable than base classes with state.
 ##### Example, bad
 
 You just knew that `Shape` would turn up somewhere :-)
-
+```c++
     class Shape {  // bad: interface class loaded with data
     public:
         Point center() const { return c; }
@@ -928,9 +928,9 @@ You just knew that `Shape` would turn up somewhere :-)
         vector<Point> outline;
         Color col;
     };
-
+```
 This will force every derived class to compute a center -- even if that's non-trivial and the center is never used. Similarly, not every `Shape` has a `Color`, and many `Shape`s are best represented without an outline defined as a sequence of `Point`s. Abstract classes were invented to discourage users from writing such classes:
-
+```c++
     class Shape {    // better: Shape is a pure interface
     public:
         virtual Point center() const = 0;   // pure virtual functions
@@ -941,7 +941,7 @@ This will force every derived class to compute a center -- even if that's non-tr
         // ...
         virtual ~Shape() = default;
     };
-
+```
 ##### Enforcement
 
 (Simple) Warn if a pointer/reference to a class `C` is assigned to a pointer/reference to a base of `C` and the base class contains data members.
@@ -979,7 +979,7 @@ implementation (Pimpl) can isolate the users of a class from changes in its impl
 ##### Example
 
 interface (widget.h)
-
+```c++
     class widget {
         class impl;
         std::unique_ptr<impl> pimpl;
@@ -992,10 +992,10 @@ interface (widget.h)
         widget& operator=(widget&&); // defined in the implementation file
         widget& operator=(const widget&) = delete;
     };
-
+```
 
 implementation (widget.cpp)
-
+```c++
     class widget::impl {
         int n; // private data
     public:
@@ -1006,7 +1006,7 @@ implementation (widget.cpp)
     widget::widget(int n) : pimpl{std::make_unique<impl>(n)} {}
     widget::~widget() = default;
     widget& widget::operator=(widget&&) = default;
-
+```
 ##### Notes
 
 See [GOTW #100](https://herbsutter.com/gotw/_100/) and [cppreference](http://en.cppreference.com/w/cpp/language/pimpl) for the trade-offs and additional implementation details associated with this idiom.
@@ -1030,7 +1030,7 @@ Implementation complexity should, if at all possible, not leak through interface
 Consider a program that, depending on some form of input (e.g., arguments to `main`), should consume input
 from a file, from the command line, or from standard input.
 We might write
-
+```c++
     bool owned;
     owner<istream*> inp;
     switch (source) {
@@ -1039,14 +1039,14 @@ We might write
     case file:          owned = true;  inp = new ifstream{argv[2]};      break;
     }
     istream& in = *inp;
-
+```
 This violated the rule [against uninitialized variables](#Res-always),
 the rule against [ignoring ownership](#Ri-raw),
 and the rule [against magic constants](#Res-magic).
 In particular, someone has to remember to somewhere write
-
+```c++
     if (owned) delete inp;
-
+```
 We could handle this particular example by using `unique_ptr` with a special deleter that does nothing for `cin`,
 but that's complicated for novices (who can easily encounter this problem) and the example is an example of a more general
 problem where a property that we would like to consider static (here, ownership) needs infrequently be addressed
@@ -1056,7 +1056,7 @@ But we must also cope with the uncommon, less-safe, and necessarily more expensi
 Such examples are discussed in [[Str15]](http://www.stroustrup.com/resource-model.pdf).
 
 So, we write a class
-
+```c++
     class Istream { [[gsl::suppress(lifetime)]]
     public:
         enum Opt { from_line = 1 };
@@ -1069,7 +1069,7 @@ So, we write a class
         bool owned = false;
         istream* inp = &cin;
     };
-
+```
 Now, the dynamic nature of `istream` ownership has been encapsulated.
 Presumably, a bit of checking for potential errors would be added in real code.
 

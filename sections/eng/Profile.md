@@ -45,12 +45,12 @@ Candidates include:
 Enabling a profile is implementation defined; typically, it is set in the analysis tool used.
 
 To suppress enforcement of a profile check, place a `suppress` annotation on a language contract. For example:
-
+```c++
     [[suppress(bounds)]] char* raw_find(char* p, int n, char x)    // find x in p[0]..p[n - 1]
     {
         // ...
     }
-
+```
 Now `raw_find()` can scramble memory to its heart's content.
 Obviously, suppression should be very rare.
 

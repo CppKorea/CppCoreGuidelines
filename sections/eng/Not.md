@@ -32,7 +32,7 @@ This rule is a legacy of old programming languages that didn't allow initializat
 This leads to longer programs and more errors caused by uninitialized and wrongly initialized variables.
 
 ##### Example, bad
-
+```c++
     int use(int x)
     {
         int i;
@@ -51,7 +51,7 @@ This leads to longer programs and more errors caused by uninitialized and wrongl
         }
         return i;
     }
-
+```
 The larger the distance between the uninitialized variable and its use, the larger the chance of a bug.
 Fortunately, compilers catch many "used before set" errors.
 Unfortunately, compilers cannot catch all such errors and unfortunately, the bugs aren't always as simple to spot as in this small example.
@@ -70,7 +70,7 @@ The single-return rule can lead to unnecessarily convoluted code and the introdu
 In particular, the single-return rule makes it harder to concentrate error checking at the top of a function.
 
 ##### Example
-
+```c++
     template<class T>
     //  requires Number<T>
     string sign(T x)
@@ -81,9 +81,9 @@ In particular, the single-return rule makes it harder to concentrate error check
             return "positive";
         return "zero";
     }
-
+```
 to use a single return only we would have to do something like
-
+```c++
     template<class T>
     //  requires Number<T>
     string sign(T x)        // bad
@@ -97,22 +97,22 @@ to use a single return only we would have to do something like
             res = "zero";
         return res;
     }
-
+```
 This is both longer and likely to be less efficient.
 The larger and more complicated the function is, the more painful the workarounds get.
 Of course many simple functions will naturally have just one `return` because of their simpler inherent logic.
 
 ##### Example
-
+```c++
     int index(const char* p)
     {
         if (!p) return -1;  // error indicator: alternatively "throw nullptr_error{}"
         // ... do a lookup to find the index for p
         return i;
     }
-
+```
 If we applied the rule, we'd get something like
-
+```c++
     int index2(const char* p)
     {
         int i;
@@ -123,7 +123,7 @@ If we applied the rule, we'd get something like
         }
         return i;
     }
-
+```
 Note that we (deliberately) violated the rule against uninitialized variables because this style commonly leads to that.
 Also, this style is a temptation to use the [goto exit](#Rnr-goto-exit) non-rule.
 
@@ -241,7 +241,7 @@ and errors (when we didn't deal correctly with semi-constructed objects consiste
 This technique is a pre-exception technique for RAII-like resource and error handling.
 
 ##### Example, bad
-
+```c++
     void do_something(int n)
     {
         if (n < 100) goto exit;
@@ -253,7 +253,7 @@ This technique is a pre-exception technique for RAII-like resource and error han
     exit:
         free(p);
     }
-
+```
 and spot the bug.
 
 ##### Alternative
