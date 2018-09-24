@@ -1,10 +1,10 @@
 
-# <a name="S-source"></a>SF: Source files
+# <a name="S-source"></a>SF: 소스 파일
 
-Distinguish between declarations (used as interfaces) and definitions (used as implementations).
-Use header files to represent interfaces and to emphasize logical structure.
+선언(인터페이스)과 정의(구현)를 구분하라. 
+헤더 파일은 인터페이스를 표현하고 논리적 구조를 강조하기 위해서 사용해야 한다.
 
-Source file rule summary:
+소스 파일 규칙 요약:
 
 * [SF.1: Use a `.cpp` suffix for code files and `.h` for interface files if your project doesn't already follow another convention](#Rs-file-suffix)
 * [SF.2: A `.h` file may not contain object definitions or non-inline function definitions](#Rs-inline)
@@ -25,9 +25,7 @@ Source file rule summary:
 ### <a name="Rs-file-suffix"></a>SF.1: Use a `.cpp` suffix for code files and `.h` for interface files if your project doesn't already follow another convention
 
 ##### Reason
-
-It's a longstanding convention.
-But consistency is more important, so if your project uses something else, follow that.
+오래된 관례이다. 하지만 일관성이 더 중요하다. 프로젝트가 무엇인가 사용하고 있다면, 그대로 따라가라
 
 ##### Note
 
@@ -37,8 +35,9 @@ and it's easier to name all headers `.h` instead of having different extensions 
 On the other hand, implementation files are rarely shared with C and so should typically be distinguished from `.c` files,
 so it's normally best to name all C++ implementation files something else (such as `.cpp`).
 
-The specific names `.h` and `.cpp` are not required (just recommended as a default) and other names are in widespread use.
-Examples are `.hh`, `.C`, and `.cxx`. Use such names equivalently.
+`.h` 와 `.cpp`가 기본적으로 권장되기는 하지만 필수는 아니다. 다른 이름들도 광범위하게 사용된다.
+예를 들자면 `.hh`, `.C`, `.cxx` 같은 것이 있다. 이런 이름을 같이 써도 좋다.
+
 In this document, we refer to `.h` and `.cpp` as a shorthand for header and implementation files,
 even though the actual extension may be different.
 
@@ -54,7 +53,7 @@ Your IDE (if you use one) may have strong opinions about suffices.
     int a;   // a definition
     void foo() { ++a; }
 ```
-`foo.h` provides the interface to `foo.cpp`. Global variables are best avoided.
+`foo.h` 는 `foo.cpp`에 대한 인터페이스를 제공한다. 전역 변수는 피해야 한다.
 
 ##### Example, bad
 ```c++
@@ -62,7 +61,7 @@ Your IDE (if you use one) may have strong opinions about suffices.
     int a;   // a definition
     void foo() { ++a; }
 ```
-`#include <foo.h>` twice in a program and you get a linker error for two one-definition-rule violations.
+`#include<foo.h>` 문구가 한 프로그램 내에 두 번 이상 포함된다면 단일 정의 규칙(one-definition-rule)에 위배된다고 링커가 오류를 낼 것이다.
 
 ##### Enforcement
 
@@ -72,8 +71,7 @@ Your IDE (if you use one) may have strong opinions about suffices.
 ### <a name="Rs-inline"></a>SF.2: A `.h` file may not contain object definitions or non-inline function definitions
 
 ##### Reason
-
-Including entities subject to the one-definition rule leads to linkage errors.
+하나의 정의만 가져야하는 대상을 `포함`하게 되면 링킹 에러로 이어진다.
 
 ##### Example
 ```c++
@@ -93,7 +91,7 @@ Including entities subject to the one-definition rule leads to linkage errors.
 ```
 Linking `file1.cpp` and `file2.cpp` will give two linker errors.
 
-**Alternative formulation**: A `.h` file must contain only:
+**Alternative formulation**: `.h` 파일은 다음의 항목만을 가진다:
 
 * `#include`s of other `.h` files (possibly with include guards)
 * templates
@@ -108,13 +106,13 @@ Linking `file1.cpp` and `file2.cpp` will give two linker errors.
 
 ##### Enforcement
 
-Check the positive list above.
+위의 목록에서 허용되는 것들을 검토한다
 
 ### <a name="Rs-declaration-header"></a>SF.3: Use `.h` files for all declarations used in multiple source files
 
 ##### Reason
 
-Maintainability. Readability.
+관리가 편해지고 가독성이 향상된다.
 
 ##### Example, bad
 ```c++
@@ -125,8 +123,8 @@ Maintainability. Readability.
     extern void bar();
     void foo() { bar(); }
 ```
-A maintainer of `bar` cannot find all declarations of `bar` if its type needs changing.
-The user of `bar` cannot know if the interface used is complete and correct. At best, error messages come (late) from the linker.
+`bar`를 관리하는 사람이 그 타입을 바꾸고자 하더라도 `bar`의 모든 선언을 찾을 수가 없다.
+`bar`를 사용하는 입장에서는 이 인터페이스가 완벽한지 알 수가 없다. 기껏해야 (나중에) 링커로부터 오류메시지를 받는 것이 고작이다.
 
 ##### Enforcement
 
@@ -135,8 +133,7 @@ The user of `bar` cannot know if the interface used is complete and correct. At 
 ### <a name="Rs-include-order"></a>SF.4: Include `.h` files before other declarations in a file
 
 ##### Reason
-
-Minimize context dependencies and increase readability.
+문맥에 대한 종속성을 최소화하고 가독성을 높인다.
 
 ##### Example
 ```c++
@@ -156,8 +153,7 @@ Minimize context dependencies and increase readability.
     #include <string>
 ```
 ##### Note
-
-This applies to both `.h` and `.cpp` files.
+이 내용은 `.h` 와 `.cpp` 파일 모두에 해당한다.
 
 ##### Note
 
@@ -181,8 +177,7 @@ Easy.
 ### <a name="Rs-consistency"></a>SF.5: A `.cpp` file must include the `.h` file(s) that defines its interface
 
 ##### Reason
-
-This enables the compiler to do an early consistency check.
+컴파일러가 좀더 일찍 일관성을 검사할 수 있도록 한다.
 
 ##### Example, bad
 ```c++
@@ -196,7 +191,7 @@ This enables the compiler to do an early consistency check.
     int bar(double) { /* ... */ }
     double foobar(int);
 ```
-The errors will not be caught until link time for a program calling `bar` or `foobar`.
+`bar` 나 `foobar` 를 호출하는 프로그램을 링크하는 시점에서야 오류를 확인할 수 있다.
 
 ##### Example
 ```c++
@@ -277,8 +272,8 @@ Flag multiple `using namespace` directives for different namespaces in a single 
 ### <a name="Rs-using-directive"></a>SF.7: Don't write `using namespace` at global scope in a header file
 
 ##### Reason
-
-Doing so takes away an `#include`r's ability to effectively disambiguate and to use alternatives. It also makes `#include`d headers order-dependent as they may have different meaning when included in different orders.
+헤더 파일에 `using` 지시자를 사용하는 경우 `#include`를 사용하는 쪽에서 대체 구현을 효과적으로 구분할 수 있는 방안을 없애버린다.
+It also makes `#include`d headers order-dependent as they may have different meaning when included in different orders.
 
 ##### Example
 ```c++
@@ -302,8 +297,7 @@ Flag `using namespace` at global scope in a header file.
 ### <a name="Rs-guards"></a>SF.8: Use `#include` guards for all `.h` files
 
 ##### Reason
-
-To avoid files being `#include`d several times.
+파일이 여러 번 `#include`되는 것을 방지한다.
 
 In order to avoid include guard collisions, do not just name the guard after the filename.
 Be sure to also include a key and good differentiator, such as the name of library or component
@@ -318,8 +312,7 @@ the header file is part of.
     #endif // LIBRARY_FOOBAR_H
 ```
 ##### Enforcement
-
-Flag `.h` files without `#include` guards.
+`#include`보호 문구가 없는 `.h` 파일이 있다면 표시한다
 
 ##### Note
 
@@ -331,13 +324,11 @@ Our recommendation is to write in ISO C++: See [rule P.2](#Rp-Cplusplus).
 ### <a name="Rs-cycles"></a>SF.9: Avoid cyclic dependencies among source files
 
 ##### Reason
-
-Cycles complicates comprehension and slows down compilation.
-Complicates conversion to use language-supported modules (when they become available).
+순환은 이해하기 어렵고, 컴파일 속도도 느려지게 한다.
+향후 언어에서 모듈 기능을 지원할 때 이를 사용하도록 변경하기 어렵게 된다.
 
 ##### Note
-
-Eliminate cycles; don't just break them with `#include` guards.
+단순히 `#include` 보호 장치로 처리하지 말고 실제 순환 구조를 없애야 한다.
 
 ##### Example, bad
 ```c++
@@ -462,27 +453,23 @@ A test should verify that the header file itself compiles or that a cpp file whi
 ### <a name="Rs-unnamed"></a>SF.21: Don't use an unnamed (anonymous) namespace in a header
 
 ##### Reason
-
-It is almost always a bug to mention an unnamed namespace in a header file.
+헤더 파일에 있는 익명 이름공간 거의 대부분이 버그이다.
 
 ##### Example
 
     ???
 
 ##### Enforcement
-
-* Flag any use of an anonymous namespace in a header file.
+ * 헤더 파일에서 사용되는 익명 이름공간을 찾아내 표시한다
 
 ### <a name="Rs-unnamed2"></a>SF.22: Use an unnamed (anonymous) namespace for all internal/nonexported entities
 
 ##### Reason
-
-Nothing external can depend on an entity in a nested unnamed namespace.
-Consider putting every definition in an implementation source file in an unnamed namespace unless that is defining an "external/exported" entity.
+어떤 외부에서도 내부의 익명 이름공간에 있는 항목들에 참조할 수 없다.
+소스 파일에 정의되어 있는 모든 구현들 중 "외부에 노출되는" 항목의 정의를 뺀 나머지 모두는 익명 이름공간에 넣는다 생각하라.
 
 ##### Example
-
-An API class and its members can't live in an unnamed namespace; but any "helper" class or function that is defined in an implementation source file should be at an unnamed namespace scope.
+API 클래스와 그 멤버들은 익명 이름공간에 있을 수 없지만, 구현 소스 파일에 정의된 "도우미" 클래스나 함수들의 경우 익명 이름공간 영역에 정의되어야 한다.
 
     ???
 

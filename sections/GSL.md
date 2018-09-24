@@ -1,19 +1,17 @@
 
-# <a name="S-gsl"></a>GSL: Guidelines support library
+# <a name="S-gsl"></a>GSL: 가이드라인 지원 라이브러리
 
-The GSL is a small library of facilities designed to support this set of guidelines.
-Without these facilities, the guidelines would have to be far more restrictive on language details.
+GSL 은 가이드라인 적용을 돕기 위해 설계된 작은 라이브러리다. 이런 기능이 없다면, 가이드라인은 언어 세부사항들에 대해 더 엄격해져야만 했을 것이다.
 
-The Core Guidelines support library is defined in namespace `gsl` and the names may be aliases for standard library or other well-known library names. Using the (compile-time) indirection through the `gsl` namespace allows for experimentation and for local variants of the support facilities.
+핵심 가이드라인 지원 라이브러리는 네임스페이스 `gsl`에 정의되어 있으며, 이 이름은 표준 라이브러리나 다른 잘 알려진 라이브러리에 대한 네임스페이스 별명일 수 있다. 이와 같은 (컴파일 시간) 우회는 지원 기능들에 대한 실험 혹은 변형을 가능하게 한다.
 
-The GSL is header only, and can be found at [GSL: Guidelines support library](https://github.com/Microsoft/GSL).
-The support library facilities are designed to be extremely lightweight (zero-overhead) so that they impose no overhead compared to using conventional alternatives.
-Where desirable, they can be "instrumented" with additional functionality (e.g., checks) for tasks such as debugging.
+GSL은 헤더 파일로만 구성되며, [GSL: Guidelines support library](https://github.com/Microsoft/GSL)에서 확인할 수 있다.
 
-These Guidelines assume a `variant` type, but this is not currently in GSL.
-Eventually, use [the one voted into C++17](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0088r3.html).
+이 라이브러리의 기능들은 전통적인 다른 방법들보다 오버헤드가 발생하지 않도록 극도로 가볍게(Zero-Overhead) 설계되었다. 디버깅 작업과 같이 특정 작업에 추가 기능(예를 들어 뭔가에 대한 확인)으로 "계측"할 때 사용될 수도 있다.
 
-Summary of GSL components:
+핵심 가이드라인에서는 `variant` 타입이 있다고 가정하지만, GSL에서는 이를 지원하지 않는다. [C++ 17에서 제안된 형태를 사용하라](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0088r3.html).
+
+GSL 구성요소 요약:
 
 * [GSL.view: Views](#SS-views)
 * [GSL.owner](#SS-ownership)
@@ -23,17 +21,18 @@ Summary of GSL components:
 
 We plan for a "ISO C++ standard style" semi-formal specification of the GSL.
 
-We rely on the ISO C++ Standard Library and hope for parts of the GSL to be absorbed into the standard library.
+ISO C++ 표준 라이브러리에 기반을 두며, GSL의 일부가 표준 라이브러리에 포함되기를 바란다.
 
 ## <a name="SS-views"></a>GSL.view: Views
 
-These types allow the user to distinguish between owning and non-owning pointers and between pointers to a single object and pointers to the first element of a sequence.
+이 타입들은 사용자가 소유권을 가진 포인터와 그렇지 않은 포인터들, 단일 개체에 대한 포인터와 첫번째 원소에 대한 포인터를 구분할 수 있도록 해준다
 
-These "views" are never owners.
+"view" 타입들은 자원을 소유하지 않는다.
 
-References are never owners (see [R.4](#Rr-ref). Note: References have many opportunities to outlive the objects they refer to (returning a local variable by reference, holding a reference to an element of a vector and doing `push_back`, binding to `std::max(x, y + 1)`, etc. The Lifetime safety profile aims to address those things, but even so `owner<T&>` does not make sense and is discouraged.
+참조 역시 자원을 소유하지 않는다. [R.4](#Rr-ref)를 참고하라. 
+Note: References have many opportunities to outlive the objects they refer to (returning a local variable by reference, holding a reference to an element of a vector and doing `push_back`, binding to `std::max(x, y + 1)`, etc. The Lifetime safety profile aims to address those things, but even so `owner<T&>` does not make sense and is discouraged.
 
-The names are mostly ISO standard-library style (lower case and underscore):
+타입 이름들은 대부분 ISO 표준 라이브러리 스타일을 따른다(소문자와 '_'를 사용):
 
 * `T*`      // The `T*` is not an owner, may be null; assumed to be pointing to a single element.
 * `T&`      // The `T&` is not an owner and can never be a "null reference"; references are always bound to objects.
@@ -43,12 +42,11 @@ Owners should be converted to resource handles (e.g., `unique_ptr` or `vector<T>
 
 * `owner<T*>`   // a `T*` that owns the object pointed/referred to; may be `nullptr`.
 
-`owner` is used to mark owning pointers in code that cannot be upgraded to use proper resource handles.
-Reasons for that include:
+`owner`는 소유권을 가진 포인터에 사용되며, 다음과 같은 이유로 이 타입은 적합한 리소스 핸들 타입으로 변환될 수 없다:
 
-* Cost of conversion.
-* The pointer is used with an ABI.
-* The pointer is part of the implementation of a resource handle.
+ * 변환 비용 발생
+ * 포인터가 ABI에 사용되는 경우
+ * 포인터가 리소스 핸들 구현의 일부인 경우
 
 An `owner<T>` differs from a resource handle for a `T` by still requiring an explicit `delete`.
 
@@ -72,16 +70,14 @@ A `char*` that points to more than one `char` but is not a C-style string (e.g.,
 * `zstring`    // a `char*` supposed to be a C-style string; that is, a zero-terminated sequence of `char` or `nullptr`
 * `czstring`   // a `const char*` supposed to be a C-style string; that is, a zero-terminated sequence of `const` `char` or `nullptr`
 
-Logically, those last two aliases are not needed, but we are not always logical, and they make the distinction between a pointer to one `char` and a pointer to a C-style string explicit.
-A sequence of characters that is not assumed to be zero-terminated should be a `char*`, rather than a `zstring`.
-French accent optional.
+논리적으로는, 마지막 두 별칭은 필요하지는 않지만, 하나의 `char`에 대한 포인터와 C 스타일 문자열에 대한 포인터를 명시적으로 구분하게 해준다. 0으로 끝나지 않는 문자열은 `zstring`보다는 `char*` 타입을 사용해야 한다.
 
 Use `not_null<zstring>` for C-style strings that cannot be `nullptr`. ??? Do we need a name for `not_null<zstring>`? or is its ugliness a feature?
 
 ## <a name="SS-ownership"></a>GSL.owner: Ownership pointers
 
-* `unique_ptr<T>`     // unique ownership: `std::unique_ptr<T>`
-* `shared_ptr<T>`     // shared ownership: `std::shared_ptr<T>` (a counted pointer)
+* `unique_ptr<T>`     // 독점적 소유권: `std::unique_ptr<T>`
+* `shared_ptr<T>`     // 공유 소유권: `std::shared_ptr<T>` (a counted pointer)
 * `stack_array<T>`    // A stack-allocated array. The number of elements are determined at construction and fixed thereafter. The elements are mutable unless `T` is a `const` type.
 * `dyn_array<T>`      // ??? needed ??? A heap-allocated array. The number of elements are determined at construction and fixed thereafter.
   The elements are mutable unless `T` is a `const` type. Basically a `span` that allocates and owns its elements.
@@ -110,13 +106,10 @@ for example, `Expects(p)` will become `[[expects: p]]`.
 
 ## <a name="SS-gsl-concepts"></a>GSL.concept: Concepts
 
-These concepts (type predicates) are borrowed from
-Andrew Sutton's Origin library,
-the Range proposal,
-and the ISO WG21 Palo Alto TR.
-They are likely to be very similar to what will become part of the ISO C++ standard.
-The notation is that of the ISO WG21 [Concepts TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-Most of the concepts below are defined in [the Ranges TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf).
+이하의 개념들(타입의 동작에 대한 것들)은 Andrew Sutton의 라이브러리, Range 제안, ISO WG21 Palo Alto TR 에서 가져온 것이다. 이들은 ISO C++ 표준에 포함될 가능성이 높다.
+
+표기법은 ISO WG21 [Concepts TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf)의 것을 따른다.
+후술할 대부분의 개념들은 [the Ranges TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)에 정의되어 있다.
 
 * `Range`
 * `String`   // ???
