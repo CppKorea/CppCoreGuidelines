@@ -1,7 +1,7 @@
 
-# <a name="S-not"></a>NR: Non-Rules and myths
+# <a name="S-not"></a>NR: 규칙이 아닌 것들과 근거없는 이야기들
 
-This section contains rules and guidelines that are popular somewhere, but that we deliberately don't recommend.
+이 절은 어디선가 널리 알려졌지만, 핵심 가이드라인에서 추천하지 않는 규칙과 가이드라인들을 포함한다.
 We know full well that there have been times and places where these rules made sense, and we have used them ourselves at times.
 However, in the context of the styles of programming we recommend and support with the guidelines, these "non-rules" would do harm.
 
