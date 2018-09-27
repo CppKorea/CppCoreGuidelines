@@ -10,9 +10,11 @@ import shutil
 import io
 import argparse
 
-import re, cgi
+import re
+import cgi
 TAG_REGEX = re.compile(r'(<!--.*?-->|<[^>]*>)')
 NAMED_A_TAG_REGEX = re.compile(r'.*name ?= ?"([^"]*)"')
+
 
 def main():
     """
@@ -28,7 +30,8 @@ def main():
 
     Snippets without code (only comments) or containing lines starting with ??? should not yeld files, but the counter for naming snippets should still increment.
     """
-    parser = argparse.ArgumentParser(description='Split md file into plain text and code blocks')
+    parser = argparse.ArgumentParser(
+        description='Split md file into plain text and code blocks')
     parser.add_argument('sourcefile',
                         help='which file to read')
     parser.add_argument('targetfile',
@@ -40,7 +43,6 @@ def main():
     # ensure folder exists
     if not os.path.exists(args.codedir):
         os.makedirs(args.codedir)
-
 
     if os.path.exists(args.targetfile):
         os.remove(args.targetfile)
@@ -55,11 +57,11 @@ def main():
                 indent_depth = is_code(line)
                 if indent_depth:
                     (line, linenum) = process_code(read_filehandle,
-                                                    text_filehandle,
-                                                    line, linenum,
-                                                    args.sourcefile, args.codedir,
-                                                    last_header, code_block_index,
-                                                    indent_depth)
+                                                   text_filehandle,
+                                                   line, linenum,
+                                                   args.sourcefile, args.codedir,
+                                                   last_header, code_block_index,
+                                                   indent_depth)
                     code_block_index += 1
                 # reach here either line was not code, or was code
                 # and we dealt with n code lines
@@ -102,13 +104,14 @@ def process_code(read_filehandle, text_filehandle, line, linenum, sourcefile, co
         if (not has_actual_code
             and not line.strip().startswith('//')
             and not line.strip().startswith('???')
-            and not line.strip() == ''):
+                and not line.strip() == ''):
             has_actual_code = True
 
         if (not line.strip() == '```'):
             if ('???' == no_comment_line or '...' == no_comment_line):
                 has_question_marks = True
-            linebuffer.append(dedent(line, indent_depth) if not fenced else line)
+            linebuffer.append(dedent(line, indent_depth)
+                              if not fenced else line)
         try:
             line = read_filehandle.next()
             linenum += 1
@@ -165,20 +168,23 @@ using namespace std;   // by md-split
             code_filehandle.write(codeline)
 
 
-def is_code(line, indent_depth = 4):
+def is_code(line, indent_depth=4):
     '''returns the indent depth, 0 means not code in markup'''
     if line.startswith(' ' * indent_depth):
         return len(line) - len(line.lstrip(' '))
     return 0
 
+
 def is_inside_code(line, indent_depth):
     return is_code(line, indent_depth) > 0 or line.strip() == ''
+
 
 def stripped(line):
     # Remove well-formed html tags, fixing mistakes by legitimate users
     sline = TAG_REGEX.sub('', line)
     sline = re.sub('[()\[\]#*]', ' ', line)
     return sline
+
 
 def dedent(line, indent_depth):
     if line.startswith(' ' * indent_depth):
@@ -187,17 +193,20 @@ def dedent(line, indent_depth):
         return line[1:]
     return line
 
+
 def get_marker(line):
     matchlist = TAG_REGEX.findall(line)
     if matchlist:
         namematch = NAMED_A_TAG_REGEX.match(line)
         if namematch:
-            return namematch.group(1) # group 0 is full match
+            return namematch.group(1)  # group 0 is full match
 
     return None
 
+
 def line_length(filename):
     return sum(1 for line in open(filename))
+
 
 if __name__ == '__main__':
     main()
