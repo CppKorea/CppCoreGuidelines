@@ -48,8 +48,8 @@ def main():
     code_block_index = 0
     last_header = ''
     linenum = 0
-    with io.open(args.sourcefile, 'r') as read_filehandle:
-        with io.open(args.targetfile, 'w') as text_filehandle:
+    with io.open(args.sourcefile, 'r', 'utf8') as read_filehandle:
+        with io.open(args.targetfile, 'w', 'utf8') as text_filehandle:
             for line in read_filehandle:
                 linenum += 1
                 indent_depth = is_code(line)
@@ -143,7 +143,7 @@ def write_with_harness(codefile, sourcefile, start_linenum, linebuffer):
     # add commonly used headers, so that lines can likely compile.
     # This is work in progress, the main issue remains handling class
     # declarations in in-function code differently
-    with io.open(codefile, 'w') as code_filehandle:
+    with io.open(codefile, 'w', 'utf8') as code_filehandle:
         code_filehandle.write('''\
 #include<stdio.h>      // by md-split
 #include<stdlib.h>     // by md-split
