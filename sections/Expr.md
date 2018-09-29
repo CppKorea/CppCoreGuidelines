@@ -1,107 +1,106 @@
+# <a name="S-expr"></a>ES: 표현식과 구문
 
-# <a name="S-expr"></a>ES: Expressions and statements
+표현식(expression)과 구문(statement)은 행위와 연산에 대해 표현하는 가장 직접적인 방법들이다. 구문은 지역 유효범위 내에서 선언하는 것을 말한다.
 
-Expressions and statements are the lowest and most direct way of expressing actions and computation. Declarations in local scopes are statements.
+이름 짓기와 주석, 들여쓰기 규칙에 대해서는, [NL: Naming and layout](#S-naming)을 참고하라.
 
-For naming, commenting, and indentation rules, see [NL: Naming and layout](#S-naming).
+일반적인 규칙:
 
-General rules:
+* [ES.1: 다른 라이브러리나 "직접 짠 코드" 대신 표준 라이브러리를 사용하라](#Res-lib)
+* [ES.2: 언어의 기능을 직접적으로 사용하기 보다는 적절한 추상화를 하라](#Res-abstr)
 
-* [ES.1: Prefer the standard library to other libraries and to "handcrafted code"](#Res-lib)
-* [ES.2: Prefer suitable abstractions to direct use of language features](#Res-abstr)
+선언 규칙:
 
-Declaration rules:
-
-* [ES.5: Keep scopes small](#Res-scope)
-* [ES.6: Declare names in for-statement initializers and conditions to limit scope](#Res-cond)
-* [ES.7: Keep common and local names short, and keep uncommon and nonlocal names longer](#Res-name-length)
-* [ES.8: Avoid similar-looking names](#Res-name-similar)
-* [ES.9: Avoid `ALL_CAPS` names](#Res-not-CAPS)
-* [ES.10: Declare one name (only) per declaration](#Res-name-one)
-* [ES.11: Use `auto` to avoid redundant repetition of type names](#Res-auto)
-* [ES.12: Do not reuse names in nested scopes](#Res-reuse)
-* [ES.20: Always initialize an object](#Res-always)
-* [ES.21: Don't introduce a variable (or constant) before you need to use it](#Res-introduce)
-* [ES.22: Don't declare a variable until you have a value to initialize it with](#Res-init)
-* [ES.23: Prefer the `{}`-initializer syntax](#Res-list)
+* [ES.5: 유효범위(scope)는 작게 유지하라](#Res-scope)
+* [ES.6: for-구문에서 관련 변수들은 구문 범위 안에 두어라](#Res-cond)
+* [ES.7: 일반적이거나 지역 변수들의 이름은 짧게, 그렇지 않다면 길게 하라](#Res-name-length)
+* [ES.8: 유사해보이는 이름은 사용하지 마라](#Res-name-similar)
+* [ES.9: 이름은 `ALL_CAPS` 형태가 아니어야 한다](#Res-not-CAPS)
+* [ES.10: 선언은 (오직) 하나의 이름을 선언해야 한다](#Res-name-one)
+* [ES.11: 타입 이름의 불필요한 반복을 막기 위해 `auto`를 사용하라](#Res-auto)
+* [ES.12: 이름을 덮어쓰지 않게 하라](#Res-reuse)
+* [ES.20: 항상 개체를 초기화하라](#Res-always)
+* [ES.21: 사용할 필요가 없을 때 변수나 상수를 선언하지 마라](#Res-introduce)
+* [ES.22: 변수를 초기화할 값이 생길 때까지 선언하지 마라](#Res-init)
+* [ES.23: `{}`초기화 문법을 사용하라](#Res-list)
 * [ES.24: Use a `unique_ptr<T>` to hold pointers](#Res-unique)
-* [ES.25: Declare an object `const` or `constexpr` unless you want to modify its value later on](#Res-const)
-* [ES.26: Don't use a variable for two unrelated purposes](#Res-recycle)
-* [ES.27: Use `std::array` or `stack_array` for arrays on the stack](#Res-stack)
-* [ES.28: Use lambdas for complex initialization, especially of `const` variables](#Res-lambda-init)
-* [ES.30: Don't use macros for program text manipulation](#Res-macros)
-* [ES.31: Don't use macros for constants or "functions"](#Res-macros2)
-* [ES.32: Use `ALL_CAPS` for all macro names](#Res-ALL_CAPS)
-* [ES.33: If you must use macros, give them unique names](#Res-MACROS)
-* [ES.34: Don't define a (C-style) variadic function](#Res-ellipses)
+* [ES.25: 값을 변경하지 않는다면 개체를 `const` 혹은 `constexpr`로 선언하라](#Res-const)
+* [ES.26: 서로 상관없는 목적에 하나의 변수를 사용하지 마라](#Res-recycle)
+* [ES.27: `std::array`나 `stack_array`를 사용하라](#Res-stack)
+* [ES.28: 복잡한 초기화, 특히 `const` 변수의 초기화에는 람다를 사용하라](#Res-lambda-init)
+* [ES.30: 프로그램 텍스트를 바꾸기 위해 매크로를 사용하지 마라](#Res-macros)
+* [ES.31: 매크로를 상수나 "함수"에 사용하지 마라](#Res-macros2)
+* [ES.32: 모든 매크로는 `ALL_CAPS`형태로 선언하라](#Res-ALL_CAPS)
+* [ES.33: 매크로를 사용해야만 한다면, 고유한 이름을 사용하라](#Res-MACROS)
+* [ES.34: (C-스타일의) 가변인자 함수를 정의하지 마라](#Res-ellipses)
 
-Expression rules:
+표현식 규칙:
 
-* [ES.40: Avoid complicated expressions](#Res-complicated)
-* [ES.41: If in doubt about operator precedence, parenthesize](#Res-parens)
-* [ES.42: Keep use of pointers simple and straightforward](#Res-ptr)
+* [ES.40: 복잡한 표현식을 피하라](#Res-complicated)
+* [ES.41: 연산자 우선순위가 혼동된다면, 소괄호를 사용하라](#Res-parens)
+* [ES.42: 포인터는 간단하고 직관적인 형태로 사용하라](#Res-ptr)
 * [ES.43: Avoid expressions with undefined order of evaluation](#Res-order)
-* [ES.44: Don't depend on order of evaluation of function arguments](#Res-order-fct)
-* [ES.45: Avoid "magic constants"; use symbolic constants](#Res-magic)
-* [ES.46: Avoid narrowing conversions](#Res-narrowing)
-* [ES.47: Use `nullptr` rather than `0` or `NULL`](#Res-nullptr)
+* [ES.44: 함수 인자가 표현식 평가 순서의 영향을 받지 않게 하라](#Res-order-fct)
+* [ES.45: "만능 상수"를 피하자. 상징적인 상수를 사용하자](#Res-magic)
+* [ES.46: 타입 범위를 축소하는 변환을 피하라](#Res-narrowing)
+* [ES.47: `0` 혹은 `NULL`보다는 `nullptr`를 사용하라](#Res-nullptr)
 * [ES.48: Avoid casts](#Res-casts)
 * [ES.49: If you must use a cast, use a named cast](#Res-casts-named)
-* [ES.50: Don't cast away `const`](#Res-casts-const)
-* [ES.55: Avoid the need for range checking](#Res-range-checking)
-* [ES.56: Write `std::move()` only when you need to explicitly move an object to another scope](#Res-move)
-* [ES.60: Avoid `new` and `delete` outside resource management functions](#Res-new)
-* [ES.61: Delete arrays using `delete[]` and non-arrays using `delete`](#Res-del)
+* [ES.50: `const`를 제거하지 마라](#Res-casts-const)
+* [ES.55: 범위 검사가 필요하지 않도록 하라](#Res-range-checking)
+* [ES.56: `std::move()`는 개체를 다른 유효범위로 명시적으로 옮겨야 할때만 사용하라](#Res-move)
+* [ES.60: 자원을 관리하는 함수 외부에서 `new`와 `delete` 사용을 피하라](#Res-new)
+* [ES.61: 배열은 delete[]`, 단일 개체는 `delete`를 사용해서 해제하라](#Res-del)
 * [ES.62: Don't compare pointers into different arrays](#Res-arr2)
 * [ES.63: Don't slice](#Res-slice)
-* [ES.64: Use the `T{e}`notation for construction](#Res-construct)
+* [ES.64: 개체 생성에는 `T{e}`을 사용하라](#Res-construct)
 * [ES.65: Don't dereference an invalid pointer](#Res-deref)
 
-Statement rules:
+구문 규칙:
 
-* [ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice](#Res-switch-if)
-* [ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice](#Res-for-range)
-* [ES.72: Prefer a `for`-statement to a `while`-statement when there is an obvious loop variable](#Res-for-while)
-* [ES.73: Prefer a `while`-statement to a `for`-statement when there is no obvious loop variable](#Res-while-for)
-* [ES.74: Prefer to declare a loop variable in the initializer part of a `for`-statement](#Res-for-init)
-* [ES.75: Avoid `do`-statements](#Res-do)
-* [ES.76: Avoid `goto`](#Res-goto)
-* [ES.77: Minimize the use of `break` and `continue` in loops](#Res-continue)
-* [ES.78: Always end a non-empty `case` with a `break`](#Res-break)
-* [ES.79: Use `default` to handle common cases (only)](#Res-default)
-* [ES.84: Don't (try to) declare a local variable with no name](#Res-noname)
+* [ES.70: 선택을 하는 경우에는 `switch`-구문을 사용하라](#Res-switch-if)
+* [ES.71: 가능하다면 범위기반 `for`-구문을 사용하라](#Res-for-range)
+* [ES.72: 루프 변수가 있다면 `while`-구문보다 `for`-구문을 사용하라](#Res-for-while)
+* [ES.73: 루프 변수가 없다면 `for`-구문보다 `while`-구문을 사용하라](#Res-while-for)
+* [ES.74:  루프 변수는 `for`-구문의 초기화 부분에서 선언하라](#Res-for-init)
+* [ES.75: `do`-구문을 사용하지 마라](#Res-do)
+* [ES.76: `goto`를 사용하지 마라](#Res-goto)
+* [ES.77: `break`와 `continue`의 사용을 최소화하라](#Res-continue)
+* [ES.78: 내용이 있는 `case`는 `break`하라](#Res-break)
+* [ES.79: 일반적인 경우를 처리하기 위해서 `default`를 사용하라](#Res-default)
+* [ES.84: 이름이 없는 지역변수는 선언하지 마라](#Res-noname)
 * [ES.85: Make empty statements visible](#Res-empty)
-* [ES.86: Avoid modifying loop control variables inside the body of raw for-loops](#Res-loop-counter)
-* [ES.87: Don't add redundant `==` or `!=` to conditions](#Res-if)
+* [ES.86: for 루프에서 루프 변수를 변경하지 마라](#Res-loop-counter)
+* [ES.87: 조건에 불필요한 `==`나 `!=`를 사용하지 마라](#Res-if)
 
-Arithmetic rules:
+산술연산 규칙:
 
-* [ES.100: Don't mix signed and unsigned arithmetic](#Res-mix)
-* [ES.101: Use unsigned types for bit manipulation](#Res-unsigned)
-* [ES.102: Use signed types for arithmetic](#Res-signed)
-* [ES.103: Don't overflow](#Res-overflow)
-* [ES.104: Don't underflow](#Res-underflow)
-* [ES.105: Don't divide by zero](#Res-zero)
-* [ES.106: Don't try to avoid negative values by using `unsigned`](#Res-nonnegative)
-* [ES.107: Don't use `unsigned` for subscripts, prefer `gsl::index`](#Res-subscripts)
+* [ES.100: 부호가 있는 타입과 없는 타입을 함께 연산하지 마라](#Res-mix)
+* [ES.101: 비트 조작시에는 부호가 없는(unsigned) 타입을 사용하라](#Res-unsigned)
+* [ES.102: 연산에는 부호가 있는(signed) 타입을 사용하라](#Res-signed)
+* [ES.103: Overflow가 발생하지 않게 하라](#Res-overflow)
+* [ES.104: Underflow가 발생하지 않게 하라](#Res-underflow)
+* [ES.105: 나눗셈의 제수(divisor)가 0이 되지 않게 하라](#Res-zero)
+* [ES.106: `unsigned`로 음수값을 막으려 하지 마라](#Res-nonnegative)
+* [ES.107: 배열 접근에는 `unsigned`보다는 `gsl::index`를 사용하라](#Res-subscripts)
 
 ### <a name="Res-lib"></a>ES.1: Prefer the standard library to other libraries and to "handcrafted code"
 
 ##### Reason
 
-Code using a library can be much easier to write than code working directly with language features, much shorter, tend to be of a higher level of abstraction, and the library code is presumably already tested.
-The ISO C++ Standard Library is among the most widely known and best tested libraries.
-It is available as part of all C++ Implementations.
+라이브러리를 사용하는 코드는 언어의 기능을 직접적으로 사용하는 것보다 쉽고, 더 짧게 작성할 수 있고, 고수준의 추상화가 가능하다. 
+ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 라이브러리다.
+모든 C++ 구현체에서 제공하고 있다.
 
 ##### Example
 ```c++
     auto sum = accumulate(begin(a), end(a), 0.0);   // good
 ```
-a range version of `accumulate` would be even better:
+`accumulate`의 범위 버전이 더 낫다:
 ```c++
     auto sum = accumulate(v, 0.0); // better
 ```
-but don't hand-code a well-known algorithm:
+그런데 잘 알려진 알고리즘을 직접 만들지는 말자:
 ```c++
     int max = v.size();   // bad: verbose, purpose unstated
     double sum = 0.0;
@@ -110,7 +109,8 @@ but don't hand-code a well-known algorithm:
 ```
 ##### Exception
 
-Large parts of the standard library rely on dynamic allocation (free store). These parts, notably the containers but not the algorithms, are unsuitable for some hard-real-time and embedded applications. In such cases, consider providing/using similar facilities, e.g.,  a standard-library-style container implemented using a pool allocator.
+표준라이브러리의 대다수가 동적 할당(자유 저장소)에 의존한다. 이런 부분은 알고리즘의 문제는 아닐지라도, 제한 시간 내에 응답성을 보장해야 하는 경우(hard-real-time)나 임베디드 환경에는 적합하지 않다.
+그런 경우는 비슷한 기능을 구현하여 사용하는 것을 고려해볼 수 있다. 예를 들면 표준 라이브러리 스타일로 구현된 메모리 풀 할당 컨테이너 같은 것들이다.
 
 ##### Enforcement
 
@@ -120,7 +120,7 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 
 ##### Reason
 
-A "suitable abstraction" (e.g., library or class) is closer to the application concepts than the bare language, leads to shorter and clearer code, and is likely to be better tested.
+"적절한 추상화"(예를 들어 라이브러리나 클래스 같은 것)가 언어보다 어플리케이션의 개념에 더 가깝다. 코드를 짧고 명확하게 만들 수 있으며, 테스트하기에도 더 쉽다.
 
 ##### Example
 ```c++
@@ -132,7 +132,7 @@ A "suitable abstraction" (e.g., library or class) is closer to the application c
         return res;
     }
 ```
-The more traditional and lower-level near-equivalent is longer, messier, harder to get right, and most likely slower:
+아래와 같은 전통적인 코드, 시스템 레벨과 거의 동등한 로우레벨 코드는 길고, 지저분하고, 이해하기도 어렵고, 느리게 돌아간다:
 ```c++
     char** read2(istream& is, int maxelem, int maxstring, int* nread)   // bad: verbose and incomplete
     {
@@ -147,23 +147,23 @@ The more traditional and lower-level near-equivalent is longer, messier, harder 
         return res;
     }
 ```
-Once the checking for overflow and error handling has been added that code gets quite messy, and there is the problem remembering to `delete` the returned pointer and the C-style strings that array contains.
+오버플로우나 에러 핸들링 코드가 일단 한 번 들어가게 되면, 코드는 확 지저분해진다. 그리고, 리턴하는 포인터와 배열로 구현되는 C 스타일의 문자열을 `delete`를 꼭 해줘야하는 문제도 있다.
 
 ##### Enforcement
 
 Not easy. ??? Look for messy loops, nested loops, long functions, absence of function calls, lack of use of non-built-in types. Cyclomatic complexity?
 
-## ES.dcl: Declarations
+## ES.dcl: 선언(Declarations)
 
-A declaration is a statement. A declaration introduces a name into a scope and may cause the construction of a named object.
+선언은 구문(statement)이다. 한 선언은 임의의 유효 범위에 하나의 이름을 만들거나 이름있는 개체(named object)를 생성할 수 있다.
 
 ### <a name="Res-scope"></a>ES.5: Keep scopes small
 
 ##### Reason
 
-Readability. Minimize resource retention. Avoid accidental misuse of value.
+가독성이 좋아진다. 리소스 점유를 최소화할 수 있다. 값의 잘못된 사용을 피할 수 있다.
 
-**Alternative formulation**: Don't declare a name in an unnecessarily large scope.
+**Alternative formulation**: 불필요하게 큰 스코프에 변수를 선언하지 마라
 
 ##### Example
 ```c++
@@ -190,12 +190,13 @@ Readability. Minimize resource retention. Avoid accidental misuse of value.
         ifstream is {fn};
         Record r;
         is >> r;
-        // ... 200 lines of code without intended use of fn or is ...
+        // ... 여기에는 fn과 is를 쓰면 안되는 200 줄짜리 코드가 들어간다 ...
     }
 ```
-This function is by most measure too long anyway, but the point is that the resources used by `fn` and the file handle held by `is`
-are retained for much longer than needed and that unanticipated use of `is` and `fn` could happen later in the function.
-In this case, it might be a good idea to factor out the read:
+이 코드는 길다는 문제점이 있지만, `fn`의 값과 `is`가 갖고 있는 파일 핸들이 필요 이상으로 훨씬 길게 유지된다는 게 문제다. 
+이러면 함수의 뒷부분에서 `is`와 `fn`을 실수로 사용해버릴 수 있다. 
+
+이럴 때는, 분할해버리는 게 낫다:
 ```c++
     Record load_record(const string& name)
     {
@@ -214,14 +215,14 @@ In this case, it might be a good idea to factor out the read:
 ```
 ##### Enforcement
 
-* Flag loop variable declared outside a loop and not used after the loop
-* Flag when expensive resources, such as file handles and locks are not used for N-lines (for some suitable N)
+* 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않는 경우를 지적하라
+* 파일 핸들이나 잠금과 같은 중요한 리소스를 사용하는 코드가 N  (이 값은 적당히 크다)줄 이상 계속되면 지적하라
 
 ### <a name="Res-cond"></a>ES.6: Declare names in for-statement initializers and conditions to limit scope
 
 ##### Reason
 
-Readability. Minimize resource retention.
+가독성. 시스템 자원 점유를 최소화한다.
 
 ##### Example
 ```c++
@@ -241,11 +242,11 @@ Readability. Minimize resource retention.
             // ... handle error ...
         }
     }
-```c++
+```
 ##### Enforcement
 
-* Flag loop variables declared before the loop and not used after the loop
-* (hard) Flag loop variables declared before the loop and used after the loop for an unrelated purpose.
+* 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않을 때 지적하라
+* (어려움) 루프 바깥에서 루프 변수를 선언하고, 루프가 끝난 뒤에 관계없는 목적으로 그 변수를 사용하는 경우 지적하라
 
 ##### C++17 example
 
@@ -270,11 +271,10 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 
 ##### Reason
 
-Readability. Lowering the chance of clashes between unrelated non-local names.
+가독성. 관계없는 비-지역(non-local) 변수 간의 충돌 확률을 낮춘다.
 
 ##### Example
-
-Conventional short, local names increase readability:
+관습적으로 쓰이는 짧은 지역변수명은 가독성을 향상시킨다:
 ```c++
     template<typename T>    // good
     void print(ostream& os, const vector<T>& v)
@@ -283,7 +283,9 @@ Conventional short, local names increase readability:
             os << v[i] << '\n';
     }
 ```
-An index is conventionally called `i` and there is no hint about the meaning of the vector in this generic function, so `v` is as good name as any. Compare
+인덱스는 관습적으로 `i`라고 쓰고, 이 일반 함수에는 벡터의 의미를 알만한 힌트가 없으므로, `v`가 어떤 경우에든지 맞는 이름이다. 
+
+비교:
 ```c++
     template<typename Element_type>   // bad: verbose, hard to read
     void print(ostream& target_stream, const vector<Element_type>& current_vector)
@@ -295,11 +297,10 @@ An index is conventionally called `i` and there is no hint about the meaning of 
         target_stream << current_vector[current_element_index] << '\n';
     }
 ```
-Yes, it is a caricature, but we have seen worse.
+과장해서 표현하긴 했지만, 이것보다 더 심한 것도 본적이 있다.
 
 ##### Example
-
-Unconventional and short non-local names obscure code:
+관습에 따르지 않는 짧은 비지역 변수는 코드를 모호하게 만든다:
 ```c++
     void use1(const string& s)
     {
@@ -308,7 +309,7 @@ Unconventional and short non-local names obscure code:
         // ...
     }
 ```
-Better, give non-local entities readable names:
+비지역 개체들에는 좀 더 가독성 있는 이름을 쓰면 나아진다:
 ```c++
     void use1(const string& s)
     {
@@ -317,11 +318,10 @@ Better, give non-local entities readable names:
         // ...
     }
 ```
-Here, there is a chance that the reader knows what `trim_tail` means and that the reader can remember it after looking it up.
+이렇게 하면, 코드를 읽는 사람이 `trim_tail`의 의미를 알 수 있게 되고, 기억할 수 있게 된다.
 
 ##### Example, bad
-
-Argument names of large functions are de facto non-local and should be meaningful:
+내용이 긴 함수의 인자는 사실상 비지역 변수라고 볼 수 있다. 따라서 인자들의 이름은 적절한 의미를 담아야 한다:
 ```c++
     void complicated_algorithm(vector<Record>& vr, const vector<int>& vi, map<string, int>& out)
     // read from events in vr (marking used Records) for the indices in
@@ -330,11 +330,11 @@ Argument names of large functions are de facto non-local and should be meaningfu
         // ... 500 lines of code using vr, vi, and out ...
     }
 ```
-We recommend keeping functions short, but that rule isn't universally adhered to and naming should reflect that.
+함수는 짧게 유지하는 것을 권장하지만, 이 룰을 모두 적용시키긴 힘들 때가 있다. 그럴 경우엔 변수명을 적절히 줘야 한다.
 
 ##### Enforcement
 
-Check length of local and non-local names. Also take function length into account.
+지역 변수와 비지역 변수의 이름이 유지되는 범위의 길이를 확인한다. 동시에 함수의 길이를 함께 고려한다.
 
 ### <a name="Res-name-similar"></a>ES.8: Avoid similar-looking names
 
@@ -367,7 +367,7 @@ Antique header files might declare non-types and types with the same name in the
 
 ##### Reason
 
-Such names are commonly used for macros. Thus, `ALL_CAPS` name are vulnerable to unintended macro substitution.
+이런 이름은 보통 매크로를 정의할 때 사용한다. 따라서 `ALL_CAPS` 형태의 이름은 매크로와 충돌될 가능성이 많다. 
 
 ##### Example
 ```c++
@@ -388,19 +388,18 @@ Such names are commonly used for macros. Thus, `ALL_CAPS` name are vulnerable to
 ```
 ##### Note
 
-Do not use `ALL_CAPS` for constants just because constants used to be macros.
+단지 상수가 매크로처럼 쓰인다는 이유로 상수에 `ALL_CAPS` 형태의 이름을 사용하면 안된다
 
 ##### Enforcement
 
-Flag all uses of ALL CAPS. For older code, accept ALL CAPS for macro names and flag all non-ALL-CAPS macro names.
+대문자만을 사용한 이름을 지적하라. 오래된 코드에 대해서는 매크로 이름으로 소문자를 섞어 사용한 경우를 지적하라
 
 ### <a name="Res-name-one"></a>ES.10: Declare one name (only) per declaration
 
 ##### Reason
 
-One-declaration-per line increases readability and avoids mistakes related to
-the C/C++ grammar. It also leaves room for a more descriptive end-of-line
-comment.
+한 줄에 선언 하나씩 하면 가독성을 향상시킬 수 있고, C/C++ 문법과 관련된 실수를 피할 수 있다. 
+그리고 `//` 주석을 달 수 있는 공간이 생긴다.
 
 ##### Example, bad
 ```c++
@@ -408,7 +407,7 @@ comment.
 ```
 ##### Exception
 
-A function declaration can contain several function argument declarations.
+함수 선언은 다수의 함수 인자 선언을 포함할 수 있다.
 
 ##### Exception
 
@@ -422,7 +421,7 @@ A structured binding (C++17) is specifically designed to introduce several varia
     template <class InputIterator, class Predicate>
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
 ```
-or better using concepts:
+좀 더 나은 용례:
 ```c++
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
 ```
@@ -430,14 +429,14 @@ or better using concepts:
 ```c++
     double scalbn(double x, int n);   // OK: x * pow(FLT_RADIX, n); FLT_RADIX is usually 2
 ```
-or:
+또는:
 ```c++
     double scalbn(    // better: x * pow(FLT_RADIX, n); FLT_RADIX is usually 2
         double x,     // base value
         int n         // exponent
     );
 ```
-or:
+또는:
 ```c++
     // better: base * pow(FLT_RADIX, exponent); FLT_RADIX is usually 2
     double scalbn(double base, int exponent);
@@ -450,7 +449,7 @@ In a long list of declarators is is easy to overlook an uninitialized variable.
 
 ##### Enforcement
 
-Flag variable and constant declarations with multiple declarators (e.g., `int* p, q;`)
+변수와 상수들을 한번에 선언을 한 곳을 지적한다.(예를 들어, `int* p, q;`)
 
 ### <a name="Res-auto"></a>ES.11: Use `auto` to avoid redundant repetition of type names
 
@@ -946,7 +945,7 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
 
 ##### Reason
 
-That way you can't change the value by mistake. That way may offer the compiler optimization opportunities.
+실수로 값을 바꾸는 걸 막을 수 있는 방법이다. 컴파일러에게 최적화를 위한 기회를 줄 수도 있다.
 
 ##### Example
 ```c++
@@ -959,15 +958,14 @@ That way you can't change the value by mistake. That way may offer the compiler 
 ```
 ##### Enforcement
 
-Look to see if a variable is actually mutated, and flag it if
-not. Unfortunately, it may be impossible to detect when a non-`const` was not
-*intended* to vary (vs when it merely did not vary).
+변수가 실제로 값이 바뀌는지 안 바뀌는지 보고 바뀐다면 지적한다.
+불행하게도, `const`가 아닌 개체가 값을 바꾸려 *의도*했는지 찾아내는 것은 불가능하다.
 
 ### <a name="Res-recycle"></a>ES.26: Don't use a variable for two unrelated purposes
 
 ##### Reason
 
-Readability and safety.
+가독성과 안전성
 
 ##### Example, bad
 ```c++
@@ -1000,14 +998,14 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 ```
 ##### Enforcement
 
-Flag recycled variables.
+재활용되는 변수가 있다면 지적한다.
 
 ### <a name="Res-stack"></a>ES.27: Use `std::array` or `stack_array` for arrays on the stack
 
 ##### Reason
 
-They are readable and don't implicitly convert to pointers.
-They are not confused with non-standard extensions of built-in arrays.
+가독성이 높아지고, 묵시적으로 포인터로 바뀌지 않는다.
+언어가 지원하는 배열의 비표준적인 확장과 헷갈리지 않는다.
 
 ##### Example, bad
 ```c++
@@ -1023,11 +1021,10 @@ They are not confused with non-standard extensions of built-in arrays.
 ```
 ##### Note
 
-The definition of `a1` is legal C++ and has always been.
-There is a lot of such code.
-It is error-prone, though, especially when the bound is non-local.
-Also, it is a "popular" source of errors (buffer overflow, pointers from array decay, etc.).
-The definition of `a2` is C but not C++ and is considered a security risk
+`a1` 변수선언은 C++에서는 적법하다. 그런 류의 코드가 많이 있다.
+다만 이는 길이값이 비지역 변수일 대 잘못 사용하기 쉽다. 버퍼 오버플로우, 배열을 포인터로 변환하는 등의 "유명한" 오류 원인이 된다.
+
+`a2` 변수선언은 C 방식으로 C++ 에서는 쓰지 않으며 보안상 문제가 있는 것으로 간주한다.
 
 ##### Example
 ```c++
@@ -1043,14 +1040,17 @@ The definition of `a2` is C but not C++ and is considered a security risk
 ```
 ##### Enforcement
 
-* Flag arrays with non-constant bounds (C-style VLAs)
-* Flag arrays with non-local constant bounds
+* 상수 길이를 가지지 않는 배열이라면 표시한다. (C 언어의 가변길이배열(VLA))
+* 배열 길이로 지역 상수를 사용하지 않으면 지적한다
 
 ### <a name="Res-lambda-init"></a>ES.28: Use lambdas for complex initialization, especially of `const` variables
 
 ##### Reason
 
-It nicely encapsulates local initialization, including cleaning up scratch variables needed only for the initialization, without needing to create a needless nonlocal yet nonreusable function. It also works for variables that should be `const` but only after some initialization work.
+멋지게 지역 초기화를 숨길 수 있다.
+초기화 작업을 위해서만 필요한 변수를 포함해서 재사용할 것 같지 않은 함수를 생성할 필요도 없다.
+
+약간의 초기화 작업 후에 `const`여야 하는 변수에도 사용할 수 있다.
 
 ##### Example, bad
 ```c++
@@ -1080,20 +1080,21 @@ It nicely encapsulates local initialization, including cleaning up scratch varia
         return s;
     }(); // note ()
 ```
-If at all possible, reduce the conditions to a simple set of alternatives (e.g., an `enum`) and don't mix up selection and initialization.
+가능하다면 `enum`같은 쉬운 방법으로 조건을 줄여라. 분기 선택과 초기화를 뒤섞어선 안된다.
 
 ##### Enforcement
 
-Hard. At best a heuristic. Look for an uninitialized variable followed by a loop assigning to it.
+어렵다. 잘 해도 경험적인(heuristic) 수준. 
+루프를 사용해 값을 설정하는 초기화 안된 변수을 찾아라.
 
 ### <a name="Res-macros"></a>ES.30: Don't use macros for program text manipulation
 
 ##### Reason
 
-Macros are a major source of bugs.
-Macros don't obey the usual scope and type rules.
-Macros ensure that the human reader sees something different from what the compiler sees.
-Macros complicate tool building.
+매크로는 버그의 주요 원인이다.   
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.   
+매크로는 사람이 보는 것과 컴파일러가 보는 것을 다르게 한다.   
+매크로는 지원 도구를 만드는 것을 복잡하게 한다.
 
 ##### Example, bad
 ```c++
@@ -1103,7 +1104,7 @@ This innocuous-looking macro makes a single lower case `c` instead of a `C` into
 
 ##### Note
 
-This rule does not ban the use of macros for "configuration control" use in `#ifdef`s, etc.
+이 규칙은 `#ifdef`문에서 설정제어를 위해 매크로를 사용하는 것은 금하지 않는다.
 
 In the future, modules are likely to eliminate the need for macros in configuration control.
 
@@ -1152,37 +1153,39 @@ In the future, static reflection is likely to eliminate the last needs for the p
 
 ##### Enforcement
 
-Scream when you see a macro that isn't just used for source control (e.g., `#ifdef`)
+소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리를 질러라.
 
 ### <a name="Res-macros2"></a>ES.31: Don't use macros for constants or "functions"
 
 ##### Reason
 
-Macros are a major source of bugs.
-Macros don't obey the usual scope and type rules.
-Macros don't obey the usual rules for argument passing.
-Macros ensure that the human reader sees something different from what the compiler sees.
-Macros complicate tool building.
+매크로는 버그의 주요 원인이다.   
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.   
+매크로는 사람이 보는 것과 컴파일러가 보는 것을 다르게 한다.   
+매크로는 지원 도구를 만드는 것을 복잡하게 한다.
 
 ##### Example, bad
 ```c++
     #define PI 3.14
     #define SQUARE(a, b) (a * b)
 ```
-Even if we hadn't left a well-known bug in `SQUARE` there are much better behaved alternatives; for example:
+`SQUARE`에 잘 알려진 버그가 없다고 하더라도 더 잘 동작하는 대안이 있다. 
+
+예를 들면:
 ```c++
     constexpr double pi = 3.14;
     template<typename T> T square(T a, T b) { return a * b; }
 ```
+
 ##### Enforcement
 
-Scream when you see a macro that isn't just used for source control (e.g., `#ifdef`)
+소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리를 질러라.
+
 
 ### <a name="Res-ALL_CAPS"></a>ES.32: Use `ALL_CAPS` for all macro names
 
 ##### Reason
-
-Convention. Readability. Distinguishing macros.
+관습. 가독성. 매크로 구별.
 
 ##### Example
 ```c++
@@ -1192,7 +1195,7 @@ Convention. Readability. Distinguishing macros.
 ```
 ##### Enforcement
 
-Scream when you see a lower case macro.
+소문자로 작성된 매크로를 본다면 소리를 질러라.
 
 ### <a name="Res-MACROS"></a>ES.33: If you must use macros, give them unique names
 
@@ -1303,7 +1306,7 @@ Expressions manipulate values.
 
 ##### Reason
 
-Complicated expressions are error-prone.
+표현식이 복잡하면 오류가 발생하기 쉽다.
 
 ##### Example
 ```c++
@@ -1331,7 +1334,8 @@ Complicated expressions are error-prone.
     // bad: undefined behavior
     x = x++ + x++ + ++x;
 ```
-Some of these expressions are unconditionally bad (e.g., they rely on undefined behavior). Others are simply so complicated and/or unusual that even good programmers could misunderstand them or overlook a problem when in a hurry.
+위의 연산식 중 몇은 의심할 여지없이 나쁘다. (정의되지 않은 행동을 야기한다.)
+나머지는 꽤 복잡하거나 특이한 편이고, 심지어 능력있는 프로그래머도 잘못 이해하거나 문제를 간과해 버릴 만한 것도 있다.
 
 ##### Note
 
@@ -1358,13 +1362,15 @@ A programmer should know and use the basic rules for expressions.
 ```
 ##### Enforcement
 
-Tricky. How complicated must an expression be to be considered complicated? Writing computations as statements with one operation each is also confusing. Things to consider:
+까다롭다. "표현식이 얼마나 복잡한가"를 어떻게 판단할 것인가? 어떻게 고려할 것인가? 
+계산을 하나의 연산으로만 구성된 문장들로 구성하기는 힘들다.
 
-* side effects: side effects on multiple non-local variables (for some definition of non-local) can be suspect, especially if the side effects are in separate subexpressions
+고려할만한 것들:
+* 부수 효과(side-effect): 다수의 비지역 변수에 대한 부수 효과을 의심할 수 있다. 특히 별도의 하위 연산식에 있는 경우
 * writes to aliased variables
-* more than N operators (and what should N be?)
-* reliance of subtle precedence rules
-* uses undefined behavior (can we catch all undefined behavior?)
+* N개 이상의 연산자 (N은 얼마가 되어야 하는가?)
+* 미묘한 우선순위규칙에 의존하기
+* 미정의 행동 (undefined behavior: 모든 미정의 행동을 잡아낼 수 있는가?)
 * implementation defined behavior?
 * ???
 
@@ -1372,7 +1378,7 @@ Tricky. How complicated must an expression be to be considered complicated? Writ
 
 ##### Reason
 
-Avoid errors. Readability. Not everyone has the operator table memorized.
+오류가 발생하지 않게 하라. 가독성. 모든 사람들이 연산자 우선순위를 기억하지는 않는다.
 
 ##### Example
 ```c++
@@ -1381,13 +1387,13 @@ Avoid errors. Readability. Not everyone has the operator table memorized.
 
     if (a & flag != 0)  // bad: means a&(flag != 0)
 ```
-Note: We recommend that programmers know their precedence table for the arithmetic operations, the logical operations, but consider mixing bitwise logical operations with other operators in need of parentheses.
+Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 테이블을 알고 있고, 다른 연산과 비트 연산을 섞어 사용할 때는 소괄호(parentheses)를 사용하기를 권한다.
 ```c++
     if ((a & flag) != 0)  // OK: works as intended
 ```
 ##### Note
 
-You should know enough not to need parentheses for:
+아래에 대해서는 소괄호가 필요없다는 정도는 알고 있을 것이다:
 ```c++
     if (a < 0 || a <= max) {
         // ...
@@ -1395,15 +1401,15 @@ You should know enough not to need parentheses for:
 ```
 ##### Enforcement
 
-* Flag combinations of bitwise-logical operators and other operators.
-* Flag assignment operators not as the leftmost operator.
+* 비트 논리 연산자와 다른 연산자가 섞여 있다면 지적한다
+* 가장 왼쪽의 연산자(leftmost operator)가 할당 연산자가 아니라면 지적한다
 * ???
 
 ### <a name="Res-ptr"></a>ES.42: Keep use of pointers simple and straightforward
 
 ##### Reason
 
-Complicated pointer manipulation is a major source of errors.
+복잡한 포인터 계산은 주요한 오류 원인이 된다.
 
 ##### Note
 
@@ -1601,8 +1607,8 @@ This rule is part of the [bounds-safety profile](#SS-bounds).
 
 ##### Reason
 
-You have no idea what such code does. Portability.
-Even if it does something sensible for you, it may do something different on another compiler (e.g., the next release of your compiler) or with a different optimizer setting.
+그런 코드가 어떻게 동작할지는 알 수가 없다. 이식성.
+특정한 환경에는 맞을지는 몰라도, 다른 컴파일러 (혹은 사용 중인 컴파일러의 다음 버전)에서는 다를 수 있다. 혹은 최적화 설정에 따라 다를 수도 있다.
 
 ##### Note
 
@@ -1619,13 +1625,13 @@ A good rule of thumb is that you should not read a value twice in an expression 
 
 ##### Enforcement
 
-Can be detected by a good analyzer.
+좋은 분석기를 사용해 찾을 수 있다.
 
 ### <a name="Res-order-fct"></a>ES.44: Don't depend on order of evaluation of function arguments
 
 ##### Reason
 
-Because that order is unspecified.
+순서가 정의되어있지 않다.
 
 ##### Note
 
@@ -1653,20 +1659,22 @@ In C++17, these examples work as expected (left to right) and assignments are ev
 ```
 ##### Enforcement
 
-Can be detected by a good analyzer.
+좋은 분석기를 사용해 찾을 수 있다.
 
 ### <a name="Res-magic"></a>ES.45: Avoid "magic constants"; use symbolic constants
 
 ##### Reason
 
-Unnamed constants embedded in expressions are easily overlooked and often hard to understand:
+표현식에 포함된 이름없는 상수는 간과되기 쉽고 이해하기 어렵다:
 
 ##### Example
 ```c++
     for (int m = 1; m <= 12; ++m)   // don't: magic constant 12
         cout << month[m] << '\n';
 ```
-No, we don't all know that there are 12 months, numbered 1..12, in a year. Better:
+1년에 12달이 숫자로만 되어 있다면 이해가 잘 안될 것이다. 
+
+더 좋게 고치면:
 ```c++
     // months are indexed 1..12
     constexpr int first_month = 1;
@@ -1675,24 +1683,24 @@ No, we don't all know that there are 12 months, numbered 1..12, in a year. Bette
     for (int m = first_month; m <= last_month; ++m)   // better
         cout << month[m] << '\n';
 ```
-Better still, don't expose constants:
+아예 상수를 사용하지 않으면 더 낫다:
 ```c++
     for (auto m : month)
         cout << m << '\n';
 ```
 ##### Enforcement
 
-Flag literals in code. Give a pass to `0`, `1`, `nullptr`, `\n`, `""`, and others on a positive list.
+코드에 리터럴이 있다면 지적한다. `0`, `1`, `nullptr`, `\n`, `""` 등 가능한 목록은 허용하라.
 
 ### <a name="Res-narrowing"></a>ES.46: Avoid lossy (narrowing, truncating) arithmetic conversions
 
 ##### Reason
 
-A narrowing conversion destroys information, often unexpectedly so.
+정보를 파괴하고 전혀 기대하지 않는 값을 가지게 한다.
 
 ##### Example, bad
 
-A key example is basic narrowing:
+기본적인 예제:
 ```c++
     double d = 7.9;
     int i = d;    // bad: narrowing: i becomes 7
@@ -1706,13 +1714,12 @@ A key example is basic narrowing:
     }
 ```
 ##### Note
-
-The guidelines support library offers a `narrow_cast` operation for specifying that narrowing is acceptable and a `narrow` ("narrow if") that throws an exception if a narrowing would throw away information:
+gsl은 narrowing을 허용하는 `narrow_cast`와 변환시 값이 바뀌면 예외를 던지는 `narrow`("narrow if")를 제공한다:
 ```c++
     i = narrow_cast<int>(d);   // OK (you asked for it): narrowing: i becomes 7
     i = narrow<int>(d);        // OK: throws narrowing_error
 ```
-We also include lossy arithmetic casts, such as from a negative floating point type to an unsigned integral type:
+이 규칙은 부동 소수점 타입의 음수를 부호 없는 정수타입으로 변환하는 등의 손실있는 형변환까지도 포함한다:
 ```c++
     double d = -7.9;
     unsigned u = 0;
@@ -1733,14 +1740,15 @@ A good analyzer can detect all narrowing conversions. However, flagging all narr
 
 ##### Reason
 
-Readability. Minimize surprises: `nullptr` cannot be confused with an
-`int`. `nullptr` also has a well-specified (very restrictive) type, and thus
+가독성의 문제다. 기대를 벗어나지 않게 한다.
+
+`nullptr`는 `int`와 혼동의 여지가 없다. `nullptr` also has a well-specified (very restrictive) type, and thus
 works in more scenarios where type deduction might do the wrong thing on `NULL`
 or `0`.
 
 ##### Example
 
-Consider:
+참고하라:
 ```c++
     void f(int);
     void f(char*);
@@ -1749,13 +1757,13 @@ Consider:
 ```
 ##### Enforcement
 
-Flag uses of `0` and `NULL` for pointers. The transformation may be helped by simple program transformation.
+포인터에 `0`, `NULL`을 사용한다면 지적한다. 프로그램으로 간단하게 변환할 수 있으면 도움이 될 것이다.
 
 ### <a name="Res-casts"></a>ES.48: Avoid casts
 
 ##### Reason
 
-Casts are a well-known source of errors. Make some optimizations unreliable.
+잘 알려진 오류의 원인이다. 최적화를 신뢰할 수 없게 만들어 버린다.
 
 ##### Example, bad
 ```c++
@@ -1789,13 +1797,13 @@ If there is not, maybe there ought to be, rather than applying a local fix (cast
 
 ##### Note
 
-Casts are necessary in a systems programming language.  For example, how else
-would we get the address of a device register into a pointer?  However, casts
-are seriously overused as well as a major source of errors.
+형변환은 시스템 프로그래밍 언어에 꼭 필요하다.
+예를 들어, 디바이스 레지스터의 주소를 포인터로 얻어 올 때이다.
+그러나 너무 남용하는 바람에 많은 오류가 발생하는 것도 사실이다.
 
 ##### Note
 
-If you feel the need for a lot of casts, there may be a fundamental design problem.
+형변환을 너무 많이 쓴다고 생각된다면 근본적인 설계 문제가 있을지도 모른다.
 
 ##### Exception
 
@@ -1821,8 +1829,14 @@ Casts are widely (mis) used. Modern C++ has rules and constructs that eliminate 
 
 ##### Reason
 
+가독성. 오류 예방.
+
 Readability. Error avoidance.
-Named casts are more specific than a C-style or functional cast, allowing the compiler to catch some errors.
+Named cast들은 C스타일이나 함수형 형변환보다 더 구체적이며, 컴파일러가 일부 오류를 잡아낼 수 있도록 한다.
+
+> 역주:
+>  - C 스타일 형변환: `(int) a`
+>  - 함수형 형변환: `int(a)`
 
 The named casts are:
 
@@ -1875,7 +1889,7 @@ for example.)
 
 ##### Enforcement
 
-* Flag C-style and functional casts.
+* C스타일, 함수형 형변환이 있다면 지적한다.
 * The [type profile](#Pro-type-reinterpretcast) bans `reinterpret_cast`.
 * The [type profile](#Pro-type-arithmeticcast) warns when using `static_cast` between arithmetic types.
 
@@ -1883,8 +1897,7 @@ for example.)
 
 ##### Reason
 
-It makes a lie out of `const`.
-If the variable is actually declared `const`, the result of "casting away `const`" is undefined behavior.
+`const`를 거짓말로 만든다. 대상 변수가 정말로 `const`로 선언되었다면, `const`를 제거한 결과는 미정의 행동(undefined behavior)이 된다.
 
 ##### Example, bad
 ```c++
@@ -1957,9 +1970,9 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 
 ##### Example
 
-Sometimes, "cast away `const`" is to allow the updating of some transient information of an otherwise immutable object.
-Examples are caching, memoization, and precomputation.
-Such examples are often handled as well or better using `mutable` or an indirection than with a `const_cast`.
+보통 `const`를 없애버리는 이유는 변경할 수 없는 객체 속에 있는 일시적인 정보를 변경하기 위해서이다.
+예를 들면 캐싱값, 임시계산값, 선계산값 등이다.
+이런 값은 `const_cast`를 쓰는 것보다 `mutable`이나 간접적인 방법을 사용하면 더 쉽게 처리할 수 있다.
 
 Consider keeping previously computed results around for a costly operation:
 ```c++
@@ -2049,14 +2062,14 @@ In any variant, we must guard against data races on the `cache` in multi-threade
 
 ##### Enforcement
 
-* Flag `const_cast`s.
-* This rule is part of the [type-safety profile](#Pro-type-constcast) for the related Profile.
+* `const_cast`를 지적한다.
+* 이 규칙은 [타입 안정성 분석](#Pro-type-constcast)과 관련 있다
 
 ### <a name="Res-range-checking"></a>ES.55: Avoid the need for range checking
 
 ##### Reason
 
-Constructs that cannot overflow do not overflow (and usually run faster):
+오버플로우가 발생할 소지가 없다 (또한 더 빠르게 실행될 수 있다).
 
 ##### Example
 ```c++
@@ -2067,7 +2080,7 @@ Constructs that cannot overflow do not overflow (and usually run faster):
 ```
 ##### Enforcement
 
-Look for explicit range checks and heuristically suggest alternatives.
+명시적인 범위검사를 찾아서 적절한 대안을 제시한다.
 
 ### <a name="Res-move"></a>ES.56: Write `std::move()` only when you need to explicitly move an object to another scope
 
@@ -2189,11 +2202,11 @@ The language already knows that a returned value is a temporary object that can 
 
 ##### Reason
 
-Direct resource management in application code is error-prone and tedious.
+프로그램 코드 내에서 직접적인 리소스 관리는 에러를 발생시키기 쉬우며 지루(tedious)하다.
 
 ##### Note
 
-also known as "No naked `new`!"
+"No naked `new`!"로 알려져있다
 
 ##### Example, bad
 ```c++
@@ -2204,19 +2217,19 @@ also known as "No naked `new`!"
         delete[] p;
     }
 ```
-There can be code in the `...` part that causes the `delete` never to happen.
+`...`에 `delete`가 발생하지 않게 만드는 코드가 있을 수 있다.
 
-**See also**: [R: Resource management](#S-resource)
+**See also**: [R: 리소스 관리](#S-resource)
 
 ##### Enforcement
 
-Flag naked `new`s and naked `delete`s.
+그대로 노출된 `new`와 `delete`를 지적한다.
 
 ### <a name="Res-del"></a>ES.61: Delete arrays using `delete[]` and non-arrays using `delete`
 
 ##### Reason
 
-That's what the language requires and mistakes can lead to resource release errors and/or memory corruption.
+C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염(memory corruption) 문제가 발생할 수 있다. 
 
 ##### Example, bad
 ```c++
@@ -2229,18 +2242,18 @@ That's what the language requires and mistakes can lead to resource release erro
 ```
 ##### Note
 
-This example not only violates the [no naked `new` rule](#Res-new) as in the previous example, it has many more problems.
+이 예제는 [no naked `new` rule](#Res-new)를 위반할 뿐만 아니라 많은 다른 문제를 야기한다.
 
 ##### Enforcement
 
-* if the `new` and the `delete` is in the same scope, mistakes can be flagged.
-* if the `new` and the `delete` are in a constructor/destructor pair, mistakes can be flagged.
+* `new`, `delete`가 같은 영역범위에 있다면 오류여부를 지적할 수 있다
+* `new`, `delete`가 생성자/소멸자 안에 있다면 오류여부를 지적할 수 있다
 
 ### <a name="Res-arr2"></a>ES.62: Don't compare pointers into different arrays
 
 ##### Reason
 
-The result of doing so is undefined.
+결과가 정의되지 않았다.
 
 ##### Example, bad
 ```c++
@@ -2254,7 +2267,7 @@ The result of doing so is undefined.
 ```
 ##### Note
 
-This example has many more problems.
+더 많은 문제가 내포되어 있다.
 
 ##### Enforcement
 
@@ -2540,9 +2553,10 @@ Statements control the flow of control (except for function calls and exception 
 
 ##### Reason
 
-* Readability.
-* Efficiency: A `switch` compares against constants and is usually better optimized than a series of tests in an `if`-`then`-`else` chain.
-* A `switch` enables some heuristic consistency checking. For example, have all values of an `enum` been covered? If not, is there a `default`?
+
+* 가독성.
+* 효율성: 상수값에 대해서 비교를 수행하므로 `if`-`then`-`else`문의 연속보다 `switch`문이 더 잘 최적화될 수 있다.
+* `switch` 문은 경험적인 형태의 일관성 검사를 할 수 있게 한다. 예를 들자면, `enum` 모든 값을 확인하고 있는가? 그렇지 않다면 `default`는 있는가?
 
 ##### Example
 ```c++
@@ -2561,7 +2575,7 @@ Statements control the flow of control (except for function calls and exception 
         }
     }
 ```
-rather than:
+위의 예제가 더 좋다:
 ```c++
     void use2(int n)
     {
@@ -2573,13 +2587,13 @@ rather than:
 ```
 ##### Enforcement
 
-Flag `if`-`then`-`else` chains that check against constants (only).
+상수값에 대해서 체크하는 if-then-else 연속이라면 지적한다. (이 경우에만)
 
 ### <a name="Res-for-range"></a>ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice
 
 ##### Reason
 
-Readability. Error prevention. Efficiency.
+가독성. 오류 예방. 효율성.
 
 ##### Example
 ```c++
@@ -2605,33 +2619,33 @@ Readability. Error prevention. Efficiency.
             cout << v[i] << '\n';
     }
 ```
-A human or a good static analyzer may determine that there really isn't a side effect on `v` in `f(v, &v[i])` so that the loop can be rewritten.
+프로그래머나 좋은 정적 분석기는 `f(&v[i])`에서 `v`에 대해서 부수효과(side effect)가 일어나지 않는다고 판단할지도 모른다. 이 경우 루프를 최적화할 수 있다.
 
-"Messing with the loop variable" in the body of a loop is typically best avoided.
+루프문 내에서 "루프변수를 변경"하는 경우가 없어야 한다.
 
 ##### Note
-
-Don't use expensive copies of the loop variable of a range-`for` loop:
+범위 기반 `for`문에서 루프변수를 복사하여 사용하지 마라:
 ```c++
     for (string s : vs) // ...
 ```
-This will copy each elements of `vs` into `s`. Better:
+위 코드는 `vs`의 원소를 `s`로 복사한다. 개선하면:
 ```c++
     for (string& s : vs) // ...
 ```
-Better still, if the loop variable isn't modified or copied:
+만약 루프 변수(`s`)가 변경되거나 복사되지 않는다면:
 ```c++
     for (const string& s : vs) // ...
 ```
+
 ##### Enforcement
 
-Look at loops, if a traditional loop just looks at each element of a sequence, and there are no side effects on what it does with the elements, rewrite the loop to a ranged-`for` loop.
+루프를 보고 개별 요소들을 일렬로 참조하고 있고 부수효과(side effect)가 없어 보이면 `for`문으로 재작성한다.
 
 ### <a name="Res-for-while"></a>ES.72: Prefer a `for`-statement to a `while`-statement when there is an obvious loop variable
 
 ##### Reason
 
-Readability: the complete logic of the loop is visible "up front". The scope of the loop variable can be limited.
+가독성: 루프에 대한 전체 로직을 첫구문에서 볼 수 있다. 루프변수의 범위가 제한되는 점도 좋다.
 
 ##### Example
 ```c++
@@ -2655,7 +2669,7 @@ Readability: the complete logic of the loop is visible "up front". The scope of 
 
 ##### Reason
 
-Readability.
+가독성
 
 ##### Example
 ```c++
@@ -2681,8 +2695,8 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 
 ##### Reason
 
-Limit the loop variable visibility to the scope of the loop.
-Avoid using the loop variable for other purposes after the loop.
+루프 변수의 가시범위를 루프 범위 내로 제한하라.
+루프문 뒤에서 다른 목적으로 루프 변수를 사용하지 못하게 하라.
 
 ##### Example
 ```c++
@@ -2708,17 +2722,22 @@ Avoid using the loop variable for other purposes after the loop.
 ```
 ##### Enforcement
 
-Warn when a variable modified inside the `for`-statement is declared outside the loop and not being used outside the loop.
+`for`문 안에서만 변하는 변수가 루프 밖에 선언되어 있지만 루프 밖에서 사용되지 않고 있다면 경고한다.
 
-**Discussion**: Scoping the loop variable to the loop body also helps code optimizers greatly. Recognizing that the induction variable
-is only accessible in the loop body unblocks optimizations such as hoisting, strength reduction, loop-invariant code motion, etc.
+**Discussion**: 루프변수를 루프구문내로 범위로 정하면 코드 최적화에 많은 도움이 된다.
+귀납 변수(induction variable)가 루프구문 안에서만 접근가능함을 파악하면 
+위치이동(hoisting), 연산 부담 완화(strength reduction), 루프 내 불변코드 이동(loop-invariant code motion) 등의 최적화가 가능해진다.
+
+> 번역 참고: 
+>  - https://en.wikipedia.org/wiki/Strength_reduction
+>  - https://code-examples.net/ko/docs/gcc~7/optimize-options
 
 ### <a name="Res-do"></a>ES.75: Avoid `do`-statements
 
 ##### Reason
 
-Readability, avoidance of errors.
-The termination condition is at the end (where it can be overlooked) and the condition is not checked the first time through.
+가독성. 오류 회피.
+종료 조건이 끝에 위치해 있고(못 보고 넘어가기 쉬운 위치.) 첫 루프에서 체크를 하지 않는다.
 
 ##### Example
 ```c++
@@ -2728,6 +2747,7 @@ The termination condition is at the end (where it can be overlooked) and the con
         // ...
     } while (x < 0);
 ```
+
 ##### Note
 
 Yes, there are genuine examples where a `do`-statement is a clear statement of a solution, but also many bugs.
@@ -2740,9 +2760,13 @@ Flag `do`-statements.
 
 ##### Reason
 
-Readability, avoidance of errors. There are better control structures for humans; `goto` is for machine generated code.
+가독성. 오류 회피. 사람을 위해서는 더 좋은 컨트롤 구조가 있다;
+`goto`는 기계코드(machine generated code)를 위한 것이다.
 
 ##### Exception
+
+중첩된 루프에서 탈출. 
+이런 경우라면 항상 처리의 진행방향으로 점프하라.
 
 Breaking out of a nested loop.
 In that case, always jump forwards.
@@ -2756,8 +2780,7 @@ In that case, always jump forwards.
     // ...
 ```
 ##### Example, bad
-
-There is a fair amount of use of the C goto-exit idiom:
+C에서 goto-exit 형태(idiom)를 꽤 많이 사용한다:
 ```c++
     void f()
     {
@@ -2770,14 +2793,14 @@ There is a fair amount of use of the C goto-exit idiom:
         // ... common cleanup code ...
     }
 ```
-This is an ad-hoc simulation of destructors.
-Declare your resources with handles with destructors that clean up.
+이건 소멸자를 시뮬레이션한 것이다. 리소스를 해제하는 소멸자를 가진 핸들로 선언하라.
+
 If for some reason you cannot handle all cleanup with destructors for the variables used,
 consider `gsl::finally()` as a cleaner and more reliable alternative to `goto exit`
 
 ##### Enforcement
 
-* Flag `goto`. Better still flag all `goto`s that do not jump from a nested loop to the statement immediately after a nest of loops.
+* `goto`가 보이면 지적한다. 루프 다음문으로 점프하지 않는 중첩 루프 내의 `goto`는 모두 표시하면 더 좋다.
 
 ### <a name="Res-continue"></a>ES.77: Minimize the use of `break` and `continue` in loops
 
@@ -2815,8 +2838,8 @@ If you really need to break out a loop, a `break` is typically better than alter
 
 ##### Reason
 
- Accidentally leaving out a `break` is a fairly common bug.
- A deliberate fallthrough is a maintenance hazard.
+실수로 `break`를 붙이지 않는 것은 꽤 많이 발생하는 버그다.
+고의적으로 `break`를 없애는 것(fallthrough)은 유지보수의 위험요소가 된다.
 
 ##### Example
 ```c++
@@ -2832,7 +2855,7 @@ If you really need to break out a loop, a `break` is typically better than alter
         break;
     }
 ```
-It is easy to overlook the fallthrough. Be explicit:
+`break`로 안 끝나는 사항은 간과하기 쉽다. 명확하게 하라:
 ```c++
     switch (eventType) {
     case Information:
@@ -2846,7 +2869,7 @@ It is easy to overlook the fallthrough. Be explicit:
         break;
     }
 ```
-In C++17, use a `[[fallthrough]]` annotation:
+C++17에서는, `[[fallthrough]]`를 사용하라:
 ```c++
     switch (eventType) {
     case Information:
@@ -2861,8 +2884,7 @@ In C++17, use a `[[fallthrough]]` annotation:
     }
 ```
 ##### Note
-
-Multiple case labels of a single statement is OK:
+단일문으로 된 여러개의 케이스 조건은 허용된다:
 ```c++
     switch (x) {
     case 'a':
@@ -2874,14 +2896,14 @@ Multiple case labels of a single statement is OK:
 ```
 ##### Enforcement
 
-Flag all fallthroughs from non-empty `case`s.
+빈 `case`문이 아닌데 break로 끝나지 않는다면 지적한다.
 
 ### <a name="Res-default"></a>ES.79: Use `default` to handle common cases (only)
 
 ##### Reason
 
- Code clarity.
- Improved opportunities for error detection.
+코드의 명확성.
+오류를 탐지할 기회를 늘려준다.
 
 ##### Example
 ```c++
@@ -2982,7 +3004,7 @@ Flag statements that are just a temporary
 
 ##### Reason
 
-Readability.
+가독성.
 
 ##### Example
 ```c++
@@ -2996,7 +3018,7 @@ Readability.
 ```
 ##### Enforcement
 
-Flag empty statements that are not blocks and don't contain comments.
+블록이 아니면서 주석문을 포함하지 않는 빈 문장이 있다면 지적한다.
 
 ### <a name="Res-loop-counter"></a>ES.86: Avoid modifying loop control variables inside the body of raw for-loops
 
@@ -3111,14 +3133,12 @@ The opposite condition is most easily expressed using a negation:
 Easy, just check for redundant use of `!=` and `==` in conditions.
 
 
-
-## <a name="SS-numbers"></a>Arithmetic
+## <a name="SS-numbers"></a>산술연산(Arithmetic)
 
 ### <a name="Res-mix"></a>ES.100: Don't mix signed and unsigned arithmetic
 
 ##### Reason
-
-Avoid wrong results.
+결과가 잘못될 수 있다.
 
 ##### Example
 ```c++
@@ -3133,12 +3153,13 @@ It is harder to spot the problem in more realistic examples.
 
 ##### Note
 
-Unfortunately, C++ uses signed integers for array subscripts and the standard library uses unsigned integers for container subscripts.
-This precludes consistency. Use `gsl::index` for subscripts; [see ES.107](#Res-subscripts).
+불행히도 C++은 배열인자에 대해서 부호있는 정수를 사용하고 표준 라이브러리는 컨테이너 인자에 부호없는 정수형을 사용한다.
+
+이는 일관적이지 않다. 배열 접근이라면 `gsl::index`를 사용하라. [ES.107](#Res-subscripts)을 참고하라.
 
 ##### Enforcement
 
-* Compilers already know and sometimes warn.
+* 컴파일러가 이미 알고 있는 상황이고 경고할 것이다
 * (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
 
 
@@ -3146,7 +3167,7 @@ This precludes consistency. Use `gsl::index` for subscripts; [see ES.107](#Res-s
 
 ##### Reason
 
-Unsigned types support bit manipulation without surprises from sign bits.
+부호없는 타입은 부호비트까지 포함해서 비트 연산할 수 있도록 지원하기 때문에 의도한 대로 동작한다.
 
 ##### Example
 ```c++
@@ -3169,8 +3190,8 @@ can be surprising for many programmers.
 
 ##### Reason
 
-Because most arithmetic is assumed to be signed;
-`x - y` yields a negative number when `y > x` except in the rare cases where you really want modulo arithmetic.
+대부분의 산술 연산은 부호를 고려한다;
+모듈러 연산과 같이 특별한 경우가 아니라면 `x - y`는 `y > x`인 경우 음수값이 나오길 기대한다.
 
 ##### Example
 
@@ -3235,8 +3256,8 @@ This makes surprises (and bugs) inevitable.
 
 ##### Reason
 
-Overflow usually makes your numeric algorithm meaningless.
-Incrementing a value beyond a maximum value can lead to memory corruption and undefined behavior.
+오버플로우는 수식 알고리즘을 의미없게 만들어 버린다.
+최대값 이상으로 증가시킨다면 메모리값이 망가지고 비정상적으로 작동한다.
 
 ##### Example, bad
 ```c++
@@ -3260,9 +3281,9 @@ Incrementing a value beyond a maximum value can lead to memory corruption and un
 ```
 ##### Exception
 
-Use unsigned types if you really want modulo arithmetic.
+모듈러 연산(modulo arithmetic)을 사용한다면 부호없는 타입을 사용하라.
 
-**Alternative**: For critical applications that can afford some overhead, use a range-checked integer and/or floating-point type.
+**Alternative**: 어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 범위 검사를 수행하거나 부동소수점 타입을 사용하라.
 
 ##### Enforcement
 
@@ -3272,7 +3293,7 @@ Use unsigned types if you really want modulo arithmetic.
 
 ##### Reason
 
-Decrementing a value beyond a minimum value can lead to memory corruption and undefined behavior.
+최소값 이하로 값이 내려가면 메모리값이 망가지고 비정상적으로 작동한다.
 
 ##### Example, bad
 ```c++
@@ -3285,7 +3306,7 @@ Decrementing a value beyond a minimum value can lead to memory corruption and un
 ```
 ##### Exception
 
-Use unsigned types if you really want modulo arithmetic.
+모듈러 연산(modulo arithmetic)을 사용한다면 부호없는 타입을 사용하라.
 
 ##### Enforcement
 
@@ -3295,11 +3316,11 @@ Use unsigned types if you really want modulo arithmetic.
 
 ##### Reason
 
-The result is undefined and probably a crash.
+결과가 정의되지 않았으며 크래시를 발생시킬 것이다.
 
 ##### Note
 
-This also applies to `%`.
+모듈러 연산(`%`)에도 적용된다
 
 ##### Example; bad
 ```c++
@@ -3321,7 +3342,7 @@ This also applies to `%`.
         return b ? a / b : quiet_NaN<double>();
     }
 ```
-**Alternative**: For critical applications that can afford some overhead, use a range-checked integer and/or floating-point type.
+**Alternative**: 어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 범위 검사를 수행하거나 부동소수점 타입을 사용하라.
 
 ##### Enforcement
 

@@ -1,3 +1,177 @@
+
+# <a name="S-functions"></a>F: 함수
+
+함수는 어떤 동작이나 계산을 명세하는데, 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 함수는 프로그램의 기초적인 설계 단위다.
+
+함수 이름은 인자의 요구사항, 인자간의 관계와 결과를 명확하게 기술할 수 있도록 의미있게 지어야 한다. 함수의 구현은 사양서가 아니다. 함수가 무엇을 해야하는지, 어떻게 동작하는지를 고려해야 한다. 함수는 모든 인터페이스에서 가장 중요한 부분이다. 인터페이스 규칙을 참고 하라.
+
+함수 규칙 요약:
+
+함수 정의 규칙:
+
+* [F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라](#Rf-package)
+* [F.2: 함수는 하나의 논리적 동작만 수행하도록 하라](#Rf-logical)
+* [F.3: 함수는 간결하고 단순하게 유지시켜라](#Rf-single)
+* [F.4: 함수가 컴파일 타임에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
+* [F.5: 함수가 매우 짧고 수행시간이 중요하다면 inline으로 선언하라](#Rf-inline)
+* [F.6: 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
+* [F.7: 보편성을 고려한다면, 스마트 포인터 대신에 `T*`나 `T&`형 인자를 사용하라](#Rf-smart)
+* [F.8: 순수 함수를 선호하라](#Rf-pure)
+
+매개 변수 전달 표현 규칙:
+
+* [F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라](#Rf-conventional)
+* [F.16: "입력" 매개 변수는 복사 비용이 적게드는 값의 형을 사용하거나 상수 참조형으로 전달하라](#Rf-in)
+* [F.17: "입출력" 매개 변수는 비상수 참조형으로 전달하라](#Rf-inout)
+* [F.18: "소모성" 매개 변수는 `X&&`형과 `std::move`로 전달하라](#Rf-consume)
+* [F.19: "forward" 매개 변수는 `TP&&`형과 `std::forward`로만 전달하라](#Rf-forward)
+* [F.20: For "out" output values, 출력 매개 변수로 값을 반환하는 방법을 선호하라](#Rf-out)
+* [F.21: "출력"값 여러개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
+* [F.60: "인자가 없을 수도" 있다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
+
+매개 변수 의미론적 규칙:
+
+* [F.22: Use `T*` or `owner<T*>` or a smart pointer to designate a single object](#Rf-ptr)
+* [F.23: Use a `not_null<T>` to indicate "null" is not a valid value](#Rf-nullptr)
+* [F.24: Use a `span<T>` or a `span_p<T>` to designate a half-open sequence](#Rf-range)
+* [F.25: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-string)
+* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
+* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
+
+값 반환 의미론적 규칙:
+
+* [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
+* [F.43: Never (directly or indirectly) return a pointer or a reference to a local object](#Rf-dangle)
+* [F.44: Return a `T&` when copy is undesirable and "returning no object" isn't an option](#Rf-return-ref)
+* [F.45: Don't return a `T&&`](#Rf-return-ref-ref)
+* [F.46: `int` is the return type for `main()`](#Rf-main)
+* [F.47: Return `T&` from assignment operators.](#Rf-assignment-op)
+
+기타 함수 규칙:
+
+* [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
+* [F.51: Where there is a choice, prefer default arguments over overloading](#Rf-default-args)
+* [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
+* [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
+* [F.54: If you capture `this`, capture all variables explicitly (no default capture)](#Rf-this-capture)
+
+함수는 람다와 함수객체와 매우 유사하다. 그러니 ???을 참고하라.
+
+## <a name="SS-fct-def"></a>F.def: 함수 정의
+
+함수 정의는 함수를 선언하고 몸체를 구현하는 것을 포함한다.
+
+### <a name="Rf-package"></a>F.1: 의미있는 동작들을 모아서 심사숙고해 함수 이름을 지어라
+
+##### 이유
+
+공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 오류 발생을 제한시킨다.
+만약 어떤 동작이 잘 정의되어 있다면 주변 코드로부터 분리하고 이름을 지어라.
+
+##### 나쁜 예제,
+
+    void read_and_print(istream& is)    // read and print an int
+    {
+        int x;
+        if (is >> x)
+            cout << "the int is " << x << '\n';
+        else
+            cerr << "no int on input\n";
+    }
+
+`read_and_print`는 대부분이 틀렸다.
+이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 오류 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
+재사용되는 코드가 없고 논리적으로 분리된 동작들은 섞였고 지역변수는 사용이 끝난 후에도 존재한다.
+간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 오류처리가 좀 더 복잡해지면 코드가 뒤엉켜서 이해하기 어려워 진다.
+
+##### 비고
+
+만약 한 곳 이상에서 사용 될 중요한 람다 함수를 작성한다면 (비지역)변수에 할당하고 이름을 지어줘라.
+
+##### 예제
+
+    sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
+
+람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠할 수 있다.
+
+    auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
+
+    sort(a, b, lessT);
+    find_if(a, b, lessT);
+
+유지보수나 성능을 고려하면 짧은 코드가 항상 좋은것은 아니다.
+
+##### 예외
+
+반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
+하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
+[함수를 간결하게 유지하라](#Rf-single) 규칙은 "반복문을 간결하게 유지하라"는 규칙을 내포한다. 콜백 인자로 사용되는 람다는 재사용하지 않지만 사소하게 볼 수 없는 경우도 있다.
+
+##### 적용
+
+* [함수를 간결하게 유지하라](#Rf-single)를 참고하라.
+* 여러곳에서 사용되는 동일하거나 매우 비슷한 람다는 표시해 두어라.
+
+### <a name="Rf-logical"></a>F.2: 함수는 논리적으로 한 가지 작업만 수행해야 한다
+
+##### 이유
+
+하나의 작업만 수행하는 함수는 이해하기 쉽고, 테스트하기 쉽고, 재사용하기 쉽다.
+
+##### 예제
+
+다음을 고려해 보자:
+
+    void read_and_print()    // bad
+    {
+        int x;
+        cin >> x;
+        // check for errors
+        cout << x << "\n";
+    }
+
+위 함수는 특정한 입력에 속박되어 있고 다른 쓰임새는 찾을 수 없다. 대신, 함수를 의미있는 논리적 작업으로 나누고 매개 변수화하라.
+
+    int read(istream& is)    // better
+    {
+        int x;
+        is >> x;
+        // check for errors
+        return x;
+    }
+
+    void print(ostream& os, int x)
+    {
+        os << x << "\n";
+    }
+
+필요하다면 두 함수를 결합하면 된다:
+
+    void read_and_print()
+    {
+        auto x = read(cin);
+        print(cout, x);
+    }
+
+또한 필요하다면 `read()`와 `print()`에서 사용하는 데이터 타입, 입력 메커니즘, 오류에 대한 응답 등을 템플릿화 할 수 있다. 예를 들어:
+
+    auto read = [](auto& input, auto& value)    // better
+    {
+        input >> value;
+        // check for errors
+    };
+
+    auto print(auto& output, const auto& value)
+    {
+        output << value << "\n";
+    }
+
+##### 적용
+
+* 출력 매개 변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다.
+* 편집기 화면에 다 나오지 않을 만큼 큰 함수를 의심하라. 이런 함수는 세부 동작을 갖는 더 작은 함수들로 (이름을 잘 지어서) 나누도록 한다.
+* 7개 이상의 매개 변수를 갖는 함수를 의심하라.
+
 <a name="Rf-single"></a>
 ### F.3: 함수를 간결하고 단순하고 유지하라
 >### F.3: Keep functions short and simple
