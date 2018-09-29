@@ -1,14 +1,16 @@
 
-# <a name="S-performance"></a>Per: Performance
+# <a name="S-performance"></a>Per: 성능
 
 ??? should this section be in the main guide???
 
-This section contains rules for people who need high performance or low-latency.
-That is, these are rules that relate to how to use as little time and as few resources as possible to achieve a task in a predictably short time.
-The rules in this section are more restrictive and intrusive than what is needed for many (most) applications.
-Do not blindly try to follow them in general code: achieving the goals of low latency requires extra work.
+이 장에서는 높은 성능 또는 지연이 거의 없어야 하는 사람들을 위한 규칙을 포함하고 있다. 
+다시 말해 예측 가능한 짧은 시간 안에 작업을 완료하기 위해 가능한 적은 시간과 리소스를 어떻게 사용하는지와 관련된 규칙이다.
 
-Performance rule summary:
+규칙들은 (대부분의) 어플리케이션에 필요한 것보다 더 제한적이고 어떻게 보면 거슬릴 수도 있는 것이다.
+일반적인 코드에 이러한 것들을 맹목적으로 따라 하지 않기 바란다:
+지연을 없애는 목적을 달성하기 위해서는 굉장한 노력이 필요하다.
+
+성능 규칙 요약:
 
 * [Per.1: Don't optimize without reason](#Rper-reason)
 * [Per.2: Don't optimize prematurely](#Rper-Knuth)
@@ -29,7 +31,7 @@ Performance rule summary:
 * [Per.19: Access memory predictably](#Rper-access)
 * [Per.30: Avoid context switches on the critical path](#Rper-context)
 
-### <a name="Rper-reason"></a>Per.1: Don't optimize without reason
+### <a name="Rper-reason"></a>Per.1: 이유없이 최적화하지 마라
 
 ##### Reason
 
@@ -41,7 +43,7 @@ Some people optimize out of habit or because it's fun.
 
 ???
 
-### <a name="Rper-Knuth"></a>Per.2: Don't optimize prematurely
+### <a name="Rper-Knuth"></a>Per.2: 성급하게 최적화하지 마라
 
 ##### Reason
 
@@ -49,7 +51,7 @@ Elaborately optimized code is usually larger and harder to change than unoptimiz
 
 ???
 
-### <a name="Rper-critical"></a>Per.3: Don't optimize something that's not performance critical
+### <a name="Rper-critical"></a>Per.3: 성능 크리티컬하지 않는 곳에는 최적화를 하지 마라
 
 ##### Reason
 
@@ -65,7 +67,7 @@ only as impactful as a 5% improvement on B. (If you don't even know how much
 time is spent on A or B, see <a href="#Rper-reason">Per.1</a> and <a
 href="#Rper-Knuth">Per.2</a>.)
 
-### <a name="Rper-simple"></a>Per.4: Don't assume that complicated code is necessarily faster than simple code
+### <a name="Rper-simple"></a>Per.4: 복잡한 코드가 간단한 코드보다 빠르다고 추측하지 마라
 
 ##### Reason
 
@@ -98,7 +100,7 @@ Simple code can be very fast. Optimizers sometimes do marvels with simple code
 
 ???
 
-### <a name="Rper-low"></a>Per.5: Don't assume that low-level code is necessarily faster than high-level code
+### <a name="Rper-low"></a>Per.5: 저수준 코드가 고수준 코드보다 필연적으로 빠를 것이라고 추측하지 마라
 
 ##### Reason
 
@@ -110,7 +112,7 @@ Low-level code sometimes inhibits optimizations. Optimizers sometimes do marvels
 
 ???
 
-### <a name="Rper-measure"></a>Per.6: Don't make claims about performance without measurements
+### <a name="Rper-measure"></a>Per.6: 측정없이 성능 개선을 주장하지 마라
 
 ##### Reason
 
@@ -130,7 +132,7 @@ Often, you will be surprised.
 
 ???
 
-### <a name="Rper-efficiency"></a>Per.7: Design to enable optimization
+### <a name="Rper-efficiency"></a>Per.7: 최적화가 가능하게 설계하라
 
 ##### Reason
 
@@ -295,7 +297,7 @@ It complements it encouraging developers enable later - appropriate and non-prem
 Tricky.
 Maybe looking for `void*` function arguments will find examples of interfaces that hinder later optimization.
 
-### <a name="Rper-type"></a>Per.10: Rely on the static type system
+### <a name="Rper-type"></a>Per.10: 정적 타입 시스템에 의지하라
 
 ##### Reason
 
@@ -303,7 +305,7 @@ Type violations, weak types (e.g. `void*`s), and low-level code (e.g., manipulat
 
 ???
 
-### <a name="Rper-Comp"></a>Per.11: Move computation from run time to compile time
+### <a name="Rper-Comp"></a>Per.11: 계산을 실행 시간에서 컴파일 시간으로 옮겨라
 
 ##### Reason
 
@@ -382,43 +384,43 @@ This is admittedly rare, but by factoring out a general computation into separat
 * Look for functions called with all constant-expression arguments.
 * Look for macros that could be constexpr.
 
-### <a name="Rper-alias"></a>Per.12: Eliminate redundant aliases
+### <a name="Rper-alias"></a>Per.12: 불필요한 별칭을 제거하라
 
 ???
 
-### <a name="Rper-indirect"></a>Per.13: Eliminate redundant indirections
+### <a name="Rper-indirect"></a>Per.13: 불필요한 간접 접근(indirection)을 제거하라
 
 ???
 
-### <a name="Rper-alloc"></a>Per.14: Minimize the number of allocations and deallocations
+### <a name="Rper-alloc"></a>Per.14: 할당과 해제의 수를 최소화하라
 
 ???
 
-### <a name="Rper-alloc0"></a>Per.15: Do not allocate on a critical branch
+### <a name="Rper-alloc0"></a>Per.15: 중요 분기에서는 할당을 하지 마라
 
 ???
 
-### <a name="Rper-compact"></a>Per.16: Use compact data structures
+### <a name="Rper-compact"></a>Per.16: 압축적인 자료 구조를 사용하라
 
 ##### Reason
 
-Performance is typically dominated by memory access times.
+보통 성능은 메모리 접근시간에 반비례한다.
 
 ???
 
-### <a name="Rper-struct"></a>Per.17: Declare the most used member of a time-critical struct first
+### <a name="Rper-struct"></a>Per.17: 빠른 처리를 요구하는 구조체에서 가장 많이 쓰이는 멤버를 먼저 선언해라
 
 ???
 
-### <a name="Rper-space"></a>Per.18: Space is time
+### <a name="Rper-space"></a>Per.18: 공간은 시간이다
 
 ##### Reason
 
-Performance is typically dominated by memory access times.
+보통 성능은 메모리 접근시간에 반비례한다.
 
 ???
 
-### <a name="Rper-access"></a>Per.19: Access memory predictably
+### <a name="Rper-access"></a>Per.19: 예측할 수 있는 메모리 접근을 해라
 
 ##### Reason
 
@@ -438,6 +440,6 @@ Performance is very sensitive to cache performance and cache algorithms favor si
         for (int c = 0; c < cols; ++c)
             sum += matrix[r][c];
 ```
-### <a name="Rper-context"></a>Per.30: Avoid context switches on the critical path
+### <a name="Rper-context"></a>Per.30: 중요 경로에서 문맥전환을 피하라
 
 ???

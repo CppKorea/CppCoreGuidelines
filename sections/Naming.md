@@ -1,14 +1,16 @@
 
-# <a name="S-naming"></a>NL: Naming and layout rules
+# <a name="S-naming"></a>NL: 이름과 코드 배치
 
-Consistent naming and layout are helpful.
-If for no other reason because it minimizes "my style is better than your style" arguments.
-However, there are many, many, different styles around and people are passionate about them (pro and con).
-Also, most real-world projects includes code from many sources, so standardizing on a single style for all code is often impossible.
-After many requests for guidance from users, we present a set of rules that you might use if you have no better ideas, but the real aim is consistency, rather than any particular rule set.
-IDEs and tools can help (as well as hinder).
+별다른 이유없이 "내 스타일이 당신 것보다 더 좋다"는 논란을 줄이기 위해서라면 일관성있는 이름짓기와 레이아웃은 도움이 된다.
+굉장히 많고 많은 스타일이 존재하고 사람들은 그 스타일에 대해 열렬하게 관심(찬성 혹은 반대)을 보인다.
 
-Naming and layout rules:
+현실의 프로젝트들은 많은 소스코드를 가지고 있고, 모든 코드에 하나의 표준화된 스타일을 적용하는 것은 거의 불가능에 가깝다.
+
+여기서 더 좋은 아이디어가 없다면 도입해도 무방한 규칙들을 소개하겠다. 그러나 규칙을 소개하는 진짜 목적은 특정한 규칙 그 자체가 아니라 일관성이다.
+
+IDE나 툴들이 이것을 도와줄 것이다. (어쩌면 방해할지도 모른다.)
+
+이름과 코드 배치 규칙 요약:
 
 * [NL.1: Don't say in comments what can be clearly stated in code](#Rl-comments)
 * [NL.2: State intent in comments](#Rl-comments-intent)
@@ -30,26 +32,25 @@ Naming and layout rules:
 * [NL.25: Don't use `void` as an argument type](#Rl-void)
 * [NL.26: Use conventional `const` notation](#Rl-const)
 
-Most of these rules are aesthetic and programmers hold strong opinions.
-IDEs also tend to have defaults and a range of alternatives.
-These rules are suggested defaults to follow unless you have reasons not to.
+규칙들 대부분이 심미적이고 개발자들은 자기 의견을 강하게 표현한다.
+IDE 역시 기본값 외에 몇가지 대안을 가지고 있는 상황이다. 특별한 이유가 없다면 이 규칙들을 기본으로 사용할 것을 제안한다.
 
 We have had comments to the effect that naming and layout are so personal and/or arbitrary that we should not try to "legislate" them.
 We are not "legislating" (see the previous paragraph).
 However, we have had many requests for a set of naming and layout conventions to use when there are no external constraints.
 
-More specific and detailed rules are easier to enforce.
+더 자세한 내용들이 적용하기 쉬울 것이다.
 
 These rules bear a strong resemblance to the recommendations in the [PPP Style Guide](http://www.stroustrup.com/Programming/PPP-style.pdf)
 written in support of Stroustrup's [Programming: Principles and Practice using C++](http://www.stroustrup.com/programming.html).
 
-### <a name="Rl-comments"></a>NL.1: Don't say in comments what can be clearly stated in code
+### <a name="Rl-comments"></a>NL.1: 코드만으로 알 수 있는 내용을 주석문에 넣지 마라
 
 ##### Reason
 
-Compilers do not read comments.
-Comments are less precise than code.
-Comments are not updated as consistently as code.
+컴파일러는 주석을 읽지 않는다.   
+주석이 코드만큼 정확하지 않다.  
+주석은 코드와 동시에 업데이트되지 않는다.  
 
 ##### Example, bad
 ```c++
@@ -57,13 +58,13 @@ Comments are not updated as consistently as code.
 ```
 ##### Enforcement
 
-Build an AI program that interprets colloquial English text and see if what is said could be better expressed in C++.
+구어체 문장을 번역하는 인공지능 프로그램을 만들고 C++로 잘 표현할 수 있는지 검사한다.
 
-### <a name="Rl-comments-intent"></a>NL.2: State intent in comments
+### <a name="Rl-comments-intent"></a>NL.2: 주석에는 의도를 기술하라
 
 ##### Reason
 
-Code says what is done, not what is supposed to be done. Often intent can be stated more clearly and concisely than the implementation.
+코드는 무엇을 할지가 아니라 무엇을 했는지를 말한다. 주석은 구현된 내용보다 목적이나 의도를 간결하고 명쾌하게 기술할 수 있다.
 
 ##### Example
 ```c++
@@ -75,14 +76,13 @@ Code says what is done, not what is supposed to be done. Often intent can be sta
     }
 ```
 ##### Note
+주석과 코드가 다르다면 둘다 틀렸을거다.
 
-If the comment and the code disagree, both are likely to be wrong.
-
-### <a name="Rl-comments-crisp"></a>NL.3: Keep comments crisp
+### <a name="Rl-comments-crisp"></a>NL.3: 주석을 간략하게 유지하라
 
 ##### Reason
 
-Verbosity slows down understanding and makes the code harder to read by spreading it around in the source file.
+말이 많으면 이해도가 떨어지고 소스파일에 퍼져 보여서 코드를 읽기 어렵게 만든다.
 
 ##### Note
 
@@ -95,11 +95,11 @@ Aim for professionalism, not "cool."
 
 not possible.
 
-### <a name="Rl-indent"></a>NL.4: Maintain a consistent indentation style
+### <a name="Rl-indent"></a>NL.4: 들여쓰기 스타일을 일관성 있게 하라
 
 ##### Reason
 
-Readability. Avoidance of "silly mistakes."
+가독성 향상. 멍청한 실수를 피하기 위해.
 
 ##### Example, bad
 ```c++
@@ -119,15 +119,14 @@ Always indenting the statement after `if (...)`, `for (...)`, and `while (...)` 
 ```
 ##### Enforcement
 
-Use a tool.
+툴을 사용하라.
 
-### <a name="Rl-name-type"></a>NL.5: Avoid encoding type information in names
+### <a name="Rl-name-type"></a>NL.5: 이름 안에 타입 정보를 포함하지 마라
 
 ##### Rationale
 
-If names reflect types rather than functionality, it becomes hard to change the types used to provide that functionality.
-Also, if the type of a variable is changed, code using it will have to be modified.
-Minimize unintentional conversions.
+이름이 기능보다는 타입을 반영한다면, 기능을 제공하는 타입들을 바꾸기 어려워진다.
+또한, 타입이 바뀌면 타입을 사용하는 변수도 함께 바뀌어야 한다. Minimize unintentional conversions.
 
 ##### Example, bad
 ```c++
@@ -172,18 +171,18 @@ This is not harmful and does not fall under this guideline because it does not e
 
 ##### Note
 
-Some styles distinguishes members from local variable, and/or from global variable.
+어떤 스타일은 지역변수와 멤버변수를 구분하거나 전역변수를 구분하려고 한다.
 ```c++
     struct S {
         int m_;
         S(int m) :m_{abs(m)} { }
     };
 ```
-This is not harmful and does not fall under this guideline because it does not encode type information.
+이는 유해하지 않고 타입 정보를 포함하지 않기 때문에 가이드라인에도 위배되지 않는다.
 
 ##### Note
 
-Like C++, some styles distinguishes types from non-types.
+어떤 스타일은 타입과 비타입을 구분하려고 한다.
 For example, by capitalizing type names, but not the names of functions and variables.
 ```c++
     typename<typename T>
@@ -193,7 +192,7 @@ For example, by capitalizing type names, but not the names of functions and vari
 
     HashTable<int> index;
 ```
-This is not harmful and does not fall under this guideline because it does not encode type information.
+이는 유해하지 않고 타입 정보를 포함하지 않기 때문에 가이드라인에도 위배되지 않는다.
 
 ### <a name="Rl-name-length"></a>NL.7: Make the length of a name roughly proportional to the length of its scope
 
@@ -217,24 +216,23 @@ The use of `p` for pointer and `x` for a floating-point variable is conventional
 
 ???
 
-### <a name="Rl-name"></a>NL.8: Use a consistent naming style
+### <a name="Rl-name"></a>NL.8: 일관적인 이름짓기 스타일을 사용하라
 
-**Rationale**: Consistence in naming and naming style increases readability.
+**Rationale**: 일관성 있게 이름을 정하면 가독성을 높여준다.
 
 ##### Note
 
-There are many styles and when you use multiple libraries, you can't follow all their different conventions.
-Choose a "house style", but leave "imported" libraries with their original style.
+많은 스타일이 공존하고 복수개의 라이브러리를 사용할 때 모든 네이밍 방식을 따를 수는 없다.
+"가져와 사용하는" 라이브러리가 가진 고유 스타일은 그대로 두고자기 스타일을 선택하라.
 
 ##### Example
-
-ISO Standard, use lower case only and digits, separate words with underscores:
+ISO 표준은 소문자, 숫자, `_`로 구분된 단어만 사용한다:
 
 * `int`
 * `vector`
 * `my_map`
 
-Avoid double underscores `__`.
+두개 짜리 `__`를 사용하지 마라.
 
 ##### Example
 
@@ -247,31 +245,29 @@ ISO Standard, but with upper case used for your own types and concepts:
 
 ##### Example
 
-CamelCase: capitalize each word in a multi-word identifier:
+낙타표기법(CamelCase): 여러 단어로 구성된 식별자에서 단어의 첫글자를 대문자로 한다:
 
 * `int`
 * `vector`
 * `MyMap`
 * `myMap`
 
-Some conventions capitalize the first letter, some don't.
+맨 첫글자를 소문자로 하는 경우도 있다.
 
 ##### Note
-
-Try to be consistent in your use of acronyms and lengths of identifiers:
+약어(acronym)나 식별자 길이도 일관성을 유지하도록 하라:
 ```c++
     int mtbf {12};
     int mean_time_between_failures {12}; // make up your mind
 ```
 ##### Enforcement
+스타일이 다른 라이브러리를 사용할 때를 뻬고는 시행이 가능할 것이다.
 
-Would be possible except for the use of libraries with varying conventions.
-
-### <a name="Rl-all-caps"></a>NL.9: Use `ALL_CAPS` for macro names only
+### <a name="Rl-all-caps"></a>NL.9: 매크로 명칭에만 전체 대문자를 사용하라
 
 ##### Reason
 
-To avoid confusing macros with names that obey scope and type rules.
+범위와 타입 규칙을 지키는 이름에 대해서는 매크로와 혼돈하지 않도록 하기 위해.
 
 ##### Example
 ```c++
@@ -282,27 +278,24 @@ To avoid confusing macros with names that obey scope and type rules.
     }
 ```
 ##### Note
-
-This rule applies to non-macro symbolic constants:
+이 규칙은 매크로가 아닌 상수에도 적용된다:
 ```c++
     enum bad { BAD, WORSE, HORRIBLE }; // BAD
 ```
 ##### Enforcement
 
-* Flag macros with lower-case letters
-* Flag `ALL_CAPS` non-macro names
+* 소문자로 된 매크로를 지적하라
+* 매크로가 아닌데 대문자로 된 경우를 지적하라
 
-### <a name="Rl-camel"></a>NL.10: Prefer `underscore_style` names
+### <a name="Rl-camel"></a>NL.10: `underscore_style`형태의 이름을 선호하라
 
 ##### Reason
 
-The use of underscores to separate parts of a name is the original C and C++ style and used in the C++ Standard Library.
+이름의 각 부분을 구분하기 위해 `_`를 사용하는 것은 원래 C/C++ 스타일이고 C++ 표준 라이브러리에도 사용하고 있다.
 
 ##### Note
-
-This rule is a default to use only if you have a choice.
-Often, you don't have a choice and must follow an established style for [consistency](#Rl-name).
-The need for consistency beats personal taste.
+이 규칙은 선택이 필요할 때의 기본 규칙이다. 이미 정립된 스타일과의 [일관성](#Rl-name)을 지켜야 하는 경우도 있을 수 있다. 
+개인의 취향보다는 일관성이 중요하다.
 
 This is a recommendation for [when you have no constraints or better ideas](#S-naming).
 Thus rule was added after many requests for guidance.
@@ -310,7 +303,7 @@ Thus rule was added after many requests for guidance.
 ##### Example
 
 [Stroustrup](http://www.stroustrup.com/Programming/PPP-style.pdf):
-ISO Standard, but with upper case used for your own types and concepts:
+사용자 정의 타입, 개념에 대해 대문자를 사용하는 ISO 표준:
 
 * `int`
 * `vector`
@@ -318,13 +311,13 @@ ISO Standard, but with upper case used for your own types and concepts:
 
 ##### Enforcement
 
-Impossible.
+불가능하다.
 
-### <a name="Rl-space"></a>NL.15: Use spaces sparingly
+### <a name="Rl-space"></a>NL.15: 스페이스를 아껴서 사용하라
 
 ##### Reason
 
-Too much space makes the text larger and distracts.
+너무 많은 스페이스는 코드를 길고 산만하게 만든다
 
 ##### Example, bad
 ```c++
@@ -346,14 +339,14 @@ Too much space makes the text larger and distracts.
 ```
 ##### Note
 
-Some IDEs have their own opinions and add distracting space.
+몇몇 IDE는 그들만의 확신에 따라 추가적인 스페이스를 사용한다.
 
 This is a recommendation for [when you have no constraints or better ideas](#S-naming).
 Thus rule was added after many requests for guidance.
 
 ##### Note
 
-We value well-placed whitespace as a significant help for readability. Just don't overdo it.
+잘 정리된 스페이스는 가독성 향상에 많은 도움이 된다. 과도하지만 않으면 된다.
 
 ### <a name="Rl-literals"></a>NL.11: Make literals readable
 
@@ -387,23 +380,22 @@ It is easy to make a typo in a long string of integers.
 
 Flag long digit sequences. The trouble is to define "long"; maybe 7.
 
-### <a name="Rl-order"></a>NL.16: Use a conventional class member declaration order
+### <a name="Rl-order"></a>NL.16: 일반적인 클래스 멤버 선언 순서를 지켜라
 
 ##### Reason
 
-A conventional order of members improves readability.
+멤버 선언 순서는 가독성을 높여준다.
 
-When declaring a class use the following order
+클래스 선언시 다음 순서를 사용하라
+* 타입: class, enum, alias (`using`구문)
+* 생성자, 복사 생성자, 해제자.
+* 함수
+* 데이터
 
-* types: classes, enums, and aliases (`using`)
-* constructors, assignments, destructor
-* functions
-* data
-
-Use the `public` before `protected` before `private` order.
+`public`, `protected`, `private` 순으로 선언하라.
 
 This is a recommendation for [when you have no constraints or better ideas](#S-naming).
-Thus rule was added after many requests for guidance.
+이 규칙은 수많은 요청에 의해 추가되었다.
 
 ##### Example
 ```c++
@@ -447,17 +439,16 @@ However, macros obscures what is being expressed anyway.
 
 ##### Enforcement
 
-Flag departures from the suggested order. There will be a lot of old code that doesn't follow this rule.
+제안된 순서와 다르면 지적하라. 이 규칙을 따르지 않는 예전 코드가 많이 있을 것이다.
 
-### <a name="Rl-knr"></a>NL.17: Use K&R-derived layout
+### <a name="Rl-knr"></a>NL.17: K&R 방식의 레이아웃을 사용하라
 
 ##### Reason
-
-This is the original C and C++ layout. It preserves vertical space well. It distinguishes different language constructs (such as functions and classes) well.
+이 방식이 C/C++의 고유한 레이아웃이다. 수직적인 배치가 유지되고 (함수나 클래스 같은) 언어 요소를 구분하기가 쉽다.
 
 ##### Note
 
-In the context of C++, this style is often called "Stroustrup".
+C++에서는 "Stroustrup" 스타일이라고 부르기도 한다.
 
 This is a recommendation for [when you have no constraints or better ideas](#S-naming).
 Thus rule was added after many requests for guidance.
@@ -498,10 +489,9 @@ Thus rule was added after many requests for guidance.
         return some_value;
     }
 ```
-Note the space between `if` and `(`
+`if`와 `(`사이에 스페이스를 한칸 넣는다는 점에 유의하라.
 
 ##### Note
-
 Use separate lines for each statement, the branches of an `if`, and the body of a `for`.
 
 ##### Note
@@ -510,28 +500,28 @@ The `{` for a `class` and a `struct` is *not* on a separate line, but the `{` fo
 
 ##### Note
 
-Capitalize the names of your user-defined types to distinguish them from standards-library types.
+표준라이브러리 타입과 구분하기 위해 사용자 정의 타입은 대문자로 이름을 짓는다.
 
 ##### Note
 
-Do not capitalize function names.
+함수 이름에는 대문자를 쓰지 마라.
 
 ##### Enforcement
 
-If you want enforcement, use an IDE to reformat.
+IDE로 다시 포맷을 맞춰라.
 
-### <a name="Rl-ptr"></a>NL.18: Use C++-style declarator layout
+### <a name="Rl-ptr"></a>NL.18: C++ 스타일의 선언 방식을 사용하라
 
 ##### Reason
 
-The C-style layout emphasizes use in expressions and grammar, whereas the C++-style emphasizes types.
-The use in expressions argument doesn't hold for references.
+C 스타일의 선언 방식은 표현식과 문법에서 사용하는데 강조를 둔다면, C++ 스타일은 타입을 강조한다.
+선언에서 사용시 인자는 참조를 붙이지 않도록 한다.
 
 ##### Example
 ```c++
     T& operator[](size_t);   // OK
     T &operator[](size_t);   // just strange
-    T & operator[](size_t);   // undecided
+    T & operator[](size_t);  // undecided
 ```
 ##### Note
 
@@ -540,7 +530,7 @@ Thus rule was added after many requests for guidance.
 
 ##### Enforcement
 
-Impossible in the face of history.
+역사적으로 볼때 불가능.
 
 
 ### <a name="Rl-misread"></a>NL.19: Avoid names that are easily misread
@@ -590,11 +580,11 @@ Minimizing confusion with the declarator syntax.
 For details, see [ES.10](#Res-name-one).
 
 
-### <a name="Rl-void"></a>NL.25: Don't use `void` as an argument type
+### <a name="Rl-void"></a>NL.25: 인자 타입으로 `void`를 사용하지 마라
 
 ##### Reason
 
-It's verbose and only needed where C compatibility matters.
+C 호환이 문제될 때만 필요하다.
 
 ##### Example
 ```c++
@@ -604,13 +594,13 @@ It's verbose and only needed where C compatibility matters.
 ```
 ##### Note
 
-Even Dennis Ritchie deemed `void f(void)` an abomination.
-You can make an argument for that abomination in C when function prototypes were rare so that banning:
+데니스 리치도 `void f(void)`는 싫어한다고 말했다.
+함수 인터페이스가 드물게 금지될 경우 C에서 그런 abomination에 대해서 인자를 추가할 수 있다:
 ```c++
     int f();
     f(1, 2, "weird but valid C89");   // hope that f() is defined int f(a, b, c) char* c; { /* ... */ }
 ```
-would have caused major problems, but not in the 21st century and in C++.
+중요한 문제를 야기할 것인데 21세기의 C나 C++에는 전혀 문제되지 않는다.
 
 ### <a name="Rl-const"></a>NL.26: Use conventional `const` notation
 
