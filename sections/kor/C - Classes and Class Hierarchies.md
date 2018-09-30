@@ -1,5 +1,4 @@
 # <a name="S-class"></a> C: 클래스와 클래스 계층 구조
-> [원문 링크](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-class)
 
 클래스는 사용자 정의 타입으로써, 타입의 표현과 연산, 인터페이스를 프로그래머가  정의할 수 있다.
 클래스 계층 구조는 관련된 클래스들을 계층적으로 구조화 할 때 사용된다.

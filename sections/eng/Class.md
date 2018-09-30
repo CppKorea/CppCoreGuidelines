@@ -1,5 +1,5 @@
 
-# <a name="S-class"></a>C: Classes and class hierarchies
+# <a name="S-class"></a>C: 클래스와 클래스 계층 구조
 
 A class is a user-defined type, for which a programmer can define the representation, operations, and interfaces.
 Class hierarchies are used to organize related classes into hierarchical structures.
@@ -33,10 +33,12 @@ Ease of comprehension.
 If data is related (for fundamental reasons), that fact should be reflected in code.
 
 ##### Example
+
 ```c++
     void draw(int x, int y, int x2, int y2);  // BAD: unnecessary implicit relationships
     void draw(Point from, Point to);          // better
 ```
+
 ##### Note
 
 A simple class without virtual functions implies no space or time overhead.
@@ -184,9 +186,11 @@ An overload set may have some members that do not directly access `private` data
     };
 ```
 Similarly, a set of functions may be designed to be used in a chain:
+
 ```c++
     x.scale(0.5).rotate(45).set_color(Color::red);
 ```
+
 Typically, some but not all of such functions directly access `private` data.
 
 ##### Enforcement

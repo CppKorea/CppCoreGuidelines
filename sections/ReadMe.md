@@ -3,8 +3,8 @@
 > 2018년 9월 2일
 
 편집자:
- * [Bjarne Stroustrup](http://www.stroustrup.com)
- * [Herb Sutter](http://herbsutter.com/)
+* [Bjarne Stroustrup](http://www.stroustrup.com)
+* [Herb Sutter](http://herbsutter.com/)
 
 이 문서는 오픈 소스 (코드) 프로젝트로, 지속적으로 개선되고 있으며 0.8 버전까지 배포되었다.
 이 프로젝트의 복사, 사용, 수정, 파생 성과물과 관련된 저작권은 MIT와 유사한 라이선스를 따른다. 프로젝트에 기여하기 위해서는 기여자 라이선스(Contributor License)에 동의해야 한다. 보다 자세한 사항은 [LICENSE](../LICENSE)을 확인하라.
@@ -15,11 +15,10 @@
 
 참고 사항:
 
- * 이하의 규칙들은 완성도, 일관성, 시행 가능성 등에 대해서 아직 철저하게 검증되지 않았다
- * (???)로 표시되어 있는 부분은 아직 관련 정보를 기입하지 않았음을 의미한다
- * 참조(Reference) 부분은 갱신이 필요하다; C++11 이전의 오래된 소스 코드들이 아직 많이 있다.
- * 앞으로 해야 할 일에 대한 최신 목록은 [To-do: 미분류 규칙 초안](#S-unclassified)에서 확인할 수 있다
-
+* 이하의 규칙들은 완성도, 일관성, 시행 가능성 등에 대해서 아직 철저하게 검증되지 않았다
+* (???)로 표시되어 있는 부분은 아직 관련 정보를 기입하지 않았음을 의미한다
+* 참조(Reference) 부분은 갱신이 필요하다; C++11 이전의 오래된 소스 코드들이 아직 많이 있다.
+* 앞으로 해야 할 일에 대한 최신 목록은 [To-do: 미분류 규칙 초안](#S-unclassified)에서 확인할 수 있다
 
 [이 가이드의 범위와 구조](#S-abstract)를 확인하거나, 읽고 싶은 부분을 클릭해 해당 내용으로 바로 이동할 수 있다.
 
@@ -27,7 +26,7 @@
 * [P: 철학](#S-philosophy)
 * [I: 인터페이스](#S-interfaces)
 * [F: 함수](#S-functions)
-* [C: 클래스와 클래스 계층](#S-class)
+* [C: 클래스와 클래스 계층 구조](#S-class)
 * [Enum: 열거형](#S-enum)
 * [R: 리소스 관리](#S-resource)
 * [ES: 표현식과 문장](#S-expr)
@@ -58,112 +57,112 @@
 
 구체적인 언어 기능과 관련된 규칙들:
 
-* assignment:
-[regular types](#Rc-regular) --
-[prefer initialization](#Rc-initialize) --
-[copy](#Rc-copy-semantic) --
-[move](#Rc-move-semantic) --
-[other operations](#Rc-matched) --
-[default](#Rc-eqdefault)
-* `class`:
-[data](#Rc-org) --
-[invariant](#Rc-struct) --
-[members](#Rc-member) --
-[helpers](#Rc-helper) --
-[concrete types](#SS-concrete) --
-[ctors, =, and dtors](#S-ctor) --
-[hierarchy](#SS-hier) --
-[operators](#SS-overload)
+* assignment
+  * [regular types](#Rc-regular)
+  * [prefer initialization](#Rc-initialize)
+  * [copy](#Rc-copy-semantic)
+  * [move](#Rc-move-semantic)
+  * [other operations](#Rc-matched)
+  * [default](#Rc-eqdefault)
+* `class`
+  * [data](#Rc-org)
+  * [invariant](#Rc-struct)
+  * [members](#Rc-member)
+  * [helpers](#Rc-helper)
+  * [concrete types](#SS-concrete)
+  * [ctors, =, and dtors](#S-ctor)
+  * [hierarchy](#SS-hier)
+  * [operators](#SS-overload)
 * `concept`:
-[rules](#SS-concepts) --
-[in generic programming](#Rt-raise) --
-[template arguments](#Rt-concepts) --
-[semantics](#Rt-low)
+  * [rules](#SS-concepts)
+  * [in generic programming](#Rt-raise)
+  * [template arguments](#Rt-concepts)
+  * [semantics](#Rt-low)
 * constructor:
-[invariant](#Rc-struct) --
-[establish invariant](#Rc-ctor) --
-[`throw`](#Rc-throw) --
-[default](#Rc-default0) --
-[not needed](#Rc-default) --
-[`explicit`](#Rc-explicit) --
-[delegating](#Rc-delegating) --
-[`virtual`](#Rc-ctor-virtual)
+  * [invariant](#Rc-struct)
+  * [establish invariant](#Rc-ctor)
+  * [`throw`](#Rc-throw)
+  * [default](#Rc-default0)
+  * [not needed](#Rc-default)
+  * [`explicit`](#Rc-explicit)
+  * [delegating](#Rc-delegating)
+  * [`virtual`](#Rc-ctor-virtual)
 * derived `class`:
-[when to use](#Rh-domain) --
-[as interface](#Rh-abstract) --
-[destructors](#Rh-dtor) --
-[copy](#Rh-copy) --
-[getters and setters](#Rh-get) --
-[multiple inheritance](#Rh-mi-interface) --
-[overloading](#Rh-using) --
-[slicing](#Rc-copy-virtual) --
-[`dynamic_cast`](#Rh-dynamic_cast)
+  * [when to use](#Rh-domain)
+  * [as interface](#Rh-abstract)
+  * [destructors](#Rh-dtor)
+  * [copy](#Rh-copy)
+  * [getters and setters](#Rh-get)
+  * [multiple inheritance](#Rh-mi-interface)
+  * [overloading](#Rh-using)
+  * [slicing](#Rc-copy-virtual)
+  * [`dynamic_cast`](#Rh-dynamic_cast)
 * destructor:
-[and constructors](#Rc-matched) --
-[when needed?](#Rc-dtor) --
-[may not fail](#Rc-dtor-fail)
+  * [and constructors](#Rc-matched)
+  * [when needed?](#Rc-dtor)
+  * [may not fail](#Rc-dtor-fail)
 * exception:
-[errors](#S-errors) --
-[`throw`](#Re-throw) --
-[for errors only](#Re-errors) --
-[`noexcept`](#Re-noexcept) --
-[minimize `try`](#Re-catch) --
-[what if no exceptions?](#Re-no-throw-codes)
+  * [errors](#S-errors)
+  * [`throw`](#Re-throw)
+  * [for errors only](#Re-errors)
+  * [`noexcept`](#Re-noexcept)
+  * [minimize `try`](#Re-catch)
+  * [what if no exceptions?](#Re-no-throw-codes)
 * `for`:
-[range-for and for](#Res-for-range) --
-[for and while](#Res-for-while) --
-[for-initializer](#Res-for-init) --
-[empty body](#Res-empty) --
-[loop variable](#Res-loop-counter) --
-[loop variable type ???](#Res-???)
+  * [range-for and for](#Res-for-range)
+  * [for and while](#Res-for-while)
+  * [for-initializer](#Res-for-init)
+  * [empty body](#Res-empty)
+  * [loop variable](#Res-loop-counter)
+  * [loop variable type ???](#Res-???)
 * function:
-[naming](#Rf-package) --
-[single operation](#Rf-logical) --
-[no throw](#Rf-noexcept) --
-[arguments](#Rf-smart) --
-[argument passing](#Rf-conventional) --
-[multiple return values](#Rf-out-multi) --
-[pointers](#Rf-return-ptr) --
-[lambdas](#Rf-capture-vs-overload)
+  * [naming](#Rf-package)
+  * [single operation](#Rf-logical)
+  * [no throw](#Rf-noexcept)
+  * [arguments](#Rf-smart)
+  * [argument passing](#Rf-conventional)
+  * [multiple return values](#Rf-out-multi)
+  * [pointers](#Rf-return-ptr)
+  * [lambdas](#Rf-capture-vs-overload)
 * `inline`:
-[small functions](#Rf-inline) --
-[in headers](#Rs-inline)
+  * [small functions](#Rf-inline)
+  * [in headers](#Rs-inline)
 * initialization:
-[always](#Res-always) --
-[prefer `{}`](#Res-list) --
-[lambdas](#Res-lambda-init) --
-[in-class initializers](#Rc-in-class-initializer) --
-[class members](#Rc-initialize) --
-[factory functions](#Rc-factory)
+  * [always](#Res-always)
+  * [prefer `{}`](#Res-list)
+  * [lambdas](#Res-lambda-init)
+  * [in-class initializers](#Rc-in-class-initializer)
+  * [class members](#Rc-initialize)
+  * [factory functions](#Rc-factory)
 * lambda expression:
-[when to use](#SS-lambdas)
+  * [when to use](#SS-lambdas)
 * operator:
-[conventional](#Ro-conventional) --
-[avoid conversion operators](#Ro-conversion) --
-[and lambdas](#Ro-lambda)
+  * [conventional](#Ro-conventional)
+  * [avoid conversion operators](#Ro-conversion)
+  * [lambdas](#Ro-lambda)
 * `public`, `private`, and `protected`:
-[information hiding](#Rc-private) --
-[consistency](#Rh-public) --
-[`protected`](#Rh-protected)
+  * [information hiding](#Rc-private)
+  * [consistency](#Rh-public)
+  * [`protected`](#Rh-protected)
 * `static_assert`:
-[compile-time checking](#Rp-compile-time) --
-[and concepts](#Rt-check-class)
+  * [compile-time checking](#Rp-compile-time)
+  * [concepts](#Rt-check-class)
 * `struct`:
-[for organizing data](#Rc-org) --
-[use if no invariant](#Rc-struct) --
-[no private members](#Rc-class)
+  * [for organizing data](#Rc-org)
+  * [use if no invariant](#Rc-struct)
+  * [no private members](#Rc-class)
 * `template`:
-[abstraction](#Rt-raise) --
-[containers](#Rt-cont) --
-[concepts](#Rt-concepts)
+  * [abstraction](#Rt-raise)
+  * [containers](#Rt-cont)
+  * [concepts](#Rt-concepts)
 * `unsigned`:
-[and signed](#Res-mix) --
-[bit manipulation](#Res-unsigned)
+  * [signed](#Res-mix)
+  * [bit manipulation](#Res-unsigned)
 * `virtual`:
-[interfaces](#Ri-abstract) --
-[not `virtual`](#Rc-concrete) --
-[destructor](#Rc-dtor-virtual) --
-[never fail](#Rc-dtor-fail)
+  * [interfaces](#Ri-abstract)
+  * [not `virtual`](#Rc-concrete)
+  * [destructor](#Rc-dtor-virtual)
+  * [never fail](#Rc-dtor-fail)
 
 규칙들을 설명하는데 사용된 설계 개념들:
 
@@ -178,8 +177,7 @@
 * 사후 조건(Postcondition): ???
 * 리소스(Resource): ???
 
-
-# <a name="S-abstract"></a>요약
+## <a name="S-abstract"></a>요약
 
 이 문서는 C++를 올바르게 사용하기 위한 가이드라인의 모음이며, 개발자들이 모던 C++를 효율적으로 사용할 수 있도록 돕기 위해 작성되었다.
 여기서 "모던 C++"는 실제로 사용되고 있는 ISO C++ 표준을 의미한다 (현재는 C++17을 의미하지만, 거의 모든 권장사항들은 C++14와 C++11에도 적용된다). 지금 개발중인 코드가 5년, 또는 10년 후에 어떤 모습이었으면 좋겠는가?
@@ -191,7 +189,6 @@ C++ 핵심 가이드라인은 인터페이스, 리소스 관리, 메모리 관�
 
 초기의 규칙들은 (다양한 형태의) 안정성과 간결함을 과도하게 강조한 측면이 있다.
 실용성을 위해 여러 예외 사항들이 도입되기를 바란다. 또한 더 많은 규칙들이 필요하다.
-
 
 규칙들 중에는 독자의 기대와 다르거나, 경험과는 정반대되는 것들도 있을 것이다.
 어떤 형태로든 여러분의 코딩 스타일에 변화를 주지 못한다면, 우리는 실패한 것이다! 올바른 규칙인지 확인해 보고, 문제가 있다면 반박해주길 바란다!

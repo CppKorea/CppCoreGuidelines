@@ -1,35 +1,35 @@
 
-# <a name="S-functions"></a>F: Functions
+# <a name="S-functions"></a>F: 함수
 
-A function specifies an action or a computation that takes the system from one consistent state to the next. It is the fundamental building block of programs.
+함수는 어떤 동작이나 계산을 명세하는데, 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 함수는 프로그램의 기초적인 설계 단위다.
 
-It should be possible to name a function meaningfully, to specify the requirements of its argument, and clearly state the relationship between the arguments and the result. An implementation is not a specification. Try to think about what a function does as well as about how it does it.
-Functions are the most critical part in most interfaces, so see the interface rules.
+함수 이름은 인자의 요구사항, 인자간의 관계와 결과를 명확하게 기술할 수 있도록 의미있게 지어야 한다. 함수의 구현은 명세가 아니다. 
+함수가 무엇을 해야하는지, 어떻게 동작하는지를 고려해야 한다. 함수는 모든 인터페이스에서 가장 중요한 부분이다. 이에 관해서는 인터페이스 규칙을 참고 하라.
 
-Function rule summary:
+함수 규칙 요약:
 
-Function definition rules:
+함수 정의 규칙:
 
-* [F.1: "Package" meaningful operations as carefully named functions](#Rf-package)
-* [F.2: A function should perform a single logical operation](#Rf-logical)
-* [F.3: Keep functions short and simple](#Rf-single)
-* [F.4: If a function may have to be evaluated at compile time, declare it `constexpr`](#Rf-constexpr)
-* [F.5: If a function is very small and time-critical, declare it inline](#Rf-inline)
-* [F.6: If your function may not throw, declare it `noexcept`](#Rf-noexcept)
-* [F.7: For general use, take `T*` or `T&` arguments rather than smart pointers](#Rf-smart)
-* [F.8: Prefer pure functions](#Rf-pure)
-* [F.9: Unused parameters should be unnamed](#Rf-unused)
+* [F.1: 의미있는 동작들을 "묶어서" 심사숙고해 함수 이름을 지어라](#Rf-package)
+* [F.2: 함수는 하나의 논리적 동작만 수행하도록 하라](#Rf-logical)
+* [F.3: 함수는 간결하고 단순하게 유지시켜라](#Rf-single)
+* [F.4: 함수가 컴파일 타임에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
+* [F.5: 함수가 매우 짧고 수행시간이 중요하다면 `inline`으로 선언하라](#Rf-inline)
+* [F.6: 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
+* [F.7: 보편성을 고려한다면, 스마트 포인터 대신에 `T*`나 `T&` 타입의 인자를 사용하라](#Rf-smart)
+* [F.8: 순수 함수를 선호하라](#Rf-pure)
+* [F.9: 사용되지 않는 인자는 이름이 없어야 한다](#Rf-unused)
 
-Parameter passing expression rules:
+매개 변수 전달 표현 규칙:
 
-* [F.15: Prefer simple and conventional ways of passing information](#Rf-conventional)
-* [F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to `const`](#Rf-in)
-* [F.17: For "in-out" parameters, pass by reference to non-`const`](#Rf-inout)
-* [F.18: For "will-move-from" parameters, pass by `X&&` and `std::move` the parameter](#Rf-consume)
-* [F.19: For "forward" parameters, pass by `TP&&` and only `std::forward` the parameter](#Rf-forward)
-* [F.20: For "out" output values, prefer return values to output parameters](#Rf-out)
-* [F.21: To return multiple "out" values, prefer returning a struct or tuple](#Rf-out-multi)
-* [F.60: Prefer `T*` over `T&` when "no argument" is a valid option](#Rf-ptr-ref)
+* [F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라](#Rf-conventional)
+* [F.16: "입력" 매개 변수는 복사 비용이 적게드는 값 타입을 사용하거나 상수 참조형으로 전달하라](#Rf-in)
+* [F.17: "입출력" 매개 변수는 비상수 참조형으로 전달하라](#Rf-inout)
+* [F.18: "소모성" 매개 변수는 `X&&`타입과 `std::move`로 전달하라](#Rf-consume)
+* [F.19: "forward" 매개 변수는 `TP&&`타입과 `std::forward`로만 전달하라](#Rf-forward)
+* [F.20: "출력" 매개 변수로 값을 반환하는 방법을 선호하라](#Rf-out)
+* [F.21: "출력"값 여러 개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
+* [F.60: "인자가 없을 수도" 있다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
 Parameter passing semantic rules:
 
@@ -40,7 +40,7 @@ Parameter passing semantic rules:
 * [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
 * [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
 
-<a name="Rf-value-return"></a>Value return semantic rules:
+<a name="Rf-value-return"></a>값 반환 의미(semantic) 규칙:
 
 * [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
 * [F.43: Never (directly or indirectly) return a pointer or a reference to a local object](#Rf-dangle)
@@ -50,7 +50,7 @@ Parameter passing semantic rules:
 * [F.47: Return `T&` from assignment operators](#Rf-assignment-op)
 * [F.48: Don't `return std::move(local)`](#Rf-return-move-local)
 
-Other function rules:
+기타 함수 규칙:
 
 * [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
 * [F.51: Where there is a choice, prefer default arguments over overloading](#Rf-default-args)
@@ -59,22 +59,23 @@ Other function rules:
 * [F.54: If you capture `this`, capture all variables explicitly (no default capture)](#Rf-this-capture)
 * [F.55: Don't use `va_arg` arguments](#F-varargs)
 
-Functions have strong similarities to lambdas and function objects.
+함수는 람다와 함수개체와 강한 연관성을 가지고 있다.
 
 **See also**: [C.lambdas: Function objects and lambdas](#SS-lambdas)
 
-## <a name="SS-fct-def"></a>F.def: Function definitions
+## <a name="SS-fct-def"></a>F.def: 함수 정의(definition)
 
-A function definition is a function declaration that also specifies the function's implementation, the function body.
+함수 정의는 함수를 선언하고 본문를 구현하는 것을 의미한다.
 
 ### <a name="Rf-package"></a>F.1: "Package" meaningful operations as carefully named functions
 
 ##### Reason
 
-Factoring out common code makes code more readable, more likely to be reused, and limit errors from complex code.
-If something is a well-specified action, separate it out from its surrounding code and give it a name.
+공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 오류 발생을 제한시킨다.
+만약 어떤 동작이 잘 정의되어 있다면 주변 코드로부터 분리하고 이름을 지어라.
 
 ##### Example, don't
+
 ```c++
     void read_and_print(istream& is)    // read and print an int
     {
@@ -85,50 +86,54 @@ If something is a well-specified action, separate it out from its surrounding co
             cerr << "no int on input\n";
     }
 ```
-Almost everything is wrong with `read_and_print`.
-It reads, it writes (to a fixed `ostream`), it writes error messages (to a fixed `ostream`), it handles only `int`s.
-There is nothing to reuse, logically separate operations are intermingled and local variables are in scope after the end of their logical use.
-For a tiny example, this looks OK, but if the input operation, the output operation, and the error handling had been more complicated the tangled
-mess could become hard to understand.
+
+`read_and_print`는 대부분이 틀렸다.
+이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 오류 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
+재사용되는 코드가 없고 논리적으로 분리된 동작들은 섞였고 지역변수는 사용이 끝난 후에도 존재한다.
+간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 오류처리가 좀 더 복잡해지면 코드가 뒤엉켜서 이해하기 어려워 진다.
 
 ##### Note
 
-If you write a non-trivial lambda that potentially can be used in more than one place, give it a name by assigning it to a (usually non-local) variable.
+만약 한 곳 이상에서 사용 될 중요한 람다 함수를 작성한다면 (비지역)변수에 할당하고 이름을 지어줘라.
 
 ##### Example
+
 ```c++
     sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
 ```
-Naming that lambda breaks up the expression into its logical parts and provides a strong hint to the meaning of the lambda.
+
+람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠할 수 있다.
+
 ```c++
     auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
 
     sort(a, b, lessT);
     find_if(a, b, lessT);
 ```
-The shortest code is not always the best for performance or maintainability.
+
+유지보수나 성능을 고려하면 짧은 코드가 항상 좋은것은 아니다.
 
 ##### Exception
 
-Loop bodies, including lambdas used as loop bodies, rarely need to be named.
-However, large loop bodies (e.g., dozens of lines or dozens of pages) can be a problem.
-The rule [Keep functions short and simple](#Rf-single) implies "Keep loop bodies short."
-Similarly, lambdas used as callback arguments are sometimes non-trivial, yet unlikely to be reusable.
+반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
+하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
+[함수를 간결하게 유지하라](#Rf-single) 규칙은 "반복문을 간결하게 유지하라"는 규칙을 내포한다. 콜백 인자로 사용되는 람다는 재사용하지 않지만 사소하게 볼 수 없는 경우도 있다.
 
 ##### Enforcement
 
-* See [Keep functions short and simple](#Rf-single)
-* Flag identical and very similar lambdas used in different places.
+* [함수를 간결하게 유지하라](#Rf-single)를 참고하라
+* 동일하거나 매우 비슷한 람다가 여러 곳에서 사용되면 지적하라
 
 ### <a name="Rf-logical"></a>F.2: A function should perform a single logical operation
 
 ##### Reason
 
-A function that performs a single operation is simpler to understand, test, and reuse.
+하나의 작업만 수행하는 함수는 이해하기 쉽고, 테스트하기 쉽고, 재사용하기 쉽다.
 
 ##### Example
 
-Consider:
+다음을 고려해 보자:
+
 ```c++
     void read_and_print()    // bad
     {
@@ -138,7 +143,9 @@ Consider:
         cout << x << "\n";
     }
 ```
-This is a monolith that is tied to a specific input and will never find another (different) use. Instead, break functions up into suitable logical parts and parameterize:
+
+위 함수는 특정한 입력에 속박되어 있고 다른 쓰임새는 찾을 수 없다. 대신, 함수를 의미있는 논리적 작업으로 나누고 매개 변수화하라:
+
 ```c++
     int read(istream& is)    // better
     {
@@ -153,7 +160,9 @@ This is a monolith that is tied to a specific input and will never find another 
         os << x << "\n";
     }
 ```
-These can now be combined where needed:
+
+필요하다면 두 함수를 결합하면 된다:
+
 ```c++
     void read_and_print()
     {
@@ -161,7 +170,11 @@ These can now be combined where needed:
         print(cout, x);
     }
 ```
-If there was a need, we could further templatize `read()` and `print()` on the data type, the I/O mechanism, the response to errors, etc. Example:
+
+또한 필요하다면 `read()`와 `print()`에서 사용하는 데이터 타입, 입력 메커니즘, 오류에 대한 응답 등을 템플릿화 할 수 있다.
+
+예를 들어:
+
 ```c++
     auto read = [](auto& input, auto& value)    // better
     {
@@ -174,22 +187,24 @@ If there was a need, we could further templatize `read()` and `print()` on the d
         output << value << "\n";
     }
 ```
+
 ##### Enforcement
 
-* Consider functions with more than one "out" parameter suspicious. Use return values instead, including `tuple` for multiple return values.
-* Consider "large" functions that don't fit on one editor screen suspicious. Consider factoring such a function into smaller well-named suboperations.
-* Consider functions with 7 or more parameters suspicious.
+* 출력 매개 변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다.
+* 편집기 화면에 다 나오지 않을 만큼 큰 함수를 의심하라. 이런 함수는 세부 동작을 갖는 더 작은 함수들로 (이름을 잘 지어서) 나누도록 한다.
+* 7개 이상의 매개 변수를 갖는 함수를 의심하라.
 
 ### <a name="Rf-single"></a>F.3: Keep functions short and simple
 
 ##### Reason
 
-Large functions are hard to read, more likely to contain complex code, and more likely to have variables in larger than minimal scopes.
-Functions with complex control structures are more likely to be long and more likely to hide logical errors
+긴 함수는 읽기 어렵고 복잡하고, 변수가 필요한 유효범위 이상으로 사용되고 있을지도 모른다.  
+복잡한 제어구조를 가진 함수는 더 길고 논리적 오류가 숨겨져 있을 수 있다
 
 ##### Example
 
 Consider:
+
 ```c++
     double simple_func(double val, int flag1, int flag2)
         // simple_func: takes a value and calculates the expected ASIC output,
@@ -219,11 +234,13 @@ Consider:
         return finalize(intermediate, 0.);
     }
 ```
-This is too complex (and long).
-How would you know if all possible alternatives have been correctly handled?
-Yes, it breaks other rules also.
 
-We can refactor:
+이 함수는 너무 복잡하다 (그리고 너무 길다).
+모든 경우가 올바르게 처리되는지 어떻게 알 수 있겠는가?
+게다가, 이 함수는 다른 규칙들도 어기고 있다.
+
+이렇게 바꿔쓸 수 있다:
+
 ```c++
     double func1_muon(double val, int flag)
     {
@@ -247,32 +264,34 @@ We can refactor:
         return 0.;
     }
 ```
-##### Note
-
-"It doesn't fit on a screen" is often a good practical definition of "far too large."
-One-to-five-line functions should be considered normal.
 
 ##### Note
 
-Break large functions up into smaller cohesive and named functions.
-Small simple functions are easily inlined where the cost of a function call is significant.
+"한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이다.
+최대 다섯줄짜리 함수를 기본으로 생각해야 한다.
+
+##### Note
+
+긴 함수는 응집성있고 의미있는 이름을 가진 작은 함수로 나누어야 한다. 작고 간결한 함수는 함수 호출 비용이 중요한 곳에서 `inline`처리될 수 있다.
 
 ##### Enforcement
 
-* Flag functions that do not "fit on a screen."
+* "한 화면에 맞지 않는" 함수는 지적한다.  
   How big is a screen? Try 60 lines by 140 characters; that's roughly the maximum that's comfortable for a book page.
-* Flag functions that are too complex. How complex is too complex?
+* 너무 복잡한 함수는 지적한다.  
+  How complex is too complex?
   You could use cyclomatic complexity. Try "more than 10 logical path through." Count a simple switch as one path.
 
 ### <a name="Rf-constexpr"></a>F.4: If a function may have to be evaluated at compile time, declare it `constexpr`
 
 ##### Reason
 
- `constexpr` is needed to tell the compiler to allow compile-time evaluation.
+`constexpr`는 컴파일 시간에 평가하라고 컴파일러에게 지시하는데 사용된다.
 
 ##### Example
 
-The (in)famous factorial:
+유명한 팩토리얼:
+
 ```c++
     constexpr int fac(int n)
     {
@@ -283,13 +302,13 @@ The (in)famous factorial:
         return x;
     }
 ```
-This is C++14.
-For C++11, use a recursive formulation of `fac()`.
+
+C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac()`를 재귀 형태로 작성해야 한다.
 
 ##### Note
 
-`constexpr` does not guarantee compile-time evaluation;
-it just guarantees that the function can be evaluated at compile time for constant expression arguments if the programmer requires it or the compiler decides to do so to optimize.
+`constexpr`은 컴파일 타임 평가를 보장하지 않는다; 단지 프로그래머가 요구하거나 컴파일러가 최적화를 하기로 결정했을 때 상수 표현 인자에 대해서 컴파일 타임에 평가 될 수 있다는 것만을 보장 할 뿐이다.
+
 ```c++
     constexpr int min(int x, int y) { return x < y ? x : y; }
 
@@ -301,9 +320,11 @@ it just guarantees that the function can be evaluated at compile time for consta
         constexpr int m4 = min(-1, v);  // error: cannot evaluate at compile time
     }
 ```
+
 ##### Note
 
-`constexpr` functions are pure: they can have no side effects.
+`constexpr` 함수는 순수 함수들이며, 부수효과(side deffect)를 가지지 않는다.
+
 ```c++
     int dcount = 0;
     constexpr int double(int v)
@@ -312,7 +333,8 @@ it just guarantees that the function can be evaluated at compile time for consta
         return v + v;
     }
 ```
-This is usually a very good thing.
+
+대체적으로 좋은 특성이다.
 
 When given a non-constant argument, a `constexpr` function can throw.
 If you consider exiting by throwing a side effect, a `constexpr` function isn't completely pure;
@@ -341,15 +363,17 @@ The compiler gives an error if a non-`constexpr` function is called where a cons
 
 ##### Reason
 
-Some optimizers are good at inlining without hints from the programmer, but don't rely on it.
-Measure! Over the last 40 years or so, we have been promised compilers that can inline better than humans without hints from humans.
-We are still waiting.
-Specifying `inline` encourages the compiler to do a better job.
+일부 최적화기(optimizer)는 별도로 힌트를 받지 않아도 함수 인라인화를 잘 하지만, 그에 의존해서는 안된다.
+측정하라! 지난 40년간 우리는 컴파일러가 아무런 힌트가 없어도 사람보다 더 인라인화를 잘 할거라고 약속해 왔다.
+그리고 그 약속은 아직 지켜지지 않았다.  
+`inline`키워드를 지정하는 것은 컴파일러가 일을 더 잘 할 수 있도록 한다. 독려해주는 것 입니다.
 
 ##### Example
+
 ```c++
     inline string cat(const string& s, const string& s2) { return s + s2; }
 ```
+
 ##### Exception
 
 Do not put an `inline` function in what is meant to be a stable interface unless you are certain that it will not change.
@@ -357,7 +381,7 @@ An inline function is part of the ABI.
 
 ##### Note
 
-`constexpr` implies `inline`.
+`constexpr`은 `inline`을 내포하고 있다.
 
 ##### Note
 
@@ -365,30 +389,30 @@ Member functions defined in-class are `inline` by default.
 
 ##### Exception
 
-Template functions (incl. template member functions) are normally defined in headers and therefore inline.
+템플릿 함수(템플릿 멤버 함수 포함)들은 보통 헤더 파일에 정의되기 때문에 인라인 함수에 해당한다.
 
 ##### Enforcement
 
-Flag `inline` functions that are more than three statements and could have been declared out of line (such as class member functions).
+`inline`함수가 3 문장보다 길고 (클래스의 멤버 함수처럼) 다른 곳에 선언되었다면 지적한다.
 
 ### <a name="Rf-noexcept"></a>F.6: If your function may not throw, declare it `noexcept`
 
 ##### Reason
 
-If an exception is not supposed to be thrown, the program cannot be assumed to cope with the error and should be terminated as soon as possible. Declaring a function `noexcept` helps optimizers by reducing the number of alternative execution paths. It also speeds up the exit after failure.
+예외를 던지지 않기로 했다면, 프로그램은 오류를 처리하지 않을 것이기 때문에 가능한 빠르게 종료되어야 한다. `noexcept`를 선언하면 최적화기가 선택하는 여러가지 실행경로들을 사전에 제거할 수 있도록 도와준다.
 
 ##### Example
 
-Put `noexcept` on every function written completely in C or in any other language without exceptions.
-The C++ Standard Library does that implicitly for all functions in the C Standard Library.
+온전히 C언어로 구현이 되었거나 예외를 지원하지 않는 모든 함수에 `noexcept`를 추가하라. C++ 표준 라이브러리는 C 표준 라이브러리에 대해서 암시적으로 그렇게하고 있다.
 
 ##### Note
 
-`constexpr` functions can throw when evaluated at run time, so you may need `noexcept` for some of those.
+`constexpr` 함수가 실행시간에 평가된다면 예외가 발생할 수 있기 때문에, `noexcept`를 명시해야 할 수 있다
 
 ##### Example
 
-You can use `noexcept` even on functions that can throw:
+예외를 던질 수 있는 함수에서 `noexcept`를 사용하는 것도 가능하다:
+
 ```c++
     vector<string> collect(istream& is) noexcept
     {
@@ -398,9 +422,9 @@ You can use `noexcept` even on functions that can throw:
         return res;
     }
 ```
-If `collect()` runs out of memory, the program crashes.
-Unless the program is crafted to survive memory exhaustion, that may be just the right thing to do;
-`terminate()` may generate suitable error log information (but after memory runs out it is hard to do anything clever).
+
+`collect()` 함수가 메모리를 모두 사용해 버리면 프로그램은 비정상적으로 종료하게 된다. 프로그램이 메모리 고갈 상태를 해결할 수 없다면, 이는 당연한 결과라고 할 수 있다;
+`terminate()` 함수에서 적합한 오류 기록(error log)을 생성할 수 있다. (하지만 메모리 부족 상황에서는 제대로 할 수 있는 일이 거의 없다)
 
 ##### Note
 
@@ -425,22 +449,23 @@ low-level functions.
 
 ##### Note
 
-Destructors, `swap` functions, move operations, and default constructors should never throw.
+소멸자, `swap` 함수, move 연산 그리고 기본 생성자에서는 절대로 예외를 던지면 안된다.
 
 ##### Enforcement
 
-* Flag functions that are not `noexcept`, yet cannot throw.
-* Flag throwing `swap`, `move`, destructors, and default constructors.
+* 예외를 던질 수 없는데도 `noexcept`가 없는 함수가 있다면 지적한다
+* 예외를 던지는 `swap`, move 연산자, 소멸자 그리고 기본 생성자가 있다면 지적한다
 
 ### <a name="Rf-smart"></a>F.7: For general use, take `T*` or `T&` arguments rather than smart pointers
 
 ##### Reason
 
-Passing a smart pointer transfers or shares ownership and should only be used when ownership semantics are intended (see [R.30](#Rr-smartptrparam)).
-Passing by smart pointer restricts the use of a function to callers that use smart pointers.
-Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost.
+스마트 포인터를 인자로 사용하면 소유권이 이전되거나 공유된다. 이는 의도적인 경우에만 사용되어야 한다. ([R.30](#Rr-smartptrparam) 참고).
+스마트 포인터를 인자로 사용하면 함수 호출 시 스마트 포인터를 사용해야한다는 제약이 생긴다.
+공유 스마트 포인터를 인자로 사용하는 것은 (예, `std::shared_ptr`) 런타임시 추가 비용을 발생시킨다.
 
 ##### Example
+
 ```c++
     // accepts any int*
     void f(int*);
@@ -457,7 +482,9 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
     // accepts any int
     void h(int&);
 ```
+
 ##### Example, bad
+
 ```c++
     // callee
     void f(shared_ptr<widget>& w)
@@ -467,7 +494,8 @@ Passing a shared smart pointer (e.g., `std::shared_ptr`) implies a run-time cost
         // ...
     };
 ```
-See further in [R.30](#Rr-smartptrparam).
+
+[R.30](#Rr-smartptrparam)에서 관련 내용을 기술하고 있다.
 
 ##### Note
 
@@ -480,7 +508,7 @@ We can catch dangling pointers statically, so we don't need to rely on resource 
 
 ##### Enforcement
 
-Flag a parameter of a smart pointer type (a type that overloads `operator->` or `operator*`) for which the ownership semantics are not used;
+스마트 포인터 타입을 인자로 사용한다면 지적한다 (a type that overloads `operator->` or `operator*`) for which the ownership semantics are not used;
 that is
 
 * copyable but never copied/moved from or movable but never moved
@@ -490,16 +518,18 @@ that is
 
 ##### Reason
 
-Pure functions are easier to reason about, sometimes easier to optimize (and even parallelize), and sometimes can be memoized.
+간결한 함수는 이유를 이해하기 쉽고, 최적화하기 쉽고(병렬화를 포함한다), 메모이제이션하기 쉽습니다.
 
 ##### Example
+
 ```c++
     template<class T>
     auto square(T t) { return t * t; }
 ```
+
 ##### Note
 
-`constexpr` functions are pure.
+`constexpr`는 순수 함수에 속한다.
 
 When given a non-constant argument, a `constexpr` function can throw.
 If you consider exiting by throwing a side effect, a `constexpr` function isn't completely pure;
@@ -515,13 +545,14 @@ Not possible.
 
 ##### Reason
 
-Readability.
-Suppression of unused parameter warnings.
+가독성. "사용되지 않는 인자" 경고가 발생하지 않게 한다.
 
 ##### Example
+
 ```c++
     X* find(map<Blob>& m, const string& s, Hint);   // once upon a time, a hint was used
 ```
+
 ##### Note
 
 Allowing parameters to be unnamed was introduced in the early 1980 to address this problem.
@@ -530,16 +561,16 @@ Allowing parameters to be unnamed was introduced in the early 1980 to address th
 
 Flag named unused parameters.
 
-## <a name="SS-call"></a>F.call: Parameter passing
+## <a name="SS-call"></a>F.call: 인자 전달(Parameter passing)
 
-There are a variety of ways to pass parameters to a function and to return values.
+함수에 인자를 전달하고 반환값을 받는데는 다양한 방법이 있다.
 
 ### <a name="Rf-conventional"></a>F.15: Prefer simple and conventional ways of passing information
 
 ##### Reason
 
-Using "unusual and clever" techniques causes surprises, slows understanding by other programmers, and encourages bugs.
-If you really feel the need for an optimization beyond the common techniques, measure to ensure that it really is an improvement, and document/comment because the improvement may not be portable.
+"별나면서 교묘한" 기법은 깜짝놀랄만한 버그를 만들어내거나, 다른 프로그래머가 코드를 이해하는데 어렵게 만든다.
+정말로 일반적인 기법을 넘어서는 방법으로 최적화를 해야 한다면 꼭 필요한 개선사항이라는것을 확신할 수 있어야하고, 이식성이 없을 수 있기 때문에 문서나 주석을 남겨야 한다.
 
 The following tables summarize the advice in the following Guidelines, F.16-21.
 
@@ -563,6 +594,7 @@ What is "cheap to copy" depends on the machine architecture, but two or three wo
 When copying is cheap, nothing beats the simplicity and safety of copying, and for small objects (up to two or three words) it is also faster than passing by reference because it does not require an extra indirection to access from the function.
 
 ##### Example
+
 ```c++
     void f1(const string& s);  // OK: pass by reference to const; always cheap
 
@@ -572,6 +604,7 @@ When copying is cheap, nothing beats the simplicity and safety of copying, and f
 
     void f4(const int& x);     // bad: overhead on access in f4()
 ```
+
 For advanced uses (only), where you really need to optimize for rvalues passed to "input-only" parameters:
 
 * If the function is going to unconditionally move from the argument, take it by `&&`. See [F.18](#Rf-consume).
@@ -580,6 +613,7 @@ For advanced uses (only), where you really need to optimize for rvalues passed t
 * In special cases, such as multiple "input + copy" parameters, consider using perfect forwarding. See [F.19](#Rf-forward).
 
 ##### Example
+
 ```c++
     int multiply(int, int); // just input ints, pass by value
 
@@ -588,6 +622,7 @@ For advanced uses (only), where you really need to optimize for rvalues passed t
 
     void sink(unique_ptr<widget>);  // input only, and moves ownership of the widget
 ```
+
 Avoid "esoteric techniques" such as:
 
 * Passing arguments as `T&&` "for efficiency".
@@ -597,6 +632,7 @@ Avoid "esoteric techniques" such as:
 ##### Example
 
 Assuming that `Matrix` has move operations (possibly by keeping its elements in a `std::vector`):
+
 ```c++
     Matrix operator+(const Matrix& a, const Matrix& b)
     {
@@ -609,6 +645,7 @@ Assuming that `Matrix` has move operations (possibly by keeping its elements in 
 
     y = m3 + m3;         // move assignment
 ```
+
 ##### Notes
 
 The return value optimization doesn't handle the assignment case, but the move assignment does.
@@ -628,16 +665,19 @@ If you need the notion of an optional value, use a pointer, `std::optional`, or 
 
 ##### Reason
 
-This makes it clear to callers that the object is assumed to be modified.
+호출자에게 값이 변경될 수 있다는 점을 분명히 할 수 있다.
 
 ##### Example
+
 ```c++
     void update(Record& r);  // assume that update writes to r
 ```
+
 ##### Note
 
-A `T&` argument can pass information into a function as well as out of it.
-Thus `T&` could be an in-out-parameter. That can in itself be a problem and a source of errors:
+`T&` 인자는 정보를 전달할 수도 있지만 받아올 수도 있다.
+때문에 `T&`는 입출력 매개변수가 될 수 있다. 이로 인해 문제가 되거나 오류의 원인이 되기도 한다:
+
 ```c++
     void f(string& s)
     {
@@ -651,8 +691,9 @@ Thus `T&` could be an in-out-parameter. That can in itself be a problem and a so
         // ...
     }
 ```
-Here, the writer of `g()` is supplying a buffer for `f()` to fill, but `f()` simply replaces it (at a somewhat higher cost than a simple copy of the characters).
-A bad logic error can happen if the writer of `g()` incorrectly assumes the size of the `buffer`.
+
+여기서, `g()` 작성자는  `f()`에게 버퍼를 제공하고 있지만,  `f()`는 참조를 변경해버린다 (이는 문자들을 단순히 복사하는 것보다 비용이 좀 더 발생한다).
+`g()`에서 `buffer`의 크기를 잘못 가정한다면 오류가 발생할 수 있다.
 
 ##### Enforcement
 
@@ -666,6 +707,7 @@ A bad logic error can happen if the writer of `g()` incorrectly assumes the size
 It's efficient and eliminates bugs at the call site: `X&&` binds to rvalues, which requires an explicit `std::move` at the call site if passing an lvalue.
 
 ##### Example
+
 ```c++
     void sink(vector<int>&& v) {   // sink takes ownership of whatever the argument owned
         // usually there might be const accesses of v here
@@ -673,6 +715,7 @@ It's efficient and eliminates bugs at the call site: `X&&` binds to rvalues, whi
         // usually no more use of v here; it is moved-from
     }
 ```
+
 Note that the `std::move(v)` makes it possible for `store_somewhere()` to leave `v` in a moved-from state.
 [That could be dangerous](#Rc-move-semantic).
 
@@ -682,12 +725,14 @@ Note that the `std::move(v)` makes it possible for `store_somewhere()` to leave 
 Unique owner types that are move-only and cheap-to-move, such as `unique_ptr`, can also be passed by value which is simpler to write and achieves the same effect. Passing by value does generate one extra (cheap) move operation, but prefer simplicity and clarity first.
 
 For example:
+
 ```c++
     template <class T>
     void sink(std::unique_ptr<T> p) {
         // use p ... possibly std::move(p) onward somewhere else
     }   // p gets destroyed
 ```
+
 ##### Enforcement
 
 * Flag all `X&&` parameters (where `X` is not a template type parameter name) where the function body uses them without `std::move`.
@@ -700,7 +745,7 @@ For example:
 
 If the object is to be passed onward to other code and not directly used by this function, we want to make this function agnostic to the argument `const`-ness and rvalue-ness.
 
-In that case, and only that case, make the parameter `TP&&` where `TP` is a template type parameter -- it both *ignores* and *preserves* `const`-ness and rvalue-ness. Therefore any code that uses a `TP&&` is implicitly declaring that it itself doesn't care about the variable's `const`-ness and rvalue-ness (because it is ignored), but that intends to pass the value onward to other code that does care about `const`-ness and rvalue-ness (because it is preserved). When used as a parameter `TP&&` is safe because any temporary objects passed from the caller will live for the duration of the function call. A parameter of type `TP&&` should essentially always be passed onward via `std::forward` in the body of the function.
+`TP`가 템플릿형 매개변수면 `TP&&`는 포워딩 참조가 된다 -- 이 때 상수 속성과 rvalue 속성은 *무시* 되기도하고 *보존* 되기도 한다. 그래서 `T&&`를 사용하는 코드는 변수의 상수 속성과 rvalue 속성에 게의치 않는다는 의미를 내포하지만 (어차피 무시되기 때문에), 값을 전달하는 코드에서는 상수 속성과 rvalue 속성을 신경쓴다 (보존이 되기 때문에). `TP&&`형 매개변수에 임시객체가 전달되면 함수가 실행되는 동안에는 유효하기 때문에 안전하다. `TP&&`형 매개변수는 항상 `std::forward`를 이용하여 함수의 몸체에서 전달되어야 한다.
 
 ##### Example
 ```c++
@@ -726,6 +771,7 @@ This includes large objects like standard containers that use implicit move oper
 If you have multiple values to return, [use a tuple](#Rf-out-multi) or similar multi-member type.
 
 ##### Example
+
 ```c++
     // OK: return pointers to elements with the value x
     vector<const int*> find_all(const vector<int>&, int x);
@@ -733,12 +779,14 @@ If you have multiple values to return, [use a tuple](#Rf-out-multi) or similar m
     // Bad: place pointers to elements with value x in-out
     void find_all(const vector<int>&, vector<const int*>& out, int x);
 ```
+
 ##### Note
 
 A `struct` of many (individually cheap-to-move) elements may be in aggregate expensive to move.
 
 It is not recommended to return a `const` value.
 Such older advice is now obsolete; it does not add value, and it interferes with move semantics.
+
 ```c++
     const vector<int> fct();    // bad: that "const" is more trouble than it is worth
 
@@ -750,6 +798,7 @@ Such older advice is now obsolete; it does not add value, and it interferes with
         return fct(); // expensive copy: move semantics suppressed by the "const"
     }
 ```
+
 The argument for adding `const` to a return value is that it prevents (very rare) accidental access to a temporary.
 The argument against is prevents (very frequent) use of move semantics.
 
@@ -760,6 +809,7 @@ The argument against is prevents (very frequent) use of move semantics.
 * To reuse an object that carries capacity (e.g., `std::string`, `std::vector`) across multiple calls to the function in an inner loop: [treat it as an in/out parameter and pass by reference](#Rf-out-multi).
 
 ##### Example
+
 ```c++
     struct Package {      // exceptional case: expensive-to-move object
         char header[16];
@@ -772,6 +822,7 @@ The argument against is prevents (very frequent) use of move semantics.
     int val();            // OK
     void val(int&);       // Bad: Is val reading its argument
 ```
+
 ##### Enforcement
 
 * Flag reference to non-`const` parameters that are not read before being written to and are a type that could be cheaply returned; they should be "out" return values.
@@ -787,6 +838,7 @@ possibly with the extra convenience of `tie` at the call site.
 Prefer using a named struct where there are semantics to the returned value. Otherwise, a nameless `tuple` is useful in generic code.
 
 ##### Example
+
 ```c++
     // BAD: output-only parameter documented in a comment
     int f(const string& input, /*output only*/ string& output_data)
@@ -803,14 +855,19 @@ Prefer using a named struct where there are semantics to the returned value. Oth
         return make_tuple(status, something());
     }
 ```
-C++98's standard library already used this style, because a `pair` is like a two-element `tuple`.
-For example, given a `set<string> my_set`, consider:
+
+사실, C++98의 표준 라이브러리에서는 `pair`가 개체 2개를 묶은 `tuple`과 같기 때문에 이 기능을 편리하게 사용하고 있었다.
+
+예를 들어, `set<string> my_set`이 주어졌다고 가정하면:
+
 ```c++
     // C++98
     result = my_set.insert("Hello");
     if (result.second) do_something_with(result.first);    // workaround
 ```
-With C++11 we can write this, putting the results directly in existing local variables:
+
+C++11에서는 이렇게 작성할 수 있다, 결과값들을 이미 존재하는 지역변수에 대입한다:
+
 ```c++
     Sometype iter;                                // default initialize if we haven't already
     Someothertype success;                        // used these variables for some other purpose
@@ -818,16 +875,20 @@ With C++11 we can write this, putting the results directly in existing local var
     tie(iter, success) = my_set.insert("Hello");   // normal return value
     if (success) do_something_with(iter);
 ```
+
 With C++17 we should be able to use "structured bindings" to declare and initialize the multiple variables:
+
 ```c++
     if (auto [ iter, success ] = my_set.insert("Hello"); success) do_something_with(iter);
 ```
+
 ##### Exception
 
 Sometimes, we need to pass an object to a function to manipulate its state.
 In such cases, passing the object by reference [`T&`](#Rf-inout) is usually the right technique.
 Explicitly passing an in-out parameter back out again as a return value is often not necessary.
 For example:
+
 ```c++
     istream& operator>>(istream& is, string& s);    // much like std::operator>>()
 
@@ -835,6 +896,7 @@ For example:
         // do something with line
     }
 ```
+
 Here, both `s` and `cin` are used as in-out parameters.
 We pass `cin` by (non-`const`) reference to be able to manipulate its state.
 We pass `s` to avoid repeated allocations.
@@ -843,6 +905,7 @@ This technique is sometimes called the "caller-allocated out" pattern and is par
 such as `string` and `vector`, that needs to do free store allocations.
 
 To compare, if we passed out all values as return values, we would something like this:
+
 ```c++
     pair<istream&, string> get_string(istream& is);  // not recommended
     {
@@ -855,6 +918,7 @@ To compare, if we passed out all values as return values, we would something lik
         // do something with p.second
     }
 ```
+
 We consider that significantly less elegant with significantly less performance.
 
 For a truly strict reading of this rule (F.21), the exception isn't really an exception because it relies on in-out parameters,
@@ -865,6 +929,7 @@ However, we prefer to be explicit, rather than subtle.
 
 In many cases, it may be useful to return a specific, user-defined type.
 For example:
+
 ```c++
     struct Distance {
         int value;
@@ -909,6 +974,7 @@ This makes it hard to understand what the code does and is supposed to do.
 It complicates checking and tool support.
 
 ##### Example
+
 ```c++
     void use(int* p, int n, char* s, int* q)
     {
@@ -920,7 +986,9 @@ It complicates checking and tool support.
                         // assume it does not or use owner
     }
 ```
+
 better
+
 ```c++
     void use2(span<int> p, zstring s, owner<int*> q)
     {
@@ -929,6 +997,7 @@ better
         delete q;  // OK
     }
 ```
+
 ##### Note
 
 `owner<T*>` represents ownership, `zstring` represents a C-style string.
@@ -947,8 +1016,8 @@ better
 
 ##### Reason
 
-Clarity. A function with a `not_null<T>` parameter makes it clear that the caller of the function is responsible for any `nullptr` checks that may be necessary.
-Similarly, a function with a return value of `not_null<T>` makes it clear that the caller of the function does not need to check for `nullptr`.
+명확성. `not_null<T>`인자는 함수 호출자가 `nullptr` 검사를 해야만 한다고 명확하게 보여준다.
+유사하게, `not_null<T>`을 반환한다면 함수 호출자는 반환 값이 `nullptr`인지 검사해야 할 필요가 없다.
 
 ##### Example
 
@@ -956,10 +1025,13 @@ Similarly, a function with a return value of `not_null<T>` makes it clear that t
 Additionally, when debugging, `owner<T*>` and `not_null<T>` can be instrumented to check for correctness.
 
 Consider:
+
 ```c++
     int length(Record* p);
 ```
+
 When I call `length(p)` should I check if `p` is `nullptr` first? Should the implementation of `length()` check if `p` is `nullptr`?
+
 ```c++
     // it is the caller's job to make sure p != nullptr
     int length(not_null<Record*> p);
@@ -967,6 +1039,7 @@ When I call `length(p)` should I check if `p` is `nullptr` first? Should the imp
     // the implementor of length() must assume that p == nullptr is possible
     int length(Record* p);
 ```
+
 ##### Note
 
 A `not_null<T*>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`; both can be represented in memory as a `T*` (so no run-time overhead is implied).
@@ -980,6 +1053,10 @@ A `not_null<T*>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`
 * (Simple) Warn if a raw pointer is dereferenced without being tested against `nullptr` (or equivalent) within a function, suggest it is declared `not_null` instead.
 * (Simple) Error if a raw pointer is sometimes dereferenced after first being tested against `nullptr` (or equivalent) within the function and sometimes is not.
 * (Simple) Warn if a `not_null` pointer is tested against `nullptr` within a function.
+
+* (단순) 원시 포인터를 `nullptr`인지 검사하지 않고 사용하면 경고한다 `not_null`를 쓰도록 제안한다
+* (단순) 포인터가 역참조 될 때 `nullptr`를 검사할 때도 있고 검사하지 않을 때도 있다면 오류로 처리한다
+* (단순) `not_null`이 `nullptr`인지 검사하는 경우 경고한다
 
 ### <a name="Rf-range"></a>F.24: Use a `span<T>` or a `span_p<T>` to designate a half-open sequence
 
@@ -1037,16 +1114,19 @@ Passing a `span` object as an argument is exactly as efficient as passing a pair
 
 ##### Reason
 
-C-style strings are ubiquitous. They are defined by convention: zero-terminated arrays of characters.
-We must distinguish C-style strings from a pointer to a single character or an old-fashioned pointer to an array of characters.
+C언어 형식의 문자열은 광범위하게 사용되고 있다. 관례적으로, 이들은 `\0`으로 끝나는 `char`배열이라고 정의되어 있다.
+C 문자열은 `char` 1개에 대한 포인터와 구분되어야 한다.
 
 ##### Example
 
 Consider:
+
 ```c++
     int length(const char* p);
 ```
-When I call `length(s)` should I check if `s` is `nullptr` first? Should the implementation of `length()` check if `p` is `nullptr`?
+
+`length(s)`를 호출 할 때 `s==nullptr`을 검사해야 하는가? `length()` 본문 안에서 `p`가 `nullptr`인지 검사해야 하는가?
+
 ```c++
     // the implementor of length() must assume that p == nullptr is possible
     int length(zstring p);
@@ -1054,9 +1134,10 @@ When I call `length(s)` should I check if `s` is `nullptr` first? Should the imp
     // it is the caller's job to make sure p != nullptr
     int length(not_null<zstring> p);
 ```
+
 ##### Note
 
-`zstring` do not represent ownership.
+`zstring`은 소유권을 표현하지 않는다.
 
 **See also**: [Support library](#S-gsl)
 
@@ -1069,6 +1150,7 @@ Using `unique_ptr` is the cheapest way to pass a pointer safely.
 **See also**: [C.50](#Rc-factory) regarding when to return a `shared_ptr` from a factory.
 
 ##### Example
+
 ```c++
     unique_ptr<Shape> get_shape(istream& is)  // assemble shape from input stream
     {
@@ -1082,6 +1164,7 @@ Using `unique_ptr` is the cheapest way to pass a pointer safely.
         }
     }
 ```
+
 ##### Note
 
 You need to pass a pointer rather than an object if what you are transferring is an object from a class hierarchy that is to be used through an interface (base class).
@@ -1094,9 +1177,10 @@ You need to pass a pointer rather than an object if what you are transferring is
 
 ##### Reason
 
-Using `std::shared_ptr` is the standard way to represent shared ownership. That is, the last owner deletes the object.
+`std::shared_ptr`로 소유권을 공유하는 것은 표준에서 사용하는 방법이다. 이를 사용하면, 마지막 소유자가 개체를 소멸시킨다.
 
 ##### Example
+
 ```c++
     shared_ptr<const Image> im { read_image(somewhere) };
 
@@ -1108,10 +1192,11 @@ Using `std::shared_ptr` is the standard way to represent shared ownership. That 
     // detach threads
     // last thread to finish deletes the image
 ```
+
 ##### Note
 
-Prefer a `unique_ptr` over a `shared_ptr` if there is never more than one owner at a time.
-`shared_ptr` is for shared ownership.
+소유자가 하나 뿐이라면 `shared_ptr`보다는 `unique_ptr`을 사용하라. 
+`shared_ptr`는 소유권의 공유를 위한 것이다.
 
 Note that pervasive use of `shared_ptr` has a cost (atomic operations on the `shared_ptr`'s reference count have a measurable aggregate cost).
 
@@ -1121,7 +1206,7 @@ Have a single object own the shared object (e.g. a scoped object) and destroy th
 
 ##### Enforcement
 
-(Not enforceable) This is a too complex pattern to reliably detect.
+(Not enforceable) 제대로 탐지하기엔 너무 복잡한 패턴을 띄고 있다.
 
 ### <a name="Rf-ptr-ref"></a>F.60: Prefer `T*` over `T&` when "no argument" is a valid option
 
@@ -1160,10 +1245,11 @@ If you prefer the pointer notation (`->` and/or `*` vs. `.`), `not_null<T*>` pro
 
 ##### Reason
 
-That's what pointers are good for.
-Returning a `T*` to transfer ownership is a misuse.
+포인터는 이를 표현하기에 적절하다. 
+소유권을 전달하기 위해 `T*`를 사용하는 것은 잘못된 방법이다.
 
 ##### Example
+
 ```c++
     Node* find(Node* t, const string& s)  // find s in a binary tree of Nodes
     {
@@ -1173,8 +1259,9 @@ Returning a `T*` to transfer ownership is a misuse.
         return nullptr;
     }
 ```
-If it isn't the `nullptr`, the pointer returned by `find` indicates a `Node` holding `s`.
-Importantly, that does not imply a transfer of ownership of the pointed-to object to the caller.
+
+`nullptr`가 아니라면 `find`가 반환하는 포인터는 `s`를 가지는 `node`를 의미한다.
+중요한점은 개체를 가리키는 포인터로는 소유권이 호출자까지 전달되지 않는다는 것이다.
 
 ##### Note
 
@@ -1189,10 +1276,8 @@ Do not return a pointer to something that is not in the caller's scope; see [F.4
 
 ##### Enforcement
 
-* Flag `delete`, `std::free()`, etc. applied to a plain `T*`.
-Only owners should be deleted.
-* Flag `new`, `malloc()`, etc. assigned to a plain `T*`.
-Only owners should be responsible for deletion.
+* Flag `delete`, `std::free()`, etc. applied to a plain `T*`. Only owners should be deleted.
+* Flag `new`, `malloc()`, etc. assigned to a plain `T*`. Only owners should be responsible for deletion.
 
 ### <a name="Rf-dangle"></a>F.43: Never (directly or indirectly) return a pointer or a reference to a local object
 
@@ -1203,6 +1288,7 @@ To avoid the crashes and data corruption that can result from the use of such a 
 ##### Example, bad
 
 After the return from a function its local objects no longer exist:
+
 ```c++
     int* f()
     {
@@ -1225,11 +1311,14 @@ After the return from a function its local objects no longer exist:
         g(p);        // pass pointer to abandoned stack frame to function (bad)
     }
 ```
+
 Here on one popular implementation I got the output:
+
 ```c++
     *p == 999
     gx == 999
 ```
+
 I expected that because the call of `g()` reuses the stack space abandoned by the call of `f()` so `*p` refers to the space now occupied by `gx`.
 
 * Imagine what would happen if `fx` and `gx` were of different types.
@@ -1242,6 +1331,7 @@ Fortunately, most (all?) modern compilers catch and warn against this simple cas
 ##### Note
 
 This applies to references as well:
+
 ```c++
     int& f()
     {
@@ -1250,6 +1340,7 @@ This applies to references as well:
         return x;  // Bad: returns reference to object that is about to be destroyed
     }
 ```
+
 ##### Note
 
 This applies only to non-`static` local variables.
@@ -1258,6 +1349,7 @@ All `static` variables are (as their name indicates) statically allocated, so th
 ##### Example, bad
 
 Not all examples of leaking a pointer to a local variable are that obvious:
+
 ```c++
     int* glob;       // global variables are bad in so many ways
 
@@ -1279,6 +1371,7 @@ Not all examples of leaking a pointer to a local variable are that obvious:
         cout << *glob << '\n';
     }
 ```
+
 Here I managed to read the location abandoned by the call of `f`.
 The pointer stored in `glob` could be used much later and cause trouble in unpredictable ways.
 
@@ -1305,12 +1398,13 @@ It can be detected/prevented with similar techniques.
 
 ##### Reason
 
-The language guarantees that a `T&` refers to an object, so that testing for `nullptr` isn't necessary.
+언어가 `T&`는 객체를 가리키고 있다는 것을 보장하기 때문에 `nullptr`인지 시험하는 것은 필요없다.
 
 **See also**: The return of a reference must not imply transfer of ownership:
 [discussion of dangling pointer prevention](#???) and [discussion of ownership](#???).
 
 ##### Example
+
 ```c++
     class Car
     {
@@ -1327,6 +1421,7 @@ The language guarantees that a `T&` refers to an object, so that testing for `nu
         wheel& w0 = c.get_wheel(0); // w0 has the same lifetime as c
     }
 ```
+
 ##### Enforcement
 
 Flag functions where no `return` expression could yield `nullptr`
@@ -1335,16 +1430,17 @@ Flag functions where no `return` expression could yield `nullptr`
 
 ##### Reason
 
-It's asking to return a reference to a destroyed temporary object.
-A `&&` is a magnet for temporary objects.
+이것은 소멸된 임시 개체에 대한 참조를 반환하는 것이다. `&&`는 임시 개체를 붙잡기 위한 것이다.
 
 ##### Example 
 
 A returned rvalue reference goes out of scope at the end of the full expression to which it is returned:
+
 ```c++
     auto&& x = max(0, 1);   // OK, so far
     foo(x);                 // Undefined behavior
 ```
+
 This kind of use is a frequent source of bugs, often incorrectly reported as a compiler bug.
 An implementer of a function should avoid setting such traps for users.
 
@@ -1359,6 +1455,7 @@ However, it's not fine when passing such a reference "upward" to a larger caller
 For passthrough functions that pass in parameters (by ordinary reference or by perfect forwarding) and want to return values, use simple `auto` return type deduction (not `auto&&`).
 
 Assume that `F` returns by value:
+
 ```c++
     template<class F>
     auto&& wrapper(F f)
@@ -1367,7 +1464,9 @@ Assume that `F` returns by value:
         return f();          // BAD: returns a reference to a temporary
     }
 ```
+
 Better:
+
 ```c++
     template<class F>
     auto wrapper(F f)
@@ -1379,11 +1478,11 @@ Better:
 
 ##### Exception
 
-`std::move` and `std::forward` do return `&&`, but they are just casts -- used by convention only in expression contexts where a reference to a temporary object is passed along within the same expression before the temporary is destroyed. We don't know of any other good examples of returning `&&`.
+`std::move` 와 `std::forward`는 `&&`를 반환하지만 이는 형변환일 뿐이다 -- used by convention only in expression contexts where a reference to a temporary object is passed along within the same expression before the temporary is destroyed. We don't know of any other good examples of returning `&&`.
 
 ##### Enforcement
 
-Flag any use of `&&` as a return type, except in `std::move` and `std::forward`.
+`std::move` 와 `std::forward`를 제외하고 `&&`를 반환한다면 지적한다
 
 ### <a name="Rf-main"></a>F.46: `int` is the return type for `main()`
 
@@ -1393,6 +1492,7 @@ It's a language rule, but violated through "language extensions" so often that i
 Declaring `main` (the one global `main` of a program) `void` limits portability.
 
 ##### Example
+
 ```c++
 	void main() { /* ... */ };  // bad, not C++
 	
@@ -1401,6 +1501,7 @@ Declaring `main` (the one global `main` of a program) `void` limits portability.
 		std::cout << "This is the way to do it\n";
 	}
 ```
+
 ##### Note
 
 We mention this only because of the persistence of this error in the community.
@@ -1425,6 +1526,7 @@ Historically there was some guidance to make the assignment operator return `con
 This was primarily to avoid code of the form `(a = b) = c` -- such code is not common enough to warrant violating consistency with standard types.
 
 ##### Example
+
 ```c++
     class Foo
     {
@@ -1437,6 +1539,7 @@ This was primarily to avoid code of the form `(a = b) = c` -- such code is not c
         }
     };
 ```
+
 ##### Enforcement
 
 This should be enforced by tooling by checking the return type (and return
@@ -1450,6 +1553,7 @@ value) of any assignment operator.
 With guaranteed copy elision, it is now almost always a pessimization to expressly use `std::move` in a return statement.
 
 ##### Example; bad
+
 ```c++
     S f()
     {
@@ -1457,7 +1561,9 @@ With guaranteed copy elision, it is now almost always a pessimization to express
       return std::move(result);
     }
 ```
+
 ##### Example; good
+
 ```c++
     S f()
     {
@@ -1465,6 +1571,7 @@ With guaranteed copy elision, it is now almost always a pessimization to express
       return result;
     }
 ```
+
 ##### Enforcement
 
 This should be enforced by tooling by checking the return expression .
@@ -1474,9 +1581,10 @@ This should be enforced by tooling by checking the return expression .
 
 ##### Reason
 
-Functions can't capture local variables or be declared at local scope; if you need those things, prefer a lambda where possible, and a handwritten function object where not. On the other hand, lambdas and function objects don't overload; if you need to overload, prefer a function (the workarounds to make lambdas overload are ornate). If either will work, prefer writing a function; use the simplest tool necessary.
+함수는 지역변수를 캡쳐할 수 없고, 지역 유효범위로 선언될 수도 없다; 이런 기능이 필요하다면 람다를 사용하거나 직접 작성한 함수 개체를 사용해야 한다 (가능한 람다를 사용하라). 하지만, 람다와 함수개체는 오버로드가 되지 않는다; 오버로드가 필요하다면 함수를 사용하라. 두 방법 모두 가능하다면 함수를 선호하라; 단순한 방법을 사용하라.
 
 ##### Example
+
 ```c++
     // writing a function that should only take an int or a string
     // -- overloading is natural
@@ -1497,9 +1605,11 @@ Functions can't capture local variables or be declared at local scope; if you ne
     }
     pool.join();
 ```
+
 ##### Exception
 
-Generic lambdas offer a concise way to write function templates and so can be useful even when a normal function template would do equally well with a little more syntax. This advantage will probably disappear in the future once all functions gain the ability to have Concept parameters.
+제네릭 람다는 함수 템플릿을 구현하는 간결한 방법을 제공하기 때문에 코드를 조금 더 작성하면 일반 함수 템플릿과 같은 기능을 사용할 수 있다.
+미래에 모든 함수들이 Concept 인자를 사용할 수 있게 되면 이 기능은 사라질지도 모른다.
 
 ##### Enforcement
 
@@ -1517,20 +1627,26 @@ The use of default arguments can avoid code replication.
 
 There is a choice between using default argument and overloading when the alternatives are from a set of arguments of the same types.
 For example:
+
 ```c++
     void print(const string& s, format f = {});
 ```
+
 as opposed to
+
 ```c++
     void print(const string& s);  // use default format
     void print(const string& s, format f);
 ```
+
 There is not a choice when a set of functions are used to do a semantically equivalent operation to a set of types. For example:
+
 ```c++
     void print(const char&);
     void print(int);
     void print(zstring);
 ```
+
 ##### See also
 
 
@@ -1544,7 +1660,7 @@ There is not a choice when a set of functions are used to do a semantically equi
 
 ##### Reason
 
-For efficiency and correctness, you nearly always want to capture by reference when using the lambda locally. This includes when writing or calling parallel algorithms that are local because they join before returning.
+지역범위에서 람다를 사용할 때는 대부분의 경우 효율성과 정확성을 위해 참조캡쳐(capture by reference)를 선호할 것이다. 여기에는 함수가 반환하기 전에 병렬 알고리즘을 작성하거나 호출할때도 포함된다.
 
 ##### Discussion
 
@@ -1559,15 +1675,19 @@ Unfortunately, there is no simple way to capture by reference to `const` to get 
 ##### Example
 
 Here, a large object (a network message) is passed to an iterative algorithm, and is it not efficient or correct to copy the message (which may not be copyable):
+
 ```c++
     std::for_each(begin(sockets), end(sockets), [&message](auto& socket)
     {
         socket.send(message);
     });
 ```
+
 ##### Example
 
-This is a simple three-stage parallel pipeline. Each `stage` object encapsulates a worker thread and a queue, has a `process` function to enqueue work, and in its destructor automatically blocks waiting for the queue to empty before ending the thread.
+아래 예제는 간단한 3단계 병렬 파이프라인이다.
+각 `stage` 개체는 `process` 함수를 통해 작업을 전달하고 작업 큐가 소진될 때까지 소멸되지 않는 작업용 스레드들을 캡슐화 한 것이다.
+
 ```c++
     void send_packets(buffers& bufs)
     {
@@ -1577,6 +1697,7 @@ This is a simple three-stage parallel pipeline. Each `stage` object encapsulates
         for (auto& b : bufs) { decorator.process(b); }
     }  // automatically blocks waiting for pipeline to finish
 ```
+
 ##### Enforcement
 
 Flag a lambda that captures by reference, but is used other than locally within the function scope or passed to a function by reference. (Note: This rule is an approximation, but does flag passing by pointer as those are more likely to be stored by the callee, writing to a heap location accessed via a parameter, returning the lambda, etc. The Lifetime rules will also provide general rules that flag escaping pointers and references including via lambdas.)
@@ -1585,9 +1706,11 @@ Flag a lambda that captures by reference, but is used other than locally within 
 
 ##### Reason
 
-Pointers and references to locals shouldn't outlive their scope. Lambdas that capture by reference are just another place to store a reference to a local object, and shouldn't do so if they (or a copy) outlive the scope.
+지역범위에 있는 포인터와 참조는 범위를 넘어서면 더 이상 존재하지 않는다.
+참조캡쳐를 가진 람다는 지역 개체를 참조하고 있을 뿐이며, 지역범위를 넘어서면 더 이상 참조해서는 않된다.
 
 ##### Example, bad
+
 ```c++
     int local = 42;
 
@@ -1597,7 +1720,9 @@ Pointers and references to locals shouldn't outlive their scope. Lambdas that ca
     // process() call will have undefined behavior!
     thread_pool.queue_work([&]{ process(local); });
 ```
+
 ##### Example, good
+
 ```c++
     int local = 42;
     // Want a copy of local.
@@ -1605,6 +1730,7 @@ Pointers and references to locals shouldn't outlive their scope. Lambdas that ca
     // always be available for the call.
     thread_pool.queue_work([=]{ process(local); });
 ```
+
 ##### Enforcement
 
 * (Simple) Warn when capture-list contains a reference to a locally declared variable
@@ -1617,6 +1743,7 @@ Pointers and references to locals shouldn't outlive their scope. Lambdas that ca
 It's confusing. Writing `[=]` in a member function appears to capture by value, but actually captures data members by reference because it actually captures the invisible `this` pointer by value. If you meant to do that, write `this` explicitly.
 
 ##### Example
+
 ```c++
     class My_class {
         int x = 0;
@@ -1643,6 +1770,7 @@ It's confusing. Writing `[=]` in a member function appears to capture by value, 
         }
     };
 ```
+
 ##### Note
 
 This is under active discussion in standardization, and may be addressed in a future version of the standard by adding a new capture mode or possibly adjusting the meaning of `[=]`. For now, just be explicit.
@@ -1660,6 +1788,7 @@ Passing to varargs assumes the correct type will be read.
 This is fragile because it cannot generally be enforced to be safe in the language and so relies on programmer discipline to get it right.
 
 ##### Example
+
 ```c++
     int sum(...) {
         // ...
@@ -1679,6 +1808,7 @@ This is fragile because it cannot generally be enforced to be safe in the langua
     sum(3, 2); // ok: 5
     sum(3.14159, 2.71828); // ok: ~5.85987
 ```
+
 ##### Alternatives
 
 * overloading
