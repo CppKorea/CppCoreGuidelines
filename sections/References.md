@@ -4,6 +4,7 @@
 C++을 보다 전문적으로 사용하기 위하여 많은 코딩 표준, 규칙들이 만들어 지고 있다.
 
 많은 규칙들이
+
 * 식별자들의 스펠링같이 사소한 사항들에 초점을 맞춘다
 * C++에 미숙한 사람들 의해 작성되었다
 * "개발자를 올바르게 인도하는"것을 기본 목표로 한다
@@ -82,12 +83,9 @@ Reference sections:
 
 ## <a name="SS-Cplusplus"></a>RF.C++: C++ 프로그래밍 (C++11/C++14)
 
-* [TC++PL4](http://www.stroustrup.com/4th.html):
-A thorough description of the C++ language and standard libraries for experienced programmers.
-* [Tour++](http://www.stroustrup.com/Tour.html):
-An overview of the C++ language and standard libraries for experienced programmers.
-* [Programming: Principles and Practice using C++](http://www.stroustrup.com/programming.html):
-A textbook for beginners and relative novices.
+* [TC++PL4](http://www.stroustrup.com/4th.html): A thorough description of the C++ language and standard libraries for experienced programmers.
+* [Tour++](http://www.stroustrup.com/Tour.html): An overview of the C++ language and standard libraries for experienced programmers.
+* [Programming: Principles and Practice using C++](http://www.stroustrup.com/programming.html): A textbook for beginners and relative novices.
 
 ## <a name="SS-web"></a>RF.web: 웹사이트
 
@@ -124,21 +122,18 @@ A textbook for beginners and relative novices.
 * [ISO C++ Concepts TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
 * [WG21 Ranges report](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf). Draft.
 
-
 ## <a name="SS-core"></a>RF.core: 핵심 가이드라인 자료들
 
 This section contains materials that has been useful for presenting the core guidelines and the ideas behind them:
 
 * [Our documents directory](https://github.com/isocpp/CppCoreGuidelines/tree/master/docs)
 * Stroustrup, Sutter, and Dos Reis: [A brief introduction to C++'s model for type- and resource-safety](http://www.stroustrup.com/resource-model.pdf). A paper with lots of examples.
-* Sergey Zubkov: [a Core Guidelines talk](https://www.youtube.com/watch?v=DyLwdl_6vmU)
-and here are the [slides](http://2017.cppconf.ru/talks/sergey-zubkov). In Russian. 2017.
+* Sergey Zubkov: [a Core Guidelines talk](https://www.youtube.com/watch?v=DyLwdl_6vmU) and here are the [slides](http://2017.cppconf.ru/talks/sergey-zubkov). In Russian. 2017.
 * Neil MacIntosh: [The Guideline Support Library: One Year Later](https://www.youtube.com/watch?v=_GhNnCuaEjo). CppCon 2016.
 * Bjarne Stroustrup: [Writing Good C++14](https://www.youtube.com/watch?v=1OEu9C51K2A). CppCon 2015 keynote.
 * Herb Sutter: [Writing Good C++14... By Default](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015 keynote.
 * Peter Sommerlad: [C++ Core Guidelines - Modernize your C++ Code Base](https://www.youtube.com/watch?v=fQ926v4ZzAM). ACCU 2017.
-* Bjarne Stroustrup: [No Littering!](https://www.youtube.com/watch?v=01zI9kV4h8c). Bay Area ACCU 2016.
-It gives some idea of the ambition level for the Core Guidelines.
+* Bjarne Stroustrup: [No Littering!](https://www.youtube.com/watch?v=01zI9kV4h8c). Bay Area ACCU 2016. It gives some idea of the ambition level for the Core Guidelines.
 
 Note that slides for CppCon presentations are available (links with the posted videos).
 

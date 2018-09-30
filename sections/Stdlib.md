@@ -1,7 +1,7 @@
 
 # <a name="S-stdlib"></a>SL: The Standard Library
 
-단순히 언어 자체만 사용하게 되면 모든 작업이 더디게 된다(어떤 언어라도). 적절한 라이브러리를 사용하게 되면 어떤 작업도 상당히 간단해진다. 
+단순히 언어 자체만 사용하게 되면 모든 작업이 더디게 된다(어떤 언어라도). 적절한 라이브러리를 사용하게 되면 어떤 작업도 상당히 간단해진다.
 
 The standard library has steadily grown over the years.
 Its description in the standard is now larger than that of the language features.
@@ -29,11 +29,13 @@ Standard-library rule summary:
 ### <a name="Rsl-lib"></a>SL.1: 가능한 라이브러리를 사용하라
 
 ##### Reason
+
 시간을 절약하고,처음부터 다시 만들지 않아도 된다. 다른 사람들이 이미 작업해 놓은 바를 중복작업할 필요가 없고, 다른 사람들이 향후 개선을 하게 되면 그 혜택을 누릴 수 있다. 또한 내가 직접 개선함으로서 다른 사람들을 도울 수 있다.
 
 ### <a name="Rsl-sl"></a>SL.2: 가능하다면 표준 라이브러리를 우선 사용하라
 
 ##### Reason
+
 많은 사람들이 표준 라이브러리를 알고있다. 스스로 작성한 코드나 다른 라이브러리 보다 더 안정적이고, 더 잘 관리되고, 더 광범위한 곳에 사용할 수 있다.
 
 ### <a name="sl-std"></a>SL.3: Do not add non-standard entities to namespace `std`
@@ -66,7 +68,6 @@ Summary of more specific rules:
 
 * [SL.4: Use the standard library in a type-safe manner](#sl-safe)
 
-
 ## <a name="SS-con"></a>SL.con: Containers
 
 ???
@@ -76,7 +77,7 @@ Container rule summary:
 * [SL.con.1: Prefer using STL `array` or `vector` instead of a C array](#Rsl-arrays)
 * [SL.con.2: Prefer using STL `vector` by default unless you have a reason to use a different container](#Rsl-vector)
 * [SL.con.3: Avoid bounds errors](#Rsl-bounds)
-*  ???
+* ???
 
 ### <a name="Rsl-arrays"></a>SL.con.1: Prefer using STL `array` or `vector` instead of a C array
 
@@ -88,18 +89,22 @@ Also, like a built-in array, a stack-allocated `std::array` keeps its elements o
 For a variable-length array, use `std::vector`, which additionally can change its size and handles memory allocation.
 
 ##### Example
+
 ```c++
     int v[SIZE];                        // BAD
 
     std::array<int, SIZE> w;             // ok
 ```
+
 ##### Example
+
 ```c++
     int* v = new int[initial_size];     // BAD, owning raw pointer
     delete[] v;                         // BAD, manual delete
 
     std::vector<int> w(initial_size);   // ok
 ```
+
 ##### Note
 
 Use `gsl::span` for non-owning references into a container.
@@ -167,6 +172,7 @@ For example
 Such loops can be much faster than individually checked element accesses.
 
 ##### Example, bad
+
 ```c++
     void f()
     {
@@ -175,9 +181,11 @@ Such loops can be much faster than individually checked element accesses.
         memcmp(a.data(), b.data(), 10);  // BAD, and contains a length error (length = 10 * sizeof(int))
     }
 ```
+
 Also, `std::array<>::fill()` or `std::fill()` or even an empty initializer are better candidate than `memset()`.
 
 ##### Example, good
+
 ```c++
     void f()
     {
@@ -191,9 +199,11 @@ Also, `std::array<>::fill()` or `std::fill()` or even an empty initializer are b
         }
     }
 ```
+
 ##### Example
 
 If code is using an unmodified standard library, then there are still workarounds that enable use of `std::array` and `std::vector` in a bounds-safe manner. Code can call the `.at()` member function on each class, which will result in an `std::out_of_range` exception being thrown. Alternatively, code can call the `at()` free function, which will result in fail-fast (or a customized action) on a bounds violation.
+
 ```c++
     void f(std::vector<int>& v, std::array<int, 12> a, int i)
     {
@@ -206,9 +216,11 @@ If code is using an unmodified standard library, then there are still workaround
         v.at(0) = at(a, i); // OK (alternative 2)
     }
 ```
+
 ##### Enforcement
 
 * Issue a diagnostic for any call to a standard-library function that is not bounds-checked.
+
 ??? insert link to a list of banned functions
 
 This rule is part of the [bounds profile](#SS-bounds).
@@ -218,8 +230,6 @@ This rule is part of the [bounds profile](#SS-bounds).
 * Impact on the standard library will require close coordination with WG21, if only to ensure compatibility even if never standardized.
 * We are considering specifying bounds-safe overloads for stdlib (especially C stdlib) functions like `memcmp` and shipping them in the GSL.
 * For existing stdlib functions and types like `vector` that are not fully bounds-checked, the goal is for these features to be bounds-checked when called from code with the bounds profile on, and unchecked when called from legacy code, possibly using contracts (concurrently being proposed by several WG21 members).
-
-
 
 ## <a name="SS-string"></a>SL.str: String
 
@@ -250,7 +260,6 @@ String summary:
 * [F.24 span](#Rf-range)
 * [F.25 zstring](#Rf-zstring)
 
-
 ### <a name="Rstr-string"></a>SL.str.1: Use `std::string` to own character sequences
 
 ##### Reason
@@ -258,6 +267,7 @@ String summary:
 `string` correctly handles allocation, ownership, copying, gradual expansion, and offers a variety of useful operations.
 
 ##### Example
+
 ```c++
     vector<string> read_until(const string& terminator)
     {
@@ -267,10 +277,12 @@ String summary:
         return res;
     }
 ```
+
 Note how `>>` and `!=` are provided for `string` (as examples of useful operations) and there are no explicit
 allocations, deallocations, or range checks (`string` takes care of those).
 
 In C++17, we might use `string_view` as the argument, rather than `const string*` to allow more flexibility to callers:
+
 ```c++
     vector<string> read_until(string_view terminator)   // C++17
     {
@@ -280,7 +292,9 @@ In C++17, we might use `string_view` as the argument, rather than `const string*
         return res;
     }
 ```
+
 The `gsl::string_span` is a current alternative offering most of the benefits of `std::string_view` for simple examples:
+
 ```c++
     vector<string> read_until(string_span terminator)
     {
@@ -290,9 +304,11 @@ The `gsl::string_span` is a current alternative offering most of the benefits of
         return res;
     }
 ```
+
 ##### Example, bad
 
 Don't use C-style strings for operations that require non-trivial memory management
+
 ```c++
     char* cat(const char* s1, const char* s2)   // beware!
         // return s1 + '.' + s2
@@ -307,6 +323,7 @@ Don't use C-style strings for operations that require non-trivial memory managem
         return p;
     }
 ```
+
 Did we get that right?
 Will the caller remember to `free()` the returned pointer?
 Will this code pass a security review?
@@ -328,6 +345,7 @@ Do not assume that `string` is slower than lower-level techniques without measur
 those sequences are allocated and stored.
 
 ##### Example
+
 ```c++
     vector<string> read_until(string_span terminator);
 
@@ -339,6 +357,7 @@ those sequences are allocated and stored.
         // ...
     }
 ```
+
 ##### Note
 
 `std::string_view` (C++17) is read-only.
@@ -357,15 +376,19 @@ A plain `char*` can be a pointer to a single character, a pointer to an array of
 Distinguishing these alternatives prevents misunderstandings and bugs.
 
 ##### Example
+
 ```c++
     void f1(const char* s); // s is probably a string
 ```
+
 All we know is that it is supposed to be the nullptr or point to at least one character
+
 ```c++
     void f1(zstring s);     // s is a C-style string or the nullptr
     void f1(czstring s);    // s is a C-style string constant or the nullptr
     void f1(std::byte* s);  // s is a pointer to a byte (C++17)
 ```
+
 ##### Note
 
 Don't convert a C-style string to `string` unless there is a reason to.
@@ -394,6 +417,7 @@ This is one of the major sources of bugs in C and C++ programs, so it is worthwh
 The variety of uses of `char*` in current code is a major source of errors.
 
 ##### Example, bad
+
 ```c++
     char arr[] = {'a', 'b', 'c'};
 
@@ -407,6 +431,7 @@ The variety of uses of `char*` in current code is a major source of errors.
         print(arr);   // run-time error; potentially very bad
     }
 ```
+
 The array `arr` is not a C-style string because it is not zero-terminated.
 
 ##### Alternative
@@ -480,6 +505,7 @@ The compiler will flag attempts to write to a `string_view`.
 Direct expression of an idea minimizes mistakes.
 
 ##### Example
+
 ```c++
     auto pp1 = make_pair("Tokyo", 9.00);         // {C-style string,double} intended?
     pair<string, double> pp2 = {"Tokyo", 9.00};  // a bit verbose
@@ -490,7 +516,6 @@ Direct expression of an idea minimizes mistakes.
 ##### Enforcement
 
 ???
-
 
 ## <a name="SS-io"></a>SL.io: Iostream
 
@@ -516,6 +541,7 @@ Unless you genuinely just deal with individual characters, using character-level
 and potentially inefficient composition of tokens out of characters.
 
 ##### Example
+
 ```c++
     char c;
     char buf[128];
@@ -526,18 +552,20 @@ and potentially inefficient composition of tokens out of characters.
         // ... handle too long string ....
     }
 ```
+
 Better (much simpler and probably faster):
+
 ```c++
     string s;
     s.reserve(128);
     cin >> s;
 ```
+
 and the `reserve(128)` is probably not worthwhile.
 
 ##### Enforcement
 
 ???
-
 
 ### <a name="Rio-validate"></a>SL.io.2: When reading, always consider ill-formed input
 
@@ -561,19 +589,23 @@ If input isn't validated, every function must be written to cope with bad data (
 `iostream`s are safe, flexible, and extensible.
 
 ##### Example
+
 ```c++
     // write a complex number:
     complex<double> z{ 3, 4 };
     cout << z << '\n';
 ```
+
 `complex` is a user-defined type and its I/O is defined without modifying the `iostream` library.
 
 ##### Example
+
 ```c++
     // read a file of complex numbers:
     for (complex<double> z; cin >> z; )
         v.push_back(z);
 ```
+
 ##### Exception
 
 ??? performance ???
@@ -602,6 +634,7 @@ Synchronizing `iostreams` with `printf-style` I/O can be costly.
 `cin` and `cout` are by default synchronized with `printf`.
 
 ##### Example
+
 ```c++
     int main()
     {
@@ -609,6 +642,7 @@ Synchronizing `iostreams` with `printf-style` I/O can be costly.
         // ... use iostreams ...
     }
 ```
+
 ##### Enforcement
 
 ???
@@ -622,10 +656,12 @@ as most commonly used it simply slows down output by doing redundant `flush()`s.
 This slowdown can be significant compared to `printf`-style output.
 
 ##### Example
+
 ```c++
     cout << "Hello, World!" << endl;    // two output operations and a flush
     cout << "Hello, World!\n";          // one output operation and no flush
 ```
+
 ##### Note
 
 For `cin`/`cout` (and equivalent) interaction, there is no reason to flush; that's done automatically.
@@ -666,4 +702,3 @@ a `longjmp` ignores destructors, thus invalidating all resource-management strat
 ##### Enforcement
 
 Flag all occurrences of `longjmp`and `setjmp`
-

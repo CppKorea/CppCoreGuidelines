@@ -48,14 +48,16 @@ written in support of Stroustrup's [Programming: Principles and Practice using C
 
 ##### Reason
 
-컴파일러는 주석을 읽지 않는다.   
+컴파일러는 주석을 읽지 않는다.  
 주석이 코드만큼 정확하지 않다.  
 주석은 코드와 동시에 업데이트되지 않는다.  
 
 ##### Example, bad
+
 ```c++
     auto x = m * v1 + vv;   // multiply m with v1 and add the result to vv
 ```
+
 ##### Enforcement
 
 구어체 문장을 번역하는 인공지능 프로그램을 만들고 C++로 잘 표현할 수 있는지 검사한다.
@@ -67,6 +69,7 @@ written in support of Stroustrup's [Programming: Principles and Practice using C
 코드는 무엇을 할지가 아니라 무엇을 했는지를 말한다. 주석은 구현된 내용보다 목적이나 의도를 간결하고 명쾌하게 기술할 수 있다.
 
 ##### Example
+
 ```c++
     void stable_sort(Sortable& c)
         // sort c in the order determined by <, keep equal elements (as defined by ==) in
@@ -75,7 +78,9 @@ written in support of Stroustrup's [Programming: Principles and Practice using C
         // ... quite a few lines of non-trivial code ...
     }
 ```
+
 ##### Note
+
 주석과 코드가 다르다면 둘다 틀렸을거다.
 
 ### <a name="Rl-comments-crisp"></a>NL.3: 주석을 간략하게 유지하라
@@ -102,21 +107,25 @@ not possible.
 가독성 향상. 멍청한 실수를 피하기 위해.
 
 ##### Example, bad
+
 ```c++
     int i;
     for (i = 0; i < max; ++i); // bug waiting to happen
     if (i == j)
         return i;
 ```
+
 ##### Note
 
 Always indenting the statement after `if (...)`, `for (...)`, and `while (...)` is usually a good idea:
+
 ```c++
     if (i < 0) error("negative argument");
 
     if (i < 0)
         error("negative argument");
 ```
+
 ##### Enforcement
 
 툴을 사용하라.
@@ -129,6 +138,7 @@ Always indenting the statement after `if (...)`, `for (...)`, and `while (...)` 
 또한, 타입이 바뀌면 타입을 사용하는 변수도 함께 바뀌어야 한다. Minimize unintentional conversions.
 
 ##### Example, bad
+
 ```c++
     void print_int(int i);
     void print_string(const char*);
@@ -136,7 +146,9 @@ Always indenting the statement after `if (...)`, `for (...)`, and `while (...)` 
     print_int(1);          // repetitive, manual type matching
     print_string("xyzzy"); // repetitive, manual type matching
 ```
+
 ##### Example, good
+
 ```c++
     void print(int i);
     void print(string_view);    // also works on any string-like sequence
@@ -144,19 +156,23 @@ Always indenting the statement after `if (...)`, `for (...)`, and `while (...)` 
     print(1);              // clear, automatic type matching
     print("xyzzy");        // clear, automatic type matching
 ```
+
 ##### Note
 
 Names with types encoded are either verbose or cryptic.
+
 ```
     printS  // print a std::string
     prints  // print a C-style string
     printi  // print an int
 ```
+
 Requiring techniques like Hungarian notation to encode a type in a name is needed in C, but is generally unnecessary and actively harmful in a strongly statically-typed language like C++, because the annotations get out of date (the warts are just like comments and rot just like them) and they interfere with good use of the language (use the same name and overload resolution instead).
 
 ##### Note
 
 Some styles use very general (not type-specific) prefixes to denote the general use of a variable.
+
 ```c++
     auto p = new User();
     auto p = make_unique<User>();
@@ -167,23 +183,27 @@ Some styles use very general (not type-specific) prefixes to denote the general 
     // note: "cnt" is not being used to encode a type,
     //       just generally to say "this is a count of something"
 ```
+
 This is not harmful and does not fall under this guideline because it does not encode type information.
 
 ##### Note
 
 어떤 스타일은 지역변수와 멤버변수를 구분하거나 전역변수를 구분하려고 한다.
+
 ```c++
     struct S {
         int m_;
         S(int m) :m_{abs(m)} { }
     };
 ```
+
 이는 유해하지 않고 타입 정보를 포함하지 않기 때문에 가이드라인에도 위배되지 않는다.
 
 ##### Note
 
 어떤 스타일은 타입과 비타입을 구분하려고 한다.
 For example, by capitalizing type names, but not the names of functions and variables.
+
 ```c++
     typename<typename T>
     class HashTable {   // maps string to T
@@ -192,6 +212,7 @@ For example, by capitalizing type names, but not the names of functions and vari
 
     HashTable<int> index;
 ```
+
 이는 유해하지 않고 타입 정보를 포함하지 않기 때문에 가이드라인에도 위배되지 않는다.
 
 ### <a name="Rl-name-length"></a>NL.7: Make the length of a name roughly proportional to the length of its scope
@@ -199,6 +220,7 @@ For example, by capitalizing type names, but not the names of functions and vari
 **Rationale**: The larger the scope the greater the chance of confusion and of an unintended name clash.
 
 ##### Example
+
 ```c++
     double sqrt(double x);   // return the square root of x; x must be non-negative
 
@@ -210,6 +232,7 @@ For example, by capitalizing type names, but not the names of functions and vari
 
     int open;   // bad: global variable with a short, popular name
 ```
+
 The use of `p` for pointer and `x` for a floating-point variable is conventional and non-confusing in a restricted scope.
 
 ##### Enforcement
@@ -226,6 +249,7 @@ The use of `p` for pointer and `x` for a floating-point variable is conventional
 "가져와 사용하는" 라이브러리가 가진 고유 스타일은 그대로 두고자기 스타일을 선택하라.
 
 ##### Example
+
 ISO 표준은 소문자, 숫자, `_`로 구분된 단어만 사용한다:
 
 * `int`
@@ -255,12 +279,16 @@ ISO Standard, but with upper case used for your own types and concepts:
 맨 첫글자를 소문자로 하는 경우도 있다.
 
 ##### Note
+
 약어(acronym)나 식별자 길이도 일관성을 유지하도록 하라:
+
 ```c++
     int mtbf {12};
     int mean_time_between_failures {12}; // make up your mind
 ```
+
 ##### Enforcement
+
 스타일이 다른 라이브러리를 사용할 때를 뻬고는 시행이 가능할 것이다.
 
 ### <a name="Rl-all-caps"></a>NL.9: 매크로 명칭에만 전체 대문자를 사용하라
@@ -270,6 +298,7 @@ ISO Standard, but with upper case used for your own types and concepts:
 범위와 타입 규칙을 지키는 이름에 대해서는 매크로와 혼돈하지 않도록 하기 위해.
 
 ##### Example
+
 ```c++
     void f()
     {
@@ -277,11 +306,15 @@ ISO Standard, but with upper case used for your own types and concepts:
         int v[SIZE];
     }
 ```
+
 ##### Note
+
 이 규칙은 매크로가 아닌 상수에도 적용된다:
+
 ```c++
     enum bad { BAD, WORSE, HORRIBLE }; // BAD
 ```
+
 ##### Enforcement
 
 * 소문자로 된 매크로를 지적하라
@@ -294,6 +327,7 @@ ISO Standard, but with upper case used for your own types and concepts:
 이름의 각 부분을 구분하기 위해 `_`를 사용하는 것은 원래 C/C++ 스타일이고 C++ 표준 라이브러리에도 사용하고 있다.
 
 ##### Note
+
 이 규칙은 선택이 필요할 때의 기본 규칙이다. 이미 정립된 스타일과의 [일관성](#Rl-name)을 지켜야 하는 경우도 있을 수 있다. 
 개인의 취향보다는 일관성이 중요하다.
 
@@ -320,6 +354,7 @@ Thus rule was added after many requests for guidance.
 너무 많은 스페이스는 코드를 길고 산만하게 만든다
 
 ##### Example, bad
+
 ```c++
     #include < map >
 
@@ -328,7 +363,9 @@ Thus rule was added after many requests for guidance.
         // ...
     }
 ```
+
 ##### Example
+
 ```c++
     #include <map>
 
@@ -337,6 +374,7 @@ Thus rule was added after many requests for guidance.
         // ...
     }
 ```
+
 ##### Note
 
 몇몇 IDE는 그들만의 확신에 따라 추가적인 스페이스를 사용한다.
@@ -357,19 +395,23 @@ Readability.
 ##### Example
 
 Use digit separators to avoid long strings of digits
+
 ```c++
     auto c = 299'792'458; // m/s2
     auto q2 = 0b0000'1111'0000'0000;
     auto ss_number = 123'456'7890;
 ```
+
 ##### Example
 
 Use literal suffixes where clarification is needed
+
 ```c++
     auto hello = "Hello!"s; // a std::string
     auto world = "world";   // a C-style string
     auto interval = 100ms;  // using <chrono>
 ```
+
 ##### Note
 
 Literals should not be sprinkled all over the code as ["magic constants"](#Res-magic),
@@ -387,6 +429,7 @@ Flag long digit sequences. The trouble is to define "long"; maybe 7.
 멤버 선언 순서는 가독성을 높여준다.
 
 클래스 선언시 다음 순서를 사용하라
+
 * 타입: class, enum, alias (`using`구문)
 * 생성자, 복사 생성자, 해제자.
 * 함수
@@ -398,6 +441,7 @@ This is a recommendation for [when you have no constraints or better ideas](#S-n
 이 규칙은 수많은 요청에 의해 추가되었다.
 
 ##### Example
+
 ```c++
     class X {
     public:
@@ -408,10 +452,12 @@ This is a recommendation for [when you have no constraints or better ideas](#S-n
         // implementation details
     };
 ```
+
 ##### Example
 
 Sometimes, the default order of members conflicts with a desire to separate the public interface from implementation details.
 In such cases, private types and functions can be placed with private data.
+
 ```c++
     class X {
     public:
@@ -422,9 +468,11 @@ In such cases, private types and functions can be placed with private data.
         // implementation details (types, functions, and data)
     };
 ```
+
 ##### Example, bad
 
 Avoid multiple blocks of declarations of one access (e.g., `public`) dispersed among blocks of declarations with different access (e.g. `private`).
+
 ```c++
     class X {   // bad
     public:
@@ -434,6 +482,7 @@ Avoid multiple blocks of declarations of one access (e.g., `public`) dispersed a
         // ...
     };
 ```
+
 The use of macros to declare groups of members often leads to violation of any ordering rules.
 However, macros obscures what is being expressed anyway.
 
@@ -444,6 +493,7 @@ However, macros obscures what is being expressed anyway.
 ### <a name="Rl-knr"></a>NL.17: K&R 방식의 레이아웃을 사용하라
 
 ##### Reason
+
 이 방식이 C/C++의 고유한 레이아웃이다. 수직적인 배치가 유지되고 (함수나 클래스 같은) 언어 요소를 구분하기가 쉽다.
 
 ##### Note
@@ -454,6 +504,7 @@ This is a recommendation for [when you have no constraints or better ideas](#S-n
 Thus rule was added after many requests for guidance.
 
 ##### Example
+
 ```c++
     struct Cable {
         int x;
@@ -489,9 +540,11 @@ Thus rule was added after many requests for guidance.
         return some_value;
     }
 ```
+
 `if`와 `(`사이에 스페이스를 한칸 넣는다는 점에 유의하라.
 
 ##### Note
+
 Use separate lines for each statement, the branches of an `if`, and the body of a `for`.
 
 ##### Note
@@ -518,11 +571,13 @@ C 스타일의 선언 방식은 표현식과 문법에서 사용하는데 강조
 선언에서 사용시 인자는 참조를 붙이지 않도록 한다.
 
 ##### Example
+
 ```c++
     T& operator[](size_t);   // OK
     T &operator[](size_t);   // just strange
     T & operator[](size_t);  // undecided
 ```
+
 ##### Note
 
 This is a recommendation for [when you have no constraints or better ideas](#S-naming).
@@ -531,7 +586,6 @@ Thus rule was added after many requests for guidance.
 ##### Enforcement
 
 역사적으로 볼때 불가능.
-
 
 ### <a name="Rl-misread"></a>NL.19: Avoid names that are easily misread
 
@@ -542,12 +596,14 @@ Not everyone has screens and printers that make it easy to distinguish all chara
 We easily confuse similarly spelled and slightly misspelled words.
 
 ##### Example
+
 ```c++
     int oO01lL = 6; // bad
 
     int splunk = 7;
     int splonk = 8; // bad: splunk and splonk are easily confused
 ```
+
 ##### Enforcement
 
 ???
@@ -560,10 +616,12 @@ Readability.
 It is really easy to overlook a statement when there is more on a line.
 
 ##### Example
+
 ```c++
     int x = 7; char* p = 29;    // don't
     int x = 7; f(x);  ++x;      // don't
 ```
+
 ##### Enforcement
 
 Easy.
@@ -579,7 +637,6 @@ Minimizing confusion with the declarator syntax.
 
 For details, see [ES.10](#Res-name-one).
 
-
 ### <a name="Rl-void"></a>NL.25: 인자 타입으로 `void`를 사용하지 마라
 
 ##### Reason
@@ -587,19 +644,23 @@ For details, see [ES.10](#Res-name-one).
 C 호환이 문제될 때만 필요하다.
 
 ##### Example
+
 ```c++
     void f(void);   // bad
 
     void g();       // better
 ```
+
 ##### Note
 
 데니스 리치도 `void f(void)`는 싫어한다고 말했다.
 함수 인터페이스가 드물게 금지될 경우 C에서 그런 abomination에 대해서 인자를 추가할 수 있다:
+
 ```c++
     int f();
     f(1, 2, "weird but valid C89");   // hope that f() is defined int f(a, b, c) char* c; { /* ... */ }
 ```
+
 중요한 문제를 야기할 것인데 21세기의 C나 C++에는 전혀 문제되지 않는다.
 
 ### <a name="Rl-const"></a>NL.26: Use conventional `const` notation
@@ -610,6 +671,7 @@ Conventional notation is more familiar to more programmers.
 Consistency in large code bases.
 
 ##### Example
+
 ```c++
     const int x = 7;    // OK
     int const y = 9;    // bad
@@ -617,6 +679,7 @@ Consistency in large code bases.
     const int *const p = nullptr;   // OK, constant pointer to constant int
     int const *const p = nullptr;   // bad, constant pointer to constant int
 ```
+
 ##### Note
 
 We are well aware that you could claim the "bad" examples more logical than the ones marked "OK",

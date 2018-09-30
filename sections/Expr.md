@@ -88,11 +88,12 @@
 
 ##### Reason
 
-라이브러리를 사용하는 코드는 언어의 기능을 직접적으로 사용하는 것보다 쉽고, 더 짧게 작성할 수 있고, 고수준의 추상화가 가능하다. 
+라이브러리를 사용하는 코드는 언어의 기능을 직접적으로 사용하는 것보다 쉽고, 더 짧게 작성할 수 있고, 고수준의 추상화가 가능하다.
 ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 라이브러리다.
 모든 C++ 구현체에서 제공하고 있다.
 
 ##### Example
+
 ```c++
     auto sum = accumulate(begin(a), end(a), 0.0);   // good
 ```
@@ -107,6 +108,7 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
     for (int i = 0; i < max; ++i)
         sum = sum + v[i];
 ```
+
 ##### Exception
 
 표준라이브러리의 대다수가 동적 할당(자유 저장소)에 의존한다. 이런 부분은 알고리즘의 문제는 아닐지라도, 제한 시간 내에 응답성을 보장해야 하는 경우(hard-real-time)나 임베디드 환경에는 적합하지 않다.
@@ -123,6 +125,7 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 "적절한 추상화"(예를 들어 라이브러리나 클래스 같은 것)가 언어보다 어플리케이션의 개념에 더 가깝다. 코드를 짧고 명확하게 만들 수 있으며, 테스트하기에도 더 쉽다.
 
 ##### Example
+
 ```c++
     vector<string> read1(istream& is)   // good
     {
@@ -166,6 +169,7 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 **Alternative formulation**: 불필요하게 큰 스코프에 변수를 선언하지 마라
 
 ##### Example
+
 ```c++
     void use()
     {
@@ -182,7 +186,9 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         }
     }
 ```
+
 ##### Example, bad
+
 ```c++
     void use(const string& name)
     {
@@ -193,8 +199,8 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         // ... 여기에는 fn과 is를 쓰면 안되는 200 줄짜리 코드가 들어간다 ...
     }
 ```
-이 코드는 길다는 문제점이 있지만, `fn`의 값과 `is`가 갖고 있는 파일 핸들이 필요 이상으로 훨씬 길게 유지된다는 게 문제다. 
-이러면 함수의 뒷부분에서 `is`와 `fn`을 실수로 사용해버릴 수 있다. 
+이 코드는 길다는 문제점이 있지만, `fn`의 값과 `is`가 갖고 있는 파일 핸들이 필요 이상으로 훨씬 길게 유지된다는 게 문제다.
+이러면 함수의 뒷부분에서 `is`와 `fn`을 실수로 사용해버릴 수 있다.
 
 이럴 때는, 분할해버리는 게 낫다:
 ```c++
@@ -213,6 +219,7 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         // ... 200 lines of code ...
     }
 ```
+
 ##### Enforcement
 
 * 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않는 경우를 지적하라
@@ -225,6 +232,7 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 가독성. 시스템 자원 점유를 최소화한다.
 
 ##### Example
+
 ```c++
     void use()
     {
@@ -243,6 +251,7 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         }
     }
 ```
+
 ##### Enforcement
 
 * 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않을 때 지적하라
@@ -260,12 +269,11 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
         // ...
     } // result is destroyed here
 ```
+
 ##### C++17 enforcement (if using a C++17 compiler)
 
 * Flag selection/loop variables declared before the body and not used after the body
 * (hard) Flag selection/loop variables declared before the body and used after the body for an unrelated purpose.
-
-
 
 ### <a name="Res-name-length"></a>ES.7: Keep common and local names short, and keep uncommon and nonlocal names longer
 
@@ -274,6 +282,7 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 가독성. 관계없는 비-지역(non-local) 변수 간의 충돌 확률을 낮춘다.
 
 ##### Example
+
 관습적으로 쓰이는 짧은 지역변수명은 가독성을 향상시킨다:
 ```c++
     template<typename T>    // good
@@ -283,7 +292,7 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
             os << v[i] << '\n';
     }
 ```
-인덱스는 관습적으로 `i`라고 쓰고, 이 일반 함수에는 벡터의 의미를 알만한 힌트가 없으므로, `v`가 어떤 경우에든지 맞는 이름이다. 
+인덱스는 관습적으로 `i`라고 쓰고, 이 일반 함수에는 벡터의 의미를 알만한 힌트가 없으므로, `v`가 어떤 경우에든지 맞는 이름이다.
 
 비교:
 ```c++
@@ -300,6 +309,7 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 과장해서 표현하긴 했지만, 이것보다 더 심한 것도 본적이 있다.
 
 ##### Example
+
 관습에 따르지 않는 짧은 비지역 변수는 코드를 모호하게 만든다:
 ```c++
     void use1(const string& s)
@@ -321,6 +331,7 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 이렇게 하면, 코드를 읽는 사람이 `trim_tail`의 의미를 알 수 있게 되고, 기억할 수 있게 된다.
 
 ##### Example, bad
+
 내용이 긴 함수의 인자는 사실상 비지역 변수라고 볼 수 있다. 따라서 인자들의 이름은 적절한 의미를 담아야 한다:
 ```c++
     void complicated_algorithm(vector<Record>& vr, const vector<int>& vi, map<string, int>& out)
@@ -343,9 +354,11 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 Code clarity and readability. Too-similar names slow down comprehension and increase the likelihood of error.
 
 ##### Example; bad
+
 ```c++
     if (readable(i1 + l1 + ol + o1 + o0 + ol + o1 + I0 + l0)) surprise();
 ```
+
 ##### Example; bad
 
 Do not declare a non-type with the same name as a type in the same scope. This removes the need to disambiguate with a keyword such as `struct` or `enum`. It also removes a source of errors, as `struct X` can implicitly declare `X` if lookup fails.
@@ -354,6 +367,7 @@ Do not declare a non-type with the same name as a type in the same scope. This r
     struct foo foo();       // BAD, foo is a type already in scope
     struct foo x = foo();   // requires disambiguation
 ```
+
 ##### Exception
 
 Antique header files might declare non-types and types with the same name in the same scope.
@@ -370,6 +384,7 @@ Antique header files might declare non-types and types with the same name in the
 이런 이름은 보통 매크로를 정의할 때 사용한다. 따라서 `ALL_CAPS` 형태의 이름은 매크로와 충돌될 가능성이 많다. 
 
 ##### Example
+
 ```c++
     // somewhere in some header:
     #define NE !=
@@ -386,6 +401,7 @@ Antique header files might declare non-types and types with the same name in the
     // ...
     }
 ```
+
 ##### Note
 
 단지 상수가 매크로처럼 쓰인다는 이유로 상수에 `ALL_CAPS` 형태의 이름을 사용하면 안된다
@@ -402,9 +418,11 @@ Antique header files might declare non-types and types with the same name in the
 그리고 `//` 주석을 달 수 있는 공간이 생긴다.
 
 ##### Example, bad
+
 ```c++
     char *p, c, a[7], *pp[7], **aa[10];   // yuck!
 ```
+
 ##### Exception
 
 함수 선언은 다수의 함수 인자 선언을 포함할 수 있다.
@@ -416,7 +434,9 @@ A structured binding (C++17) is specifically designed to introduce several varia
     auto [iter, inserted] = m.insert_or_assign(k, val);
     if (inserted) { /* new entry was inserted */ }
 ```
+
 ##### Example
+
 ```c++
     template <class InputIterator, class Predicate>
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
@@ -425,7 +445,9 @@ A structured binding (C++17) is specifically designed to introduce several varia
 ```c++
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
 ```
+
 ##### Example
+
 ```c++
     double scalbn(double x, int n);   // OK: x * pow(FLT_RADIX, n); FLT_RADIX is usually 2
 ```
@@ -441,7 +463,9 @@ A structured binding (C++17) is specifically designed to introduce several varia
     // better: base * pow(FLT_RADIX, exponent); FLT_RADIX is usually 2
     double scalbn(double base, int exponent);
 ```
+
 ##### Example
+
 ```c++
     int a = 7, b = 9, c, d = 10, e = 3;
 ```
@@ -471,19 +495,23 @@ Consider:
 In each case, we save writing a longish, hard-to-remember type that the compiler already knows but a programmer could get wrong.
 
 ##### Example
+
 ```c++
     template<class T>
     auto Container<T>::first() -> Iterator;   // Container<T>::Iterator
 ```
+
 ##### Exception
 
 Avoid `auto` for initializer lists and in cases where you know exactly which type you want and where an initializer might require conversion.
 
 ##### Example
+
 ```c++
     auto lst = { 1, 2, 3 };   // lst is an initializer list
     auto x{1};   // x is an int (in C++17; initializer_list in C++11)
 ```
+
 ##### Note
 
 When concepts become available, we can (and should) be more specific about the type we are deducing:
@@ -491,10 +519,13 @@ When concepts become available, we can (and should) be more specific about the t
     // ...
     ForwardIterator p = algo(x, y, z);
 ```
+
 ##### Example (C++17)
+
 ```c++
     auto [ quotient, remainder ] = div(123456, 73);   // break out the members of the div_t result
 ```
+
 ##### Enforcement
 
 Flag redundant repetition of type names in a declaration.
@@ -507,6 +538,7 @@ It is easy to get confused about which variable is used.
 Can cause maintenance problems.
 
 ##### Example, bad
+
 ```c++
     int d = 0;
     // ...
@@ -567,6 +599,7 @@ Reuse of a member name as a local variable can also be a problem:
         }
     }
 ```
+
 ##### Exception
 
 We often reuse function names from a base class in a derived class:
@@ -601,6 +634,7 @@ Avoid problems with comprehension of complex initialization.
 Simplify refactoring.
 
 ##### Example
+
 ```c++
     void use(int arg)
     {
@@ -618,6 +652,7 @@ No, `i = 7` does not initialize `i`; it assigns to it. Also, `i` can be read in 
         // ...
     }
 ```
+
 ##### Note
 
 The *always initialize* rule is deliberately stronger than the *an object must be set before used* language rule.
@@ -660,6 +695,7 @@ Assuming that there is a logical connection between `i` and `j`, that connection
 
     auto [i, j] = make_related_widgets(cond);    // C++17
 ```
+
 ##### Note
 
 Complex initialization has been popular with clever programmers for decades.
@@ -781,6 +817,7 @@ or maybe:
 Readability. To limit the scope in which the variable can be used.
 
 ##### Example
+
 ```c++
     int x = 7;
     // ... no use of x here ...
@@ -797,12 +834,15 @@ Flag declarations that are distant from their first use.
 Readability. Limit the scope in which a variable can be used. Don't risk used-before-set. Initialization is often more efficient than assignment.
 
 ##### Example, bad
+
 ```c++
     string s;
     // ... no use of s here ...
     s = "what a waste";
 ```
+
 ##### Example, bad
+
 ```c++
     SomeLargeType var;   // ugly CaMeLcAsEvArIaBlE
 
@@ -837,10 +877,12 @@ For initializers of moderate complexity, including for `const` variables, consid
 The rules for `{}` initialization are simpler, more general, less ambiguous, and safer than for other forms of initialization.
 
 ##### Example
+
 ```c++
     int x {f(99)};
     vector<int> v = {1, 2, 3, 4, 5, 6};
 ```
+
 ##### Exception
 
 For containers, there is a tradition for using `{...}` for a list of elements and `(...)` for sizes:
@@ -848,15 +890,18 @@ For containers, there is a tradition for using `{...}` for a list of elements an
     vector<int> v1(10);    // vector of 10 elements with the default value 0
     vector<int> v2 {10};   // vector of 1 element with the value 10
 ```
+
 ##### Note
 
 `{}`-initializers do not allow narrowing conversions.
 
 ##### Example
+
 ```c++
     int x {7.9};   // error: narrowing
     int y = 7.9;   // OK: y becomes 7. Hope for a compiler warning
 ```
+
 ##### Note
 
 `{}` initialization can be used for all initialization; other forms of initialization can't:
@@ -871,6 +916,7 @@ For containers, there is a tradition for using `{...}` for a list of elements an
         // ...
     };
 ```
+
 ##### Note
 
 Initialization of a variable declared using `auto` with a single value, e.g., `{v}`, had surprising results until C++17.
@@ -886,11 +932,13 @@ So use `={...}` if you really want an `initializer_list<T>`
 ```c++
     auto fib10 = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};   // fib10 is a list
 ```
+
 ##### Note
 
 Old habits die hard, so this rule is hard to apply consistently, especially as there are so many cases where `=` is innocent.
 
 ##### Example
+
 ```c++
     template<typename T>
     void f()
@@ -921,6 +969,7 @@ makes the type system do much of the work to validate ownership safety, it
 increases readability, and it has zero or near zero run-time cost.
 
 ##### Example
+
 ```c++
     void use(bool leak)
     {
@@ -948,6 +997,7 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
 실수로 값을 바꾸는 걸 막을 수 있는 방법이다. 컴파일러에게 최적화를 위한 기회를 줄 수도 있다.
 
 ##### Example
+
 ```c++
     void f(int n)
     {
@@ -956,6 +1006,7 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
         // ...
     }
 ```
+
 ##### Enforcement
 
 변수가 실제로 값이 바뀌는지 안 바뀌는지 보고 바뀐다면 지적한다.
@@ -968,6 +1019,7 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
 가독성과 안전성
 
 ##### Example, bad
+
 ```c++
     void use()
     {
@@ -976,6 +1028,7 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
         for (i = 0; i < 200; ++i) { /* ... */ } // bad: i recycled
     }
 ```
+
 ##### Note
 
 As an optimization, you may want to reuse a buffer as a scratch pad, but even then prefer to limit the variable's scope as much as possible and be careful not to cause bugs from data left in a recycled buffer as this is a common source of security bugs.
@@ -996,6 +1049,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
         }
     }
 ```
+
 ##### Enforcement
 
 재활용되는 변수가 있다면 지적한다.
@@ -1008,6 +1062,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 언어가 지원하는 배열의 비표준적인 확장과 헷갈리지 않는다.
 
 ##### Example, bad
+
 ```c++
     const int n = 7;
     int m = 9;
@@ -1019,6 +1074,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
         // ...
     }
 ```
+
 ##### Note
 
 `a1` 변수선언은 C++에서는 적법하다. 그런 류의 코드가 많이 있다.
@@ -1027,6 +1083,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 `a2` 변수선언은 C 방식으로 C++ 에서는 쓰지 않으며 보안상 문제가 있는 것으로 간주한다.
 
 ##### Example
+
 ```c++
     const int n = 7;
     int m = 9;
@@ -1038,6 +1095,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
         // ...
     }
 ```
+
 ##### Enforcement
 
 * 상수 길이를 가지지 않는 배열이라면 표시한다. (C 언어의 가변길이배열(VLA))
@@ -1053,6 +1111,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 약간의 초기화 작업 후에 `const`여야 하는 변수에도 사용할 수 있다.
 
 ##### Example, bad
+
 ```c++
     widget x;   // should be const, but:
     for (auto i = 2; i <= N; ++i) {          // this could be some
@@ -1060,7 +1119,9 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
     }                                        // needed to initialize x
     // from here, x should be const, but we can't say so in code in this style
 ```
+
 ##### Example, good
+
 ```c++
     const widget x = [&]{
         widget val;                                // assume that widget has a default constructor
@@ -1070,7 +1131,9 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
         return val;
     }();
 ```
+
 ##### Example
+
 ```c++
     string var = [&]{
         if (!in) return "";   // default
@@ -1091,12 +1154,13 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 
 ##### Reason
 
-매크로는 버그의 주요 원인이다.   
-매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.   
-매크로는 사람이 보는 것과 컴파일러가 보는 것을 다르게 한다.   
+매크로는 버그의 주요 원인이다.
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.
+매크로는 사람이 보는 것과 컴파일러가 보는 것을 다르게 한다.
 매크로는 지원 도구를 만드는 것을 복잡하게 한다.
 
 ##### Example, bad
+
 ```c++
     #define Case break; case   /* BAD */
 ```
@@ -1159,17 +1223,18 @@ In the future, static reflection is likely to eliminate the last needs for the p
 
 ##### Reason
 
-매크로는 버그의 주요 원인이다.   
-매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.   
-매크로는 사람이 보는 것과 컴파일러가 보는 것을 다르게 한다.   
-매크로는 지원 도구를 만드는 것을 복잡하게 한다.
+매크로는 버그의 주요 원인이다.  
+매크로는 일반적인 범위와 타입 규칙을 따르지 않는다.  
+매크로는 사람이 보는 것과 컴파일러가 보는 것을 다르게 한다.  
+매크로는 지원 도구를 만드는 것을 복잡하게 한다.  
 
 ##### Example, bad
+
 ```c++
     #define PI 3.14
     #define SQUARE(a, b) (a * b)
 ```
-`SQUARE`에 잘 알려진 버그가 없다고 하더라도 더 잘 동작하는 대안이 있다. 
+`SQUARE`에 잘 알려진 버그가 없다고 하더라도 더 잘 동작하는 대안이 있다.
 
 예를 들면:
 ```c++
@@ -1181,18 +1246,20 @@ In the future, static reflection is likely to eliminate the last needs for the p
 
 소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리를 질러라.
 
-
 ### <a name="Res-ALL_CAPS"></a>ES.32: Use `ALL_CAPS` for all macro names
 
 ##### Reason
+
 관습. 가독성. 매크로 구별.
 
 ##### Example
+
 ```c++
     #define forever for (;;)   /* very BAD */
 
     #define FOREVER for (;;)   /* Still evil, but at least visible to humans */
 ```
+
 ##### Enforcement
 
 소문자로 작성된 매크로를 본다면 소리를 질러라.
@@ -1204,11 +1271,13 @@ In the future, static reflection is likely to eliminate the last needs for the p
 Macros do not obey scope rules.
 
 ##### Example
+
 ```c++
     #define MYCHAR        /* BAD, will eventually clash with someone else's MYCHAR*/
 
     #define ZCORP_CHAR    /* Still evil, but less likely to clash */
 ```
+
 ##### Note
 
 Avoid macros if you can: [ES.30](#Res-macros), [ES.31](#Res-macros2), and [ES.32](#Res-ALL_CAPS).
@@ -1227,6 +1296,7 @@ Not type safe.
 Requires messy cast-and-macro-laden code to get working right.
 
 ##### Example
+
 ```c++
     #include <cstdarg>
 
@@ -1297,7 +1367,6 @@ This is basically the way `printf` is implemented.
 * Flag definitions of C-style variadic functions.
 * Flag `#include <cstdarg>` and `#include <stdarg.h>`
 
-
 ## ES.expr: Expressions
 
 Expressions manipulate values.
@@ -1309,6 +1378,7 @@ Expressions manipulate values.
 표현식이 복잡하면 오류가 발생하기 쉽다.
 
 ##### Example
+
 ```c++
     // bad: assignment hidden in subexpression
     while ((c = getc()) != -1)
@@ -1348,6 +1418,7 @@ but that doesn't change the fact that complicated expressions are potentially co
 A programmer should know and use the basic rules for expressions.
 
 ##### Example
+
 ```c++
     x = k * y + z;             // OK
 
@@ -1360,6 +1431,7 @@ A programmer should know and use the basic rules for expressions.
     auto t2 = x < max;
     if (t1 && t2)            // ...
 ```
+
 ##### Enforcement
 
 까다롭다. "표현식이 얼마나 복잡한가"를 어떻게 판단할 것인가? 어떻게 고려할 것인가? 
@@ -1381,6 +1453,7 @@ A programmer should know and use the basic rules for expressions.
 오류가 발생하지 않게 하라. 가독성. 모든 사람들이 연산자 우선순위를 기억하지는 않는다.
 
 ##### Example
+
 ```c++
     const unsigned int flag = 2;
     unsigned int a = flag;
@@ -1391,6 +1464,7 @@ Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 
 ```c++
     if ((a & flag) != 0)  // OK: works as intended
 ```
+
 ##### Note
 
 아래에 대해서는 소괄호가 필요없다는 정도는 알고 있을 것이다:
@@ -1399,6 +1473,7 @@ Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 
         // ...
     }
 ```
+
 ##### Enforcement
 
 * 비트 논리 연산자와 다른 연산자가 섞여 있다면 지적한다
@@ -1420,6 +1495,7 @@ Pointer arithmetic is fragile and easy to get wrong, the source of many, many ba
 Access into an array with known bounds using a constant as a subscript can be validated by the compiler.
 
 ##### Example, bad
+
 ```c++
     void f(int* p, int count)
     {
@@ -1443,7 +1519,9 @@ Access into an array with known bounds using a constant as a subscript can be va
         use(&p[0], 3);     // BAD
     }
 ```
+
 ##### Example, good
+
 ```c++
     void f(span<int> a) // BETTER: use span in the function declaration
     {
@@ -1462,6 +1540,7 @@ Access into an array with known bounds using a constant as a subscript can be va
         use(a.data(), 3);  // OK
     }
 ```
+
 ##### Note
 
 Subscripting with a variable is difficult for both tools and humans to validate as safe.
@@ -1470,6 +1549,7 @@ Subscripting with a variable is difficult for both tools and humans to validate 
 If iterators are needed to access an array, use the iterators from a `span` constructed over the array.
 
 ##### Example, bad
+
 ```c++
     void f(array<int, 10> a, int pos)
     {
@@ -1479,6 +1559,7 @@ If iterators are needed to access an array, use the iterators from a `span` cons
         a[10] = 4;    // BAD (but easily caught by tools) -- no replacement, just don't do this
     }
 ```
+
 ##### Example, good
 
 Use a `span`:
@@ -1504,7 +1585,9 @@ Use a `at()`:
         at(a, pos - 1) = 2; // OK
     }
 ```
+
 ##### Example, bad
+
 ```c++
     void f()
     {
@@ -1513,6 +1596,7 @@ Use a `at()`:
             arr[i] = i; // BAD, cannot use non-constant indexer
     }
 ```
+
 ##### Example, good
 
 Use a `span`:
@@ -1554,6 +1638,7 @@ Use a range-`for`:
              e = i++;
     }
 ```
+
 ##### Note
 
 Tooling can offer rewrites of array accesses that involve dynamic index expressions to use `at()` instead:
@@ -1566,6 +1651,7 @@ Tooling can offer rewrites of array accesses that involve dynamic index expressi
         at(a, i + j) = 12;  // OK -- bounds-checked
     }
 ```
+
 ##### Example
 
 Turning an array into a pointer (as the language does essentially always) removes opportunities for checking, so avoid it
@@ -1594,6 +1680,7 @@ If you want to pass an array, say so:
         g1(a);                     // OK -- no decay here, instead use implicit span ctor
     }
 ```
+
 ##### Enforcement
 
 * Flag any arithmetic operation on an expression of pointer type that results in a value of pointer type.
@@ -1601,7 +1688,6 @@ If you want to pass an array, say so:
 * Flag any expression that would rely on implicit conversion of an array type to a pointer type.
 
 This rule is part of the [bounds-safety profile](#SS-bounds).
-
 
 ### <a name="Res-order"></a>ES.43: Avoid expressions with undefined order of evaluation
 
@@ -1618,6 +1704,7 @@ left-to-right except right-to-left in assignments, and the order of evaluation o
 However, remember that your code may be compiled with a pre-C++17 compiler (e.g., through cut-and-paste) so don't be too clever.
 
 ##### Example
+
 ```c++
     v[i] = ++i;   //  the result is undefined
 ```
@@ -1638,6 +1725,7 @@ A good rule of thumb is that you should not read a value twice in an expression 
 C++17 tightens up the rules for the order of evaluation, but the order of evaluation of function arguments is still unspecified.
 
 ##### Example
+
 ```c++
     int i = 0;
     f(++i, ++i);
@@ -1657,6 +1745,7 @@ In C++17, these examples work as expected (left to right) and assignments are ev
 ```c++
     f1() = f2();    // undefined behavior in C++14; in C++17, f2() is evaluated before f1()
 ```
+
 ##### Enforcement
 
 좋은 분석기를 사용해 찾을 수 있다.
@@ -1668,6 +1757,7 @@ In C++17, these examples work as expected (left to right) and assignments are ev
 표현식에 포함된 이름없는 상수는 간과되기 쉽고 이해하기 어렵다:
 
 ##### Example
+
 ```c++
     for (int m = 1; m <= 12; ++m)   // don't: magic constant 12
         cout << month[m] << '\n';
@@ -1688,6 +1778,7 @@ In C++17, these examples work as expected (left to right) and assignments are ev
     for (auto m : month)
         cout << m << '\n';
 ```
+
 ##### Enforcement
 
 코드에 리터럴이 있다면 지적한다. `0`, `1`, `nullptr`, `\n`, `""` 등 가능한 목록은 허용하라.
@@ -1713,7 +1804,9 @@ In C++17, these examples work as expected (left to right) and assignments are ev
         char c3 = d;   // bad: narrowing
     }
 ```
+
 ##### Note
+
 gsl은 narrowing을 허용하는 `narrow_cast`와 변환시 값이 바뀌면 예외를 던지는 `narrow`("narrow if")를 제공한다:
 ```c++
     i = narrow_cast<int>(d);   // OK (you asked for it): narrowing: i becomes 7
@@ -1728,6 +1821,7 @@ gsl은 narrowing을 허용하는 `narrow_cast`와 변환시 값이 바뀌면 예
     u = narrow_cast<unsigned>(d);   // OK (you asked for it): u becomes 0
     u = narrow<unsigned>(d);        // OK: throws narrowing_error
 ```
+
 ##### Enforcement
 
 A good analyzer can detect all narrowing conversions. However, flagging all narrowing conversions will lead to a lot of false positives. Suggestions:
@@ -1755,6 +1849,7 @@ or `0`.
     f(0);         // call f(int)
     f(nullptr);   // call f(char*)
 ```
+
 ##### Enforcement
 
 포인터에 `0`, `NULL`을 사용한다면 지적한다. 프로그램으로 간단하게 변환할 수 있으면 도움이 될 것이다.
@@ -1766,6 +1861,7 @@ or `0`.
 잘 알려진 오류의 원인이다. 최적화를 신뢰할 수 없게 만들어 버린다.
 
 ##### Example, bad
+
 ```c++
     double d = 2;
     auto p = (long*)&d;
@@ -1835,8 +1931,8 @@ Readability. Error avoidance.
 Named cast들은 C스타일이나 함수형 형변환보다 더 구체적이며, 컴파일러가 일부 오류를 잡아낼 수 있도록 한다.
 
 > 역주:
->  - C 스타일 형변환: `(int) a`
->  - 함수형 형변환: `int(a)`
+> * C 스타일 형변환: `(int) a`
+> * 함수형 형변환: `int(a)`
 
 The named casts are:
 
@@ -1850,6 +1946,7 @@ The named casts are:
 * `gsl::narrow`       // `narrow<T>(x)` is `static_cast<T>(x)` if `static_cast<T>(x) == x` or it throws `narrowing_error`
 
 ##### Example
+
 ```c++
     class B { /* ... */ };
     class D { /* ... */ };
@@ -1900,6 +1997,7 @@ for example.)
 `const`를 거짓말로 만든다. 대상 변수가 정말로 `const`로 선언되었다면, `const`를 제거한 결과는 미정의 행동(undefined behavior)이 된다.
 
 ##### Example, bad
+
 ```c++
     void f(const int& i)
     {
@@ -1912,6 +2010,7 @@ for example.)
     f(i); // silent side effect
     f(j); // undefined behavior
 ```
+
 ##### Example
 
 Sometimes, you may be tempted to resort to `const_cast` to avoid code duplication, such as when two accessor functions that differ only in `const`-ness have similar implementations. For example:
@@ -1963,6 +2062,7 @@ Instead, prefer to put the common code in a common helper function -- and make i
             { /* the complex logic around getting a possibly-const reference to my_bar */ }
     };
 ```
+
 ##### Exception
 
 You may need to cast away `const` when calling `const`-incorrect functions.
@@ -2072,12 +2172,14 @@ In any variant, we must guard against data races on the `cache` in multi-threade
 오버플로우가 발생할 소지가 없다 (또한 더 빠르게 실행될 수 있다).
 
 ##### Example
+
 ```c++
     for (auto& x : v)      // print all elements of v
         cout << x << '\n';
 
     auto p = find(v, x);   // find x in v
 ```
+
 ##### Enforcement
 
 명시적인 범위검사를 찾아서 적절한 대안을 제시한다.
@@ -2099,6 +2201,7 @@ In general, following the guidelines in this document (including not making vari
 Explicit `move` is needed to explicitly move an object to another scope, notably to pass it to a "sink" function and in the implementations of the move operations themselves (move constructor, move assignment operator) and swap operations.
 
 ##### Example, bad
+
 ```c++
     void sink(X&& x);   // sink takes ownership of x
 
@@ -2132,7 +2235,9 @@ And after you do that, assume the object has been moved from (see [C.64](#Rc-mov
         assert(s1 == "supercalifragilisticexpialidocious");
     }
 ```
+
 ##### Example
+
 ```c++
     void sink(unique_ptr<widget> p);  // pass ownership of p to sink()
 
@@ -2144,6 +2249,7 @@ And after you do that, assume the object has been moved from (see [C.64](#Rc-mov
         sink(w);    // Error: unique_ptr is carefully designed so that you cannot copy it
     }
 ```
+
 ##### Notes
 
 `std::move()` is a cast to `&&` in disguise; it doesn't itself move anything, but marks a named object as a candidate that can be moved from.
@@ -2154,6 +2260,7 @@ In general, don't believe claims of "efficiency" without data (???).
 In general, don't complicate your code without reason (??)
 
 ##### Example, bad
+
 ```c++
     vector<int> make_vector() {
         vector<int> result;
@@ -2164,8 +2271,8 @@ In general, don't complicate your code without reason (??)
 Never write `return move(local_variable);`, because the language already knows the variable is a move candidate.
 Writing `move` in this code won't help, and can actually be detrimental because on some compilers it interferes with RVO (the return value optimization) by creating an additional reference alias to the local variable.
 
-
 ##### Example, bad
+
 ```c++
     vector<int> v = std::move(make_vector());   // bad; the std::move is entirely redundant
 ```
@@ -2173,6 +2280,7 @@ Never write `move` on a returned value such as `x = move(f());` where `f` return
 The language already knows that a returned value is a temporary object that can be moved from.
 
 ##### Example
+
 ```c++
     void mover(X&& x) {
         call_something(std::move(x));         // ok
@@ -2187,6 +2295,7 @@ The language already knows that a returned value is a temporary object that can 
         call_something(t);                    // suspicious, why not std::forward?
     }
 ```
+
 ##### Enforcement
 
 * Flag use of `std::move(x)` where `x` is an rvalue or the language will already treat it as an rvalue, including `return std::move(local_variable);` and `std::move(f())` on a function that returns by value.
@@ -2209,6 +2318,7 @@ The language already knows that a returned value is a temporary object that can 
 "No naked `new`!"로 알려져있다
 
 ##### Example, bad
+
 ```c++
     void f(int n)
     {
@@ -2232,6 +2342,7 @@ The language already knows that a returned value is a temporary object that can 
 C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염(memory corruption) 문제가 발생할 수 있다. 
 
 ##### Example, bad
+
 ```c++
     void f(int n)
     {
@@ -2240,6 +2351,7 @@ C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염
         delete p;   // error: just delete the object p, rather than delete the array p[]
     }
 ```
+
 ##### Note
 
 이 예제는 [no naked `new` rule](#Res-new)를 위반할 뿐만 아니라 많은 다른 문제를 야기한다.
@@ -2256,6 +2368,7 @@ C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염
 결과가 정의되지 않았다.
 
 ##### Example, bad
+
 ```c++
     void f(int n)
     {
@@ -2265,6 +2378,7 @@ C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염
         if (0 < &a1[5] - &a2[7]) {}   // bad: undefined
     }
 ```
+
 ##### Note
 
 더 많은 문제가 내포되어 있다.
@@ -2282,6 +2396,7 @@ the object was meant to be considered as a whole.
 In the rare cases where the slicing was deliberate the code can be surprising.
 
 ##### Example
+
 ```c++
     class Shape { /* ... */ };
     class Circle : public Shape { /* ... */ Point c; int r; };
@@ -2308,6 +2423,7 @@ For example:
     Circle c1 {sm};  // ideally prevented by the definition of Circle
     Circle c2 {sm.copy_circle()};
 ```
+
 ##### Enforcement
 
 Warn against slicing.
@@ -2358,6 +2474,7 @@ When unambiguous, the `T` can be left out of `T{e}`.
 
     auto z = f({2*pi, 1});
 ```
+
 ##### Note
 
 The construction notation is the most general [initializer notation](#Res-list).
@@ -2403,7 +2520,6 @@ The main problem left is to find a suitable name for `Count`.
 
 Flag the C-style `(T)e` and functional-style `T(e)` casts.
 
-
 ### <a name="Res-deref"></a>ES.65: Don't dereference an invalid pointer
 
 ##### Reason
@@ -2426,8 +2542,8 @@ This is a major part of the discussion of [C++'s resource- and type-safety model
 * Use [not_null](#Rf-not_null) to catch unexpected `nullptr` early.
 * Use the [bounds profile](#SS-bounds) to avoid range errors.
 
-
 ##### Example
+
 ```c++
     void f()
     {
@@ -2460,6 +2576,7 @@ To resolve the problem, either extend the lifetime of the object the pointer is 
 Unfortunately, most invalid pointer problems are harder to spot and harder to fix.
 
 ##### Example
+
 ```c++
     void f(int* p)
     {
@@ -2512,6 +2629,7 @@ These remedies take care of `nullptr` only.
 Remember that there are other ways of getting an invalid pointer.
 
 ##### Example
+
 ```c++
     void f(int* p)  // old code, doesn't use owner
     {
@@ -2526,6 +2644,7 @@ Remember that there are other ways of getting an invalid pointer.
     }
 ```
 ##### Example
+
 ```c++
     void f()
     {
@@ -2535,6 +2654,7 @@ Remember that there are other ways of getting an invalid pointer.
         int x = *p; // BAD: dereferences potentially invalid pointer
     }
 ```
+
 ##### Enforcement
 
 This rule is part of the [lifetime safety profile](#SS-lifetime)
@@ -2544,7 +2664,6 @@ This rule is part of the [lifetime safety profile](#SS-lifetime)
 * Flag a dereference of a pointer that may have been invalidated by a `delete`
 * Flag a dereference to a pointer to a container element that may have been invalidated by dereference
 
-
 ## ES.stmt: Statements
 
 Statements control the flow of control (except for function calls and exception throws, which are expressions).
@@ -2553,12 +2672,12 @@ Statements control the flow of control (except for function calls and exception 
 
 ##### Reason
 
-
 * 가독성.
 * 효율성: 상수값에 대해서 비교를 수행하므로 `if`-`then`-`else`문의 연속보다 `switch`문이 더 잘 최적화될 수 있다.
 * `switch` 문은 경험적인 형태의 일관성 검사를 할 수 있게 한다. 예를 들자면, `enum` 모든 값을 확인하고 있는가? 그렇지 않다면 `default`는 있는가?
 
 ##### Example
+
 ```c++
     void use(int n)
     {
@@ -2585,6 +2704,7 @@ Statements control the flow of control (except for function calls and exception 
             // ...
     }
 ```
+
 ##### Enforcement
 
 상수값에 대해서 체크하는 if-then-else 연속이라면 지적한다. (이 경우에만)
@@ -2596,6 +2716,7 @@ Statements control the flow of control (except for function calls and exception 
 가독성. 오류 예방. 효율성.
 
 ##### Example
+
 ```c++
     for (gsl::index i = 0; i < v.size(); ++i)   // bad
             cout << v[i] << '\n';
@@ -2624,6 +2745,7 @@ Statements control the flow of control (except for function calls and exception 
 루프문 내에서 "루프변수를 변경"하는 경우가 없어야 한다.
 
 ##### Note
+
 범위 기반 `for`문에서 루프변수를 복사하여 사용하지 마라:
 ```c++
     for (string s : vs) // ...
@@ -2648,12 +2770,15 @@ Statements control the flow of control (except for function calls and exception 
 가독성: 루프에 대한 전체 로직을 첫구문에서 볼 수 있다. 루프변수의 범위가 제한되는 점도 좋다.
 
 ##### Example
+
 ```c++
     for (gsl::index i = 0; i < vec.size(); i++) {
         // do work
     }
 ```
+
 ##### Example, bad
+
 ```c++
     int i = 0;
     while (i < vec.size()) {
@@ -2661,6 +2786,7 @@ Statements control the flow of control (except for function calls and exception 
         i++;
     }
 ```
+
 ##### Enforcement
 
 ???
@@ -2672,6 +2798,7 @@ Statements control the flow of control (except for function calls and exception 
 가독성
 
 ##### Example
+
 ```c++
     int events = 0;
     for (; wait_for_event(); ++events) {  // bad, confusing
@@ -2687,6 +2814,7 @@ Better
         // ...
     }
 ```
+
 ##### Enforcement
 
 Flag actions in `for`-initializers and `for`-increments that do not relate to the `for`-condition.
@@ -2699,12 +2827,15 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 루프문 뒤에서 다른 목적으로 루프 변수를 사용하지 못하게 하라.
 
 ##### Example
+
 ```c++
     for (int i = 0; i < 100; ++i) {   // GOOD: i var is visible only inside the loop
         // ...
     }
 ```
+
 ##### Example, don't
+
 ```c++
     int j;                            // BAD: j is visible outside the loop
     for (j = 0; j < 100; ++j) {
@@ -2715,11 +2846,13 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 **See also**: [Don't use a variable for two unrelated purposes](#Res-recycle)
 
 ##### Example
+
 ```c++
     for (string s; cin >> s; ) {
         cout << s << '\n';
     }
 ```
+
 ##### Enforcement
 
 `for`문 안에서만 변하는 변수가 루프 밖에 선언되어 있지만 루프 밖에서 사용되지 않고 있다면 경고한다.
@@ -2728,9 +2861,9 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 귀납 변수(induction variable)가 루프구문 안에서만 접근가능함을 파악하면 
 위치이동(hoisting), 연산 부담 완화(strength reduction), 루프 내 불변코드 이동(loop-invariant code motion) 등의 최적화가 가능해진다.
 
-> 번역 참고: 
->  - https://en.wikipedia.org/wiki/Strength_reduction
->  - https://code-examples.net/ko/docs/gcc~7/optimize-options
+> 번역 참고:
+> * https://en.wikipedia.org/wiki/Strength_reduction
+> * https://code-examples.net/ko/docs/gcc~7/optimize-options
 
 ### <a name="Res-do"></a>ES.75: Avoid `do`-statements
 
@@ -2740,6 +2873,7 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 종료 조건이 끝에 위치해 있고(못 보고 넘어가기 쉬운 위치.) 첫 루프에서 체크를 하지 않는다.
 
 ##### Example
+
 ```c++
     int x;
     do {
@@ -2765,7 +2899,7 @@ Flag `do`-statements.
 
 ##### Exception
 
-중첩된 루프에서 탈출. 
+중첩된 루프에서 탈출.
 이런 경우라면 항상 처리의 진행방향으로 점프하라.
 
 Breaking out of a nested loop.
@@ -2779,7 +2913,9 @@ In that case, always jump forwards.
     finished:
     // ...
 ```
+
 ##### Example, bad
+
 C에서 goto-exit 형태(idiom)를 꽤 많이 사용한다:
 ```c++
     void f()
@@ -2806,9 +2942,9 @@ consider `gsl::finally()` as a cleaner and more reliable alternative to `goto ex
 
 ##### Reason
 
- In a non-trivial loop body, it is easy to overlook a `break` or a `continue`.
+In a non-trivial loop body, it is easy to overlook a `break` or a `continue`.
 
- A `break` in a loop has a dramatically different meaning than a `break` in a `switch`-statement
+A `break` in a loop has a dramatically different meaning than a `break` in a `switch`-statement
  (and you can have `switch`-statement in a loop and a loop in a `switch`-case).
 
 ##### Example
@@ -2829,7 +2965,6 @@ Often. a loop that uses `continue` can equivalently and as clearly be expressed 
 
 If you really need to break out a loop, a `break` is typically better than alternatives such as [modifying the loop variable](#Res-loop-counter) or a [`goto`](#Res-goto):
 
-
 ##### Enforcement
 
 ???
@@ -2842,6 +2977,7 @@ If you really need to break out a loop, a `break` is typically better than alter
 고의적으로 `break`를 없애는 것(fallthrough)은 유지보수의 위험요소가 된다.
 
 ##### Example
+
 ```c++
     switch (eventType) {
     case Information:
@@ -2883,7 +3019,9 @@ C++17에서는, `[[fallthrough]]`를 사용하라:
         break;
     }
 ```
+
 ##### Note
+
 단일문으로 된 여러개의 케이스 조건은 허용된다:
 ```c++
     switch (x) {
@@ -2894,6 +3032,7 @@ C++17에서는, `[[fallthrough]]`를 사용하라:
         break;
     }
 ```
+
 ##### Enforcement
 
 빈 `case`문이 아닌데 break로 끝나지 않는다면 지적한다.
@@ -2906,6 +3045,7 @@ C++17에서는, `[[fallthrough]]`를 사용하라:
 오류를 탐지할 기회를 늘려준다.
 
 ##### Example
+
 ```c++
     enum E { a, b, c , d };
 
@@ -2980,6 +3120,7 @@ What looks to a human like a variable without a name is to the compiler a statem
 To avoid unpleasant surprises.
 
 ##### Example, bad
+
 ```c++
     void f()
     {
@@ -3007,6 +3148,7 @@ Flag statements that are just a temporary
 가독성.
 
 ##### Example
+
 ```c++
     for (i = 0; i < max; ++i);   // BAD: the empty statement is easily overlooked
     v[i] = f(v[i]);
@@ -3016,6 +3158,7 @@ Flag statements that are just a temporary
     }
     v[i] = f(v[i]);
 ```
+
 ##### Enforcement
 
 블록이 아니면서 주석문을 포함하지 않는 빈 문장이 있다면 지적한다.
@@ -3027,6 +3170,7 @@ Flag statements that are just a temporary
 The loop control up front should enable correct reasoning about what is happening inside the loop. Modifying loop counters in both the iteration-expression and inside the body of the loop is a perennial source of surprises and bugs.
 
 ##### Example
+
 ```c++
     for (int i = 0; i < 10; ++i) {
         // no updates to i -- ok
@@ -3046,10 +3190,10 @@ The loop control up front should enable correct reasoning about what is happenin
         //
     }
 ```
+
 ##### Enforcement
 
 Flag variables that are potentially updated (have a non-`const` use) in both the loop control iteration-expression and the loop body.
-
 
 ### <a name="Res-if"></a>ES.87: Don't add redundant `==` or `!=` to conditions
 
@@ -3079,6 +3223,7 @@ This rule is especially useful when a declaration is used as a condition
 
     if (auto pc = dynamic_cast<Circle>(ps); pc != nullptr) { ... } // not recommended
 ```
+
 ##### Example
 
 Note that implicit conversions to bool are applied in conditions.
@@ -3128,19 +3273,21 @@ The opposite condition is most easily expressed using a negation:
     if (p == 0) { ... }       // redundant `== 0`; bad: don't use `0` for pointers
     if (p == nullptr) { ... } // redundant `== nullptr`, not recommended
 ```
+
 ##### Enforcement
 
 Easy, just check for redundant use of `!=` and `==` in conditions.
-
 
 ## <a name="SS-numbers"></a>산술연산(Arithmetic)
 
 ### <a name="Res-mix"></a>ES.100: Don't mix signed and unsigned arithmetic
 
 ##### Reason
+
 결과가 잘못될 수 있다.
 
 ##### Example
+
 ```c++
     int x = -3;
     unsigned int y = 7;
@@ -3162,7 +3309,6 @@ It is harder to spot the problem in more realistic examples.
 * 컴파일러가 이미 알고 있는 상황이고 경고할 것이다
 * (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
 
-
 ### <a name="Res-unsigned"></a>ES.101: Use unsigned types for bit manipulation
 
 ##### Reason
@@ -3170,10 +3316,12 @@ It is harder to spot the problem in more realistic examples.
 부호없는 타입은 부호비트까지 포함해서 비트 연산할 수 있도록 지원하기 때문에 의도한 대로 동작한다.
 
 ##### Example
+
 ```c++
     unsigned char x = 0b1010'1010;
     unsigned char y = ~x;   // y == 0b0101'0101;
 ```
+
 ##### Note
 
 Unsigned types can also be useful for modulo arithmetic.
@@ -3251,7 +3399,6 @@ This makes surprises (and bugs) inevitable.
 * Flag unsigned literals (e.g. `-2`) used as container subscripts.
 * (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
 
-
 ### <a name="Res-overflow"></a>ES.103: Don't overflow
 
 ##### Reason
@@ -3260,6 +3407,7 @@ This makes surprises (and bugs) inevitable.
 최대값 이상으로 증가시킨다면 메모리값이 망가지고 비정상적으로 작동한다.
 
 ##### Example, bad
+
 ```c++
     int a[10];
     a[10] = 7;   // bad
@@ -3268,17 +3416,22 @@ This makes surprises (and bugs) inevitable.
     while (n++ < 10)
         a[n - 1] = 9; // bad (twice)
 ```
+
 ##### Example, bad
+
 ```c++
     int n = numeric_limits<int>::max();
     int m = n + 1;   // bad
 ```
+
 ##### Example, bad
+
 ```c++
     int area(int h, int w) { return h * w; }
 
     auto a = area(10'000'000, 100'000'000);   // bad
 ```
+
 ##### Exception
 
 모듈러 연산(modulo arithmetic)을 사용한다면 부호없는 타입을 사용하라.
@@ -3296,6 +3449,7 @@ This makes surprises (and bugs) inevitable.
 최소값 이하로 값이 내려가면 메모리값이 망가지고 비정상적으로 작동한다.
 
 ##### Example, bad
+
 ```c++
     int a[10];
     a[-2] = 7;   // bad
@@ -3304,6 +3458,7 @@ This makes surprises (and bugs) inevitable.
     while (n--)
         a[n - 1] = 9;   // bad (twice)
 ```
+
 ##### Exception
 
 모듈러 연산(modulo arithmetic)을 사용한다면 부호없는 타입을 사용하라.
@@ -3323,6 +3478,7 @@ This makes surprises (and bugs) inevitable.
 모듈러 연산(`%`)에도 적용된다
 
 ##### Example; bad
+
 ```c++
     double divide(int a, int b) {
         // BAD, should be checked (e.g., in a precondition)
@@ -3330,6 +3486,7 @@ This makes surprises (and bugs) inevitable.
     }
 ```
 ##### Example; good
+
 ```c++
     double divide(int a, int b) {
         // good, address via precondition (and replace with contracts once C++ gets them)
@@ -3348,7 +3505,6 @@ This makes surprises (and bugs) inevitable.
 
 * Flag division by an integral value that could be zero
 
-
 ### <a name="Res-nonnegative"></a>ES.106: Don't try to avoid negative values by using `unsigned`
 
 ##### Reason
@@ -3359,6 +3515,7 @@ and opens the door for errors related to signed/unsigned mixes.
 Using `unsigned` doesn't actually eliminate the possibility of negative values.
 
 ##### Example
+
 ```c++
     unsigned int u1 = -2;   // Valid: the value of u1 is 4294967294
     int i1 = -2;
@@ -3378,6 +3535,7 @@ Remember that `-1` when assigned to an `unsigned int` becomes the largest `unsig
 Also, since unsigned arithmetic is modulo arithmetic the multiplication didn't overflow, it wrapped around.
 
 ##### Example
+
 ```c++
     unsigned max = 100000;    // "accidental typo", I mean to say 10'000
     unsigned short x = 100;
@@ -3405,6 +3563,7 @@ For example
     int r1 = f(2);
     int r2 = f(-2);  // throws
 ```
+
 ##### Note
 
 ???
@@ -3412,7 +3571,6 @@ For example
 ##### Enforcement
 
 Hard: there is a lot of code using `unsigned` and we don't offer a practical positive number type.
-
 
 ### <a name="Res-subscripts"></a>ES.107: Don't use `unsigned` for subscripts, prefer `gsl::index`
 
@@ -3424,6 +3582,7 @@ To enable better error detection.
 To avoid the pitfalls with `auto` and `int`.
 
 ##### Example, bad
+
 ```c++
     vector<int> vec = /*...*/;
 
@@ -3440,7 +3599,9 @@ To avoid the pitfalls with `auto` and `int`.
     for (int i = vec.size()-1; i >= 0; i -= 2)                 // may not be big enough
         cout << vec[i] << '\n';
 ```
+
 ##### Example, good
+
 ```c++
     vector<int> vec = /*...*/;
 
@@ -3449,6 +3610,7 @@ To avoid the pitfalls with `auto` and `int`.
     for (gsl::index i = vec.size()-1; i >= 0; i -= 2)          // ok
         cout << vec[i] << '\n';
 ```
+
 ##### Note
 
 The built-in array uses signed subscripts.
@@ -3457,6 +3619,7 @@ Thus, no perfect and fully compatible solution is possible (unless and until the
 Given the known problems with unsigned and signed/unsigned mixtures, better stick to (signed) integers of a sufficient size, which is guaranteed by `gsl::index`.
 
 ##### Example
+
 ```c++
     template<typename T>
     struct My_container {
@@ -3466,6 +3629,7 @@ Given the known problems with unsigned and signed/unsigned mixtures, better stic
         // ...
     };
 ```
+
 ##### Example
 
     ??? demonstrate improved code generation and potential for error detection ???
@@ -3482,4 +3646,3 @@ Alternatives for users
 
 * Very tricky as long as the standard-library containers get it wrong.
 * (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
-

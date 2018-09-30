@@ -44,6 +44,7 @@ even though the actual extension may be different.
 Your IDE (if you use one) may have strong opinions about suffices.
 
 ##### Example
+
 ```c++
     // foo.h:
     extern int a;   // a declaration
@@ -53,14 +54,17 @@ Your IDE (if you use one) may have strong opinions about suffices.
     int a;   // a definition
     void foo() { ++a; }
 ```
+
 `foo.h` 는 `foo.cpp`에 대한 인터페이스를 제공한다. 전역 변수는 피해야 한다.
 
 ##### Example, bad
+
 ```c++
     // foo.h:
     int a;   // a definition
     void foo() { ++a; }
 ```
+
 `#include<foo.h>` 문구가 한 프로그램 내에 두 번 이상 포함된다면 단일 정의 규칙(one-definition-rule)에 위배된다고 링커가 오류를 낼 것이다.
 
 ##### Enforcement
@@ -71,9 +75,11 @@ Your IDE (if you use one) may have strong opinions about suffices.
 ### <a name="Rs-inline"></a>SF.2: A `.h` file may not contain object definitions or non-inline function definitions
 
 ##### Reason
+
 하나의 정의만 가져야하는 대상을 `포함`하게 되면 링킹 에러로 이어진다.
 
 ##### Example
+
 ```c++
     // file.h:
     namespace Foo {
@@ -89,6 +95,7 @@ Your IDE (if you use one) may have strong opinions about suffices.
     #include <file.h>
     // ... more ...
 ```
+
 Linking `file1.cpp` and `file2.cpp` will give two linker errors.
 
 **Alternative formulation**: `.h` 파일은 다음의 항목만을 가진다:
@@ -115,6 +122,7 @@ Linking `file1.cpp` and `file2.cpp` will give two linker errors.
 관리가 편해지고 가독성이 향상된다.
 
 ##### Example, bad
+
 ```c++
     // bar.cpp:
     void bar() { cout << "bar\n"; }
@@ -123,6 +131,7 @@ Linking `file1.cpp` and `file2.cpp` will give two linker errors.
     extern void bar();
     void foo() { bar(); }
 ```
+
 `bar`를 관리하는 사람이 그 타입을 바꾸고자 하더라도 `bar`의 모든 선언을 찾을 수가 없다.
 `bar`를 사용하는 입장에서는 이 인터페이스가 완벽한지 알 수가 없다. 기껏해야 (나중에) 링커로부터 오류메시지를 받는 것이 고작이다.
 
@@ -133,9 +142,11 @@ Linking `file1.cpp` and `file2.cpp` will give two linker errors.
 ### <a name="Rs-include-order"></a>SF.4: Include `.h` files before other declarations in a file
 
 ##### Reason
+
 문맥에 대한 종속성을 최소화하고 가독성을 높인다.
 
 ##### Example
+
 ```c++
     #include <vector>
     #include <algorithm>
@@ -143,7 +154,9 @@ Linking `file1.cpp` and `file2.cpp` will give two linker errors.
 
     // ... my code here ...
 ```
+
 ##### Example, bad
+
 ```c++
     #include <vector>
 
@@ -152,7 +165,9 @@ Linking `file1.cpp` and `file2.cpp` will give two linker errors.
     #include <algorithm>
     #include <string>
 ```
+
 ##### Note
+
 이 내용은 `.h` 와 `.cpp` 파일 모두에 해당한다.
 
 ##### Note
@@ -177,9 +192,11 @@ Easy.
 ### <a name="Rs-consistency"></a>SF.5: A `.cpp` file must include the `.h` file(s) that defines its interface
 
 ##### Reason
+
 컴파일러가 좀더 일찍 일관성을 검사할 수 있도록 한다.
 
 ##### Example, bad
+
 ```c++
     // foo.h:
     void foo(int);
@@ -191,9 +208,11 @@ Easy.
     int bar(double) { /* ... */ }
     double foobar(int);
 ```
+
 `bar` 나 `foobar` 를 호출하는 프로그램을 링크하는 시점에서야 오류를 확인할 수 있다.
 
 ##### Example
+
 ```c++
     // foo.h:
     void foo(int);
@@ -207,6 +226,7 @@ Easy.
     int bar(double) { /* ... */ }
     double foobar(int);   // error: wrong return type
 ```
+
 The return-type error for `foobar` is now caught immediately when `foo.cpp` is compiled.
 The argument-type error for `bar` cannot be caught until link time because of the possibility of overloading, but systematic use of `.h` files increases the likelihood that it is caught earlier by the programmer.
 
@@ -223,6 +243,7 @@ The argument-type error for `bar` cannot be caught until link time because of th
  and sometimes a namespace is so fundamental and prevalent in a code base, that consistent qualification would be verbose and distracting.
 
 ##### Example
+
 ```c++
     #include <string>
     #include <vector>
@@ -234,12 +255,14 @@ The argument-type error for `bar` cannot be caught until link time because of th
 
     // ...
 ```
+
 Here (obviously), the standard library is used pervasively and apparently no other library is used, so requiring `std::` everywhere
 could be distracting.
 
 ##### Example
 
 The use of `using namespace std;` leaves the programmer open to a name clash with a name from the standard library
+
 ```c++
     #include <cmath>
     using namespace std;
@@ -251,6 +274,7 @@ The use of `using namespace std;` leaves the programmer open to a name clash wit
         return sqrt(x); // error
     }
 ```
+
 However, this is not particularly likely to lead to a resolution that is not an error and
 people who use `using namespace std` are supposed to know about `std` and about this risk.
 
@@ -272,10 +296,12 @@ Flag multiple `using namespace` directives for different namespaces in a single 
 ### <a name="Rs-using-directive"></a>SF.7: Don't write `using namespace` at global scope in a header file
 
 ##### Reason
+
 헤더 파일에 `using` 지시자를 사용하는 경우 `#include`를 사용하는 쪽에서 대체 구현을 효과적으로 구분할 수 있는 방안을 없애버린다.
 It also makes `#include`d headers order-dependent as they may have different meaning when included in different orders.
 
 ##### Example
+
 ```c++
     // bad.h
     #include <iostream>
@@ -290,6 +316,7 @@ It also makes `#include`d headers order-dependent as they may have different mea
         copy(/*...*/);    // now overloads local ::copy and std::copy, could be ambiguous
     }
 ```
+
 ##### Enforcement
 
 Flag `using namespace` at global scope in a header file.
@@ -297,6 +324,7 @@ Flag `using namespace` at global scope in a header file.
 ### <a name="Rs-guards"></a>SF.8: Use `#include` guards for all `.h` files
 
 ##### Reason
+
 파일이 여러 번 `#include`되는 것을 방지한다.
 
 In order to avoid include guard collisions, do not just name the guard after the filename.
@@ -304,6 +332,7 @@ Be sure to also include a key and good differentiator, such as the name of libra
 the header file is part of.
 
 ##### Example
+
 ```c++
     // file foobar.h:
     #ifndef LIBRARY_FOOBAR_H
@@ -311,7 +340,9 @@ the header file is part of.
     // ... declarations ...
     #endif // LIBRARY_FOOBAR_H
 ```
+
 ##### Enforcement
+
 `#include`보호 문구가 없는 `.h` 파일이 있다면 표시한다
 
 ##### Note
@@ -328,9 +359,11 @@ Our recommendation is to write in ISO C++: See [rule P.2](#Rp-Cplusplus).
 향후 언어에서 모듈 기능을 지원할 때 이를 사용하도록 변경하기 어렵게 된다.
 
 ##### Note
+
 단순히 `#include` 보호 장치로 처리하지 말고 실제 순환 구조를 없애야 한다.
 
 ##### Example, bad
+
 ```c++
     // file1.h:
     #include "file2.h"
@@ -341,10 +374,10 @@ Our recommendation is to write in ISO C++: See [rule P.2](#Rp-Cplusplus).
     // file3.h:
     #include "file1.h"
 ```
+
 ##### Enforcement
 
 Flag all cycles.
-
 
 ### <a name="Rs-implicit"></a>SF.10: Avoid dependencies on implicitly `#include`d names
 
@@ -355,6 +388,7 @@ Avoid having to change `#include`s if an `#include`d header changes.
 Avoid accidentally becoming dependent on implementation details and logically separate entities included in a header.
 
 ##### Example
+
 ```c++
     #include <iostream>
     using namespace std;
@@ -369,12 +403,14 @@ Avoid accidentally becoming dependent on implementation details and logically se
         }
     }
 ```
+
 `<iostream>` exposes the definition of `std::string` ("why?" makes for a fun trivia question),
 but it is not required to do so by transitively including the entire `<string>` header,
 resulting in the popular beginner question "why doesn't `getline(cin,s);` work?"
 or even an occasional "`string`s cannot be compared with `==`).
 
 The solution is to explicitly `#include <string>`:
+
 ```c++
     #include <iostream>
     #include <string>
@@ -390,10 +426,12 @@ The solution is to explicitly `#include <string>`:
         }
     }
 ```
+
 ##### Note
 
 Some headers exist exactly to collect a set of consistent declarations from a variety of headers.
 For example:
+
 ```c++
     // basic_std_lib.h:
 
@@ -404,10 +442,13 @@ For example:
     #include <random>
     #include <vector>
 ```
-a user can now get that set of declarations with a single `#include`"
+
+a user can now get that set of declarations with a single `#include`
+
 ```c++
     #include "basic_std_lib.h"
 ```
+
 This rule against implicit inclusion is not meant to prevent such deliberate aggregation.
 
 ##### Enforcement
@@ -424,10 +465,12 @@ Headers should encapsulate the functionality they provide.
 Avoid clients of a header having to manage that header's dependencies.
 
 ##### Example
+
 ```c++
     #include "helpers.h"
     // helpers.h depends on std::string and includes <string>
 ```
+
 ##### Note
 
 Failing to follow this results in difficult to diagnose errors for clients of a header.
@@ -453,6 +496,7 @@ A test should verify that the header file itself compiles or that a cpp file whi
 ### <a name="Rs-unnamed"></a>SF.21: Don't use an unnamed (anonymous) namespace in a header
 
 ##### Reason
+
 헤더 파일에 있는 익명 이름공간 거의 대부분이 버그이다.
 
 ##### Example
@@ -460,15 +504,18 @@ A test should verify that the header file itself compiles or that a cpp file whi
     ???
 
 ##### Enforcement
- * 헤더 파일에서 사용되는 익명 이름공간을 찾아내 표시한다
+
+* 헤더 파일에서 사용되는 익명 이름공간을 찾아내 표시한다
 
 ### <a name="Rs-unnamed2"></a>SF.22: Use an unnamed (anonymous) namespace for all internal/nonexported entities
 
 ##### Reason
+
 어떤 외부에서도 내부의 익명 이름공간에 있는 항목들에 참조할 수 없다.
 소스 파일에 정의되어 있는 모든 구현들 중 "외부에 노출되는" 항목의 정의를 뺀 나머지 모두는 익명 이름공간에 넣는다 생각하라.
 
 ##### Example
+
 API 클래스와 그 멤버들은 익명 이름공간에 있을 수 없지만, 구현 소스 파일에 정의된 "도우미" 클래스나 함수들의 경우 익명 이름공간 영역에 정의되어야 한다.
 
     ???

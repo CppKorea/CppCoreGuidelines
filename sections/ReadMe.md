@@ -3,6 +3,7 @@
 > 2018년 9월 2일
 
 편집자:
+
 * [Bjarne Stroustrup](http://www.stroustrup.com)
 * [Herb Sutter](http://herbsutter.com/)
 

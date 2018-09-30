@@ -47,6 +47,7 @@
 ### <a name="Rr-raii"></a>R.1:자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동적으로 관리되도록 하라
 
 ##### Reason
+
 수동 자원 관리의 복잡성과 누출을 피하기 위한 방법을 알아본다. 
 C++ 언어적 강제인 생성자 소멸자 대칭은 `fopen`/`fclose`,  그리고 `lock`/`unlock`, `new`/`delete`과 같은 자원 획득/해체 함수의 짝과 같은 구조를 가진다.
 
@@ -55,6 +56,7 @@ C++ 언어적 강제인 생성자 소멸자 대칭은 `fopen`/`fclose`,  그리�
 ##### Example, bad
 
 Consider:
+
 ```c++
     void send(X* x, cstring_span destination)
     {
@@ -74,6 +76,7 @@ Consider:
 ##### Example
 
 Consider:
+
 ```c++
     void send(unique_ptr<X> x, cstring_span destination)  // x owns the X
     {
@@ -88,6 +91,7 @@ Consider:
 모든 자원 관리가 자동화되었고 예외와 상관없이 모든 경로에서 한번 수행된다. 추가적으로 함수가 포인터 소유권을 가져간 것도 보여주고 있다.
 
 `Port`는 어떻게 구현할 수 있을까? 자원을 캡슐화하는 간단한 래퍼로 구현할 수 있다:
+
 ```c++
     class Port {
         PortHandle port;
@@ -101,7 +105,9 @@ Consider:
         Port& operator=(const Port&) = delete;
     };
 ```
+
 ##### Note
+
 소멸자를 가진 클래스로 표현되지 않고 다루기 힘든 자원인 경우 클래스로 감싸서 자원을 관리하거나 [`finally`](#S-GSL)를 사용하라.
 
 **See also**: [RAII](#Rr-raii)
@@ -113,6 +119,7 @@ Consider:
 배열은 컨테이너 타입(가령, `vector`(소유)이나 `span`(비 소유))으로 가장 잘 표현된다. 이런 컨테이너와 뷰는 범위 검사를 위한 충분한 정보를 가지고 있다.
 
 ##### Example, bad
+
 ```c++
     void f(int* p, int n)   // n is the number of elements in p[]
     {
@@ -121,40 +128,47 @@ Consider:
         // ...
     }
 ```
+
 컴파일러 주석을 읽지 않는다. 또한 다른 코드를 읽지 않고는 `p`가 정말로 `n` 만큼을 가르키는지 알 수 없다. 
 대신 `span`을 사용하라.
 
 ##### Example
+
 ```c++
     void g(int* p, int fmt)   // print *p using format #fmt
     {
         // ... uses *p and p[0] only ...
     }
 ```
+
 ##### Exception
+
 C 스타일 문자열은 0으로 끝나는 문자 배열을 포인터로 전달하기도 한다.
 관례를 따른다는 것을 보여주기 위해 `char*`보다는 `zstring`을 사용하라
 
 ##### Note
+
 하나의 원소를 위해서는 참조자를 사용할 수도 있다. 그러나 `nullptr`이 가능한 경우라면 참조가 좋은 대안은 아니다.
 
 ##### Enforcement
 
 컨테이너 또는 뷰, 반복자(iterator)가 아닌 포인터에서 주소 계산(++ 포함)을 삼가해라
 이 규칙은 오래된 코드 베이스에 적용된다면 많은 양의 false positive를 만들 수 있다.
-* 간단한 포인터로 전달하는 배열 이름을 삼가해라??
 
+* 간단한 포인터로 전달하는 배열 이름을 삼가해라??
 * 컨테이너, 뷰, 반복자가 아닌 포인터 연산에는 표시를 남겨라. (이는 `++`를 포함한다)  
-  이 규칙은 오래된 코드에서는 엄청나게 많은 거짓 양성(false positive)을 만들 것이다. 
+  이 규칙은 오래된 코드에서는 엄청나게 많은 거짓 양성(false positive)을 만들 것이다.
 * 배열을 포인터를 사용해 전달할 경우 표시를 남겨라
 
 ### <a name="Rr-ptr"></a>R.3: A raw pointer (a `T*`) is non-owning
 
 ##### Reason
-C++ 표준뿐만 아니라 대부분의 경우 원시 포인터는 소유를 하지 않는다. 
+
+C++ 표준뿐만 아니라 대부분의 경우 원시 포인터는 소유를 하지 않는다.
 신뢰할 수 있고 효과적인 방법으로 개체를 제거하기 위해서는 개체를 소유하는 포인터가 필요하다.
 
 ##### Example
+
 ```c++
     void f()
     {
@@ -163,9 +177,11 @@ C++ 표준뿐만 아니라 대부분의 경우 원시 포인터는 소유를 하
         // ...
     }
 ```
+
 `unique_ptr`는 개체의 제거를 보장하기 때문에 메모리 누수를 차단해준다. (예외 발생에서도 마찬가지다.) `T*`는 그렇지 않다.
 
 ##### Example
+
 ```c++
     template<typename T>
     class X {
@@ -175,7 +191,9 @@ C++ 표준뿐만 아니라 대부분의 경우 원시 포인터는 소유를 하
         T* q;   // bad: it is unclear whether q is owning or not
     };
 ```
+
 명시적인 소유권을 만들어 이 문제를 해결할 수 있다:
+
 ```c++
     template<typename T>
     class X2 {
@@ -185,7 +203,9 @@ C++ 표준뿐만 아니라 대부분의 경우 원시 포인터는 소유를 하
         T* q;         // OK: q is not owning
     };
 ```
+
 ##### Exception
+
 주요 예외사항은 레거시 코드라고 할 수 있다. 특히 ABI를 통해서 C 혹은 C 스타일 C++ 인터페이스와 호환성을 가져야 하는 경우가 그렇다. `T*`를 소유하는 방식을 위반하는 억 단위의 코드가 존재한다는 사실을 무시할 수는 없다.
 20년 묵은 "레거시" 코드를 최신 C++ 코드로 변환할 수 있는 툴이 있으면 좋을것이다. 이런 툴의 개발과 툴의 사용을 독려할것이고 또한 이 가이드라인이 도움이 되었으면 좋겠다. 
 가시적인 성과가 보일때까지 몇 년은 더 걸릴것이다: 최신 코드로 바꿀수 있게 되기전에 "레거시 코드"가 더 빠르게 생성될지도 모른다.
@@ -206,6 +226,7 @@ For example, if an `owner<T*>` is a member of a class, that class better have a 
 ##### Example, bad
 
 원시 포인터를 반환하는것은 호출자에게 수명 관리에 불확실성을 심어준다; 다시 말해, 누가 포인터를 통해 개체를 제거해야 하는가?
+
 ```c++
     Gadget* make_gadget(int n)
     {
@@ -221,8 +242,10 @@ For example, if an `owner<T*>` is a member of a class, that class better have a 
         delete p;
     }
 ```
+
 [leak](#???)로 인한 고통뿐만 아니라 이는 쓸데없이 많고 미심쩍은 할당과 해제를 야기할 수 있다. 
 만약 Gadget을 함수 바깥으로 가져오는 비용이 크지 않다면, 단순히 값으로 반환하는 것도 한 방법이다. (["out" return values](#Rf-out)를 보라):
+
 ```c++
     Gadget make_gadget(int n)
     {
@@ -231,6 +254,7 @@ For example, if an `owner<T*>` is a member of a class, that class better have a 
         return g;
     }
 ```
+
 ##### Note
 이 규칙은 펙토리 함수에 적용될 수 있다.
 
@@ -249,10 +273,12 @@ If pointer semantics are required (e.g., because the return type needs to refer 
 ### <a name="Rr-ref"></a>R.4: A raw reference (a `T&`) is non-owning
 
 ##### Reason
+
 C++ 표준뿐만 아니라 대부분의 경우 참조는 소유를 하지 않는다. 
 신뢰할 수 있고 효과적인 방법으로 개체를 제거하기 위해서는 개체를 소유하는 포인터가 필요하다.
 
 ##### Example
+
 ```c++
     void f()
     {
@@ -261,6 +287,7 @@ C++ 표준뿐만 아니라 대부분의 경우 참조는 소유를 하지 않는
         delete &r;             // bad: violated the rule against deleting raw pointers
     }
 ```
+
 **See also**: [The raw pointer rule](#Rr-ptr)
 
 ##### Enforcement
@@ -275,7 +302,9 @@ See [the raw pointer rule](#Rr-ptr)
 유효범위 내 개체의 멤버들은 생성자와 소멸자에 의해 수명이 관리된다.
 
 ##### Example
+
 다음 예는 불필요한 할당화 해제를 하기 떄문에 비효율적이고, 예외에 취약하며, `...` 부분에서는 누수가 발생할 수 있다:
+
 ```c++
     void f(int n)
     {
@@ -284,7 +313,9 @@ See [the raw pointer rule](#Rr-ptr)
         delete p;
     }
 ```
+
 대신, 지역 변수를 사용하라:
+
 ```c++
     void f(int n)
     {
@@ -292,6 +323,7 @@ See [the raw pointer rule](#Rr-ptr)
         // ...
     }
 ```
+
 ##### Enforcement
 
 * (Moderate) Warn if an object is allocated and then deallocated on all paths within a function. Suggest it should be a local `auto` stack object instead.
@@ -300,14 +332,17 @@ See [the raw pointer rule](#Rr-ptr)
 ### <a name="Rr-global"></a>R.6: Avoid non-`const` global variables
 
 ##### Reason
+
 전역 변수는 모든 곳에서 접근될 수 있고 명백히 관련 없는 개체들 사이에 말도 안되는 의존성을 만들 수 있다. 에러의 원인 중 잘 알려진 것이기도 하다.
 
 **Warning**: 전역 개체의 초기화 순서는 보장되지 않는다. 상수로 전역 개체를 초기화하고 싶다면, `const` 개체에 대해서도 초기화 순서가 정의되지 않았을 수 있다는 점을 명심하라.
 
 ##### Exception
+
 싱글톤 패턴 보다는 전역 개체가 나을 수도 있다.
 
 ##### Exception
+
 변경할 수 없는(`const`) 전역 개체는 이런 문제를 발생시키지 않는다.
 
 ##### Enforcement
@@ -319,9 +354,11 @@ See [the raw pointer rule](#Rr-ptr)
 ### <a name="Rr-mallocfree"></a>R.10: Avoid `malloc()` and `free()`
 
 ##### Reason
+
 `malloc()`과 `free()`는 생성자와 소멸자를 지원하지 않는다. `new` 과 `delete`와 섞어서 사용하지 마라.
 
 ##### Example
+
 ```c++
     class Record {
         int id;
@@ -348,6 +385,7 @@ See [the raw pointer rule](#Rr-ptr)
         free(p2);    // error: cannot free() object allocated by new
     }
 ```
+
 In some implementations that `delete` and that `free()` might work, or maybe they will cause run-time errors.
 
 ##### Exception
@@ -383,9 +421,11 @@ If you have a naked `new`, you probably need a naked `delete` somewhere, so you 
 ### <a name="Rr-immediate-alloc"></a>R.12: Immediately give the result of an explicit resource allocation to a manager object
 
 ##### Reason
+
 그렇지 않으면, 예외나 반환이 자원 누수를 야기할 수 있다.
 
 ##### Example, bad
+
 ```c++
     void f(const string& name)
     {
@@ -395,9 +435,11 @@ If you have a naked `new`, you probably need a naked `delete` somewhere, so you 
         // ...
     }
 ```
+
 The allocation of `buf` may fail and leak the file handle.
 
 ##### Example
+
 ```c++
     void f(const string& name)
     {
@@ -406,6 +448,7 @@ The allocation of `buf` may fail and leak the file handle.
         // ...
     }
 ```
+
 The use of the file handle (in `ifstream`) is simple, efficient, and safe.
 
 ##### Enforcement
@@ -419,14 +462,18 @@ The use of the file handle (in `ifstream`) is simple, efficient, and safe.
 If you perform two explicit resource allocations in one statement, you could leak resources because the order of evaluation of many subexpressions, including function arguments, is unspecified.
 
 ##### Example
+
 ```c++
     void fun(shared_ptr<Widget> sp1, shared_ptr<Widget> sp2);
 ```
+
 This `fun` can be called like this:
+
 ```c++
     // BAD: potential leak
     fun(shared_ptr<Widget>(new Widget(a, b)), shared_ptr<Widget>(new Widget(c, d)));
 ```
+
 This is exception-unsafe because the compiler may reorder the two expressions building the function's two arguments.
 In particular, the compiler can interleave execution of the two expressions:
 Memory allocation (by calling `operator new`) could be done first for both objects, followed by attempts to call the two `Widget` constructors.
@@ -434,14 +481,18 @@ If one of the constructor calls throws an exception, then the other object's mem
 
 This subtle problem has a simple solution: Never perform more than one explicit resource allocation in a single expression statement.
 For example:
+
 ```c++
     shared_ptr<Widget> sp1(new Widget(a, b)); // Better, but messy
     fun(sp1, new Widget(c, d));
 ```
+
 The best solution is to avoid explicit allocation entirely use factory functions that return owning objects:
+
 ```c++
     fun(make_shared<Widget>(a, b), make_shared<Widget>(c, d)); // Best
 ```
+
 Write your own factory wrapper if there is not one already.
 
 ##### Enforcement
@@ -455,9 +506,11 @@ Write your own factory wrapper if there is not one already.
 An array decays to a pointer, thereby losing its size, opening the opportunity for range errors.
 
 ##### Example
+
 ```
     ??? what do we recommend: f(int*[]) or f(int**) ???
 ```
+
 **Alternative**: Use `span` to preserve size information.
 
 ##### Enforcement
@@ -471,6 +524,7 @@ Flag `[]` parameters.
 Otherwise you get mismatched operations and chaos.
 
 ##### Example
+
 ```c++
     class X {
         // ...
@@ -479,6 +533,7 @@ Otherwise you get mismatched operations and chaos.
         // ...
     };
 ```
+
 ##### Note
 
 If you want memory that cannot be deallocated, `=delete` the deallocation operation.
@@ -493,11 +548,13 @@ Flag incomplete pairs.
 ### <a name="Rr-owner"></a>R.20: Use `unique_ptr` or `shared_ptr` to represent ownership
 
 ##### Reason
+
 자원 누수를 막을 수 있다.
 
 ##### Example
 
 Consider:
+
 ```c++
     void f()
     {
@@ -509,6 +566,7 @@ Consider:
         auto p5 = make_shared<X>();   // shared ownership, preferable to the explicit use "new"
     }
 ```
+
 This will leak the object used to initialize `p1` (only).
 
 ##### Enforcement
@@ -523,6 +581,7 @@ This will leak the object used to initialize `p1` (only).
 
 ##### Example, bad
 이 코드는 불필요하게 참조 횟수를 증가 및 유지하고 있다.
+
 ```c++
     void f()
     {
@@ -530,9 +589,11 @@ This will leak the object used to initialize `p1` (only).
         // use base locally, without copying it -- refcount never exceeds 1
     } // destroy base
 ```
+
 ##### Example
 
 이 코드가 더 효율적이다:
+
 ```c++
     void f()
     {
@@ -540,17 +601,21 @@ This will leak the object used to initialize `p1` (only).
         // use base locally
     } // destroy base
 ```
+
 ##### Enforcement
+
 (쉬움) 만약 함수 내에서 개체 할당에 `shared_ptr`을 사용하지만, `shared_ptr`을 리턴하지 않거나 `shared_ptr&`를 필요로 하는 함수에 전달하고 있다면 경고하라. 대신 `unique_ptr` 사용을 권하라.
 
 ### <a name="Rr-make_shared"></a>R.22: Use `make_shared()` to make `shared_ptr`s
 
 ##### Reason
+
 만약 개체를 처음 만들고 `shared_ptr`의 생성자에 전달하면, `make_shared()`를 사용할 때보다 (거의 확실히) 할당(그리고 나중의 해제)을 한번 더 하게 된다. 개체와는 독립적으로 참조 카운트를 할당해야 하기 때문이다.
 
 ##### Example
 
 Consider:
+
 ```c++
     shared_ptr<X> p1 { new X{2} }; // bad
     auto p = make_shared<X>(2);    // good
@@ -579,9 +644,11 @@ For convenience and consistency with `shared_ptr`.
 ### <a name="Rr-weak_ptr"></a>R.24: Use `std::weak_ptr` to break cycles of `shared_ptr`s
 
 ##### Reason
+
 `shared_ptr`은 참조 카운트를 사용하는데, 순환 구조에서 이는 절대로 0이 되지 않는다.  때문에 우리는 순환 구조를 파괴할 수 있는 방법이 필요하다.
 
 ##### Example
+
 ```c++
     #include <memory>
 
@@ -613,6 +680,7 @@ For convenience and consistency with `shared_ptr`.
       std::weak_ptr<foo> back_reference_;
     };
 ```
+
 ##### Note
 
 ??? (HS: 많은 사람들은 "순환을 끊는"이라고 말하는 반면 나는 "일시적인 임시 공유"가 더 적절하다고 생각한다.)   
@@ -631,6 +699,7 @@ It should be able to accept any `widget` object, not just ones whose lifetimes a
 A function that does not manipulate lifetime should take raw pointers or references instead.
 
 ##### Example, bad
+
 ```c++
     // callee
     void f(shared_ptr<widget>& w)
@@ -647,7 +716,9 @@ A function that does not manipulate lifetime should take raw pointers or referen
     widget stack_widget;
     f(stack_widget); // error
 ```
+
 ##### Example, good
+
 ```c++
     // callee
     void f(widget& w)
@@ -664,6 +735,7 @@ A function that does not manipulate lifetime should take raw pointers or referen
     widget stack_widget;
     f(stack_widget); // ok -- now this works
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a function takes a parameter of a smart pointer type (that overloads `operator->` or `operator*`) that is copyable but the function only calls any of: `operator*`, `operator->` or `get()`.
@@ -674,6 +746,7 @@ A function that does not manipulate lifetime should take raw pointers or referen
 ### <a name="Rr-smart"></a>R.31: 표준 스마트 포인터를 사용하지 않고 있다면, 표준에서 사용하는 기본 패턴을 사용하라
 
 ##### Reason
+
 다음 섹션들의 규칙들 또한 다른 종류의 서드파티 혹은 커스텀 스마트 포인터 등에서도 동작할 것이며 성능과 정확성 문제를 일으키는 흔한 스마트 포인터 에러에 대한 분석에 매우 유용할 것이다. 당신은 사용하고 있는 모든 스마트 포인터에 대해서 이 규칙이 작동해야 한다.
 
 스마트 포인터는 단항 연산자 `*`와 `->`를 오버로드하는 (기본 또는 특수 템플릿을 포함한) 타입을 의미한다:
@@ -682,6 +755,7 @@ A function that does not manipulate lifetime should take raw pointers or referen
 * 복사할 수 없다면, 고유한 `unique_ptr`처럼 동작한다
 
 ##### Example
+
 ```c++
     // use Boost's intrusive_ptr
     #include <boost/intrusive_ptr.hpp>
@@ -712,15 +786,19 @@ widget이 `nullptr`이 될 수 있다면 `widget*`를 넘겨받아야 하고, �
 Using `unique_ptr` in this way both documents and enforces the function call's ownership transfer.
 
 ##### Example
+
 ```c++
     void sink(unique_ptr<widget>); // takes ownership of the widget
 
     void uses(widget*);            // just uses the widget
 ```
+
 ##### Example, bad
+
 ```c++
     void thinko(const unique_ptr<widget>&); // usually not what you want
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a function takes a `Unique_ptr<T>` parameter by lvalue reference and does not either assign to it or call `reset()` on it on at least one code path. Suggest taking a `T*` or `T&` instead.
@@ -737,13 +815,17 @@ Using `unique_ptr` in this way both documents and enforces the function call's r
 "reseat" means "making a pointer or a smart pointer refer to a different object."
 
 ##### Example
+
 ```c++
     void reseat(unique_ptr<widget>&); // "will" or "might" reseat pointer
 ```
+
 ##### Example, bad
+
 ```c++
     void thinko(const unique_ptr<widget>&); // usually not what you want
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a function takes a `Unique_ptr<T>` parameter by lvalue reference and does not either assign to it or call `reset()` on it on at least one code path. Suggest taking a `T*` or `T&` instead.
@@ -756,6 +838,7 @@ Using `unique_ptr` in this way both documents and enforces the function call's r
 This makes the function's ownership sharing explicit.
 
 ##### Example, good
+
 ```c++
     void share(shared_ptr<widget>);            // share -- "will" retain refcount
 
@@ -763,6 +846,7 @@ This makes the function's ownership sharing explicit.
 
     void reseat(shared_ptr<widget>&);          // "might" reseat ptr
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a function takes a `shared_ptr<T>` parameter by lvalue reference and does not either assign to it or call `reset()` on it on at least one code path. Suggest taking a `T*` or `T&` instead.
@@ -780,6 +864,7 @@ This makes the function's reseating explicit.
 "reseat" means "making a reference or a smart pointer refer to a different object."
 
 ##### Example, good
+
 ```c++
     void share(shared_ptr<widget>);            // share -- "will" retain refcount
 
@@ -787,6 +872,7 @@ This makes the function's reseating explicit.
 
     void may_share(const shared_ptr<widget>&); // "might" retain refcount
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a function takes a `shared_ptr<T>` parameter by lvalue reference and does not either assign to it or call `reset()` on it on at least one code path. Suggest taking a `T*` or `T&` instead.
@@ -800,6 +886,7 @@ This makes the function's reseating explicit.
 This makes the function's ??? explicit.
 
 ##### Example, good
+
 ```c++
     void share(shared_ptr<widget>);            // share -- "will" retain refcount
 
@@ -807,6 +894,7 @@ This makes the function's ??? explicit.
 
     void may_share(const shared_ptr<widget>&); // "might" retain refcount
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a function takes a `shared_ptr<T>` parameter by lvalue reference and does not either assign to it or call `reset()` on it on at least one code path. Suggest taking a `T*` or `T&` instead.
@@ -829,6 +917,7 @@ To do this, sometimes you need to take a local copy of a smart pointer, which fi
 ##### Example
 
 Consider this code:
+
 ```c++
     // global (static or heap), or aliased local ...
     shared_ptr<widget> g_p = ...;
@@ -844,7 +933,9 @@ Consider this code:
         g_p = ...; // oops, if this was the last shared_ptr to that widget, destroys the widget
     }
 ```
+
 The following should not pass code review:
+
 ```c++
     void my_code()
     {
@@ -856,7 +947,9 @@ The following should not pass code review:
          g_p->func();
     }
 ```
+
 The fix is simple -- take a local copy of the pointer to "keep a ref count" for your call tree:
+
 ```c++
     void my_code()
     {
@@ -870,6 +963,7 @@ The fix is simple -- take a local copy of the pointer to "keep a ref count" for 
         pin->func();
     }
 ```
+
 ##### Enforcement
 
 * (Simple) Warn if a pointer or reference obtained from a smart pointer variable (`Unique_ptr` or `shared_ptr`) that is nonlocal, or that is local but potentially aliased, is used in a function call. If the smart pointer is a `shared_ptr` then suggest taking a local copy of the smart pointer and obtain a pointer or reference from that instead.

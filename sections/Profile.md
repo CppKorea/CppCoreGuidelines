@@ -27,6 +27,7 @@ Enforcement of "random" rules in isolation is more likely to be disruptive to a 
 프로파일은 올바른 코드의 작성을 도와주는 라이브러리들을 소개해 드릴 것입니다.
 
 분석 요약:
+
 * [Pro.type: 타입 안전성](#SS-type)
 * [Pro.bounds: 범위 안전성](#SS-bounds)
 * [Pro.lifetime: 수명 안전성](#SS-lifetime)
@@ -43,12 +44,14 @@ Candidates include:
 Enabling a profile is implementation defined; typically, it is set in the analysis tool used.
 
 To suppress enforcement of a profile check, place a `suppress` annotation on a language contract. For example:
+
 ```c++
     [[suppress(bounds)]] char* raw_find(char* p, int n, char x)    // find x in p[0]..p[n - 1]
     {
         // ...
     }
 ```
+
 Now `raw_find()` can scramble memory to its heart's content.
 Obviously, suppression should be very rare.
 
@@ -57,8 +60,8 @@ Obviously, suppression should be very rare.
 이 유형의 프로파일은 타입을 정확히 사용하며, 부주의한 타입변형을 방지하면서 코드를 작성하도록 도와드릴 것입니다.
 안전하지 않은 캐스팅과 `union`의 사용을 포함하여 타입이 잘못사용되는 것에 대한 주요 원인을 제거하는 것에 초점을 맞춰서 진행하겠습니다.
 
-이 장의 목적인, 
-타입 안전성을 정의하자면, 프로그램 상에서 변수를 원래 타입과 다르게 사용하지 않는 것이라 하겠습니다. 실제 `U` 타입으로 정의된 객체가 저장된 메모리에 `T`타입으로 읽어서 사용하지 말자는 겁니다. 
+이 장의 목적인,
+타입 안전성을 정의하자면, 프로그램 상에서 변수를 원래 타입과 다르게 사용하지 않는 것이라 하겠습니다. 실제 `U` 타입으로 정의된 객체가 저장된 메모리에 `T`타입으로 읽어서 사용하지 말자는 겁니다.
 (타입 안전성 하나만 지켜서는 코드가 안전하다는 보장을 받기 힘듭니다. [범위 안전성](#SS-bounds)과 [수명 안전성](#SS-lifetime)을 함께 지켰을 때 비로서 완전히 안전성이 보장된다고 할 수 있습니다.)
 
 An implementation of this profile shall recognize the following patterns in source code as non-conforming and issue a diagnostic.
@@ -66,26 +69,17 @@ An implementation of this profile shall recognize the following patterns in sour
 Type safety profile summary:
 
 * <a name="Pro-type-avoidcasts"></a>Type.1: [Avoid casts](#Res-casts):
-  - <a name="Pro-type-reinterpretcast">a. </a>Don't use `reinterpret_cast`; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named).
-  - <a name="Pro-type-arithmeticcast">b. </a>Don't use `static_cast` for arithmetic types; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named).
-  - <a name="Pro-type-identitycast">c. </a>Don't cast between pointer types where the source type and the target type are the same; A strict version of [Avoid casts](#Res-casts).
-  - <a name="Pro-type-implicitpointercast">d. </a>Don't cast between pointer types when the conversion could be implicit; A strict version of [Avoid casts](#Res-casts).
-* <a name="Pro-type-downcast"></a>Type.2: Don't use `static_cast` to downcast:
-[Use `dynamic_cast` instead](#Rh-dynamic_cast).
-* <a name="Pro-type-constcast"></a>Type.3: Don't use `const_cast` to cast away `const` (i.e., at all):
-[Don't cast away const](#Res-casts-const).
-* <a name="Pro-type-cstylecast"></a>Type.4: Don't use C-style `(T)expression` or functional `T(expression)` casts:
-Prefer [construction](#Res-construct) or [named casts](#Res-cast-named).
-* <a name="Pro-type-init"></a>Type.5: Don't use a variable before it has been initialized:
-[always initialize](#Res-always).
-* <a name="Pro-type-memberinit"></a>Type.6: Always initialize a member variable:
-[always initialize](#Res-always),
-possibly using [default constructors](#Rc-default0) or
-[default member initializers](#Rc-in-class-initializers).
-* <a name="Pro-type-unon"></a>Type.7: Avoid naked union:
-[Use `variant` instead](#Ru-naked).
-* <a name="Pro-type-varargs"></a>Type.8: Avoid varargs:
-[Don't use `va_arg` arguments](#F-varargs).
+  * <a name="Pro-type-reinterpretcast"></a>Don't use `reinterpret_cast`; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named)
+  * <a name="Pro-type-arithmeticcast"></a>Don't use `static_cast` for arithmetic types; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named).
+  * <a name="Pro-type-identitycast"></a>Don't cast between pointer types where the source type and the target type are the same; A strict version of [Avoid casts](#Res-casts).
+  * <a name="Pro-type-implicitpointercast"></a>Don't cast between pointer types when the conversion could be implicit; A strict version of [Avoid casts](#Res-casts).
+* <a name="Pro-type-downcast"></a>Type.2: Don't use `static_cast` to downcast: [Use `dynamic_cast` instead](#Rh-dynamic_cast).
+* <a name="Pro-type-constcast"></a>Type.3: Don't use `const_cast` to cast away `const` (i.e., at all): [Don't cast away const](#Res-casts-const).
+* <a name="Pro-type-cstylecast"></a>Type.4: Don't use C-style `(T)expression` or functional `T(expression)` casts: Prefer [construction](#Res-construct) or [named casts](#Res-cast-named).
+* <a name="Pro-type-init"></a>Type.5: Don't use a variable before it has been initialized: [always initialize](#Res-always).
+* <a name="Pro-type-memberinit"></a>Type.6: Always initialize a member variable: [always initialize](#Res-always), possibly using [default constructors](#Rc-default0) or [default member initializers](#Rc-in-class-initializers).
+* <a name="Pro-type-unon"></a>Type.7: Avoid naked union: [Use `variant` instead](#Ru-naked).
+* <a name="Pro-type-varargs"></a>Type.8: Avoid varargs: [Don't use `va_arg` arguments](#F-varargs).
 
 ##### Impact
 
@@ -94,8 +88,8 @@ Exception may be thrown to indicate errors that cannot be detected statically (a
 Note that this type-safety can be complete only if we also have [Bounds safety](#SS-bounds) and [Lifetime safety](#SS-lifetime).
 Without those guarantees, a region of memory could be accessed independent of which object, objects, or parts of objects are stored in it.
 
-
 ## <a name="SS-bounds"></a>Pro.bounds: 범위 안전성 분석
+
 이 프로파일은 메모리 블록 할당 작업에 대해 코드 작성을 쉽게 해 줍니다.
 포인터 연산, 배열 인덱스 연산 등에서 발생하는 범위 위반 사항을 제거하는 것에 초점을 맞춰서 진행하겠습니다.
 이 프로파일의 주요 기능중 하나는 (하나의 객체가 아니라) 배열을 참조하는 포인터를 제한하자는 것입니다.
@@ -105,14 +99,10 @@ Without those guarantees, a region of memory could be accessed independent of wh
 
 Bounds safety profile summary:
 
-* <a href="Pro-bounds-arithmetic"></a>Bounds.1: Don't use pointer arithmetic. Use `span` instead:
-[Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
-* <a href="Pro-bounds-arrayindex"></a>Bounds.2: Only index into arrays using constant expressions:
-[Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
-* <a href="Pro-bounds-decay"></a>Bounds.3: No array-to-pointer decay:
-[Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
-* <a href="Pro-bounds-stdlib"></a>Bounds.4: Don't use standard-library functions and types that are not bounds-checked:
-[Use the standard library in a type-safe manner](#Rsl-bounds).
+* <a href="Pro-bounds-arithmetic"></a>Bounds.1: Don't use pointer arithmetic. Use `span` instead: [Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
+* <a href="Pro-bounds-arrayindex"></a>Bounds.2: Only index into arrays using constant expressions: [Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
+* <a href="Pro-bounds-decay"></a>Bounds.3: No array-to-pointer decay: [Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
+* <a href="Pro-bounds-stdlib"></a>Bounds.4: Don't use standard-library functions and types that are not bounds-checked: [Use the standard library in a type-safe manner](#Rsl-bounds).
 
 ##### Impact
 
@@ -121,7 +111,6 @@ This eliminates a large class of insidious and hard-to-find errors, including th
 This closes security loopholes as well as a prominent source of memory corruption (when writing out of bounds).
 Even an out-of-bounds access is "just a read", it can lead to invariant violations (when the accessed isn't of the assumed type)
 and "mysterious values."
-
 
 ## <a name="SS-lifetime"></a>Pro.lifetime: 수명 안전성 분석
 
@@ -133,8 +122,7 @@ For example, a pointer may be uninitialized, the `nullptr`, point beyond the ran
 
 Lifetime safety profile summary:
 
-* <a href="Pro-lifetime-invalid-deref"></a>Lifetime.1: Don't dereference a possibly invalid pointer:
-[detect or avoid](#Res-deref).
+* <a href="Pro-lifetime-invalid-deref"></a>Lifetime.1: Don't dereference a possibly invalid pointer:[detect or avoid](#Res-deref).
 
 ##### Impact
 

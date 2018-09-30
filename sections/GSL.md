@@ -44,9 +44,9 @@ Owners should be converted to resource handles (e.g., `unique_ptr` or `vector<T>
 
 `owner`는 소유권을 가진 포인터에 사용되며, 다음과 같은 이유로 이 타입은 적합한 리소스 핸들 타입으로 변환될 수 없다:
 
- * 변환 비용 발생
- * 포인터가 ABI에 사용되는 경우
- * 포인터가 리소스 핸들 구현의 일부인 경우
+* 변환 비용 발생
+* 포인터가 ABI에 사용되는 경우
+* 포인터가 리소스 핸들 구현의 일부인 경우
 
 An `owner<T>` differs from a resource handle for a `T` by still requiring an explicit `delete`.
 

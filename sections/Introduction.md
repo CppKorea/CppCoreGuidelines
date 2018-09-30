@@ -94,7 +94,7 @@
 규칙이 주어진 상황에서 유익한 요소를 금지할 수도 있다.
 규칙이 주어진 상황에서 중대한 오류가 발생하는 것을 막지 못할 수도 있다.
 규칙이 모호하고, 실행 불가능하고, 문제를 위한 모든 해결책을 열어놓음으로써 더 많은 해로움을 가져올 수 있다.
-"어떠한 해로움도 없는" 기준을 완벽하게 만족하는 것은 불가능하다 
+"어떠한 해로움도 없는" 기준을 완벽하게 만족하는 것은 불가능하다
 우리의 목표는, 대신, "다수의 프로그래머들에게 가장 좋은 것"을 위한 기준을 제시하는 것이다.  
 규칙을 원하지 않는다면, 따르지 않거나 무시해도 좋다. 하지만 규칙이 무의미해지기 전까지는 폄하하지 말라. 또 가능하다면, 개선 사항을 제안하기를 바란다.
 
@@ -126,46 +126,44 @@
 하나의 규칙은 여러 프로필에 속할 수 있으며, 어떤 프로필에도 속하지 않은 규칙들도 있다.
 자주 사용되는 프로필 몇 가지를 먼저 살펴보자.
 
- - **타입**: (캐스팅, 공용체, 가변 인수를 통해 `T`를 `U`로 재해석 하는) 타입 위반 없음
- - **한계**: (배열의 범위를 넘어서 접근하는) 범위 위반 없음
- - **수명**: (`delete`나 `delete[]`이 실패하는) 누수 없음, (`nullptr`를 역참조하고 댕글링된 참조를 사용해) 유효하지 않은 개체에 접근하지 않음
+* **타입**: (캐스팅, 공용체, 가변 인수를 통해 `T`를 `U`로 재해석 하는) 타입 위반 없음
+* **한계**: (배열의 범위를 넘어서 접근하는) 범위 위반 없음
+* **수명**: (`delete`나 `delete[]`이 실패하는) 누수 없음, (`nullptr`를 역참조하고 댕글링된 참조를 사용해) 유효하지 않은 개체에 접근하지 않음
 
 프로필은 툴에서 활용할 용도로 만들었지만, 내용을 읽어보면 많은 도움이 된다.
 **적용** 단락을 단순히 우리가 알고 있는 적용 방법을 제시하는 것으로만 제한하고 싶지 않다.
 단락 중 일부는 툴 개발자에게 도움이 될만한 내용일 것이다.
 
 가이드라인의 규칙들을 구현한 툴에서는 명시적으로 규칙을 무시하는 다음과 같은 문법을 지원하기를 바란다:
-```
-[[gsl::suppress(tag)]]
-```
+
+    [[gsl::suppress(tag)]]
+
 여기서 "tag"는 HTML anchor의 이름으로, 가이드라인 내에서 규칙이 있는 지점을 의미한다. (가령, [C.134](#Rh-public) 규칙의 경우, Anchor 값은 "Rh-public"이다. ) 
 
 ## <a name="SS-struct"></a>In.struct: 문서의 구조
 
 각 규칙(가이드라인, 제안)은 여러 부분으로 나뉜다.
 
- - 규칙 그 자체 -- 예) **`new`를 무방비 상태로 사용하지 마라**
- - 규칙 참조 번호 -- 예), **C.7** (클래스와 관련된 7번째 규칙).
+* 규칙 그 자체 -- 예) **`new`를 무방비 상태로 사용하지 마라**
+* 규칙 참조 번호 -- 예), **C.7** (클래스와 관련된 7번째 규칙).
    주요 단원이 순서대로 나열되지 않았기 때문에 규칙 참조 "번호"의 첫 번째 부분은 문자로 시작한다.
    규칙을 추가하거나 삭제할 때 혼란을 최소화하기 위해 숫자를 매길때 간격을 둔다.
- - **이유**들 (근거) -- 이해할 수 없는 규칙을 따르고 싶지는 않을 것이므로 구체적인 이유를 설명한다.
- - **예제**들 -- 추상적인 표현만으로 내용을 이해하기 어려울 경우 구체적인 예(좋은 예나 나쁜 예)를 기술한다.
- - **대안**들 -- "이런 식으로 하지 마라"에 대한 대안을 제시한다.
- - **예외**들 -- 단순하고 보편적인 규칙이 좋다. 많은 규칙들이 널리 사용되지만 만능은 아니므로 예외가 있을 경우 이를 나열한다.
- - **적용** -- "기계적으로" 규칙을 확인하는 방법에 대한 아이디어를 설명한다.
- - **참고할 만한 내용**들 -- (이 문서나 다른 문서에 대해) 규칙이나 관련 내용과 연관된 항목들을 안내한다.
- - **비고**들 (언급) -- 다른데서 다루기 적합하지 않은 부분에 대해 추가로 설명한다.
- - **논의** -- 규칙을 제시한 근본적인 이유를 담고 있는 다른 글에 대한 참조나 규칙의 주요 리스트에 포함되지 않는 예 등을 설명한다.
+* **이유**들 (근거) -- 이해할 수 없는 규칙을 따르고 싶지는 않을 것이므로 구체적인 이유를 설명한다.
+* **예제**들 -- 추상적인 표현만으로 내용을 이해하기 어려울 경우 구체적인 예(좋은 예나 나쁜 예)를 기술한다.
+* **대안**들 -- "이런 식으로 하지 마라"에 대한 대안을 제시한다.
+* **예외**들 -- 단순하고 보편적인 규칙이 좋다. 많은 규칙들이 널리 사용되지만 만능은 아니므로 예외가 있을 경우 이를 나열한다.
+* **적용** -- "기계적으로" 규칙을 확인하는 방법에 대한 아이디어를 설명한다.
+* **참고할 만한 내용**들 -- (이 문서나 다른 문서에 대해) 규칙이나 관련 내용과 연관된 항목들을 안내한다.
+* **비고**들 (언급) -- 다른데서 다루기 적합하지 않은 부분에 대해 추가로 설명한다.
+* **논의** -- 규칙을 제시한 근본적인 이유를 담고 있는 다른 글에 대한 참조나 규칙의 주요 리스트에 포함되지 않는 예 등을 설명한다.
 
 
-일부 규칙들은 기계적으로 확인하기에 어려울 수 있으나 전문적인 프로그래머라면 손쉽게 위반 여부를 발견할 수 있다. "기계적인" 도구들이 그런 전문 프로그래머 처럼 지적할 수 있도록 발전하기를 희망한다. 또, 규칙들이 시간이 지날수록 더 정확하고 검사가 가능하도록 발전하도록 할 것이다. 
-
+일부 규칙들은 기계적으로 확인하기에 어려울 수 있으나 전문적인 프로그래머라면 손쉽게 위반 여부를 발견할 수 있다. "기계적인" 도구들이 그런 전문 프로그래머 처럼 지적할 수 있도록 발전하기를 희망한다. 또, 규칙들이 시간이 지날수록 더 정확하고 검사가 가능하도록 발전하도록 할 것이다.
 
 각 규칙들이 가능한 단순하게 유지되길 바란다. 적용 가능한 모든 대안과 특별한 예외사항까지 모두 언급하기를 바라지는 않는다.
 이러한 정보는 **대안** 단락과 [토론](#S-discussion) 절에서 찾을 수 있다.
 규칙을 이해할 수 없거나 동의하지 않는다면, **논의**를 살펴보기 바란다.
 또한, 논의가 없거나 불완전하다고 생각된다면 Issue에 여러분이 염려하는 부분과 가능하다면 관련 PR에 대한 설명을 적어주기 바란다.
-
 
 이 문서는 언어어 대한 매뉴얼이 아니다.
 따라서 기술적인 세부 사항을 자세히 다루기보다는 기존에 작성된 코드에 대한 가이드로써의 역할을 했으면 한다.
@@ -173,38 +171,38 @@
 
 ## <a name="SS-sec"></a>In.sec: 주요 목차
 
- * [In(Introduction): 소개](#S-introduction)
- * [P(Philosophy): 철학](#S-philosophy)
- * [I(Interfaces): 인터페이스](#S-interfaces)
- * [F(Functions): 함수](#S-functions)
- * [C(Classes and class hierarchies): 클래스와 클래스 계층](#S-class)
- * [Enum(Enumerations): 열거형](#S-enum)
- * [R(Resource management): 리소스 관리](#S-resource)
- * [ES(Expressions and statements): 표현식과 문장](#S-expr)
- * [Per(Performance): 성능](#S-performance)
- * [CP(Concurrency): 동시성](#S-concurrency)
- * [E(Error handling): 오류 처리](#S-errors)
- * [Con(Constants and immutability): 상수와 불변성](#S-const)
- * [T(Templates and generic programming): 템플릿과 제너릭 프로그래밍](#S-templates)
- * [CPL(C-style programming): C 스타일 프로그래밍](#S-cpl)
- * [SF(Source files): 소스 파일](#S-source)
- * [SL(The Standard library): 표준 라이브러리](#S-stdlib)
+* [In(Introduction): 소개](#S-introduction)
+* [P(Philosophy): 철학](#S-philosophy)
+* [I(Interfaces): 인터페이스](#S-interfaces)
+* [F(Functions): 함수](#S-functions)
+* [C(Classes and class hierarchies): 클래스와 클래스 계층 구조](#S-class)
+* [Enum(Enumerations): 열거형](#S-enum)
+* [R(Resource management): 리소스 관리](#S-resource)
+* [ES(Expressions and statements): 표현식과 문장](#S-expr)
+* [Per(Performance): 성능](#S-performance)
+* [CP(Concurrency): 동시성](#S-concurrency)
+* [E(Error handling): 오류 처리](#S-errors)
+* [Con(Constants and immutability): 상수와 불변성](#S-const)
+* [T(Templates and generic programming): 템플릿과 제너릭 프로그래밍](#S-templates)
+* [CPL(C-style programming): C 스타일 프로그래밍](#S-cpl)
+* [SF(Source files): 소스 파일](#S-source)
+* [SL(The Standard library): 표준 라이브러리](#S-stdlib)
 
 참고할 만한 내용:
 
- * [A(Architectural Ideas): 구조적 아이디어](#S-A)
- * [NR(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
- * [RF(References): 참고 문헌](#S-references)
- * [Pro(Profiles): 프로파일](#S-profile)
- * [GSL(Guideline support library): 가이드라인 지원 라이브러리](#S-gsl)
- * [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
- * [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
- * [부록 A: 라이브러리](#S-libraries)
- * [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
- * [부록 C: 토론](#S-discussion)
- * [부록 D: 유용한 도구](#S-tools)
- * [용어 설명](#S-glossary)
- * [To-do(Unclassified proto-rules): 미분류 규칙](#S-unclassified)
+* [A(Architectural Ideas): 구조적 아이디어](#S-A)
+* [NR(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
+* [RF(References): 참고 문헌](#S-references)
+* [Pro(Profiles): 프로파일](#S-profile)
+* [GSL(Guideline support library): 가이드라인 지원 라이브러리](#S-gsl)
+* [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
+* [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
+* [부록 A: 라이브러리](#S-libraries)
+* [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
+* [부록 C: 토론](#S-discussion)
+* [부록 D: 유용한 도구](#S-tools)
+* [용어 설명](#S-glossary)
+* [To-do(Unclassified proto-rules): 미분류 규칙](#S-unclassified)
 
 각 부분들은 서로 연관되어 있다.
 
