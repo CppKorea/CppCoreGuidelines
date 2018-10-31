@@ -395,10 +395,10 @@ C++의 언어 내장(built-in) 타입들은 정규적(regular)이고, `string`, 
 
 실제 타입 규칙 요약:
 
-* [C.10:  복잡한 클래스들 보다 실제(Concrete) 타입들을 선호하라](#Rc-concrete)
+* [C.10: 클래스 계층 보다 실제(Concrete) 타입들을 선호하라](#Rc-concrete)
 * [C.11: 실제 타입들은 정규적으로 만들어라](#Rc-regular)
 
-### <a name="Rc-concrete"></a>C.10: 복잡한 클래스들 보다 실제(Concrete) 타입들을 선호하라
+### <a name="Rc-concrete"></a>C.10: 클래스 계층 보다 실제(Concrete) 타입들을 선호하라
 
 ##### Reason
 
@@ -548,7 +548,7 @@ The default operations are a set of related operations that together implement t
 
 다른 기본 연산들에 대한 규칙:
 
-* [C.80: 기본 의미(semantic)를 명시적으로 사용하려면 `=default`를 사용하라](#Rc-eqdefault)
+* [C.80: 기본 의미구조(semantic)를 명시적으로 사용하려면 `=default`를 사용하라](#Rc-eqdefault)
 * [C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라](#Rc-delete)
 * [C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라](#Rc-ctor-virtual)
 * [C.83: 값 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라](#Rc-swap)
@@ -1101,7 +1101,7 @@ protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있�
 
 ##### Enforcement
 
-(쉬움) 소멸자는 `noexcept`로 선언되어야 한다.
+(쉬움) 만약 예외 발생이 가능하면, 소멸자는 `noexcept`로 선언되어야 한다
 
 ### <a name="Rc-dtor-noexcept"></a>C.37: Make destructors `noexcept`
 
@@ -1252,7 +1252,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 생성자가 유효한 객체를 만들기 위해 자원을 얻는다면, 리소스는 [소멸자에 의해 해제](#Rc-release)되어야 한다.
 생성자에서 자원을 얻고 소멸자에서 자원을 해제하는 것을 [RAII](Rr-raii) ("Resource Acquisitions Is Initialization") 라고 한다.
 
-### <a name="Rc-throw"></a>C.42: If a constructor cannot construct a valid object, throw an exception
+### <a name="Rc-throw"></a>C.42: 생성자가 유효한 개체를 생성하지 못한다면, 예외를 던지도록 하라
 
 ##### Reason
 
@@ -1373,7 +1373,6 @@ It is closely related to the notion of Regular type from [EoP](http://elementsof
 ```
 
 기본 생성자는 다른 사용자 정의 생성자가 없을 때만 자동으로 생성된다. 때문에 이런 코드와 같은 경우엔 `vd1`을 초기화 하는 것은 불가능하다.
-
 기본값이 없다는 것은 사용자에게는 날벼락 같은 상황일 수 있으며 타입의 사용을 어렵게 한다. 때문에 하나라도 의미있게 정의할 수 있다면, 정의되어야 한다.
 
 `Date` is chosen to encourage thought:
@@ -1510,7 +1509,7 @@ However, it is preferable to have a default constructor default to a meaningful 
 
 일반적이지만, 오류 이후 `Vector0` 를 공백으로 만드는 것은 할당과 관련이 있고, 실패할 수 있다.
 또, 기본 `Vector` 를 `{ new T[0], 0, 0}` 으로 표현하는 것 역시 낭비처럼 보인다
-예를 들면, `Vector0 v(100)`은 100 만큼 할당하는 비용이 든다.
+예를 들면, `Vector0<int> v(100)`은 100 만큼 할당하는 비용이 든다.
 
 ##### Example
 
@@ -1537,7 +1536,7 @@ However, it is preferable to have a default constructor default to a meaningful 
 
 * 예외를 던지는 기본 생성자를 지적한다
 
-### <a name="Rc-default"></a>C.45: Don't define a default constructor that only initializes data members; use in-class member initializers instead
+### <a name="Rc-default"></a>C.45: 멤버를 초기화 하기만 하는 기본 생성자는 정의하지 마라; 대신 멤버들이 스스로 초기화 하도록 하라
 
 ##### Reason
 
@@ -1971,7 +1970,7 @@ Make sure that every member of the derived class is initialized.
 * (쉬움) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 객체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
 * (중간) 대입 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 대입 연산자를 호출해야 한다. 해당 타입이 포인터 문맥이나 값 문맥을 가지는지 확인하기 위해 소멸자를 확인하라.
 
-### <a name="Rc-copy-semantic"></a>C.61: A copy operation should copy
+### <a name="Rc-copy-semantic"></a>C.61: 복사 연산은 복사를 수행해야 한다
 
 ##### Reason
 
@@ -2046,7 +2045,7 @@ Make sure that every member of the derived class is initialized.
 
 (특별히 없음)
 
-### <a name="Rc-copy-self"></a>C.62: Make copy assignment safe for self-assignment
+### <a name="Rc-copy-self"></a>C.62: 복사 연산은 자기 대입에 안전하게 작성하라
 
 ##### Reason
 
@@ -2121,7 +2120,7 @@ Make sure that every member of the derived class is initialized.
 
 * (쉬움) 대입 연산자들은 `if (this == &a) return *this;`와 같은 패턴이 있어선 안된다.  
 
-### <a name="Rc-move-assignment"></a>C.63: Make move assignment non-`virtual`, take the parameter by `&&`, and return by non-`const &`
+### <a name="Rc-move-assignment"></a>C.63: 이동 연산은 `virtual`로 만들지 말아라, 매개변수는 `&&`를 사용하고, `const&`로 반환하지 말아라
 
 ##### Reason
 
@@ -2137,7 +2136,7 @@ Make sure that every member of the derived class is initialized.
 * (쉬움) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 객체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
 * (중간) 이동 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 이동 연산자를 호출해야 한다.  
 
-### <a name="Rc-move-semantic"></a>C.64: A move operation should move and leave its source in a valid state
+### <a name="Rc-move-semantic"></a>C.64: 이동 연산은 이동을 수행해야 하며, 원본 객체를 유효한 상태로 남겨놓아야 한다
 
 ##### Reason
 
@@ -2190,7 +2189,7 @@ Make sure that every member of the derived class is initialized.
 
 (자유선택) 이동 연산에서 멤버들의 대입을 확인해보라. 기본 생성자가 있다면, 그 대입 연산들을 기본 생성자를 사용한 초기화와 비교해보라.  
 
-### <a name="Rc-move-self"></a>C.65: Make move assignment safe for self-assignment
+### <a name="Rc-move-self"></a>C.65: 이동 연산은 자기 대입에 안전하게 작성하라
 
 ##### Reason
 
@@ -2244,7 +2243,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 * (중간) 이러한 자기 대입의 경우, 이동 대입 연산자는 대입 받는 객체의 포인터 멤버를 `delete`된 상태 또는 `nullptr`로 남겨놓아서는 안된다.
 * (자유선택) 표준 라이브러리 컨테이너들의 사용법을 보라(`string`을 포함한다). 그리고 일반적인(객체 수명에 민감하지 않은) 사용에 그 컨테이너들이 안전하다고 생각하라.
 
-### <a name="Rc-move-noexcept"></a>C.66: Make move operations `noexcept`
+### <a name="Rc-move-noexcept"></a>C.66: 이동 연산은 `noexcept`로 만들어라
 
 ##### Reason
 
@@ -2360,7 +2359,7 @@ Classes that represent exception objects need both to be polymorphic and copy-co
 
 언어가 제공하는 기본 연산들의 구현 이외에도, 비교, `swap`, 그리고 `hash`처럼 별도의 정의가 필요할 정도로 기초적인 몇몇 연산들이 있다:
 
-### <a name="Rc-eqdefault"></a>C.80: Use `=default` if you have to be explicit about using the default semantics
+### <a name="Rc-eqdefault"></a>C.80: 기본 의미구조(semantic)를 명시적으로 사용하려면 `=default`를 사용하라
 
 ##### Reason
 
@@ -2406,7 +2405,7 @@ Classes that represent exception objects need both to be polymorphic and copy-co
 
 * (중간) 특별한 연산들은 중복을 피하기 위해 컴파일러가 만든 함수들과 같은 접근성, 의미구조를 가져서는 안된다
 
-### <a name="Rc-delete"></a>C.81: Use `=delete` when you want to disable default behavior (without wanting an alternative)
+### <a name="Rc-delete"></a>C.81: 기본 동작을 (대안을 원하지 않고) 금지하고 싶다면 `=delete`를 사용하라
 
 ##### Reason
 
@@ -2464,7 +2463,7 @@ Note that deleted functions should be public.
 정말 이유가 있는지 의심하라.
 하지만 사람이 보기에 문맥적으로 타당하다고 단언(assert)할 수 있도록 하라.
 
-### <a name="Rc-ctor-virtual"></a>C.82: Don't call virtual functions in constructors and destructors
+### <a name="Rc-ctor-virtual"></a>C.82: 생성자 또는 소멸자에서 가상 함수를 호출하지 말아라
 
 ##### Reason
 
@@ -2518,7 +2517,7 @@ However, experience shows that such calls are rarely needed, easily confuse main
 
 * 생성자와 소멸자에서의 가상 함수 호출에는 표시를 남겨라.
 
-### <a name="Rc-swap"></a>C.83: For value-like types, consider providing a `noexcept` swap function
+### <a name="Rc-swap"></a>C.83: 값 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라
 
 ##### Reason
 
@@ -2556,7 +2555,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 * (쉬움) 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다.
 * (쉬움) 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다.
 
-### <a name="Rc-swap-fail"></a>C.84: A `swap` function may not fail
+### <a name="Rc-swap-fail"></a>C.84: `swap` 연산은 실패해선 안된다
 
 ##### Reason
 
@@ -2580,7 +2579,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 
 * (쉬움) 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.
 
-### <a name="Rc-swap-noexcept"></a>C.85: Make `swap` `noexcept`
+### <a name="Rc-swap-noexcept"></a>C.85: `swap` 연산은 `noexcept`로 작성하라
 
 ##### Reason
 
@@ -2591,7 +2590,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 
 * (쉬움) 클래스에 `swap` 멤버 함수가 있으면, `noexcept`로 선언되어야 한다.
 
-### <a name="Rc-eq"></a>C.86: Make `==` symmetric with respect to operand types and `noexcept`
+### <a name="Rc-eq"></a>C.86: `==`연산자는 피연산자 타입들에 대칭적이고, `noexcept`로 만들어라
 
 ##### Reason
 
@@ -2640,7 +2639,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 * 인자의 타입이 다른 `operator==()`를 지적하라. 다른 비교 연산자들도 마찬가지다 : `!=`, `<`, `<=`, `>`, `>=`.
 * 멤버인  `operator==()` 함수들을 지적하라. 다른 비교 연산자들도 마찬가지다 : `!=`, `<`, `<=`, `>`, `>=`.
 
-### <a name="Rc-eq-base"></a>C.87: Beware of `==` on base classes
+### <a name="Rc-eq-base"></a>C.87: 기본 클래스에 있는 `==`에 주의하라
 
 ##### Reason
 
@@ -2692,7 +2691,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 
 * 가상 함수인 `operator==()`를 지적하라. 다른 비교 연산자들도 동일하다: `!=`, `<`, `<=`, `>`, `>=`.
 
-### <a name="Rc-hash"></a>C.89: Make a `hash` `noexcept`
+### <a name="Rc-hash"></a>C.89: `hash`는 `noexcept`로 작성하라
 
 ##### Reason
 
