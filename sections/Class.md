@@ -20,7 +20,7 @@
 * [C.concrete: 실제 타입(Concrete types)](#SS-concrete)
 * [C.ctor: 생성자, 대입 연산자, 소멸자](#S-ctor)
 * [C.con: 컨테이너와 리소스 핸들](#SS-containers)
-* [C.lambdas: 함수 객체와 람다 표현식](#SS-lambdas)
+* [C.lambdas: 함수 개체와 람다 표현식](#SS-lambdas)
 * [C.hier: 클래스 계층 구조 (OOP)](#SS-hier)
 * [C.over: 오버로딩](#SS-overload)
 * [C.union: 공용체](#SS-union)
@@ -60,7 +60,7 @@
 
 ##### Note
 
-invariant는 객체 멤버들의 논리적인 상태로써, 공개 멤버 함수들이 가정할 수 있도록 생성자가 설정 해 주어야 한다. invariant 가 설정된 후에야 (일반적으로 생성자에 의해) 모든 멤버 함수는 객체를 통해 호출될 수 있다.
+invariant는 개체 멤버들의 논리적인 상태로써, 공개 멤버 함수들이 가정할 수 있도록 생성자가 설정 해 주어야 한다. invariant 가 설정된 후에야 (일반적으로 생성자에 의해) 모든 멤버 함수는 개체를 통해 호출될 수 있다.
 invariant 는 형식에 구애받지 않고 (가령, 주석으로) 기술될 수 있으며, 더 형식을 갖춘다면 `Expects` 를 사용할 수 있다.
 
 만약 모든 데이터 멤버들이 상호독립적이라면, 불변조건은 존재할 수 없다.
@@ -89,7 +89,7 @@ invariant 는 형식에 구애받지 않고 (가령, 주석으로) 기술될 수
 
 ##### Note
 
-클래스가 어떤 `private` 데이터를 가지고 있으면, 사용자는 생성자 호출 없이 객체를 초기화할 수 없다. 
+클래스가 어떤 `private` 데이터를 가지고 있으면, 사용자는 생성자 호출 없이 개체를 초기화할 수 없다. 
 따라서, 클래스를 정의하는 사람은 생성자를 제공하고 그 의미를 명시해야만 한다.
 이는 클래스 작성자가 invariant를 정의해야 한다는 것을 의미한다.
 
@@ -143,7 +143,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 
 ##### Reason
 
-멤버 함수간 커플링을 줄이고, 객체 상태 변경에 의해 문제가 생기는 함수를 줄이고, representation이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
+멤버 함수간 커플링을 줄이고, 개체 상태 변경에 의해 문제가 생기는 함수를 줄이고, representation이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
 
 ##### Example
 
@@ -380,18 +380,29 @@ For example, a derived class might be allowed to skip a run-time check because i
 
 ##### Enforcement
 
-* [Flag protected data](#Rh-protected).
-* Flag mixtures of `public` and private `data`
+* [protected 데이터를 지적하라](#Rh-protected).
+* `public`과 `private` 데이터가 함께 사용된 경우를 지적하라
 
 ## <a name="SS-concrete"></a>C.concrete: 실제 타입(Concrete types)
 
-이상적인 클래스는 정규(regular) 타입과 같아야 한다.
+이상적인 클래스는 정규 타입(Regular Type)과 같아야 한다.
 쉽게 말하면 "`int` 처럼 동작하는 것"이다. 실제 타입(Concrete type)이란 가장 간단한 종류의 클래스를 의미한다.
 
-정규 타입의 값은 복사 될 수 있고, 복사의 결과는 원본과 같은 값을 갖는 독립적인 객체이다. 타입이 `=` 와 `==` 를 모두 갖는다면, `a = b`를 실행한 이후에는 `a == b`에서 `true`가 반환되도록 해야 한다.
-Concrete classes without assignment and equality can be defined, but they are (and should be) rare.
+> 역주:  
+> Regular Type은 다음의 조건을 모두 만족하는 타입을 의미합니다.
+> - DefaultConstructible
+> - CopyConstructible, CopyAssignable
+> - MoveConstructible, MoveAssignable
+> - Destructible
+> - Swappable
+> - EqualityComparable
+>
+> 예시로 언급된 `int`의 경우, 기본 연산(생성, 파괴, 복사, 이동)을 지원하면서 교환, 동등비교가 가능합니다
 
-C++의 언어 내장(built-in) 타입들은 정규적(regular)이고, `string`, `vector`, `map`같은 표준 라이브러리의 클래스들 또한 그렇다. 실제 타입들은 종종 계층구조의 일부로 사용되는 타입들과 구분하여 값 타입으로 언급된다.
+정규 타입의 값은 복사 될 수 있고, 복사의 결과는 원본과 같은 값을 갖는 독립적인 개체이다. 타입이 `=` 와 `==` 를 모두 갖는다면, `a = b`를 실행한 이후에는 `a == b`에서 `true`가 반환되도록 해야 한다.
+실제 타입이 대입과 동등 비교를 지원하지 않을 수 있지만, 그런 경우는 드물다. (거의 없어야 한다).
+
+C++의 언어 내장(built-in) 타입들은 정규적(Regular)이고, `string`, `vector`, `map`같은 표준 라이브러리의 클래스들 또한 그렇다. 실제 타입들은 종종 계층구조의 일부로 사용되는 타입들과 구분하여 값 타입으로 언급된다.
 
 실제 타입 규칙 요약:
 
@@ -432,7 +443,7 @@ C++의 언어 내장(built-in) 타입들은 정규적(regular)이고, `string`, 
     }
 ```
 
-클래스가 계층구조의 일부가 될 수 있다면, 반드시 포인터나 레퍼런스로 객체를 다루어야 한다.
+클래스가 계층구조의 일부가 될 수 있다면, 반드시 포인터나 레퍼런스로 개체를 다루어야 한다.
 이는 간접 처리를 위해 더 많은 메모리를 사용하게 되고, 더 많은 할당과 해제, 실행시간 오버헤드가 발생하게 된다는 것을 의미한다.
 
 ##### Note
@@ -443,7 +454,7 @@ C++의 언어 내장(built-in) 타입들은 정규적(regular)이고, `string`, 
 
 실행시간에 다형적 인터페이스를 위해 간접처리는 필수적이다.
 할당과 해제의 추가비용은 그렇지 않다. (단지 가장 흔한 사례일 뿐이다)
-패생 클래스의 제한된(특정된) 객체에 대한 인터페이스로써 기본 클래스를 사용할 수도 있다.
+패생 클래스의 제한된(특정된) 개체에 대한 인터페이스로써 기본 클래스를 사용할 수도 있다.
 동적 할당을 할 수 없으며, 플러그인과 같은 것들에게 안정적인 인터페이스를 제공하고자 할 때 이렇게 할 수 있다. (예컨대, hard real-time)
 
 ##### Enforcement
@@ -485,7 +496,7 @@ C++의 언어 내장(built-in) 타입들은 정규적(regular)이고, `string`, 
 
 ## <a name="S-ctor"></a>C.ctor: 생성자, 대입 연산자, 소멸자
 
-이 함수들은 객체의 생명주기를 제어 한다: 생성, 복사, 이동, 그리고 소멸.
+이 함수들은 개체의 생명주기를 제어 한다: 생성, 복사, 이동, 그리고 소멸.
 생성자를 정의해서 클래스의 초기화를 보장하고 단순화 하라.
 
 *기본 연산*은 아래와 같은 연산들을 의미한다.
@@ -497,43 +508,43 @@ C++의 언어 내장(built-in) 타입들은 정규적(regular)이고, `string`, 
 * 이동 대입 연산자: `operator=(X&&)`
 * 소멸자: `~X()`
 
-이상의 연산들은 정의하지 않아도 코드에서 사용되면 컴파일러가 생성한다. but the default can be suppressed.
+이상의 연산들은 정의하지 않아도 코드에서 사용되면 컴파일러가 생성한다. 하지만 기본연산을 제한하는 것도 가능하다.
 
-The default operations are a set of related operations that together implement the lifecycle semantics of an object.
+기본 연산은 개체의 수명주기와 관련된 연산들의 집합을 의미한다.
 
-기본적으로, C++은 클래스를 값 타입 처럼 다루지만 모든 타입이 값 타입처럼 동작하는 것은 아니다.
+코드가 명시하지 않는 한, C++은 클래스를 값 타입 처럼 다루지만 모든 타입이 값 타입처럼 동작하는 것은 아니다.
 
 기본 연산 규칙들:
 
-* [C.20:기본 연산을 정의하지 않아도 되면 그렇게 하라](#Rc-zero)
+* [C.20: 기본 연산을 정의하지 않아도 되면 그렇게 하라](#Rc-zero)
 * [C.21: 기본 연산을 정의 하거나 `=delete` 로 선언했다면, 나머지 모두 정의하거나 `=delete`하라](#Rc-five)
-* [C.22: 기본 연산들을 일관성 있도록 하라](#Rc-matched)
+* [C.22: 기본 연산들을 서로 조화롭게 동작해야 한다](#Rc-matched)
 
 소멸자 규칙들:
 
-* [C.30: 객체가 없어질 때, 명시적인 동작이 필요할 경우 소멸자를 정의하라](#Rc-dtor)
-* [C.31: 클래스에 의해 얻어진 모든 리로스는 소멸자에서 해제되어야 한다](#Rc-dtor-release)
-* [C.32: 클래스가 포인터(`T*`)나 참조(`T&`)를 갖고 있을 때, 해당 클래스가 소유하고 있는지를 고려하라](#Rc-dtor-ptr)
-* [C.33: 클래스가 포인터 멤버를 소유하고 있다면, 소멸자를 정의하거나 `=delete` 로 선언하라](#Rc-dtor-ptr2)
-* [C.35: 가상 함수를 갖는 기본 클래스는 가상 소멸자가 필요하다](#Rc-dtor-virtual)
+* [C.30: 개체가 없어질 때, 명시적인 동작이 필요할 경우 소멸자를 정의하라](#Rc-dtor)
+* [C.31: 클래스가 획득한 모든 자원은 소멸자에서 해제되어야 한다](#Rc-dtor-release)
+* [C.32: 클래스가 포인터(`T*`)나 참조(`T&`)를 가지고 있다면, 참조 대상을 소유하고 있는지를 고려하라](#Rc-dtor-ptr)
+* [C.33: 클래스가 포인터로 대상을 소유하고 있다면, 소멸자를 정의하라](#Rc-dtor-ptr2)
+* [C.35: 상위 클래스의 소멸자는 공개된 가상 소멸자 혹은 상속되는 비-가상 함수여야 한다](#Rc-dtor-virtual)
 * [C.36: 소멸자는 실패해선 안된다](#Rc-dtor-fail)
 * [C.37: 소멸자를 `noexcept`로 작성하라](#Rc-dtor-noexcept)
 
 생성자 규칙들:
 
-* [C.40: 클래스가 불변 조건을 가지면 생성자를 정의하라](#Rc-ctor)
-* [C.41: 생성자는 완전히 초기화된 객체를 생성해야 한다](#Rc-complete)
-* [C.42: 생성자가 유효한 객체를 생성하지 못한다면, 예외를 던지도록 하라](#Rc-throw)
-* [C.43: 복사 가능한 클래스는 반드시 기본 생성자를 갖도록 하라](#Rc-default0)
-* [C.44: 기본 생성자는 되도록 단순하고 예외를 던지지 않도록 하라](#Rc-default00)
+* [C.40: 클래스가 불변 조건을 가진다면 생성자를 정의하라](#Rc-ctor)
+* [C.41: 생성자는 완전히 초기화된 개체를 생성해야 한다](#Rc-complete)
+* [C.42: 생성자가 유효한 개체를 생성하지 못한다면, 예외를 던지도록 하라](#Rc-throw)
+* [C.43: 복사 가능한 클래스(값 타입)는 반드시 기본 생성자를 갖도록 하라](#Rc-default0)
+* [C.44: 기본 생성자는 가능한 단순하고 예외를 던지지 않도록 하라](#Rc-default00)
 * [C.45: 멤버를 초기화 하기만 하는 기본 생성자는 정의하지 마라; 대신 멤버들이 스스로 초기화 하도록 하라](#Rc-default)
 * [C.46: 단일 인자를 사용하는 생성자는 `explicit`으로 선언하라](#Rc-explicit)
-* [C.47: 멤버 변수들은 선언된 순서대로 초기화 하라](#Rc-order)
-* [C.48: 상수 초기화는 가능한 in-calss 멤버 초기화를 사용하라](#Rc-in-class-initializer)
+* [C.47: 멤버 변수들은 선언된 순서대로 초기화하라](#Rc-order)
+* [C.48: 상수 초기화는 가능한 클래스 내(in-class) 멤버 초기화를 사용하라](#Rc-in-class-initializer)
 * [C.49: 생성자 안에서의 대입 보다는 초기화를 선호하라](#Rc-initialize)
-* [C.50: 초기화 과정에서 `virtual` 연산이 필요하다면, 팩토리 함수를 사용하라](#Rc-factory)
+* [C.50: 초기화 과정에서 `virtual` 동작이 필요하다면, 팩토리 함수를 사용하라](#Rc-factory)
 * [C.51: 클래스의 모든 생성자들을 위한 일반적인 동작을 표현할 때는 대리 생성자를 사용하라](#Rc-delegating)
-* [C.52: 추가적인 초기화가 필요하지 않은 파생된 클래스에서 생성자를 사용할 때는 상속받은 생성자들을 사용하라](#Rc-inheriting)
+* [C.52: 추가적인 초기화가 필요하지 않은 파생된 클래스에서 생성자를 사용할 때는 상속 생성자들을 사용하라](#Rc-inheriting)
 
 복사와 이동 규칙들:
 
@@ -563,7 +574,7 @@ The default operations are a set of related operations that together implement t
 C++ 에서는 기본적인 의미를 가진 연산들을 제공한다.
 프로그래머는 이 연산들을 금지하거나 교체할 수 있다.
 
-### <a name="Rc-zero"></a>C.20: If you can avoid defining default operations, do
+### <a name="Rc-zero"></a>C.20: 기본 연산을 정의하지 않아도 되면 그렇게하라
 
 ##### Reason
 
@@ -584,36 +595,28 @@ C++ 에서는 기본적인 의미를 가진 연산들을 제공한다.
     Named_map nm2 {nm};  // copy construct
 ```
 
-`std::map` 과 `string` 은 모든 특수한 함수들을 갖고 있다, 추가적인 작업이 필요없다.
+`std::map` 과 `string` 은 모든 특수한 함수들을 갖고 있다, 추가로 코드를 작성할 필요가 없다.
 
 ##### Note
 
-"the rule of zero"로 알려져 있다.
+"The rule of zero"로 알려져 있다.
 
 ##### Enforcement
 
 (Not enforceable) 시행할 수 없더라도, 좋은 정적 분석기는 이 규칙에 맞는 가능한 개선사항들을 알려주는 패턴들을 찾을 수 있다.
 예를 들면, 포인터와 크기를 멤버로 갖는 클래스가 있고 소멸자에서 그 포인터를 `delete` 한다면 아마도 `vector` 로 바꿀 수 있을 것이다.
 
-### <a name="Rc-five"></a>C.21: If you define or `=delete` any default operation, define or `=delete` them all
+### <a name="Rc-five"></a>C.21: 기본 연산을 정의 하거나 `=delete` 로 선언했다면, 나머지 모두 정의하거나 `=delete`하라
 
 ##### Reason
 
-The *special member functions* are the default constructor, copy constructor,
-copy assignment operator, move constructor, move assignment operator, and
-destructor.
+이 *특별한 멤버 함수들*은 기본 생성자, 복사 생성자, 복사 대입 연산자, 이동 생성자, 이동 대입 연산자, 소멸자를 의미한다.
 
-이 특별한 함수들의 의미는 서로 밀접하게 연관되어 있다. 만약 한 함수가 기본 제공 함수가 아니어야 한다면(non-default), 다른 함수들도 수정이 필요하다.
+이들의 의미는 서로 밀접하게 연관되어 있다. 만약 한 함수가 기본 제공 함수가 아니어야 한다면(non-default), 다른 함수들도 수정이 필요하다.
 
-Declaring any special member function except a default constructor,
-even as `=default` or `=delete`, will suppress the implicit declaration
-of a move constructor and move assignment operator.
-Declaring a move constructor or move assignment operator, even as
-`=default` or `=delete`, will cause an implicitly generated copy constructor
-or implicitly generated copy assignment operator to be defined as deleted.
-So as soon as any of the special functions is declared, the others should
-all be declared to avoid unwanted effects like turning all potential moves
-into more expensive copies, or making a class move-only.
+기본 생성자를 제외하고 이 특별한 멤버 함수들 중 하나를 `=default` 혹은 `=delete`로 선언할 경우, 컴파일러가 이동 생성자와 이동 대입 연산자를 묵시적으로 선언하지 않는다.
+이동 생성자 또는 이동 대입 연산자를 선언하는 경우, 복사 생성자와 복사 대입 연산자가 이를 따른다. 이동 연산이 `=default`로 선언된 경우 복사 연산이 자동으로 정의되며, 이동 연산이 `=delete`로 선언된 경우 복사 연산도 `=delete`가 적용된다.
+따라서, 이 특별 함수들 중 하나라도 선언되었다면, 의도치 않은 복사와 이동연산을 피하기 위해 나머지 함수들도 선언되어야 한다.
 
 ##### Example, bad
 
@@ -641,7 +644,7 @@ into more expensive copies, or making a class move-only.
 
 ##### Note
 
-기본 생성자를 중요하게 생각하는지에 달려있는데, 이것은 "the rule of five" 혹은 "the rule of six" 이라고 알려져 있다.
+기본 생성자를 중요하게 생각하는지에 달려있는데, 이것은 "The rule of five" 혹은 "The rule of six" 이라고 알려져 있다.
 
 ##### Note
 
@@ -650,10 +653,9 @@ into more expensive copies, or making a class move-only.
 
 ##### Example, good
 
-When a destructor needs to be declared just to make it `virtual`, it can be
-defined as defaulted. To avoid suppressing the implicit move operations
-they must also be declared, and then to avoid the class becoming move-only
-(and not copyable) the copy operations must be declared:
+단순히 `virtual`을 위해 소멸자가 선언되어야 한다면, `=default`를 사용해 정의할 수 있다. 
+묵시적으로 이동 연산이 제한되는 것을 막고 싶다면 이동 연산들이 선언되어야 한다. 만약 이동 연산만 지원하는게 아니라면 (즉 복사가 가능해야 한다면) 복사 연산 역시 그에 맞게 선언해야 한다:
+
 ```c++
     class AbstractBase {
     public:
@@ -664,8 +666,9 @@ they must also be declared, and then to avoid the class becoming move-only
       AbstractBase& operator=(AbstractBase&&) = default;
     };
 ```
-Alternatively to prevent slicing as per [C.67](#Rc-copy-virtual),
-the copy and move operations can all be deleted:
+
+[C.67](#Rc-copy-virtual)을 고려해서 복사 절단(slicing) 문제를 예방하기 위해 복사와 이동연산을 제한할 수도 있다:
+
 ```c++
     class ClonableBase {
     public:
@@ -677,9 +680,8 @@ the copy and move operations can all be deleted:
       ClonableBase& operator=(ClonableBase&&) = delete;
     };
 ```
-Defining only the move operations or only the copy operations would have the
-same effect here, but stating the intent explicitly for each special member
-makes it more obvious to the reader.
+
+복사를 지원하지 않는다면 이동 연산들을 `=delete`로 정의하거나 복사연산을 `=delete`하는 경우 모두 같은 효과를 가진다. 하지만 타입의 의도를 분명히 전달하기 위해서는 모든 특별 함수들을 정의하는 것이 좋다.
 
 ##### Note
 
@@ -691,8 +693,8 @@ makes it more obvious to the reader.
 
 ##### Note
 
-Writing the six special member functions can be error prone.
-Note their argument types:
+여섯개의 특별 함수들을 모두 작성하는 것은 오류에 취약할 수 있다. 아래 예시의 인자 타입에 주목하라:
+
 ```c++
     class X {
     public:
@@ -704,19 +706,20 @@ Note their argument types:
         X& operator=(X&&) = default;       // move assignment
     };
 ```
-A minor mistake (such as a misspelling, leaving out a `const`, using `&` instead of `&&`, or leaving out a special function) can lead to errors or warnings.
-To avoid the tedium and the possibility of errors, try to follow the [rule of zero](#Rc-zero).
+
+스펠링을 잘못 적거나, `const`를 빠뜨리거나, `&&`대신 `&`을 사용하거나, 하나를 빠뜨리는 것 같은 사소한 실수가 오류나 경고로 이어질 수 있다.
+이런 (지루한 코드로 인해 발생하는) 오류를 피하고자 한다면 [The rule of zero](#Rc-zero)를 따르는 것을 권한다.
 
 ##### Enforcement
 
 (쉬움) 클래스는 특별한 함수들에 대한 선언(`=delete`도 포함하여)을 모두 갖거나 하나도 없어야 한다.
 
-### <a name="Rc-matched"></a>C.22: Make default operations consistent
+### <a name="Rc-matched"></a>C.22: 기본 연산들을 서로 조화롭게 동작해야 한다
 
 ##### Reason
 
 기본 연산들은 개념적으로 잘 짜여진 집합이다. 연산들의 의미는 서로 연관되어 있다.
-사용자는 복사/이동 생성과 복사/이동 할당이 논리적으로 동일하고, 생성자와 소멸자가 리소스 관리에 대해 일관적으로 동작하며, 복사와 이동이 생성자와 소멸자가 동작하는 방식을 반영한다는 것을 기대 할 것이다. Users will be surprised if copy and move don't reflect the way constructors and destructors work.
+사용자는 복사/이동 생성과 복사/이동 할당이 논리적으로 동일하고, 생성자와 소멸자가 리소스 관리에 대해 일관적으로 동작하며, 복사와 이동이 생성자와 소멸자가 동작하는 방식을 반영한다는 것을 기대 할 것이다. 만약 복사와 이동이 생성과 소멸에 영향을 주지 않는다면 사용자에게 혼란을 줄 것이다.
 
 ##### Example, bad
 
@@ -745,16 +748,16 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 ## <a name="SS-dtor"></a>C.dtor: 소멸자
 
 "이 클래스에 소멸자가 필요할까?"라는 것은 설계 측면에서 굉장히 강력한 질문이다.
-대부분의 클래스들에 대해서 대답은 "no"인데, 그 이유는 해당 클래스가 자원들을 가지고 있지 않거나 소멸과정이 [the rule of zero](#Rc-zero)에 의해 처리되기 때문이다.
+대부분의 클래스들에 대해서 대답은 "no"인데, 그 이유는 해당 클래스가 자원들을 가지고 있지 않거나 소멸과정이 [The rule of zero](#Rc-zero)에 의해 처리되기 때문이다.
 
 요컨대, 클래스의 멤버들이 스스로의 소멸을 관리한다는 것이다.
-만약 대답이 "yes"라면, 그 클래스 설계의 대부분은 [the rule of five](#Rc-five)를 따르게 된다.
+만약 대답이 "yes"라면, 그 클래스 설계의 대부분은 [The rule of five](#Rc-five)를 따르게 된다.
 
-### <a name="Rc-dtor"></a>C.30: Define a destructor if a class needs an explicit action at object destruction
+### <a name="Rc-dtor"></a>C.30: 개체가 없어질 때, 명시적인 동작이 필요할 경우 소멸자를 정의하라
 
 ##### Reason
 
-소멸자는 암묵적으로 객체의 생명주기의 마지막에 호출된다.
+소멸자는 암묵적으로 개체의 생명주기의 마지막에 호출된다.
 기본 소멸자로 충분하다면 그것을 사용하라.
 단순하게 멤버의 소멸자를 호출하는 것이 아닌 코드가 필요할 경우 소멸자를 정의하라.
 
@@ -790,7 +793,7 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 사용자 정의 소멸자가 필요한 클래스에는 보통 두 종류가 있다:
 
 * 리소스를 사용하는 클래스가 소멸자가 없는 경우, 예컨대 `vector` 혹은 트랜잭션 코드
-* A class that exists primarily to execute an action upon destruction, such as a tracer or `final_action`.
+* 트레이싱이나 `final_action`처럼 소멸시기에 어떤 동작을 발생시키기 위한 클래스
 
 ##### Example, bad
 
@@ -817,7 +820,7 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 포인터나 참조와 같은 "암묵적인 자원"이 될 수 있는 것들을 찾아보라. 
 모든 데이터 멤버가 소멸자를 갖고 있더라도, 사용자 지정 소멸자가 있는 클래스들을 찾아보라.
 
-### <a name="Rc-dtor-release"></a>C.31: All resources acquired by a class must be released by the class's destructor
+### <a name="Rc-dtor-release"></a>C.31: 클래스가 획득한 모든 자원은 소멸자에서 해제되어야 한다
 
 ##### Reason
 
@@ -853,7 +856,7 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 
 닫지 않은 소켓은 어떨까? 소멸자, 닫기, 정리 연산은 [실패하지 않는 것이 좋다](#Rc-dtor-fail).
 그럼에도 불구하고 발생한다면, 좋은 해결책을 찾기 정말 힘든 문제를 마주친 것이다.
-초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리를 거부"를 할 수 없는지 알지 못할 것이다. 이에 대해서는 [discussion](#Sd-never-fail)을 보라.
+초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리를 거부"를 할 수 없는지 알지 못할 것이다. 이에 대해서는 [소멸자는 실패해선 안된다](#Sd-never-fail)를 참고하라.
 
 문제를 악화시키는 것은, 많은 "닫기/해제" 연산들이 재시도 할 수 없도록 되어있는 것이다.
 이 문제를 풀려는 시도는 많았지만, 일반적인 해결책은 알려지지 않았다.
@@ -861,8 +864,8 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 
 ##### Note
 
-클래스가 소유하고 있지 않은 객체에 대한 포인터나 참조를 갖고 있을 수 있다.
-당연하지만, 이 객체들은 클래스의 소멸자에서 `delete`되지 않아야 한다.
+클래스가 소유하고 있지 않은 개체에 대한 포인터나 참조를 갖고 있을 수 있다.
+당연하지만, 이 개체들은 클래스의 소멸자에서 `delete`되지 않아야 한다.
 예를 들면:
 
 ```c++
@@ -878,7 +881,7 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 * (쉬움) 클래스가 소유자인 포인터나 참조 멤버 변수를 갖고 있다면 (가령, `gsl::owner`를 사용하여 소유하는 경우), 소멸자에서 참조되는 것이 좋다
 * (어려움) 소유권에 대해 명시적으로 기술하지 않은 경우, 포인터나 참조 멤버 변수들이 소유자 인지 판단하라 (예, 생성자 본문을 확인한다).
 
-### <a name="Rc-dtor-ptr"></a>C.32: If a class has a raw pointer (`T*`) or reference (`T&`), consider whether it might be owning
+### <a name="Rc-dtor-ptr"></a>C.32: 클래스가 포인터(`T*`)나 참조(`T&`)를 가지고 있다면, 참조 대상을 소유하고 있는지를 고려하라
 
 ##### Reason
 
@@ -886,7 +889,9 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 
 ##### Example
 
+```
     ???
+```
 
 ##### Note
 
@@ -895,13 +900,13 @@ To avoid the tedium and the possibility of errors, try to follow the [rule of ze
 
 ##### Enforcement
 
-Look at the initialization of raw member pointers and member references and see if an allocation is used.
+포인터나 참조를 초기화 할 때 자원할당이 발생하는지 확인하라.
 
-### <a name="Rc-dtor-ptr2"></a>C.33: If a class has an owning pointer member, define a destructor
+### <a name="Rc-dtor-ptr2"></a>C.33: 클래스가 포인터로 대상을 소유하고 있다면, 소멸자를 정의하라
 
 ##### Reason
 
-소유된 객체는 그것을 소유한 객체가 소멸될 때 `삭제`되어야 한다.
+소유된 개체는 그것을 소유한 개체가 소멸될 때 `삭제`되어야 한다.
 
 ##### Example
 
@@ -976,7 +981,7 @@ Look at the initialization of raw member pointers and member references and see 
 * 포인터 데이터 맴버를 갖는 클래스를 의심하라
 * `owner<T>` 를 갖는 클래스는 기본 연산들을 정의 해야한다
 
-### <a name="Rc-dtor-virtual"></a>C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
+### <a name="Rc-dtor-virtual"></a>C.35: 상위 클래스의 소멸자는 공개된 가상 소멸자 혹은 상속되는 비-가상 함수여야 한다
 
 ##### Reason
 
@@ -1038,13 +1043,13 @@ Look at the initialization of raw member pointers and member references and see 
 
 ##### Exception
 
-protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있다. 파생 타입의 객체가 기본 타입 포인터를 통해 (그 자신이 아닌) *다른* 개체의 소멸을 하도록 허용해야 하는 경우가 그러하다. 하지만 아직까지 그런 사례를 볼 수 없었다.
+protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있다. 파생 타입의 개체가 기본 타입 포인터를 통해 (그 자신이 아닌) *다른* 개체의 소멸을 하도록 허용해야 하는 경우가 그러하다. 하지만 아직까지 그런 사례를 볼 수 없었다.
 
 ##### Enforcement
 
 * 가상 함수를 하나라도 가지는 클래스는 `public` 하고 `virtual`한 소멸자를 가져야 한다. 또는 `protected`이고 `virtual`이 아닌 소멸자를 가져야 한다.
 
-### <a name="Rc-dtor-fail"></a>C.36: A destructor may not fail
+### <a name="Rc-dtor-fail"></a>C.36: 소멸자는 실패해선 안된다
 
 ##### Reason
 
@@ -1103,7 +1108,7 @@ protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있�
 
 (쉬움) 만약 예외 발생이 가능하면, 소멸자는 `noexcept`로 선언되어야 한다
 
-### <a name="Rc-dtor-noexcept"></a>C.37: Make destructors `noexcept`
+### <a name="Rc-dtor-noexcept"></a>C.37: 소멸자를 `noexcept`로 작성하라
 
 ##### Reason
 
@@ -1112,11 +1117,12 @@ protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있�
 
 ##### Note
 
-A destructor (either user-defined or compiler-generated) is implicitly declared `noexcept` (independently of what code is in its body) if all of the members of its class have `noexcept` destructors. By explicitly marking destructors `noexcept`, an author guards against the destructor becoming implicitly `noexcept(false)` through the addition or modification of a class member.
+사용자가 정의하였건 컴파일러가 생성하였건 모든 멤버 변수들의 소멸자가 `noexcept`라면 소멸자는 암묵적으로 `noexcept`가 된다 (함수의 코드가 어떻게 작성되었는지는 고려되지 않는다).
+명시적으로 소멸자를 `noexcept`로 표기함으로써, 그 코드의 작성자는 나중에 멤버가 추가되거나 변경되면서 소멸자가 `noexcept(false)`로 변하는 것을 차단할 수 있다.
 
 ##### Example
 
-Not all destructors are noexcept by default; one throwing member poisons the whole class hierarchy
+모든 소멸자가 `noexcept`를 기본으로 하지는 않는다; 예외를 던지는 하나의 멤버가 모든 클래스 계층구조에 영향을 줄 수 있다.
 
 ```c++
     struct X {
@@ -1126,12 +1132,11 @@ Not all destructors are noexcept by default; one throwing member poisons the who
     };
 ```
 
-So, if in doubt, declare a destructor noexcept.
+만약 의심이 생긴다면, 소멸자는 `noexcept`로 선언하라.
 
 ##### Note
 
-Why not then declare all destructors noexcept?
-Because that would in many cases -- especially simple cases -- be distracting clutter.
+소멸자를 `noexcept`로 선언하지 않을 이유가 없다. `noexcept(false)`는 많은 경우 -- 특히 단순한 코드에서 -- 혼란을 발생시킨다.
 
 ##### Enforcement
 
@@ -1141,7 +1146,7 @@ Because that would in many cases -- especially simple cases -- be distracting cl
 
 생성자는 개체가 생성되는(초기화되는) 방법을 정의 한다.
 
-### <a name="Rc-ctor"></a>C.40: Define a constructor if a class has an invariant
+### <a name="Rc-ctor"></a>C.40: 클래스가 불변 조건을 가진다면 생성자를 정의하라
 
 ##### Reason
 
@@ -1199,20 +1204,20 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 `Rec2` 생성자는 중복적이다. 그리고, `int`에 대한 기본값은 [member initializer](#Rc-in-class initializer)를 사용하는 편이 났다.
 
-**See also**:
+##### See also:
 
-* [유효한 객체를 생성하라](#Rc-complete)
+* [유효한 개체를 생성하라](#Rc-complete)
 * [생성자가 던지는 예외](#Rc-throw)
 
 ##### Enforcement
 
 * 사용자 정의 복사 연산이 있지만 소멸자가 없는 클래스를 지적한다 (사용자 정의 복사는 클래스가 불변조건을 가진다는 것을 알려준다)
 
-### <a name="Rc-complete"></a>C.41: A constructor should create a fully initialized object
+### <a name="Rc-complete"></a>C.41: 생성자는 완전히 초기화된 개체를 생성해야 한다
 
 ##### Reason
 
-생성자는 클래스에 대한 불변조건을 설정한다. 클래스 사용자는 생성된 객체가 사용가능하다는 것을 가정할 수 있어야 한다.
+생성자는 클래스에 대한 불변조건을 설정한다. 클래스 사용자는 생성된 개체가 사용가능하다는 것을 가정할 수 있어야 한다.
 
 ##### Example, bad
 
@@ -1240,23 +1245,23 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 ##### Exception
 
-생성자만으로 유효한 객체를 쉽게 만들 수 없다면 [팩토리 함수를 사용하라](#C factory)
+생성자만으로 유효한 개체를 쉽게 만들 수 없다면 [팩토리 함수를 사용하라](#Rc-factory)
 
 ##### Enforcement
 
-* (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
-* (Unknown) If a constructor has an `Ensures` contract, try to see if it holds as a postcondition.
+* (단순) 모든 생성자는 해당 클래스의 모든 멤버변수들을 초기화해야 한다 (명시적인 생성자 위임 혹은 기본 생성을 통해서)
+* (불분명함) 만약 생성자가 `Ensures` 계약을 가지고 있다면, 생성 후 조건이 존재하는지 확인하라
 
 ##### Note
 
-생성자가 유효한 객체를 만들기 위해 자원을 얻는다면, 리소스는 [소멸자에 의해 해제](#Rc-release)되어야 한다.
+생성자가 유효한 개체를 만들기 위해 자원을 얻는다면, 리소스는 [소멸자에 의해 해제](#Rc-release)되어야 한다.
 생성자에서 자원을 얻고 소멸자에서 자원을 해제하는 것을 [RAII](Rr-raii) ("Resource Acquisitions Is Initialization") 라고 한다.
 
 ### <a name="Rc-throw"></a>C.42: 생성자가 유효한 개체를 생성하지 못한다면, 예외를 던지도록 하라
 
 ##### Reason
 
-유효하지 않은 객체를 남겨두는 것은 문제를 일으킬 것이다.
+유효하지 않은 개체를 남겨두는 것은 문제를 일으킬 것이다.
 
 ##### Example
 
@@ -1287,7 +1292,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 ##### Example, bad
 
 ```c++
-    class X3 {     // bad: 생성자가 유효하지 않은 객체를 남겨놓을 수 있다
+    class X3 {     // bad: 생성자가 유효하지 않은 개체를 남겨놓을 수 있다
         FILE* f;   // call is_valid() before any other function
         bool valid;
         // ...
@@ -1322,8 +1327,8 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 ##### Note
 
-변수를 정의할 때는 (가령, 스택에 혹은 다른 객체의 멤버로써) 오류코드가 리턴되는 명시적인 함수 호출은 없다.
-유효하지 않은 객체를 남겨두고 사용하기 전에 지속적으로 `is_valid()` 함수를 호출해야 하는 것은 번거롭고, 오류가 발생하기 쉬우며, 비효율적 이다.
+변수를 정의할 때는 (가령, 스택에 혹은 다른 개체의 멤버로써) 오류코드가 리턴되는 명시적인 함수 호출은 없다.
+유효하지 않은 개체를 남겨두고 사용하기 전에 지속적으로 `is_valid()` 함수를 호출해야 하는 것은 번거롭고, 오류가 발생하기 쉬우며, 비효율적 이다.
 
 ##### Exception
 
@@ -1340,24 +1345,24 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 사람들이 생성자에서 초기화를 수행하지 않고 `init()`함수를 사용해온 이유 중 하나는 코드의 중복을 막기 위함이었다.
 [대리 생성자](#Rc-delegating)와 [기본 멤버 초기화](#Rc-in-class-initializer)가 이런 작업을 더 잘 해낼 수 있다.
 
-또 다른 이유로는 객체가 필요할 때까지 초기화를 지연시키는 것이다; 이러한 해법은 보통 [변수가 적절하게 초기화되기 전까지는 해당 변수를 선언하지 않는 것이다](#Res-init).
+또 다른 이유로는 개체가 필요할 때까지 초기화를 지연시키는 것이다; 이러한 해법은 보통 [변수가 적절하게 초기화되기 전까지는 해당 변수를 선언하지 않는 것이다](#Res-init).
 
 ##### Enforcement
 
 ???
 
-### <a name="Rc-default0"></a>C.43: Ensure that a copyable (value type) class has a default constructor
+### <a name="Rc-default0"></a>C.43: 복사 가능한 클래스(값 타입)는 반드시 기본 생성자를 갖도록 하라
 
 ##### Reason
 
 많은 언어나 라이브러리들이 기본 생성자에 의존하고 있다.  
 예를 들면, `T a[10]` 나 `std::vector<T> v(10)` 는 기본 생성자들이 각 요소를 초기화 한다.
-A default constructor often simplifies the task of defining a suitable [moved-from state](#???) for a type that is also copyable.
+기본 생성자는 보통 복사 가능한 타입이 적합한 [이동 된 상태](#???)를 정의하기 쉽도록 한다.
 
 ##### Note
 
-A [value type](#SS-concrete) is a class that is copyable (and usually also comparable).
-It is closely related to the notion of Regular type from [EoP](http://elementsofprogramming.com/) and [the Palo Alto TR](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3351.pdf).
+[값 타입](#SS-concrete)은 복사 가능한 타입을 의미한다 (많은 경우 보통 비교 가능하다).
+[EoP](http://elementsofprogramming.com/)와 [The Palo Alto TR](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3351.pdf)에서 나온 정규 타입 개념과 밀접한 관련이 있다.
 
 ##### Example
 
@@ -1375,9 +1380,9 @@ It is closely related to the notion of Regular type from [EoP](http://elementsof
 기본 생성자는 다른 사용자 정의 생성자가 없을 때만 자동으로 생성된다. 때문에 이런 코드와 같은 경우엔 `vd1`을 초기화 하는 것은 불가능하다.
 기본값이 없다는 것은 사용자에게는 날벼락 같은 상황일 수 있으며 타입의 사용을 어렵게 한다. 때문에 하나라도 의미있게 정의할 수 있다면, 정의되어야 한다.
 
-`Date` is chosen to encourage thought:
-There is no "natural" default date (the big bang is too far back in time to be useful for most people), so this example is non-trivial.
-`{0, 0, 0}` is not a valid date in most calendar systems, so choosing that would be introducing something like floating-point's `NaN`.
+`Date`를 바탕으로 생각해보자:  
+"자연적인" 기본 날짜라는 것은 존재하지 않는다 (빅뱅은 대부분의 사람들에게 너무 오래 전 이야기다). 그러니 이 예시는 사소한 고민은 아니라고 할 수 있다.
+`{0, 0, 0}`는 대부분의 달력 체계에서 유효한 날짜가 아니다. 때문에 이 값을 사용하는 것은 부동 소수점에서 `NaN`을 사용하는 것과 같다.
 하지만, 대부분의 현실적인 `Date` 클래스는 "첫째 날" (가령. 1970년 1월 1일이 많이 쓰인다)을 갖기 때문에 이것을 기본으로 사용하는 것이 일반적이다.
 
 ```c++
@@ -1426,7 +1431,7 @@ There is no "natural" default date (the big bang is too far back in time to be u
     }
 ```
 
-정적으로 할당된 내장 타입 객체들은 `0`으로 초기화 된다. 하지만 지역 변수들은 그렇지 않다.  
+정적으로 할당된 내장 타입 개체들은 `0`으로 초기화 된다. 하지만 지역 변수들은 그렇지 않다.  
 컴파일러의 최적화 빌드는 내장 타입 지역 변수들을 초기화하지 않을 수 있다는 점에 주의하라. 따라서, 위의 예시와 같은 코드가 나타난다면, 미정의 동작을 일으킬 수 있다.
 초기화를 하고자 한다면, 명시적 기본 생성이 도움이 될 것이다:
 
@@ -1439,9 +1444,9 @@ There is no "natural" default date (the big bang is too far back in time to be u
 
 ##### Notes
 
-Classes that don't have a reasonable default construction are usually not copyable either, so they don't fall under this guideline.
+적절한 기본 생성을 가지지 않는 클래스들은 보통 복사 또한 불가하다. 때문에 이런 경우는 이 가이드라인에서 다루지 않는다.
 
-For example, a base class is not a value type (base classes should not be copyable) and so does not necessarily need a default constructor:
+예를 들어, 상위 클래스가 값 타입이 아니라면 (상위 클래스들은 복사되어선 안된다) 기본 생성자가 필수적이지 않다:
 
 ```c++
     // Shape is an abstract base class, not a copyable value type.
@@ -1454,7 +1459,7 @@ For example, a base class is not a value type (base classes should not be copyab
     };
 ```
 
-A class that must acquire a caller-provided resource during construction often cannot have a default constructor, but it does not fall under this guideline because such a class is usually not copyable anyway:
+호출자가 제공하는 자원을 생성 과정에서 사용하는 경우라면 기본 생성자를 가질 수 없다. 이 경우도 가이드라인에 해당하지 않는데 보통 이런 클래스들은 복사가 불가능하기 때문이다:
 
 ```c++
     // std::lock_guard is not a copyable value type.
@@ -1463,8 +1468,7 @@ A class that must acquire a caller-provided resource during construction often c
     lock_guard g2;      // error: guarding nothing
 ```
 
-A class that has a "special state" that must be handled separately from other states by member functions or users causes extra work
-(and most likely more errors). Such a type can naturally use the special state as a default constructed value, whether or not it is copyable:
+다른 상태들과 다른 방식으로 처리되어야 하는 "특별한 상태"를 가지는 클래스들은 사용자가 더 많은 작업을 하게 만든다 (그 때문에 더 많은 오류를 만들기도 한다). 그런 타입은 (복사와 무관하게) 특별한 상태를 기본 생성 직후의 상태로 사용할 수도 있다.
 
 ```c++
     // std::ofstream is not a copyable value type.
@@ -1475,16 +1479,16 @@ A class that has a "special state" that must be handled separately from other st
     out << log(time, transaction);
 ```
 
-Similar special-state types that are copyable, such as copyable smart pointers that have the special state "==nullptr", should use the special state as their default constructed value.
+복사 가능한 특별한 상태를 가진 타입의 예시로는, 복사 가능한 스마트 포인터를 들 수 있다. 여기서 기본 생성 상태(특별한 상태)는 `nullptr`를 들고있는 상태가 된다.
 
-However, it is preferable to have a default constructor default to a meaningful state such as `std::string`s `""` and `std::vector`s `{}`.
+하지만, 기본 생성자를 지원하고 생성 후 유의미한 상태를 가지는 것이 권장된다. 이런 예로는 `std::string`이 `""`로 초기화되거나, `std::vector`가 공백상태(`{}`)를 가지는 것을 들 수 있다.
 
 ##### Enforcement
 
-* Flag classes that are copyable by `=` without a default constructor
-* Flag classes that are comparable with `==` but not copyable
+* 클래스가 기본 생성자 없이 복사 가능한 경우를 지적한다
+* 클래스가 복사를 지원하지 않으면서 동등 비교(`==`)가 가능하면 지적한다
 
-### <a name="Rc-default00"></a>C.44: Prefer default constructors to be simple and non-throwing
+### <a name="Rc-default00"></a>C.44: 기본 생성자는 가능한 단순하고 예외를 던지지 않도록 하라
 
 ##### Reason
 
@@ -1570,7 +1574,7 @@ However, it is preferable to have a default constructor default to a meaningful 
 
 (쉬움) 명시적인 기본 생성자는 초기화 이외의 동작을 해야할 때 쓰는 것이 좋다.
 
-### <a name="Rc-explicit"></a>C.46: By default, declare single-argument constructors explicit
+### <a name="Rc-explicit"></a>C.46: 단일 인자를 사용하는 생성자는 `explicit`으로 선언하라
 
 ##### Reason
 
@@ -1591,7 +1595,7 @@ However, it is preferable to have a default constructor default to a meaningful 
 
 ##### Exception
 
-If you really want an implicit conversion from the constructor argument type to the class type, don't use `explicit`:
+생성 인자 타입으로부터의 묵시적인 변환을 허용한다면 `explicit`을 사용하지 않아야 한다:
 
 ```c++
     class Complex {
@@ -1601,24 +1605,25 @@ If you really want an implicit conversion from the constructor argument type to 
         // ...
     };
 
-    Complex z = 10.7;   // unsurprising conversion
+    Complex z = 10.7;   // 전혀 어색하지 않다
 ```
 
-**See also**: [Discussion of implicit conversions](#Ro-conversion)
+##### See also
+[Discussion of implicit conversions](#Ro-conversion)
 
 ##### Note
 
-Copy and move constructors should not be made `explicit` because they do not perform conversions. Explicit copy/move constructors make passing and returning by value difficult.
+복사와 이동 생성자는 변환(conversion)을 수행하지 않기 때문에 `explicit`이 되어야 한다. 명시적 복사/이동 생성자는 값으로 전달하거나 반환하는 것을 어렵게 한다.
 
 ##### Enforcement
 
-(Simple) Single-argument constructors should be declared `explicit`. Good single argument non-`explicit` constructors are rare in most code based. Warn for all that are not on a "positive list".
+(쉬움) 단일 인자를 사용하는 생성자는 `explicit`으로 선언하도록 한다. `explicit`이 아니면서 좋은 생성자는 드물다. 모범 사례에 포함되지 않는다면 경고하라.
 
-### <a name="Rc-order"></a>C.47: Define and initialize member variables in the order of member declaration
+### <a name="Rc-order"></a>C.47: 멤버 변수들은 선언된 순서대로 초기화하라
 
 ##### Reason
 
-To minimize confusion and errors. That is the order in which the initialization happens (independent of the order of member initializers).
+혼란과 오류를 최소화한다. 순서대로 진행하는 것이 초기화의 방식이다. (멤버 변수 초기화와는 무관하다).
 
 ##### Example, bad
 
@@ -1636,15 +1641,15 @@ To minimize confusion and errors. That is the order in which the initialization 
 
 ##### Enforcement
 
-(Simple) A member initializer list should mention the members in the same order they are declared.
+(단순) 멤버 초기화 리스트는 선언과 같은 순서로 진행되어야 한다.
 
 **See also**: [Discussion](#Sd-order)
 
-### <a name="Rc-in-class-initializer"></a>C.48: Prefer in-class initializers to member initializers in constructors for constant initializers
+### <a name="Rc-in-class-initializer"></a>C.48: 상수 초기화는 가능한 클래스 내(in-class) 멤버 초기화를 사용하라
 
 ##### Reason
 
-Makes it explicit that the same value is expected to be used in all constructors. Avoids repetition. Avoids maintenance problems. It leads to the shortest and most efficient code.
+같은 변수가 사용될 것이라고 명시적으로 보여준다. 중복적으로 작성하지 않아도 된다. 유지보수 문제는 없앤다. 짧고 효율적인 코드가 된다.
 
 ##### Example, bad
 
@@ -1659,8 +1664,8 @@ Makes it explicit that the same value is expected to be used in all constructors
         // ...
     };
 ```
-
-How would a maintainer know whether `j` was deliberately uninitialized (probably a poor idea anyway) and whether it was intentional to give `s` the default value `""` in one case and `qqq` in another (almost certainly a bug)? The problem with `j` (forgetting to initialize a member) often happens when a new member is added to an existing class.
+
+코드를 유지보수하는 사람이 `j`가 의도적으로 초기화되지 않았다고 생각할 수 있다 (꽤 이상한 생각이지만). 또 어떤 의도로 `s`의 기본값으로 `""`와 `qqq`를 사용하는지 알 수 있을까? `j`와 같이 멤버 초기화가 생략되는 문제는 이미 있는 클래스에 새로운 멤버가 추가될 때 발생한다.
 
 ##### Example
 
@@ -1676,7 +1681,9 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
     };
 ```
 
-**Alternative**: We can get part of the benefits from default arguments to constructors, and that is not uncommon in older code. However, that is less explicit, causes more arguments to be passed, and is repetitive when there is more than one constructor:
+##### Alternative
+
+생성자에 기본 인자를 주는 것을 생각해볼 수 있다. 오래된 코드에선 꽤 흔한 방법이다. 하지만, 이는 명시적이지 않고, 더 많은 인자가 전달되도록 만든다. 생성자가 여럿인 경우, 기본 인자 코드를 반복적으로 작성해야 한다:
 
 ```c++
     class X3 {   // BAD: inexplicit, argument passing overhead
@@ -1692,14 +1699,14 @@ How would a maintainer know whether `j` was deliberately uninitialized (probably
 
 ##### Enforcement
 
-* (Simple) Every constructor should initialize every member variable (either explicitly, via a delegating ctor call or via default construction).
-* (Simple) Default arguments to constructors suggest an in-class initializer may be more appropriate.
+* (쉬움) 모든 생성자는 모든 멤버 변수들을 초기화해야 한다 (명시적으로든, 생성자 위임이든, 기본 생성이든)
+* (쉬움) 생성자의 기본인자는 클래스 내 초기화가 적합할 수 있다
 
-### <a name="Rc-initialize"></a>C.49: Prefer initialization to assignment in constructors
+### <a name="Rc-initialize"></a>C.49: 생성자 안에서의 대입 보다는 초기화를 선호하라
 
 ##### Reason
 
-An initialization explicitly states that initialization, rather than assignment, is done and can be more elegant and efficient. Prevents "use before set" errors.
+초기화는 대입 보다 깔끔하고 아름답게 수행될 수 있다. 값을 설정하기 전에 사용하는 오류("use before set")를 예방한다.
 
 ##### Example, good
 
@@ -1730,15 +1737,15 @@ An initialization explicitly states that initialization, rather than assignment,
     };
 ```
 
-### <a name="Rc-factory"></a>C.50: Use a factory function if you need "virtual behavior" during initialization
+### <a name="Rc-factory"></a>C.50: 초기화 과정에서 `virtual` 동작이 필요하다면, 팩토리 함수를 사용하라
 
 ##### Reason
 
-If the state of a base class object must depend on the state of a derived part of the object, we need to use a virtual function (or equivalent) while minimizing the window of opportunity to misuse an imperfectly constructed object.
+상위 클래스의 상태가 하위 개체에 의해 결정된다면, 불완전하게 생성된 개체를 사용할 가능성을 최소화 하면서 가상 함수를 사용해야 한다.
 
 ##### Note
 
-The return type of the factory should normally be `unique_ptr` by default; if some uses are shared, the caller can `move` the `unique_ptr` into a `shared_ptr`. However, if the factory author knows that all uses of the returned object will be shared uses, return `shared_ptr` and use `make_shared` in the body to save an allocation.
+팩토리 함수의 반환 탕비은 보통 `unique_ptr`가 적절하다; 만약 공유되어야 한다면, 함수를 호출한 쪽에서 `unique_ptr`를 `shared_ptr`로 이동시킬 수 있다. 다르게는, 팩토리 함수의 작성자가 반환 개체가 항상 공유된다는 것을 알고있다면, `make_shared`를 사용해서 `shared_ptr`를 반환하고 할당을 줄일 수 있다.
 
 ##### Example, bad
 
@@ -1789,20 +1796,21 @@ The return type of the factory should normally be `unique_ptr` by default; if so
     shared_ptr<D> p = D::Create<D>();  // creating a D object
 ```
 
-By making the constructor `protected` we avoid an incompletely constructed object escaping into the wild.
-By providing the factory function `Create()`, we make construction (on the free store) convenient.
+생성자를 `protected`로 만듦으로써, 개체가 불완전하게 생성된 후 사용자 코드에 노출되는 것을 막을 수 있다.
+팩토리 함수 `Create()`를 지원하면 (자유 저장소 영역에) 개체 생성을 좀 더 쉽게할 수 있다.
 
 ##### Note
 
-Conventional factory functions allocate on the free store, rather than on the stack or in an enclosing object.
+전통적인 팩토리 함수들은 스택이나 인접 개체보다는 자유 저장소에 생성한다.
 
-**See also**: [Discussion](#Sd-factory)
+##### See also
+[Discussion](#Sd-factory)
 
-### <a name="Rc-delegating"></a>C.51: Use delegating constructors to represent common actions for all constructors of a class
+### <a name="Rc-delegating"></a>C.51: 클래스의 모든 생성자들을 위한 일반적인 동작을 표현할 때는 대리 생성자를 사용하라
 
 ##### Reason
 
-To avoid repetition and accidental differences.
+코드 중복과 실수에 의한 코드 차이가 발생하지 않는다.
 
 ##### Example, bad
 
@@ -1823,7 +1831,7 @@ To avoid repetition and accidental differences.
     };
 ```
 
-The common action gets tedious to write and may accidentally not be common.
+똑같은 동작을 작성하는 것은 지루하고 실수로 인해 똑같지 않을 수도 있다.
 
 ##### Example
 
@@ -1843,21 +1851,23 @@ The common action gets tedious to write and may accidentally not be common.
     };
 ```
 
-**See also**: If the "repeated action" is a simple initialization, consider [an in-class member initializer](#Rc-in-class-initializer).
+##### See also
+
+만약 "반복된 동작"이 단순한 초기화라면, [클래스 내 멤버 초기화](#Rc-in-class-initializer)를 고려하라.
 
 ##### Enforcement
 
-(Moderate) Look for similar constructor bodies.
+(중간) 유사한 생성자 구현(Body)을 찾는다
 
-### <a name="Rc-inheriting"></a>C.52: Use inheriting constructors to import constructors into a derived class that does not need further explicit initialization
+### <a name="Rc-inheriting"></a>C.52: 추가적인 초기화가 필요하지 않은 파생된 클래스에서 생성자를 사용할 때는 상속 생성자들을 사용하라
 
 ##### Reason
 
-If you need those constructors for a derived class, re-implementing them is tedious and error-prone.
+하위 클래스들을 위한 생성자가 필요하다면, 생성자를 다시 구현하도록 하는 것은 자루하고 오류의 소지가 많다.
 
 ##### Example
 
-`std::vector` has a lot of tricky constructors, so if I want my own `vector`, I don't want to reimplement them:
+`std::vector`는 굉장히 많은 생성자를 지원한다. 때문에 자신만의 `vector`를 만들고자 한다면, 그 많은 생성자를 다시 작성하고 싶지는 않을 것이다:
 
 ```c++
     class Rec {
@@ -1885,7 +1895,7 @@ If you need those constructors for a derived class, re-implementing them is tedi
 
 ##### Enforcement
 
-Make sure that every member of the derived class is initialized.
+하위 클래스의 모든 멤버들이 초기화되는지 검사한다
 
 ## <a name="SS-copy"></a>C.copy: 복사(Copy)와 이동(Move)
 
@@ -1893,7 +1903,7 @@ Make sure that every member of the derived class is initialized.
 리소스 핸들의 경우, 복사가 가능할 수도, 그렇지 않을 수도 있다.  
 타입들은 논리적인 또는 성능 상의 이유로 이동하도록 정의될 수 있다.
 
-### <a name="Rc-copy-assignment"></a>C.60: Make copy assignment non-`virtual`, take the parameter by `const&`, and return by non-`const&`
+### <a name="Rc-copy-assignment"></a>C.60: 복사연산을 `virtual`로 만들지 말아라. 매개변수는 `const&`로 받고, `const&`로 반환하지 말아라
 
 ##### Reason
 
@@ -1961,13 +1971,15 @@ Make sure that every member of the derived class is initialized.
 대상 원소들에 직접 쓰기 연산을 함으로써, `swap`기법이 제공하는 강한 예외 보장 대신 [기본적인 예외 보장](#Abrahams01)만 얻게 될 것이다.  
 [자기 대입](#Rc-copy-self)에 주의하라.
 
-**Alternatives**: 만약 `virtual` 대입 연산자가 필요하다고 생각한다면, 그리고 그것이 어째서 문제를 야기할 수 있는지 이해한다면, 그 함수는 `operator=`라고 부르지 마라. 이름을 부여해서 `virtual void assign(const Foo&)`로 만들어라.
+##### Alternatives
+
+만약 `virtual` 대입 연산자가 필요하다고 생각한다면, 그리고 그것이 어째서 문제를 야기할 수 있는지 이해한다면, 그 함수는 `operator=`라고 부르지 마라. 이름을 부여해서 `virtual void assign(const Foo&)`로 만들어라.
 [복사 생성 vs. `clone()`](#Rc-copy-virtual)를 참조하라.
 
 ##### Enforcement
 
 * (쉬움) 대입 연산자는 가상함수여서는 안된다. 드래곤들만큼 위험하다!
-* (쉬움) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 객체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
+* (쉬움) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 개체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
 * (중간) 대입 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 대입 연산자를 호출해야 한다. 해당 타입이 포인터 문맥이나 값 문맥을 가지는지 확인하기 위해 소멸자를 확인하라.
 
 ### <a name="Rc-copy-semantic"></a>C.61: 복사 연산은 복사를 수행해야 한다
@@ -1975,7 +1987,7 @@ Make sure that every member of the derived class is initialized.
 ##### Reason
 
 일반적으로 그렇게 할 것이라 생각한다. `x = y`가 수행된 후에는, `x == y`인 결과를 가져야 한다.
-복사 후에는 `x`와 `y`가 독립적인 개체들일 수 있다. (값 의미구조, 비-포인터 기본 타입들과 표준 라이브러리 타입들의 동작하는 방식) 또는 공유된 객체를 참조한다(포인터 의미구조, 포인터들이 동작하는 방식).
+복사 후에는 `x`와 `y`가 독립적인 개체들일 수 있다. (값 의미구조, 비-포인터 기본 타입들과 표준 라이브러리 타입들의 동작하는 방식) 또는 공유된 개체를 참조한다(포인터 의미구조, 포인터들이 동작하는 방식).
 
 ##### Example
 
@@ -2126,17 +2138,19 @@ Make sure that every member of the derived class is initialized.
 
 간단하고, 효율적이다.
 
-**See**: [복사 대입을 위한 규칙들](#Rc-copy-assignment).
+##### See also
+
+[복사 대입을 위한 규칙들](#Rc-copy-assignment)
 
 ##### Enforcement
 
 [복사 대입](#Rc-copy-assignment)에서와 동일하다.  
 
 * (쉬움) 대입 연산자는 가상 함수여서는 안된다. 드래곤들만큼 위험하다!
-* (쉬움) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 객체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라.
-* (중간) 이동 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 이동 연산자를 호출해야 한다.  
+* (쉬움) 대입 연산자는 `T&`를 반환하면 안된다. 연쇄적인 호출을 위해선, 컨테이너로의 개체 대입과 코드 작성을 방해하는 `const T&`를 사용하지 말아라
+* (중간) 이동 연산자는 (암시적으로나 명시적으로나) 모든 기본 클래스와 멤버들의 이동 연산자를 호출해야 한다
 
-### <a name="Rc-move-semantic"></a>C.64: 이동 연산은 이동을 수행해야 하며, 원본 객체를 유효한 상태로 남겨놓아야 한다
+### <a name="Rc-move-semantic"></a>C.64: 이동 연산은 이동을 수행해야 하며, 원본 개체를 유효한 상태로 남겨놓아야 한다
 
 ##### Reason
 
@@ -2176,10 +2190,10 @@ Make sure that every member of the derived class is initialized.
 
 ##### Note
 
-이상적으로는, 이동연산을 해준 객체는 해당 타입의 기본 값이어야 한다. 그렇지 않아야 하는 이유가 있지 않는한 기본 값을 가지도록 확실히 하라. 
+이상적으로는, 이동연산을 해준 개체는 해당 타입의 기본 값이어야 한다. 그렇지 않아야 하는 이유가 있지 않는한 기본 값을 가지도록 확실히 하라. 
 하지만, 모든 타입들이 기본 값을 가지는 것은 아니며, 또 일부 타입들에서는 기본 값을 만드는 것이 비싼 비용을 필요로 할 수도 있다.
-표준에서 요구하는 것은, 이동연산을 해준 객체가 파괴될 수 있다는 것 뿐이다.  
-종종, 쉽고 비용이 들지 않는 방법을 쓸수도 있다: 표준 라이브러리는 객체로부터 이동을 받을 수 있다고 가정한다. 이동을 해주는 객체는 유효한 상태로 (필요하다면 명시하여) 남겨놓아라.  
+표준에서 요구하는 것은, 이동연산을 해준 개체가 파괴될 수 있다는 것 뿐이다.  
+종종, 쉽고 비용이 들지 않는 방법을 쓸수도 있다: 표준 라이브러리는 개체로부터 이동을 받을 수 있다고 가정한다. 이동을 해주는 개체는 유효한 상태로 (필요하다면 명시하여) 남겨놓아라.  
 
 ##### Note
 
@@ -2194,7 +2208,7 @@ Make sure that every member of the derived class is initialized.
 ##### Reason
 
 만약 `x = x`가 `x`의 값을 바꾼다면, 사람들은 놀랄 것이고 안좋은 에러들이 발생할 수 있다. 사람들은 주로 자기 대입을 이동연산으로 작성하지 않지만, 그럴 수도 있다. 
-예를 들어, `std::swap`은 이동 연산들로 구현되었고 만약 당신이 우연히  `a`와 `b`가 같은 객체를 참조하는 상황에서 `swap(a, b)`를 사용한다면, 자기-이동의 실패는 심각하거나 찾기 어려운(subtle) 에러가 될 수 있다.
+예를 들어, `std::swap`은 이동 연산들로 구현되었고 만약 당신이 우연히  `a`와 `b`가 같은 개체를 참조하는 상황에서 `swap(a, b)`를 사용한다면, 자기-이동의 실패는 심각하거나 찾기 어려운(subtle) 에러가 될 수 있다.
 
 ##### Example
 
@@ -2228,7 +2242,7 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 
 ##### Example
 
-여기 검사 없이 포인터를 이동하는 방법이 있다.(마치 이동 대입을 구현한 코드라고 상상해보라.):
+아래는 검사 없이 포인터를 이동하는 방법이다(마치 이동 대입을 구현한 코드라고 상상해보라.):
 
 ```c++
     // move from other.ptr to this->ptr
@@ -2240,8 +2254,8 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 
 ##### Enforcement
 
-* (중간) 이러한 자기 대입의 경우, 이동 대입 연산자는 대입 받는 객체의 포인터 멤버를 `delete`된 상태 또는 `nullptr`로 남겨놓아서는 안된다.
-* (자유선택) 표준 라이브러리 컨테이너들의 사용법을 보라(`string`을 포함한다). 그리고 일반적인(객체 수명에 민감하지 않은) 사용에 그 컨테이너들이 안전하다고 생각하라.
+* (중간) 이러한 자기 대입의 경우, 이동 대입 연산자는 대입 받는 개체의 포인터 멤버를 `delete`된 상태 또는 `nullptr`로 남겨놓아서는 안된다.
+* (자유선택) 표준 라이브러리 컨테이너들의 사용법을 보라(`string`을 포함한다). 그리고 일반적인(개체 수명에 민감하지 않은) 사용에 그 컨테이너들이 안전하다고 생각하라.
 
 ### <a name="Rc-move-noexcept"></a>C.66: 이동 연산은 `noexcept`로 만들어라
 
@@ -2288,11 +2302,12 @@ ISO 표준은 표준 라이브러리 컨테이너들에 대해 오직 "유효하
 
 (쉬움) 이동연산은 `noexcept`로 표시되어야 한다.
 
-### <a name="Rc-copy-virtual"></a>C.67: A polymorphic class should suppress copying
+### <a name="Rc-copy-virtual"></a>C.67: 다형적인 클래스는 복사를 제한해야 한다
 
 ##### Reason
 
-A *polymorphic class* is a class that defines or inherits at least one virtual function. It is likely that it will be used as a base class for other derived classes with polymorphic behavior. If it is accidentally passed by value, with the implicitly generated copy constructor and assignment, we risk slicing: only the base portion of a derived object will be copied, and the polymorphic behavior will be corrupted.
+*다형적인 클래스*는 하나 이상의 가상 함수를 정의하거나 상속받은 클래스를 의미한다. 다른 하위 클래스들과 같이 상위 클래스를 통해서 사용될 것이다. 
+만약 실수로 인해 묵시적으로 생성된 복사 생성자/대입 연산자와 함께 값으로 전달된 경우, 복사 절단(slicing)의 위험이 있다: 하위 개체에서 상위 개체에 해당하는 부분만 복사되고 다형성이 망가진다.
 
 ##### Example, bad
 
@@ -2344,16 +2359,16 @@ A *polymorphic class* is a class that defines or inherits at least one virtual f
 
 ##### Note
 
-If you need to create deep copies of polymorphic objects, use `clone()` functions: see [C.130](#Rh-copy).
+다형적인 개체에 깊은 복사를 사용해야 한다면, `clone()` 함수들을 사용하라: [C.130](#Rh-copy)를 참고하라.
 
 ##### Exception
 
-Classes that represent exception objects need both to be polymorphic and copy-constructible.
+예외 개체들을 위한 클래스는 다형적이면서 복사 생성이 가능해야 한다.
 
 ##### Enforcement
 
-* Flag a polymorphic class with a non-deleted copy operation.
-* Flag an assignment of polymorphic class objects.
+* 다형적인 클래스이면서 복사 연산을 지원하는 경우를 지적하라
+* 다형적인 클래스의 개체가 복사되는 경우 지적하라
 
 ## C.other: 다른 기본 연산 규칙들
 
@@ -2455,7 +2470,7 @@ Classes that represent exception objects need both to be polymorphic and copy-co
     }
 ```
 
-Note that deleted functions should be public.
+delete된 함수들이 public이라는 점에 주목하라
 
 ##### Enforcement
 
@@ -2467,7 +2482,7 @@ Note that deleted functions should be public.
 
 ##### Reason
 
-호출된 함수는 파생 클래스에서 오버라이드 하는 함수가 아니라, 생성된 객체의 함수이다.
+호출된 함수는 파생 클래스에서 오버라이드 하는 함수가 아니라, 생성된 개체의 함수이다.
 이러한 동작은 혼란을 일으킬 수 있다.
 나쁘게는, 생성자와 소멸자 내부에서 발생하는 구현되지 않은 순수 가상 함수에 대한 직접 또는 간접호출이 비정의된 동작을 일으킨다.
 
@@ -2505,23 +2520,24 @@ Note that deleted functions should be public.
 
 특정하게 명시적으로 한정된 함수는 `virtual`로 선언되었다고 하더라도 가상호출이 발생하지 않음을 기억하라.
 
-**See also** 정의되지 않은 동작의 위험이 없이 파생 클래스의 함수를 호출하는 효과를 얻기 위해서는 [팩토리 함수](#Rc-factory) 항목을 참고하라.
+##### See also
+
+정의되지 않은 동작의 위험이 없이 파생 클래스의 함수를 호출하는 효과를 얻기 위해서는 [팩토리 함수](#Rc-factory) 항목을 참고하라.
 
 ##### Note
 
-There is nothing inherently wrong with calling virtual functions from constructors and destructors.
-The semantics of such calls is type safe.
-However, experience shows that such calls are rarely needed, easily confuse maintainers, and become a source of errors when used by novices.
+가상 함수를 생성자와 소멸자에서 호출하는 행위가 반드시 잘못된 것은 아니다. 보통의 경우 이런 행위는 타입 안전한 의미구조를 가진다.
+하지만, 경험적으로 그런 사용이 필요한 경우는 거의 발생하지 않으며, 유지보수 개발자를 혼란스럽게 한다. 초심자가 사용한다면 실수하는 원인이 될 수 있다.
 
 ##### Enforcement
 
-* 생성자와 소멸자에서의 가상 함수 호출에는 표시를 남겨라.
+* 생성자와 소멸자에서의 가상 함수 호출을 지적한다
 
 ### <a name="Rc-swap"></a>C.83: 값 타입들에는, `noexcept` swap함수를 제공하는 것을 고려하라
 
 ##### Reason
 
-`swap`함수는 객체 대입을 구현할 때 원활하게 객체를 이동하는 것에서, 에러가 발생하지 않는 것을 보장하는 함수를 제공하는 것까지 몇몇 함수들(idioms)을 구현하는데 유용하다.
+`swap`함수는 개체 대입을 구현할 때 원활하게 개체를 이동하는 것에서, 에러가 발생하지 않는 것을 보장하는 함수를 제공하는 것까지 몇몇 함수들(idioms)을 구현하는데 유용하다.
 swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [소멸자, 자원 해제, 그리고 swap은 실패해선 안된다]("#Re-never-fail).
 
 ##### Example, good
@@ -2552,8 +2568,8 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 
 ##### Enforcement
 
-* (쉬움) 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다.
-* (쉬움) 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다.
+* (쉬움) 가상 함수들이 없는 클래스는 `swap`멤버 함수 선언이 있어야 한다
+* (쉬움) 클래스가 `swap` 멤버함수를 가지고 있다면, 그 함수는 `noexcept`로 선언되어야 한다
 
 ### <a name="Rc-swap-fail"></a>C.84: `swap` 연산은 실패해선 안된다
 
@@ -2695,7 +2711,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 
 ##### Reason
 
-해시 컴테이너들의 사용자들은 hash를 간접적으로 사용하며, 해시값을 위한 단순한 접근이 throw하지 않을 것으로 기대한다.  
+해시 컨테이너들의 사용자들은 hash를 간접적으로 사용하며, 해시값을 위한 단순한 접근이 throw하지 않을 것으로 기대한다.  
 이는 표준 라이브러리의 요구사항이다.  
 
 ##### Example, bad
@@ -2736,15 +2752,167 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 컨테이너 규칙 요약:
 
 * [C.100: 컨테이너를 정의할때는 STL을 따르라](#Rcon-stl)
-* [C.101: 값 문맥을 적용하라](#Rcon-val)
-* [C.102: move 연산을 제공하라](#Rcon-move)
+* [C.101: 값 의미구조(value semantics)를 제공하라](#Rcon-val)
+* [C.102: 이동 연산을 제공하라](#Rcon-move)
 * [C.103: 초기화 리스트 생성자를 지원하라](#Rcon-init)
-* [C.104: 공백 값으로 설정하는 기본 생성자를 지원하라](#Rcon-empty)
-* [C.105: 생성자와 '확장' 생성자를 지원하라](#Rcon-val)
-* ???
-* [C.109: 리소스 핸들이 포인터 문맥을 따를 경우에는, `*` 과 `->` 연산자를 제공하라](#rcon-ptr)
+* [C.104: 기본 생성자는 빈 컨테이너를 만들도록 하라](#Rcon-empty)
+* [C.109: 리소스 핸들이 포인터 의미구조를 따를 경우에는, `*` 과 `->` 연산자를 제공하라](#rcon-ptr)
 
-**See also**: [Resources](#S-resource)
+##### See also
+[Resources](#S-resource)
+
+### <a name="Rcon-stl"></a>C.100: 컨테이너를 정의할때는 STL을 따르라
+
+##### Reason
+
+C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 완전한(fundamentally sound) 설계를 가지고 있다.
+
+##### Note
+
+다른 fundamentally sound한 설계 방식들이 있고 표준 라이브러리의 방식을 사용하지 않을 이유가 있기도 하지만, 다른 방식을 택해야 할 확실한 이유가 없다면, 구현자와 사용자 모두 표준을 따르는 것이 단순하고 쉬운 방법이다.
+
+특히, `std::vector`와 `std::map`은 단순하고 유용한 모델을 제공한다
+
+##### Example
+
+```c++
+    // simplified (e.g., no allocators):
+
+    template<typename T>
+    class Sorted_vector {
+        using value_type = T;
+        // ... iterator types ...
+
+        Sorted_vector() = default;
+        Sorted_vector(initializer_list<T>);    // initializer-list constructor: sort and store
+        Sorted_vector(const Sorted_vector&) = default;
+        Sorted_vector(Sorted_vector&&) = default;
+        Sorted_vector& operator=(const Sorted_vector&) = default;   // copy assignment
+        Sorted_vector& operator=(Sorted_vector&&) = default;        // move assignment
+        ~Sorted_vector() = default;
+
+        Sorted_vector(const std::vector<T>& v);   // store and sort
+        Sorted_vector(std::vector<T>&& v);        // sort and "steal representation"
+
+        const T& operator[](int i) const { return rep[i]; }
+        // no non-const direct access to preserve order
+
+        void push_back(const T&);   // insert in the right place (not necessarily at back)
+        void push_back(T&&);        // insert in the right place (not necessarily at back)
+
+        // ... cbegin(), cend() ...
+    private:
+        std::vector<T> rep;  // use a std::vector to hold elements
+    };
+
+    template<typename T> bool operator==(const T&);
+    template<typename T> bool operator!=(const T&);
+    // ...
+```
+
+위 예시에선, 표준 템플릿 라이브러리 스타일을 불완전하게 따른다. 이런 경우는 흔히 볼 수 있다. 최소한의 기능만 제공하는 것은 특별히 구현된 컨테이너에게는 타당하다. 
+핵심은 그 컨테이너에게 맞게 전통적인 생성자, 대입, 소멸, 그리고 반복자를 전통적인 의미구조를 지원하도록 정의하는 것이다. 
+이를 바탕으로, 그 컨테이너는 필요한 만큼 확장될 수 있다. 이 예시에서는 `std::vector`를 사용하는 특별한 생성자가 추가되었다.
+
+##### Enforcement
+
+???
+
+### <a name="Rcon-val"></a>C.101: 값 의미구조(value semantics)를 제공하라
+
+##### Reason
+
+정규 타입의 개체들은 고민없이 사용할 수 있다. 사용자들은 값 의미구조에 익숙하다.
+
+##### Note
+
+필요하다면, 컨테이너를 `Regular`(Concept 중 하나)하게 만들어라. 특히, 복사된 개체와 원래 개체를 비교했을 때 같도록 하라.
+
+##### Example
+
+```c++
+    void f(const Sorted_vector<string>& v)
+    {
+        Sorted_vector<string> v2 {v};
+        if (v != v2)
+            cout << "insanity rules!\n";
+        // ...
+    }
+```
+
+##### Enforcement
+
+???
+
+### <a name="Rcon-move"></a>C.102: 이동 연산을 제공하라
+
+##### Reason
+
+컨테이너는 큰 규모로 사용되는 경향이 있다; 이동 연산이 없다면 비용이 많이 드는 복사가 사용될 것이고, 사람들이 포인터를 전달하도록 만듦으로써 자원 관리 문제를 일으킬 수 있다.
+
+##### Example
+
+```c++
+    Sorted_vector<int> read_sorted(istream& is)
+    {
+        vector<int> v;
+        cin >> v;   // assume we have a read operation for vectors
+        Sorted_vector<int> sv = v;  // sorts
+        return sv;
+    }
+
+    A user can reasonably assume that returning a standard-like container is cheap.
+```
+
+##### Enforcement
+
+???
+
+### <a name="Rcon-init"></a>C.103: 초기화 리스트 생성자를 지원하라
+
+##### Reason
+
+사람들은 값 집합을 사용해서 컨테이너 초기화가 가능할 것이라 기대한다. 자연스럽다.
+
+##### Example
+
+```c++
+    Sorted_vector<int> sv {1, 3, -1, 7, 0, 0}; // Sorted_vector sorts elements as needed
+```
+
+##### Enforcement
+
+???
+
+### <a name="Rcon-empty"></a>C.104: 기본 생성자는 빈 컨테이너를 만들도록 하라
+
+##### Reason
+
+컨테이너를 정규(Regular) 타입으로 만들어준다.
+
+##### Example
+
+```c++
+    vector<Sorted_sequence<string>> vs(100);    // 100 Sorted_sequences each with the value ""
+```
+
+##### Enforcement
+
+???
+
+### <a name="Rcon-ptr"></a>C.109: 리소스 핸들이 포인터 의미구조를 따를 경우에는, `*` 과 `->` 연산자를 제공하라
+
+##### Reason
+
+포인터에 기대되는 연산들이다. 포인터 사용자들에게는 이런 표현이 익숙하다.
+
+##### Example
+
+    ???
+
+##### Enforcement
+
+???
 
 ## <a name="SS-lambdas"></a>C.lambdas: 함수 개체와 람다 표현식(Function objects and lambdas)
 
@@ -2752,62 +2920,62 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 람다 표현식(줄여서 "람다"라고도 한다)은 함수 개체를 생성하도록 하는 표기를 의미한다.
 함수 개체는 가능한 복사 비용을 발생시키지 않아야 한다 (또 그렇기에 [값에 의한 전달](#Rf-in)이 사용된다).
 
-Summary:
+요약:
 
-* [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
-* [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
-* [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
-* [ES.28: Use lambdas for complex initialization, especially of `const` variables](#Res-lambda-init)
+* [F.50: 함수를 사용할 수 없다면 람다를 사용하라 (지역 변수를 복사하거나, 지역적으로 사용되는 함수를 작성하는 경우)](#Rf-capture-vs-overload)
+* [F.52: 지역적으로 사용되거나 알고리즘에 전달된다면 람다 캡쳐로는 참조를 선호하라](#Rf-reference-capture)
+* [F.53: 반환되거나, 외부에 저장되거나, 다른 스레드로 전달하는 경우처럼 비 지역적으로 사용된다면 람다의 참조 캡쳐를 지양하라](#Rf-value-capture)
+* [ES.28: 복잡한 초기화에는, 특히 상수 변수들의 초기화에는 람다를 사용하라](#Res-lambda-init)
 
 ## <a name="SS-hier"></a>C.hier: 클래스 계층 구조 (OOP)
 
-A class hierarchy is constructed to represent a set of hierarchically organized concepts (only).
-Typically base classes act as interfaces.
-There are two major uses for hierarchies, often named implementation inheritance and interface inheritance.
+클래스 계층구조는 계층적으로 조직화된 개념들의 집합을 표현하면서 (오직 그런 경우에만) 생성된다.
+보통 상위 클래스(base class)들은 인터페이스로써 동작한다. 
+계층구조를 사용하는 대표적인 예로는 2가지가 있는데, 구현 상속과 인터페이스 상속으로 불린다.
 
-Class hierarchy rule summary:
+클래스 계층구조 규칙 요약:
 
-* [C.120: Use class hierarchies to represent concepts with inherent hierarchical structure (only)](#Rh-domain)
-* [C.121: If a base class is used as an interface, make it a pure abstract class](#Rh-abstract)
-* [C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed](#Rh-separation)
+* [C.120: 계층적인 구조를 가진 개념을 표현하기 위해서만 클래스 계층구조를 사용하라](#Rh-domain)
+* [C.121: 상위 클래스가 인터페이스로 사용된다면, 순수 가상 클래스로 만들어라](#Rh-abstract)
+* [C.122: 인터페이스와 구현의 분리가 필요하다면 추상 클래스들을 인터페이스로 사용하라](#Rh-separation)
 
-Designing rules for classes in a hierarchy summary:
+계층 구조 내 클래스 설계 규칙 요약:
 
-* [C.126: An abstract class typically doesn't need a constructor](#Rh-abstract-ctor)
-* [C.127: A class with a virtual function should have a virtual or protected destructor](#Rh-dtor)
-* [C.128: Virtual functions should specify exactly one of `virtual`, `override`, or `final`](#Rh-override)
-* [C.129: When designing a class hierarchy, distinguish between implementation inheritance and interface inheritance](#Rh-kind)
-* [C.130: For making deep copies of polymorphic classes prefer a virtual `clone` function instead of copy construction/assignment](#Rh-copy)
-* [C.131: Avoid trivial getters and setters](#Rh-get)
-* [C.132: Don't make a function `virtual` without reason](#Rh-virtual)
-* [C.133: Avoid `protected` data](#Rh-protected)
-* [C.134: Ensure all non-`const` data members have the same access level](#Rh-public)
-* [C.135: Use multiple inheritance to represent multiple distinct interfaces](#Rh-mi-interface)
-* [C.136: Use multiple inheritance to represent the union of implementation attributes](#Rh-mi-implementation)
+* [C.126: 일반적으로 추상 클래스는 생성자가 필요하지 않다](#Rh-abstract-ctor)
+* [C.127: 가상함수를 가진 클래스는 공개(public)된 가상(virtual) 혹은 상속되는(protected) 소멸자를 가져야 한다](#Rh-dtor)
+* [C.128: 가상 함수들은 `virtual`, `override`, 혹은 `final` 중 하나만 명시해야 한다](#Rh-override)
+* [C.129: 클래스 계층구조를 정의할 때는 구현 상속과 인터페이스 상속을 구분하라](#Rh-kind)
+* [C.130: 다형적인 클래스에서 깊은 복사를 지원하게 하려면 복사 생성/대입 보다는 가상 `clone`을 선호하라](#Rh-copy)
+* [C.131: 자잘한 getter와 setter를 사용하지 말아라](#Rh-get)
+* [C.132: 이유없이 함수를 `virtual`로 만들지 말아라](#Rh-virtual)
+* [C.133: `protected` 데이터를 지양하라](#Rh-protected)
+* [C.134: `const`가 아닌 모든 데이터 멤버들이 같은 접근 레벨을 가지도록 하라](#Rh-public)
+* [C.135: 다른 인터페이스를 표현하기 위해 다중 상속을 사용하라](#Rh-mi-interface)
+* [C.136: 구현 속성의 결합을 표현하기 위해 다중 상속을 사용하라](#Rh-mi-implementation)
 * [C.137: Use `virtual` bases to avoid overly general base classes](#Rh-vbase)
 * [C.138: Create an overload set for a derived class and its bases with `using`](#Rh-using)
-* [C.139: Use `final` sparingly](#Rh-final)
-* [C.140: Do not provide different default arguments for a virtual function and an overrider](#Rh-virtual-default-arg)
+* [C.139: `final`은 필요한 만큼만 사용하라](#Rh-final)
+* [C.140: 가상 함수와 그 구현 함수에 서로 다른 기본 인자를 사용하지 마라](#Rh-virtual-default-arg)
 
-Accessing objects in a hierarchy rule summary:
+계층 구조 내 개체 접근 규칙 요약:
 
-* [C.145: Access polymorphic objects through pointers and references](#Rh-poly)
-* [C.146: Use `dynamic_cast` where class hierarchy navigation is unavoidable](#Rh-dynamic_cast)
-* [C.147: Use `dynamic_cast` to a reference type when failure to find the required class is considered an error](#Rh-ref-cast)
-* [C.148: Use `dynamic_cast` to a pointer type when failure to find the required class is considered a valid alternative](#Rh-ptr-cast)
-* [C.149: Use `unique_ptr` or `shared_ptr` to avoid forgetting to `delete` objects created using `new`](#Rh-smart)
-* [C.150: Use `make_unique()` to construct objects owned by `unique_ptr`s](#Rh-make_unique)
-* [C.151: Use `make_shared()` to construct objects owned by `shared_ptr`s](#Rh-make_shared)
-* [C.152: Never assign a pointer to an array of derived class objects to a pointer to its base](#Rh-array)
-* [C.153: Prefer virtual function to casting](#Rh-use-virtual)
+* [C.145: 다형적인 개체들은 포인터와 참조를 통해 접근하라](#Rh-poly)
+* [C.146:  클래스 계층구조 탐색이 불가피한 경우에만 `dynamic_cast`를 사용하라](#Rh-dynamic_cast)
+* [C.147: 필요한 클래스를 찾지 못한 경우가 오류에 해당하는 경우 `dynamic_cast`를 참조 타입에 사용하라](#Rh-ref-cast)
+* [C.148: 필요한 클래스를 찾지 못한 경우가 대안으로 사용된다면 `dynamic_cast`를 포인터 타입에 사용하라](#Rh-ptr-cast)
+* [C.149: 동적 할당한 개체의 소멸을 잊지 않도록 `unique_ptr` 혹은 `shared_ptr`를 사용하라](#Rh-smart)
+* [C.150: `unique_ptr`로 소유되는 개체를 생성하기 위해서는 `make_unique()`를 사용하라](#Rh-make_unique)
+* [C.151: `shared_ptr`로 소유되는 개체를 생성하기 위해서는 `make_shared()`를 사용하라](#Rh-make_shared)
+* [C.152: 하위 클래스의 포인터에 상위 클래스 포인터를 대입하지 마라](#Rh-array)
+* [C.153: 타입 캐스팅보다 가상 함수를 선호하라](#Rh-use-virtual)
 
-### <a name="Rh-domain"></a>C.120: Use class hierarchies to represent concepts with inherent hierarchical structure (only)
+### <a name="Rh-domain"></a>C.120: 계층적인 구조를 가진 개념을 표현하기 위해서만 클래스 계층구조를 사용하라
 
 ##### Reason
 
-Direct representation of ideas in code eases comprehension and maintenance. Make sure the idea represented in the base class exactly matches all derived types and there is not a better way to express it than using the tight coupling of inheritance.
+생각이 바로 코드로 나타나는 것은 이해와 유지보수를 쉽게 만든다. 생각이 상위 클래스에서 나타나고 하위 타입에서 이를 따르게 하라. 이 목적을 담아내기 위한 방법으로 상속보다 좋은 방법은 없다.
 
-Do *not* use inheritance when simply having a data member will do. Usually this means that the derived type needs to override a base virtual function or needs access to a protected member.
+데이터 멤버를 담기 위한 방법으로 상속을 *사용해선 안된다*. 많은 경우 상속은 하위 타입이 상위 가상 함수를 재정의하거나 멤버에 접근할 필요한 경우를 의미한다.
 
 ##### Example
 
@@ -2837,7 +3005,7 @@ Do *not* use inheritance when simply having a data member will do. Usually this 
 
 ##### Example, bad
 
-Do *not* represent non-hierarchical domain concepts as class hierarchies.
+계층적이지 않은 개념을 클래스 계층구조로 표현해선 *안된다*.
 
 ```c++
     template<typename T>
@@ -2858,24 +3026,22 @@ Do *not* represent non-hierarchical domain concepts as class hierarchies.
     };
 ```
 
-Here most overriding classes cannot implement most of the functions required in the interface well.
-Thus the base class becomes an implementation burden.
-Furthermore, the user of `Container` cannot rely on the member functions actually performing a meaningful operations reasonably efficiently;
-it may throw an exception instead.
-Thus users have to resort to run-time checking and/or
-not using this (over)general interface in favor of a particular interface found by a run-time type inquiry (e.g., a `dynamic_cast`).
+위 예에서 대부분의 하위 클래스들은 인터페이스에서 요구하는 함수들을 잘 재정의(override)할 수 없다. 때문에 상위 클래스는 구현 부담을 발생시킨다.
+나아가서, `Container`의 사용자는 멤버 함수들이 실제로 유의미한 연산들을 효율적으로 실행하는지 신뢰할 수 없다: 연산을 수행하지 않고 예외를 던질 수도 있다.
+
+이 때문에 유저는 실행 시간 검사에 의존하거나 이와 같은 (과도하게) 일반적인 인터페이스를 사용하지 않고 (`dynamic_cast`와 같은) 실행시간 타입 확인을 사용할 것이다.
 
 ##### Enforcement
 
-* Look for classes with lots of members that do nothing but throw.
-* Flag every use of a nonpublic base class `B` where the derived class `D` does not override a virtual function or access a protected member in `B`, and `B` is not one of the following: empty, a template parameter or parameter pack of `D`, a class template specialized with `D`.
+* 아무것도 하지 않고 예외를 던지는 멤버가 많은 클래스를 찾
+아낸다
+* 상위 클래스 `B`의 가상함수를 하위 클래스 `D`가 구현하지 않거나 `B` 멤버에 접근하지 않는 경우를 지적하라. 이때 `B`는 다음에 해당하지 않아야 한다: 멤버 변수를 가지지 않는다. `D`의 템플릿 인자 혹은 인자 묶음(pack)이 아니다. `D`를 사용해 특수화된 템플릿이다.
 
-### <a name="Rh-abstract"></a>C.121: If a base class is used as an interface, make it a pure abstract class
+### <a name="Rh-abstract"></a>C.121: 상위 클래스가 인터페이스로 사용된다면, 순수 가상 클래스로 만들어라
 
 ##### Reason
 
-A class is more stable (less brittle) if it does not contain data.
-Interfaces should normally be composed entirely of public pure virtual functions and a default/empty virtual destructor.
+클래스는 데이터를 가지지 않으면 더 안정적이다. 인터페이스는 일반적으로 순수 가상 함수와 기본/비어있는 가상 소멸자로 구성되어야 한다
 
 ##### Example
 
@@ -2909,18 +3075,17 @@ Interfaces should normally be composed entirely of public pure virtual functions
     } // leak
 ```
 
-The `Derived` is `delete`d through its `Goof` interface, so its `string` is leaked.
-Give `Goof` a virtual destructor and all is well.
+`Derived` 클래스는 `Goof`를 통해서 소멸되기 때문에, 멤버 `string`에서 누수가 발생한다. `Goof`에서 가상 소멸자를 제공하면 모든게 원활하게 돌아간다.
 
 ##### Enforcement
 
-* Warn on any class that contains data members and also has an overridable (non-`final`) virtual function.
+* 클래스가 데이터 멤버를 가지면서 (`final`이 아닌) 가상 함수를 가지면 경고한다
 
-### <a name="Rh-separation"></a>C.122: Use abstract classes as interfaces when complete separation of interface and implementation is needed
+### <a name="Rh-separation"></a>C.122: 인터페이스와 구현의 분리가 필요하다면 추상 클래스들을 인터페이스로 사용하라
 
 ##### Reason
 
-Such as on an ABI (link) boundary.
+예를 들어 ABI(Application Binary Interfae)를 사용하는 지점에서 이런 작업이 필요하다.
 
 ##### Example
 
@@ -2946,20 +3111,19 @@ Such as on an ABI (link) boundary.
     };
 ```
 
-A user can now use `D1`s and `D2`s interchangeably through the interface provided by `Device`.
-Furthermore, we can update `D1` and `D2` in a ways that are not binary compatible with older versions as long as all access goes through `Device`.
+위와 같은 코드에서 사용자는 `Device`에서 제공하는 인터페이스를 통해서 `D1`과 `D2`를 교환하면서 사용할 수 있다. 나아가서, `Device`를 통해서 접근되는 한 `D1`과 `D2`를 구 버전과 호환되지 않도록(not binary compatible) 업데이트 할 수 있다.
 
 ##### Enforcement
 
     ???
 
-## C.hierclass: Designing classes in a hierarchy:
+## C.hierclass: 계층 구조 내 클래스 설계
 
-### <a name="Rh-abstract-ctor"></a>C.126: An abstract class typically doesn't need a constructor
+### <a name="Rh-abstract-ctor"></a>C.126: 일반적으로 추상 클래스는 생성자가 필요하지 않다
 
 ##### Reason
 
-An abstract class typically does not have any data for a constructor to initialize.
+추상 클래스는 데이터 멤버를 가지지 않으며 이를 초기화하기 위한 생성자 또한 가지지 않는다.
 
 ##### Example
 
@@ -2967,19 +3131,19 @@ An abstract class typically does not have any data for a constructor to initiali
 
 ##### Exception
 
-* A base class constructor that does work, such as registering an object somewhere, may need a constructor.
-* In extremely rare cases, you might find it reasonable for an abstract class to have a bit of data shared by all derived classes
-  (e.g., use statistics data, debug information, etc.); such classes tend to have constructors. But be warned: Such classes also tend to be prone to requiring virtual inheritance.
+* 개체를 어딘가에 등록하기 위한 상위 클래스 생성자가 필요할 수도 있다
+* 극히 드문 경우이지만, 추상 클래스가 하위 클래스들이 공유하는 데이터를 가지는 것이 타당한 경우가 있을 수 있다 (예를 들어, 정적 데이터, 디버깅 정보 등); 그러한 클래스들은 생성자를 가진다. 하지만 주의하라; 그런 경우는 가상 상속에 취약하다
 
 ##### Enforcement
 
-Flag abstract classes with constructors.
+생성자를 가진 추상 클래스들을 지적하라
 
-### <a name="Rh-dtor"></a>C.127: A class with a virtual function should have a virtual or protected destructor
+### <a name="Rh-dtor"></a>C.127: 가상함수를 가진 클래스는 공개(public)된 가상(virtual) 혹은 상속되는(protected) 소멸자를 가져야 한다
 
 ##### Reason
 
-A class with a virtual function is usually (and in general) used via a pointer to base. Usually, the last user has to call delete on a pointer to base, often via a smart pointer to base, so the destructor should be public and virtual. Less commonly, if deletion through a pointer to base is not intended to be supported, the destructor should be protected and nonvirtual; see [C.35](#Rc-dtor-virtual).
+가상 함수를 가진 클래스들은 보통 상위 클래스의 포인터를 통해서 사용된다. 많은 경우, 마지막 사용자가 상위 클래스 포인터를 통해 delete 하거나 스마트 포인터를 사용해 소멸시킨다. 때문에 소멸자는 public 범위에 있으면서 가상 함수여야 한다. 
+드물게는, 상위 클래스 포인터를 사용한 소멸을 의도적으로 지원하지 않는다면, 소멸자는 protected 범위에 있으면서 가상 함수가 아니어야 한다; [C.35](#Rc-dtor-virtual)를 참고하라
 
 ##### Example, bad
 
@@ -3003,28 +3167,28 @@ A class with a virtual function is usually (and in general) used via a pointer t
 
 ##### Note
 
-There are people who don't follow this rule because they plan to use a class only through a `shared_ptr`: `std::shared_ptr<B> p = std::make_shared<D>(args);` Here, the shared pointer will take care of deletion, so no leak will occur from an inappropriate `delete` of the base. People who do this consistently can get a false positive, but the rule is important -- what if one was allocated using `make_unique`? It's not safe unless the author of `B` ensures that it can never be misused, such as by making all constructors private and providing a factory function to enforce the allocation with `make_shared`.
+`shared_ptr`를 통해 클래스를 사용하기 때문에 이 규칙을 따르지 않는 사람들도 있다: `std::shared_ptr<B> p = std::make_shared<D>(args);` 이런 경우, 공유 포인터가 소멸을 담당할 것이다. 그러니 부적절한 상위 클래스의 `delete`로 인한 누수가 발생하지 않는다. 
+이를 계속하는 사람들은 잘못된 코드로부터 정상적인 동작을 만들어낸다 (false positive), 그렇지만 이 규칙은 중요하다 -- 만약 누군가 `make_unique`를 사용해 할당하면 어떻게 될 것인가? `B`의 작성자가 모든 생성자를 private로 만들고 `make_shared`를 통해서만 생성이 가능하도록 팩토리 함수를 제공해서 잘못 사용될 것이라고 보장하지 않는 한, 이 코드는 안전하지 않다. 
 
 ##### Enforcement
 
-* A class with any virtual functions should have a destructor that is either public and virtual or else protected and nonvirtual.
-* Flag `delete` of a class with a virtual function but no virtual destructor.
+* 가상 함수를 가진 클래스는 공개(public)된 가상(virtual) 혹은 상속되는(protected) 소멸자를 가져야 한다
+* 가상 소멸자를 가지지 않고 가상 함수를 사용해 `delete`하는 클래스를 지적하라
 
-### <a name="Rh-override"></a>C.128: Virtual functions should specify exactly one of `virtual`, `override`, or `final`
+### <a name="Rh-override"></a>C.128: 가상 함수들은 `virtual`, `override`, 혹은 `final` 중 하나만 명시해야 한다
 
 ##### Reason
 
-Readability.
-Detection of mistakes.
-Writing explicit `virtual`, `override`, or `final` is self-documenting and enables the compiler to catch mismatch of types and/or names between base and derived classes. However, writing more than one of these three is both redundant and a potential source of errors.
+가독성. 실수를 발견할 수 있다. 명시적으로 `virtual`, `override`, `final`을 사용하는 것은 함수 자체를 문서화한다. 동시에 컴파일러가 상위 클래스와 하위 클래스의 타입 혹은 이름이 불일치 하는 것을 잡아낼 수 있도록 돕는다.
+하지만 이들을 하나 이상 작성하는 것은 중복적이면서 오류를 발생시킬 수 있다.
 
-It's simple and clear:
+하나만 작성하는 것이 단순하고 명확하다:
 
-* `virtual` means exactly and only "this is a new virtual function."
-* `override` means exactly and only "this is a non-final overrider."
-* `final` means exactly and only "this is a final overrider."
+* `virtual`는 "새로운 가상 함수"라는 것을 의미한다
+* `override`는 "재정의 될 수 있는(non-`final`) 재정의 함수"라는 것을 의미한다
+* `final` 는 "마지막 재정의 함수"라는 것을 의미한다
 
-If a base class destructor is declared `virtual`, one should avoid declaring derived class destructors  `virtual` or `override`. Some code base and tools might insist on `override` for destructors, but that is not the recommendation of these guidelines.
+만약 상위 클래스의 소멸자가 `virtual`로 선언되었다면, 하위 클래스 소멸자들은 `virtual` 혹은 `override`가 된다. 어떤 코드 혹은 지원도구에서 소멸자에 `override`를 사용하도록 강요할 수도 있지만, 이 가이드라인에서는 그 방법은 권하지 않는다.
 
 ##### Example, bad
 
@@ -3057,46 +3221,42 @@ If a base class destructor is declared `virtual`, one should avoid declaring der
 
 #### Discussion
 
-We want to eliminate two particular classes of errors:
+우리는 이 규칙을 통해 2가지 오류 없애고자 한다:
 
-* **implicit virtual**: the programmer intended the function to be implicitly virtual and it is (but readers of the code can't tell); or the programmer intended the function to be implicitly virtual but it isn't (e.g., because of a subtle parameter list mismatch); or the programmer did not intend the function to be virtual but it is (because it happens to have the same signature as a virtual in the base class)
-* **implicit override**: the programmer intended the function to be implicitly an overrider and it is (but readers of the code can't tell); or the programmer intended the function to be implicitly an overrider but it isn't (e.g., because of a subtle parameter list mismatch); or the programmer did not intend the function to be an overrider but it is (because it happens to have the same signature as a virtual in the base class -- note this problem arises whether or not the function is explicitly declared virtual, because the programmer may have intended to create either a new virtual function or a new nonvirtual function)
+* **암묵적 가상함수**: the programmer intended the function to be implicitly virtual and it is (but readers of the code can't tell); or the programmer intended the function to be implicitly virtual but it isn't (e.g., because of a subtle parameter list mismatch); or the programmer did not intend the function to be virtual but it is (because it happens to have the same signature as a virtual in the base class)
+* **암묵적 재정의**: the programmer intended the function to be implicitly an overrider and it is (but readers of the code can't tell); or the programmer intended the function to be implicitly an overrider but it isn't (e.g., because of a subtle parameter list mismatch); or the programmer did not intend the function to be an overrider but it is (because it happens to have the same signature as a virtual in the base class -- note this problem arises whether or not the function is explicitly declared virtual, because the programmer may have intended to create either a new virtual function or a new nonvirtual function)
 
 ##### Enforcement
 
-* Compare names in base and derived classes and flag uses of the same name that does not override.
-* Flag overrides with neither `override` nor `final`.
-* Flag function declarations that use more than one of `virtual`, `override`, and `final`.
+* 상위 클래스와 하위 클래스들의 이름을 비교하고 같은 이름을 쓰면서 재정의하지 않는 경우를 지적하라
+* `override`와 `final` 중 어느 하나도 사용하지 않은 재정의를 지적하라
+* `virtual`, `override`, `final`중 2개 이상을 사용한 함수 선언을 지적하라
 
-### <a name="Rh-kind"></a>C.129: When designing a class hierarchy, distinguish between implementation inheritance and interface inheritance
+### <a name="Rh-kind"></a>C.129: 클래스 계층구조를 정의할 때는 구현 상속과 인터페이스 상속을 구분하라
 
 ##### Reason
 
-Implementation details in an interface makes the interface brittle;
-that is, makes its users vulnerable to having to recompile after changes in the implementation.
-Data in a base class increases the complexity of implementing the base and can lead to replication of code.
+인터페이스에서 구현 내용을 가지는 것은 인터페이스가 망가지기 쉽게 한다; 달리 말해, 인터페이스의 사용자들이 구현을 바꾼 뒤에 다시 컴파일할 때 영향을 받게 한다.
+상위 클래스의 데이터는 상위 클래스를 구현하는 것을 어렵게 만들고 코드 중복을 발생시킬 수 있다.
 
 ##### Note
 
-Definition:
+정의:
 
-* interface inheritance is the use of inheritance to separate users from implementations,
+* 인터페이스 상속 is the use of inheritance to separate users from implementations,
 in particular to allow derived classes to be added and changed without affecting the users of base classes.
-* implementation inheritance is the use of inheritance to simplify implementation of new facilities
+* 구현 상속 is the use of inheritance to simplify implementation of new facilities
 by making useful operations available for implementers of related new operations (sometimes called "programming by difference").
 
-A pure interface class is simply a set of pure virtual functions; see [I.25](#Ri-abstract).
+순수한 인터페이스 클래스는 쉽게말해 순수 가상함수들의 집합이라고 할 수 있다; [I.25](#Ri-abstract)를 참고하라.
 
-In early OOP (e.g., in the 1980s and 1990s), implementation inheritance and interface inheritance were often mixed
-and bad habits die hard.
-Even now, mixtures are not uncommon in old code bases and in old-style teaching material.
+초창기의 개체지향 프로그래밍에서는 (1980년도와 1990년도), 구현 상속과 인터페이스 상속이 혼재되어 있었고 그런 인습이 아직도 남아있다. 오래된 코드나 교육자료에서는 흔히 볼 수 있다.
 
-The importance of keeping the two kinds of inheritance increases
+아래의 경우 2가지 상속을 구분하는 것이 중요하다
 
-* with the size of a hierarchy (e.g., dozens of derived classes),
-* with the length of time the hierarchy is used (e.g., decades), and
-* with the number of distinct organizations in which a hierarchy is used
-(e.g., it can be difficult to distribute an update to a base class)
+* 계층구조의 크기가 커진다(십수개의 하위 클래스가 존재한다)
+* 계층구조를 사용하는 시간이 길어진다 (수십년)
+* 서로 다른 조직이 계층구조를 사용하고 있다 (즉, 흩어진 상위 클래스를 업데이트 하기 어렵다)
 
 ##### Example, bad
 
@@ -3136,21 +3296,18 @@ The importance of keeping the two kinds of inheritance increases
     };
 ```
 
-Problems:
+위 예시는 아래와 같은 문제들을 가지고 있다:
 
-* As the hierarchy grows and more data is added to `Shape`, the constructors gets harder to write and maintain.
-* Why calculate the center for the `Triangle`? we may never us it.
-* Add a data member to `Shape` (e.g., drawing style or canvas)
-and all derived classes and all users needs to be reviewed, possibly changes, and probably recompiled.
+* 계층구조가 늘고 `Shape`의 데이터가 늘어난다. 생성자를 작성하고 관리하기 어려워진다
+* `Triangle`의 중심을 사용하지 않을지도 모르는데 계산할 필요가 있을까?
+* `Shape`에 새로운 멤버를 추가되면 (예컨대 그리는 방법이라던가 그리는 캔버스), 모든 하위 클래스들이 변화되면서 새로 컴파일 되어야 한다
 
-The implementation of `Shape::move()` is an example of implementation inheritance:
-we have defined `move()` once and for all for all derived classes.
-The more code there is in such base class member function implementations and the more data is shared by placing it in the base,
-the more benefits we gain - and the less stable the hierarchy is.
+`Shape::move()`가 구현 상속의 한 사례이다: 상위 클래스와 모든 하위 클래스를 위해서 `move()`를 한번만 정의한다.
+상위 클래스에 더 많은 멤버함수 코드가 작성될수록,더 많은 데이터가 공유될수록, 코드를 적게 작성하는 효용이 생기지만 계층구조가 불안정하게 된다.
 
 ##### Example
 
-This Shape hierarchy can be rewritten using interface inheritance:
+인터페이스 상속을 사용해 `Shape` 계층을 다시 작성하면 이렇다:
 
 ```c++
     class Shape {  // pure interface
@@ -3167,7 +3324,7 @@ This Shape hierarchy can be rewritten using interface inheritance:
     };
 ```
 
-Note that a pure interface rarely have constructors: there is nothing to construct.
+순수 인터페이스들이 생성자를 가지는 경우는 드물다는 점에 주의하라: 생성할 데이터가 존재하지 않는다.
 
 ```c++
     class Circle : public Shape {
@@ -3185,16 +3342,15 @@ Note that a pure interface rarely have constructors: there is nothing to constru
     };
 ```
 
-The interface is now less brittle, but there is more work in implementing the member functions.
-For example, `center` has to be implemented by every class derived from `Shape`.
+인터페이스는 이제 좀 더 견고해졌지만, 멤버 함수의 구현을 위해 더 많은 작업을 해야 한다. 예를 들어, `center`는 모든 하위 클래스에서 제각기 구현해야 한다.
 
 ##### Example, dual hierarchy
 
-How can we gain the benefit of the stable hierarchies from implementation hierarchies and the benefit of implementation reuse from implementation inheritance.
-One popular technique is dual hierarchies.
-There are many ways of implementing the idea of dual hierarchies; here, we use a multiple-inheritance variant.
+어떻게 하면 인터페이스 상속에 의한 안정적인 계층구조와 구현 상속의 효율적인 재사용을 결합할 수 있을까?
+관련해서 유명한 방식 중 하나는 이중 계층(dual hierarchies) 방식이다. 
+여러 방식들이 있지만, 여기서는 다중 상속 방법을 사용한다.
 
-First we devise a hierarchy of interface classes:
+첫번째로 인터페이스 상속을 만든다:
 
 ```c++
     class Shape {   // pure interface
@@ -3217,7 +3373,7 @@ First we devise a hierarchy of interface classes:
     };
 ```
 
-To make this interface useful, we must provide its implementation classes (here, named equivalently, but in the `Impl` namespace):
+이 인터페이스를 유용하게 만드려면, 구현 클래스들가 필요하다. (여기서는 `Impl` 네임스페이스에서 클래스를 하나 더 정의한다):
 
 ```c++
     class Impl::Shape : public Shape { // implementation
@@ -3236,8 +3392,7 @@ To make this interface useful, we must provide its implementation classes (here,
     };
 ```
 
-Now `Shape` is a poor example of a class with an implementation,
-but bear with us because this is just a simple example of a technique aimed at more complex hierarchies.
+이제 `Shape`는 구현을 가진 클래스의 지저분한 예시가 되었지만, 좀 더 복잡한 계층구조를 위한 단순한 예시이기 때문에 참아줄 수 있다.
 
 ```c++
     class Impl::Circle : public Circle, public Impl::Shape {   // implementation
@@ -3249,7 +3404,7 @@ but bear with us because this is just a simple example of a technique aimed at m
     };
 ```
 
-And we could extend the hierarchies by adding a Smiley class (:-)):
+여기서 `Smiley`클래스를 더해 계층구조를 확장해보자:
 
 ```c++
     class Smiley : public Circle { // pure interface
@@ -3264,12 +3419,12 @@ And we could extend the hierarchies by adding a Smiley class (:-)):
     }
 ```
 
-There are now two hierarchies:
+여기에는 두 계층구조가 혼합되어 있다:
 
-* interface: Smiley -> Circle -> Shape
-* implementation: Impl::Smiley -> Impl::Circle -> Impl::Shape
+* 인터페이스: Smiley -> Circle -> Shape
+* 구현: Impl::Smiley -> Impl::Circle -> Impl::Shape
 
-Since each implementation derived from its interface as well as its implementation base class we get a lattice (DAG):
+인터페이스와 구현 양쪽에서 상속받기 때문에 격자 구조(유향 비순환 그래프)를 가지게 된다:
 
 ```
     Smiley     ->         Circle     ->  Shape
@@ -3278,9 +3433,9 @@ Since each implementation derived from its interface as well as its implementati
     Impl::Smiley -> Impl::Circle -> Impl::Shape
 ```
 
-As mentioned, this is just one way to construct a dual hierarchy.
+앞서 언급한 것처럼, 이는 이중 계층을 구현하기 위한 한 방법일 뿐이다.
 
-The implementation hierarchy can be used directly, rather than through the abstract interface.
+추상 인터페이스가 아니라 구현 계층을 통해서 바로 사용될수도 있다.
 
 ```c++
     void work_with_shape(Shape&);
@@ -3296,12 +3451,12 @@ The implementation hierarchy can be used directly, rather than through the abstr
     }
 ```
 
-This can be useful when the implementation class has members that are not offered in the abstract interface
-or if direct use of a member offers optimization opportunities (e.g., if an implementation member function is `final`)
+추상 인터페이스에서 지원하지 않는 멤버를 구현 클래스에서 지원하는 경우 유용할 수 있다. 
+또 멤버를 직접 사용함으로써 최적화의 가능성도 제공한다 (가령, 구현 멤버함수가 `final`로 선언되었다면)
 
 ##### Note
 
-Another (related) technique for separating interface and implementation is [Pimpl](#Ri-pimpl).
+인터페이스와 구현을 분리하기 위한 또 다른 (관련된) 방법은 [Pimpl](#Ri-pimpl)이다.
 
 ##### Note
 
@@ -3389,7 +3544,7 @@ Flag multiple `get` and `set` member functions that simply access a member witho
 
 ##### Reason
 
-중첩된 `virtual`은 실행 시간과 객체의 코드 크기를 증가시킨다.
+중첩된 `virtual`은 실행 시간과 개체의 코드 크기를 증가시킨다.
 가상 함수는 오버라이드 될 수 있고, 그렇기 때문에 파생 클래스에서의 실수에 노출되어있다. 
 가상 함수는 템플릿 계층구조에서 코드 복제를 야기한다.
 
@@ -3739,9 +3894,9 @@ That can cause confusion: An overrider does not inherit default arguments.
 
 Flag default arguments on virtual functions if they differ between base and derived declarations.
 
-## C.hier-access: 계층 구조에서 개체 접근
+## C.hier-access: 계층 구조 내 개체 접근
 
-### <a name="Rh-poly"></a>C.145: Access polymorphic objects through pointers and references
+### <a name="Rh-poly"></a>C.145: 다형적인 개체들은 포인터와 참조를 통해 접근하라
 
 ##### Reason
 
@@ -3771,7 +3926,7 @@ Both `d`s are sliced.
 
 ##### Exception
 
-객체가 정의된 범위 안에서는 이름이 있는 다형적 객체에 안전하게 접근할 수 있다. 단지 복사 손실이 생기지 않도록 하라.
+개체가 정의된 범위 안에서는 이름이 있는 다형적 개체에 안전하게 접근할 수 있다. 단지 복사 손실이 생기지 않도록 하라.
 
 ```c++
     void use3()
@@ -3783,7 +3938,7 @@ Both `d`s are sliced.
 
 ##### Enforcement
 
-Flag all slicing.
+모든 절단(slicing)을 지적하라.
 
 ### <a name="Rh-dynamic_cast"></a>C.146: Use `dynamic_cast` where class hierarchy navigation is unavoidable
 
@@ -3914,7 +4069,7 @@ In very rare cases, if you have measured that the `dynamic_cast` overhead is mat
 
 ##### Exception
 
-Consider:
+다음과 같은 코드:
 
 ```c++
     template<typename B>
@@ -3925,14 +4080,14 @@ Consider:
 
 ##### Enforcement
 
-* Flag all uses of `static_cast` for downcasts, including C-style casts that perform a `static_cast`.
-* This rule is part of the [type-safety profile](#Pro-type-downcast)
+* 모든 하위 타입으로의 `static_cast`를 지적하라. `static_cast`를 수행하는 C 스타일 변환도 포함하라
+* 이 규칙은 [타입 안전성](#Pro-type-downcast) 규칙들의 일부이다
 
-### <a name="Rh-ref-cast"></a>C.147: Use `dynamic_cast` to a reference type when failure to find the required class is considered an error
+### <a name="Rh-ref-cast"></a>C.147: 필요한 클래스를 찾지 못한 경우가 오류에 해당하는 경우 `dynamic_cast`를 참조 타입에 사용하라
 
 ##### Reason
 
-참조자에 대한 캐스팅은 당신이 정상적인 객체를 얻는 것을 의도했음을 표현한다. 따라서 캐스팅은 반드시 성공해야만 한다. `dynamic_cast`는 만약 실패한다면 예외를 던질 것이다.
+참조자에 대한 캐스팅은 당신이 정상적인 개체를 얻는 것을 의도했음을 표현한다. 따라서 캐스팅은 반드시 성공해야만 한다. `dynamic_cast`는 만약 실패한다면 예외를 던질 것이다.
 
 ##### Example
 
@@ -3984,7 +4139,7 @@ Therefore the result of the `dynamic_cast` should always be treated as if it may
 
 * (Complex) Unless there is a null test on the result of a `dynamic_cast` of a pointer type, warn upon dereference of the pointer.
 
-### <a name="Rh-smart"></a>C.149: Use `unique_ptr` or `shared_ptr` to avoid forgetting to `delete` objects created using `new`
+### <a name="Rh-smart"></a>C.149: 동적 할당한 개체의 소멸을 잊지 않도록 `unique_ptr` 혹은 `shared_ptr`를 사용하라
 
 ##### Reason
 
@@ -4007,12 +4162,11 @@ Therefore the result of the `dynamic_cast` should always be treated as if it may
 * `new`를 사용한 일반(naked) 포인터의 초기화를 지적하라
 * 지역 변수의 `delete`처리를 지적하라
 
-### <a name="Rh-make_unique"></a>C.150: Use `make_unique()` to construct objects owned by `unique_ptr`s
+### <a name="Rh-make_unique"></a>C.150: `unique_ptr`로 소유되는 개체를 생성하기 위해서는 `make_unique()`를 사용하라
 
 ##### Reason
 
- `make_unique` gives a more concise statement of the construction.
-It also ensures exception safety in complex expressions.
+`make_unique`는 생성에 대한 보다 정확한 구문을 제공한다. 복잡한 표현식에서 예외 안전성을 보장한다.
 
 ##### Example
 
@@ -4037,8 +4191,9 @@ It also ensures exception safety in complex expressions.
 
 ##### Enforcement
 
-* Flag the repetitive usage of template specialization list `<Foo>`
-* Flag variables declared to be `unique_ptr<Foo>`
+* 반복적인 템플릿 특수화 `<Foo>`의 사용을 지적한다
+* `unique_ptr<Foo>`로 선언된 변수들을 지적한다
+
 
 ### <a name="Rh-make_shared"></a>C.151: Use `make_shared()` to construct objects owned by `shared_ptr`s
 
@@ -4530,8 +4685,8 @@ A type that is a `union` plus an indicator of which member is currently held is 
 
 공용체(Unions) 규칙 요약:
 
-* [C.180: Use `union`s to save Memory](#Ru-union)
-* [C.181: Avoid "naked" `union`s](#Ru-naked)
+* [C.180: `union`은 메모리를 절약하기 위해 사용하라](#Ru-union)
+* [C.181: `union`을 노출해서 사용하자 말아라](#Ru-naked)
 * [C.182: Use anonymous `union`s to implement tagged unions](#Ru-anonymous)
 * [C.183: Don't use a `union` for type punning](#Ru-pun)
 * ???
