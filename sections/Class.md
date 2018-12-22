@@ -50,7 +50,7 @@
 
 특별히 없다. 데이터 항목들에 대한 경험적인 관점들이 함께 반영될 수는 있을 것이다.
 
-### <a name="Rc-struct"></a>C.2: Use `class` if the class has an invariant; use `struct` if the data members can vary independently
+### <a name="Rc-struct"></a>C.2: 타입이 불변조건을 가진다면, `class`를 사용하라; 데이터 멤버들에 대한 제약이 자유롭다면 `struct`를 사용하라
 
 ##### Reason
 
@@ -93,12 +93,12 @@ invariant 는 형식에 구애받지 않고 (가령, 주석으로) 기술될 수
 따라서, 클래스를 정의하는 사람은 생성자를 제공하고 그 의미를 명시해야만 한다.
 이는 클래스 작성자가 invariant를 정의해야 한다는 것을 의미한다.
 
-**See also**:
+##### See also
 
-* [define a class with private data as `class`](#Rc-class)
-* [Prefer to place the interface first in a class](#Rl-order)
-* [minimize exposure of members](#Rc-private)
-* [Avoid `protected` data](#Rh-protected)
+* [private 데이터를 가지고 있다면 `class`를 사용하라](#Rc-class)
+* [클래스 정의에 인터페이스를 먼저 배치하라](#Rl-order)
+* [멤버의 노출을 최소화하라](#Rc-private)
+* [`protected` 데이터 사용을 지양하라](#Rh-protected)
 
 ##### Enforcement
 
@@ -143,7 +143,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 
 ##### Reason
 
-멤버 함수간 커플링을 줄이고, 개체 상태 변경에 의해 문제가 생기는 함수를 줄이고, representation이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
+멤버 함수간 커플링을 줄인다. 개체 상태 변경에 의해 문제가 생기는 함수를 줄인다. 표현이 변경된 후에 수정될 필요가 있는 멤버 함수의 수를 줄인다.
 
 ##### Example
 
@@ -157,7 +157,7 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
     bool operator==(Date, Date);
 ```
 
-표시된 "helper functions"은 `Date`의 representation에 직접 접근할 필요가 없다.
+"helper functions"으로 표시된 함수들은 `Date`의 내부에 접근할 필요가 없다.
 
 ##### Note
 
@@ -165,18 +165,17 @@ private 데이터를 가진 `struct`나 public 멤버를 가진 `class`들을 �
 
 ##### Exception
 
-The language requires `virtual` functions to be members, and not all `virtual` functions directly access data.
-In particular, members of an abstract class rarely do.
+C++ 에서는 멤버 함수만이 `virtual` 함수가 될 수 있지만, 모든 `virtual`가 멤버에 접근하는 것은 아니다. 특히 추상 클래스들은 멤버에 접근하는 경우가 드물다.
 
-Note [multi-methods](https://parasol.tamu.edu/~yuriys/papers/OMM10.pdf).
-
-##### Exception
-
-The language requires operators `=`, `()`, `[]`, and `->` to be members.
+[multi-methods](https://parasol.tamu.edu/~yuriys/papers/OMM10.pdf)를 확인하라.
 
 ##### Exception
 
-An overload set may have some members that do not directly access `private` data:
+C++ 언어에서 `=`, `()`, `[]`, `->` 연산자는 멤버함수여야 한다.
+
+##### Exception
+
+중복정의 집합에 `private` 데이터에 직접 접근하지 않는 멤버가 있을 수 있다:
 ```c++
     class Foobar {
     public:
@@ -187,28 +186,28 @@ An overload set may have some members that do not directly access `private` data
         // ...
     };
 ```
-Similarly, a set of functions may be designed to be used in a chain:
+
+유사하게, 어떤 함수들은 연속적으로 호출하도록 설계되었을 수 있다:
 
 ```c++
     x.scale(0.5).rotate(45).set_color(Color::red);
 ```
 
-Typically, some but not all of such functions directly access `private` data.
+일반적으로, 이런 함수들 중 일부는 `private` 데이터에 접근한다.
 
 ##### Enforcement
 
-* Look for non-`virtual` member functions that do not touch data members directly.
-The snag is that many member functions that do not need to touch data members directly do.
-* Ignore `virtual` functions.
-* Ignore functions that are part of an overload set out of which at least one function accesses `private` members.
-* Ignore functions returning `this`.
+* 데이터 멤버에 직접 접근하지 않는 비 가상 멤버 함수를 찾아낸다. 이런 함수는 많은 멤버 함수들이 데이터 멤버를 직접 접근할 필요가 없음을 의미한다
+* `virtual` 함수들은 무시한다
+* 중복정의(overload) 하는 함수는 그 중 하나가 `private` 데이터 멤버에 접근하지 않는 한 무시한다
+* `this`를 반환하는 함수들은 무시한다
 
 ### <a name="Rc-helper"></a>C.5: 보조 함수들은 관련 클래스와 같은 namespace에 배치하라
 
 ##### Reason
 
 보조 함수(helper function)는 (보통 클래스 작성자가 제공하는) 클래스의 표현에 직접 접근할 필요가 없는 함수이며, 클래스에 대한 유용한 인터페이스 중에 하나로 볼 수 있다.
-보조 함수들을 같은 네임스페이스에 넣으면 함수와 클래스의 관계가 명확해지고, 인자 종속적인 검색(Argument Dependent Lookup)에서 발견 할 수 있게 된다.
+보조 함수들을 같은 네임스페이스에 넣으면 함수와 클래스의 관계가 명확해지고, Argument Dependent Lookup에서 발견 할 수 있게 된다.
 
 ##### Example
 
@@ -288,7 +287,7 @@ private 데이터가 public data와 멀리 떨어져 숨어있고, 클래스 선
 
 ##### Enforcement
 
-Flag classes declared with `struct` if there is a `private` or `protected` member.
+`private` 혹은 `protected` 멤버를 가지지만 `struct`로 선언된 클래스를 지적한다
 
 ### <a name="Rc-private"></a>C.9: 멤버들의 노출을 최소화하라
 
@@ -307,12 +306,13 @@ Flag classes declared with `struct` if there is a `private` or `protected` membe
     };
 ```
 
-Whatever we do in the `//`-part, an arbitrary user of a `pair` can arbitrarily and independently change its `a` and `b`.
-In a large code base, we cannot easily find which code does what to the members of `pair`.
-This may be exactly what we want, but if we want to enforce a relation among members, we need to make them `private`
-and enforce that relation (invariant) through constructors and member functions.
+`//` 부분에 어떤 코드가 작성되건, `pair`의 사용자는 `a`와 `b`를 독립적으로 변경할 수 있다.
+코드 규모가 큰 경우, `pair`의 멤버에 어떤 일이 일어나는지 찾기 어렵다.
 
-For example:
+독립적으로 변경하는 것이 의도에 맞을 수 있지만, 멤버간의 관계를 강제하고 싶다면, `privae`로 변경하고 그 관계(불변조건)를 생성자와 멤버 함수들로 지키도록 해야 한다.
+
+예를 들자면:
+
 ```c++
     class Distance {
     public:
@@ -320,9 +320,9 @@ For example:
         double meters() const { return magnitude*unit; }
         void set_unit(double u)
         {
-                // ... check that u is a factor of 10 ...
-                // ... change magnitude appropriately ...
-                unit = u;
+            // ... check that u is a factor of 10 ...
+            // ... change magnitude appropriately ...
+            unit = u;
         }
         // ...
     private:
@@ -333,14 +333,13 @@ For example:
 
 ##### Note
 
-If the set of direct users of a set of variables cannot be easily determined, the type or usage of that set cannot be (easily) changed/improved.
-For `public` and `protected` data, that's usually the case.
+만약 변수들에 접근하는 코드를 쉽게 결정할 수 없다면, 그 타입이나 사용을 (쉽게) 변경하거나 개선하기 어렵다.
+`public`과 `protected` 데이터는 보통 이 경우에 해당한다.
 
 ##### Example
 
-A class can provide two interfaces to its users.
-One for derived classes (`protected`) and one for general users (`public`).
-For example, a derived class might be allowed to skip a run-time check because it has already guaranteed correctness:
+클래스는 사용자에게 두가지 인터페이스를 제공할 수 있다. 하나는 상속받는 클래스에게 제공하는 `protected`이며 하나는 일반적으로 사용 가능한 `public`이다.
+예를 들면, 하위 클래스는 상위 클래스의불변조건이 유지된다는 것을 확실히 할 수 있다면 실행시간 검사를 생략 할수도 있다:
 
 ```c++
     class Foo {
@@ -370,9 +369,10 @@ For example, a derived class might be allowed to skip a run-time check because i
         // ...
     }
 ```
+
 ##### Note
 
-[`protected` data is a bad idea](#Rh-protected).
+[`protected` 데이터는 좋은 생각이 아니다](#Rh-protected).
 
 ##### Note
 
@@ -380,7 +380,7 @@ For example, a derived class might be allowed to skip a run-time check because i
 
 ##### Enforcement
 
-* [protected 데이터를 지적하라](#Rh-protected).
+* [protected 데이터를 지적하라](#Rh-protected)
 * `public`과 `private` 데이터가 함께 사용된 경우를 지적하라
 
 ## <a name="SS-concrete"></a>C.concrete: 실제 타입(Concrete types)
@@ -397,10 +397,10 @@ For example, a derived class might be allowed to skip a run-time check because i
 > - Swappable
 > - EqualityComparable
 >
-> 예시로 언급된 `int`의 경우, 기본 연산(생성, 파괴, 복사, 이동)을 지원하면서 교환, 동등비교가 가능합니다
+> 예시로 언급된 `int`의 경우, 기본 연산(생성, 파괴, 복사, 이동)을 지원하면서 교환, 동등비교가 가능합니다
 
 정규 타입의 값은 복사 될 수 있고, 복사의 결과는 원본과 같은 값을 갖는 독립적인 개체이다. 타입이 `=` 와 `==` 를 모두 갖는다면, `a = b`를 실행한 이후에는 `a == b`에서 `true`가 반환되도록 해야 한다.
-실제 타입이 대입과 동등 비교를 지원하지 않을 수 있지만, 그런 경우는 드물다. (거의 없어야 한다).
+실제 타입이 대입과 동등 비교를 지원하지 않을 수 있지만, 그런 경우는 드물다 (거의 없어야 한다).
 
 C++의 언어 내장(built-in) 타입들은 정규적(Regular)이고, `string`, `vector`, `map`같은 표준 라이브러리의 클래스들 또한 그렇다. 실제 타입들은 종종 계층구조의 일부로 사용되는 타입들과 구분하여 값 타입으로 언급된다.
 
@@ -974,7 +974,7 @@ C++ 에서는 기본적인 의미를 가진 연산들을 제공한다.
 ##### Note
 
 소유하고 있는 모든 포인터를 "스마트 포인터"로 변경하는 것은 어떤가?
-드물게 중대한 코드 변경이 필요해지고 ABI 에 영향을 줄 수도 있다.
+드물게는 중대한 코드 변경이 필요해지고 ABI 에 영향을 줄 수도 있다.
 
 ##### Enforcement
 
@@ -1643,7 +1643,8 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 (단순) 멤버 초기화 리스트는 선언과 같은 순서로 진행되어야 한다.
 
-**See also**: [Discussion](#Sd-order)
+##### See also
+[Discussion](#Sd-order)
 
 ### <a name="Rc-in-class-initializer"></a>C.48: 상수 초기화는 가능한 클래스 내(in-class) 멤버 초기화를 사용하라
 
@@ -1664,7 +1665,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
         // ...
     };
 ```
-
+
 코드를 유지보수하는 사람이 `j`가 의도적으로 초기화되지 않았다고 생각할 수 있다 (꽤 이상한 생각이지만). 또 어떤 의도로 `s`의 기본값으로 `""`와 `qqq`를 사용하는지 알 수 있을까? `j`와 같이 멤버 초기화가 생략되는 문제는 이미 있는 클래스에 새로운 멤버가 추가될 때 발생한다.
 
 ##### Example
@@ -1907,7 +1908,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 ##### Reason
 
-이렇게 하는 것이 간단하고 효율적이다. r-value를 위해 최적화하길 원한다면, `&&`를 받는 대입 연산을 오버로드하여 제공하라. (see [F.18](#Rf-consume)).
+이렇게 하는 것이 간단하고 효율적이다. r-value를 위해 최적화하길 원한다면, `&&`를 받는 대입 연산을 오버로드하여 제공하라. ([F.18](#Rf-consume)를 보라)
 
 ##### Example
 
@@ -2715,6 +2716,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
 이는 표준 라이브러리의 요구사항이다.  
 
 ##### Example, bad
+
 ```c++
     template<>
     struct hash<My_type> {  // 정말정말 안좋은 해시 특수화
@@ -2737,6 +2739,7 @@ swap함수을 이용해서 복사 대입을 구현하는 것을 고려하라. [�
         cout << m[My_type{ "asdfg" }] << '\n';
     }
 ```
+
 `hash` 특수화를 정의할 때는, 간단하게 `^` (xor)와 함께 표준 라이브러리의 `hash` 특수화와 통합되도록 하라.  
 비 전문가들을 위해선 이 방법이 더 적합하다.
 
@@ -2908,7 +2911,9 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
@@ -2966,7 +2971,7 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 * [C.149: 동적 할당한 개체의 소멸을 잊지 않도록 `unique_ptr` 혹은 `shared_ptr`를 사용하라](#Rh-smart)
 * [C.150: `unique_ptr`로 소유되는 개체를 생성하기 위해서는 `make_unique()`를 사용하라](#Rh-make_unique)
 * [C.151: `shared_ptr`로 소유되는 개체를 생성하기 위해서는 `make_shared()`를 사용하라](#Rh-make_shared)
-* [C.152: 하위 클래스의 포인터에 상위 클래스 포인터를 대입하지 마라](#Rh-array)
+* [C.152: 절대로 하위 클래스의 포인터에 상위 클래스 포인터를 대입하지 마라](#Rh-array)
 * [C.153: 타입 캐스팅보다 가상 함수를 선호하라](#Rh-use-virtual)
 
 ### <a name="Rh-domain"></a>C.120: 계층적인 구조를 가진 개념을 표현하기 위해서만 클래스 계층구조를 사용하라
@@ -3115,7 +3120,7 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 
 ##### Enforcement
 
-    ???
+???
 
 ## C.hierclass: 계층 구조 내 클래스 설계
 
@@ -3127,7 +3132,9 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 
 ##### Example
 
+```
     ???
+```
 
 ##### Exception
 
@@ -3223,8 +3230,20 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 
 우리는 이 규칙을 통해 2가지 오류 없애고자 한다:
 
-* **암묵적 가상함수**: the programmer intended the function to be implicitly virtual and it is (but readers of the code can't tell); or the programmer intended the function to be implicitly virtual but it isn't (e.g., because of a subtle parameter list mismatch); or the programmer did not intend the function to be virtual but it is (because it happens to have the same signature as a virtual in the base class)
-* **암묵적 재정의**: the programmer intended the function to be implicitly an overrider and it is (but readers of the code can't tell); or the programmer intended the function to be implicitly an overrider but it isn't (e.g., because of a subtle parameter list mismatch); or the programmer did not intend the function to be an overrider but it is (because it happens to have the same signature as a virtual in the base class -- note this problem arises whether or not the function is explicitly declared virtual, because the programmer may have intended to create either a new virtual function or a new nonvirtual function)
+* **암묵적 가상함수**
+   * 프로그래머가 암묵적 가상 함수를 의도했으며, 실제로 그에 해당하는 경우  
+     (하지만 코드를 읽는 사람은 알아볼 수 없다)
+   * 프로그래머는 암묵적 가상 함수를 의도했으나 그렇지 않은 경우  
+     (예를 들어 인자가 미묘하게 맞지 않았다거나하는 이유로)
+   * 프로그래머가 가상 함수를 의도하지 않았으나 가상 함수가 된 경우  
+     (상위 클래스의 가상 함수와 같은 시그니처를 가지는 바람에)     
+* **암묵적 재정의**
+   * 프로그래머는 함수가 암묵적으로 재정의되는 것을 의도했고 그렇게 된 경우  
+     (하지만 코드를 읽는 사람은 알아볼 수 없다)
+   * 프로그래머는 함수가 암묵적으로 재정의되는 것을 의도했으나 그렇지 않은 경우
+     (예를 들어 인자가 미묘하게 맞지 않았다거나하는 이유로)
+   * 프로그래머가 함수가 재정의 되는 것을 의도하지 않았으나 재정의 된 경우  
+     (상위 클래스의 가상 함수와 같은 시그니처를 가지는 바람에 -- 이런 일은 그 함수가 virtual로 선언되지 않아도 발생한다는 점에 주의하라, 프로그래머가 새로운 가상 함수를 만들기를 원했는지 비 가상 함수를 원했는지 알 방법이 없기 때문이다)
 
 ##### Enforcement
 
@@ -3243,10 +3262,8 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 
 정의:
 
-* 인터페이스 상속 is the use of inheritance to separate users from implementations,
-in particular to allow derived classes to be added and changed without affecting the users of base classes.
-* 구현 상속 is the use of inheritance to simplify implementation of new facilities
-by making useful operations available for implementers of related new operations (sometimes called "programming by difference").
+* 인터페이스 상속은 사용자 코드를 구현과 분리하기 위한 것이다. 하위 클래스에서 상위 클래스를 사용하는 코드에 영향을 미치지 않으면서 코드를 더하거나 변경하는데 사용된다
+* 구현 상속은 상속을 사용해 새로운 구현내용을 하위 구현체들이 사용할 수 있도록하는 것이다 (보통 "programming by difference"라고 불린다).
 
 순수한 인터페이스 클래스는 쉽게말해 순수 가상함수들의 집합이라고 할 수 있다; [I.25](#Ri-abstract)를 참고하라.
 
@@ -3460,22 +3477,22 @@ by making useful operations available for implementers of related new operations
 
 ##### Note
 
-There is often a choice between offering common functionality as (implemented) base class functions and free-standing functions
-(in an implementation namespace).
-Base classes gives a shorter notation and easier access to shared data (in the base)
-at the cost of the functionality being available only to users of the hierarchy.
+공통적인 기능들은 (이미 구현된) 상위 클래스 함수로 제공하고 구현 namespace에서 자유롭게 선택하도록 할수도 있다.
+상위 클래스는 더 짧은 표기를 할 수 있게 만들어주며, 기능적인 측면에서(at the cost of the functionality) 계층구조가 공유하는 데이터에 접근하는 유일한 존재가 될 수 있다. 유일한 접근자가 접근하기가 쉽다.
 
 ##### Enforcement
 
-* Flag a derived to base conversion to a base with both data and virtual functions
-(except for calls from a derived class member to a base class member)
+* 데이터와 가상함수에 대해 하위 타입에서 상위 타입으로의 변환을 지적하라  
+  (상위 클래스 멤버 함수를 호출하는 것을 제외하고)
 * ???
 
-### <a name="Rh-copy"></a>C.130: For making deep copies of polymorphic classes prefer a virtual `clone` function instead of copy construction/assignment
+### <a name="Rh-copy"></a>C.130: 다형적인 클래스에서 깊은 복사를 지원하게 하려면 복사 생성/대입 보다는 가상 `clone`을 선호하라
 
 ##### Reason
 
-Copying a polymorphic class is discouraged due to the slicing problem, see [C.67](#Rc-copy-virtual). If you really need copy semantics, copy deeply: Provide a virtual `clone` function that will copy the actual most-derived type and return an owning pointer to the new object, and then in derived classes return the derived type (use a covariant return type).
+다형적인 클래스를 복사하는 것은 절단 문제 때문에 권할만한 일이 아니다. [C.67](#Rc-copy-virtual)를 보라. 복사 문맥이 정말 필요하다면, 깊은 복사를 수행하라: 가상 `clone` 함수를 제공해서 실제 하위 타입을 복사하고 새로운 개체를 소유하는 포인터를 반환하라. 그리고 하위 클래스에서는 하위 클래스의 타입을 반환하라 (공변적인 반환 타입을 사용하라)
+
+> 공변성: covariance
 
 ##### Example
 
@@ -3496,14 +3513,13 @@ Copying a polymorphic class is discouraged due to the slicing problem, see [C.67
     };
 ```
 
-Generally, it is recommended to use smart pointers to represent ownership (see [R.20](#Rr-owner)). However, because of language rules, the covariant return type cannot be a smart pointer: `D::clone` can't return a `unique_ptr<D>` while `B::clone` returns `unique_ptr<B>`. Therefore, you either need to consistently return `unique_ptr<B>` in all overrides, or use `owner<>` utility from the [Guidelines Support Library](#SS-views).
+보편적인 경우, 소유권을 표현하기 위해 스마트 포인터를 사용하는 것이 권장된다.([R.20](#Rr-owner) 참고). 하지만, 언어 규칙으로 인해, 공변적인 반환타입은 스마트 포인터가 될 수 없다: `D::clone`은 `unique_ptr<D>`을 반환할 수 없는 반면 `B::clone`는 `unique_ptr<B>`를 반환할 수 있다. 이로 인해, 모든 재정의에서 항상 `unique_ptr<B>` 혹은 [Guidelines Support Library](#SS-views)의 `owner<>`를 반환할 수 밖에 없다.
 
-
-### <a name="Rh-get"></a>C.131: Avoid trivial getters and setters
+### <a name="Rh-get"></a>C.131: 자잘한 getter와 setter를 사용하지 말아라
 
 ##### Reason
 
-A trivial getter or setter adds no semantic value; the data item could just as well be `public`.
+사소한 목적으로 작성된 getter와 setter는 의미구조적 가치가 없다; 단순히 `public`으로 공개해도 될 것이다.
 
 ##### Example
 
@@ -3521,7 +3537,7 @@ A trivial getter or setter adds no semantic value; the data item could just as w
     };
 ```
 
-Consider making such a class a `struct` -- that is, a behaviorless bunch of variables, all public data and no member functions.
+이런 클래스를 `struct`로 만드는 것을 고려하라 -- 즉, 어떤 행위도 하지 않는 변수들을 public 데이터로 만들고 멤버함수를 가지지 않는 것이다.
 
 ```c++
     struct Point {
@@ -3530,17 +3546,17 @@ Consider making such a class a `struct` -- that is, a behaviorless bunch of vari
     };
 ```
 
-Note that we can put default initializers on member variables: [C.49: Prefer initialization to assignment in constructors](#Rc-initialize).
+멤버 변수들에 기본 초기화를 사용할 수 있다는 점에 유의하라: [C.49: 생성자 안에서의 대입 보다는 초기화를 선호하라](#Rc-initialize).
 
 ##### Note
 
-The key to this rule is whether the semantics of the getter/setter are trivial. While it is not a complete definition of "trivial", consider whether there would be any difference beyond syntax if the getter/setter was a public data member instead. Examples of non-trivial semantics would be: maintaining a class invariant or converting between an internal type and an interface type.
+이 규칙의 핵심은 getter/setter의 의미구조가 가치있는지 판단하는 것이다. 이것이 "사소함"에 대한 완전한 정의는 아니지만, 문법을 넘어서 getter/setter가 public 데이터 멤버였을 때를 고려해보라. 사소하지 않은 의미구조의 예를 든다면: 클래스의 불변조건을 유지하거나 내부(internal) 타입과 인터페이스 타입을 변환하는 것을 예로 들 수 있다.
 
 ##### Enforcement
 
-Flag multiple `get` and `set` member functions that simply access a member without additional semantics.
+별다른 의미구조 없이 단순히 멤버에 접근하기만 하는 `get`/`set` 멤버 함수를 여럿 가지고 있으면 지적한다.
 
-### <a name="Rh-virtual"></a>C.132: Don't make a function `virtual` without reason
+### <a name="Rh-virtual"></a>C.132: 이유없이 함수를 `virtual`로 만들지 말아라
 
 ##### Reason
 
@@ -3569,13 +3585,13 @@ Flag multiple `get` and `set` member functions that simply access a member witho
 * 가상 함수를 가지지만 파생 클래스가 없으면 지적하라.
 * 모든 멤버 함수가 가상 함수이고 구현을 가지고 있으면 지적하라.
 
-### <a name="Rh-protected"></a>C.133: Avoid `protected` data
+### <a name="Rh-protected"></a>C.133: `protected` 데이터를 지양하라
 
 ##### Reason
 
 `protected` 데이터는 복잡성과 에러의 원인이다.  
 `protected` 데이터는 불변조건의 구문을 복잡하게 만든다.  
-`protected` data inherently violates the guidance against putting data in base classes, which usually leads to having to deal with virtual inheritance as well.
+`protected` 데이터는 상위 클래스에 데이터를 배치함으로써 필연적으로 가상 상속을 처리해야 하는 상황으로 이어질 수 있다.
 
 ##### Example, bad
 
@@ -3591,32 +3607,25 @@ Flag multiple `get` and `set` member functions that simply access a member witho
     };
 ```
 
-Now it is up to every derived `Shape` to manipulate the protected data correctly.
-This has been popular, but also a major source of maintenance problems.
-In a large class hierarchy, the consistent use of protected data is hard to maintain because there can be a lot of code,
-spread over a lot of classes.
-
-The set of classes that can touch that data is open: anyone can derive a new class and start manipulating the protected data.
-Often, it is not possible to examine the complete set of classes, so any change to the representation of the class becomes infeasible.
-There is no enforced invariant for the protected data; it is much like a set of global variables.
-The protected data has de facto become global to a large body of code.
+이 예에서 모든 `Shape`의 하위 타입들은 protected 데이터를 정확하게 변경해야만 한다. 흔히 볼수 있으면서 유지보수 문제를 일으키는 주요 원인 중 하나에 해당한다. 클래스 계층구조가 큰 경우, 일관적으로 protected 데이터를 사용하는 것은 코드가 양적으로 많고 분산되어 있기 때문에 관리되기 어렵다.
+상속되는 데이터를 변경할 수 있는 클래스는 더 늘어날 수 있다: 새로 클래스를 상속받아 protected 데이터를 변경하기 시작할 수 있다.
+경우에 따라선 클래스들의 전체 집합을 찾는 것이 불가능할수도 있다. 이로 인해 클래스를 변경하는 것을 실행할 수 없을 수도 있다. protected 데이터에는 불변조건을 강요할 수 없다; 전역변수 집합과 같다고 할 수 있다. protected 데이터는 코드 규모가 커지면 실제로 전역변수가 된다.
 
 ##### Note
 
-Protected data often looks tempting to enable arbitrary improvements through derivation.
-Often, what you get is unprincipled changes and errors.
-[Prefer `private` data](#Rc-private) with a well-specified and enforced invariant.
-Alternative, and often better, [keep data out of any class used as an interface](#Rh-abstract).
+데이터를 protected를 사용해 상속하는 것은 임의적으로 개선하도록 할 수 있게 한다는 점에서 매력적으로 보일 수 있다. 하지만 이로 인해 제어되지 않는 변경과 오류를 발생시키게 된다.
+잘 정의되고 불변조건을 강요하도록 [`private` 데이터를 선호하라](#Rc-private)
+다른 방법으로는, [인터페이스 클래스는 데이터를 가지지 않도록 하라](#Rh-abstract).
 
 ##### Note
 
-Protected member function can be just fine.
+protected 멤버 함수에는 문제가 없다.
 
 ##### Enforcement
 
-Flag classes with `protected` data.
+`protected` 데이터를 지적하라
 
-### <a name="Rh-public"></a>C.134: Ensure all non-`const` data members have the same access level
+### <a name="Rh-public"></a>C.134: `const`가 아닌 모든 데이터 멤버들이 같은 접근 레벨을 가지도록 하라
 
 ##### Reason
 
@@ -4091,7 +4100,9 @@ In very rare cases, if you have measured that the `dynamic_cast` overhead is mat
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
@@ -4195,12 +4206,11 @@ Therefore the result of the `dynamic_cast` should always be treated as if it may
 * `unique_ptr<Foo>`로 선언된 변수들을 지적한다
 
 
-### <a name="Rh-make_shared"></a>C.151: Use `make_shared()` to construct objects owned by `shared_ptr`s
+### <a name="Rh-make_shared"></a>C.151: `shared_ptr`로 소유되는 개체를 생성하기 위해서는 `make_shared()`를 사용하라
 
 ##### Reason
 
- `make_shared` gives a more concise statement of the construction.
-It also gives an opportunity to eliminate a separate allocation for the reference counts, by placing the `shared_ptr`'s use counts next to its object.
+`make_shared`는 생성에 대한 보다 정확한 구문을 제공한다. 참조 카운트에 대한 별도의 공간 할당이 필요없게 된다. `shared_ptr`는 개체의 옆(다음 영역)에 참조 카운트를 배치해 사용한다.
 
 ##### Example
 
@@ -4215,14 +4225,15 @@ It also gives an opportunity to eliminate a separate allocation for the referenc
 
 ##### Enforcement
 
-* Flag the repetitive usage of template specialization list`<Bar>`
-* Flag variables declared to be `shared_ptr<Bar>`
 
-### <a name="Rh-array"></a>C.152: Never assign a pointer to an array of derived class objects to a pointer to its base
+* 반복적인 템플릿 특수화 `<Bar>`의 사용을 지적한다
+* `shared_ptr<Bar>`로 선언된 변수들을 지적한다
+
+### <a name="Rh-array"></a>C.152: 절대로 하위 클래스의 포인터에 상위 클래스 포인터를 대입하지 마라
 
 ##### Reason
 
-Subscripting the resulting base pointer will lead to invalid object access and probably to memory corruption.
+상위 타입 포인터를 대입하면 부적절한 개체 접근이 발생하고 아마도 메모리 손상을 일으킬 것이다.
 
 ##### Example
 
@@ -4241,44 +4252,43 @@ Subscripting the resulting base pointer will lead to invalid object access and p
 
 ##### Enforcement
 
-* Flag all combinations of array decay and base to derived conversions.
-* Pass an array as a `span` rather than as a pointer, and don't let the array name suffer a derived-to-base conversion before getting into the `span`
+* 배열 포인터의 변환이나 상위 타입에서 하위 타입으로의 변환을 지적한다
+* 배열은 포인터보다는 `span`을 사용해서 전달하라. 그리고 `span`을 생성하기  전까지는 하위 타입에서 상위 타입으로 변환되지 않도록 하라
 
-### <a name="Rh-use-virtual"></a>C.153: Prefer virtual function to casting
+### <a name="Rh-use-virtual"></a>C.153: 타입 캐스팅보다 가상 함수를 선호하라
 
 ##### Reason
 
-A virtual function call is safe, whereas casting is error-prone.
-A virtual function call reaches the most derived function, whereas a cast may reach an intermediate class and therefore
-give a wrong result (especially as a hierarchy is modified during maintenance).
+타입 캐스팅이 오류에 취약한 반면 가상함수 호출은 안전하디. 가상 함수 호출은 최종 구현을 사용하는 반면, 타입 캐스팅은 중간 클래스에 적용될수도 있다. 이로 인해 잘못된 결과를 반환할 수 있다 (계층 구조가 유지보수 과정에서 변경되었다면).
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
-See [C.146](#Rh-dynamic_cast) and ???
+[C.146](#Rh-dynamic_cast)를 참고하라
 
-## <a name="SS-overload"></a>C.over: 오버로딩
+## <a name="SS-overload"></a>C.over: 중복정의(Overloading)
 
-You can overload ordinary functions, template functions, and operators.
-You cannot overload function objects.
+일반 함수, 템플릿 함수, 연산자를 중복 정의할 수 있다. 함수 개체는 중복정의할 수 없다.
 
-Overload rule summary:
+중복정의 규칙 요약:
 
-* [C.160: 연산자를 정의할때는 관례적인 사용을 모방하라](#Ro-conventional)
-* [C.161: 대칭적인 연산자들에는 비멤버 함수들을 사용하라](#Ro-symmetric)
-* [C.162: 거의 동등한 연산들을 오버로드하라](#Ro-equivalent)
-* [C.163: 거의 동등한 연산들'만' 오버로드하라](#Ro-equivalent-2)
-* [C.164: 형변환 연산자들을 지양하라](#Ro-conversion)
-* [C.165: Use `using` for customization points](#Ro-custom)
-* [C.166: Overload unary `&` only as part of a system of smart pointers and references](#Ro-address-of)
-* [C.167: Use an operator for an operation with its conventional meaning](#Ro-overload)
-* [C.168: Define overloaded operators in the namespace of their operands](#Ro-namespace)
-* [C.170: 람다를 오버로딩하는 기분이 든다면, 제네릭 람다를 사용하라](#Ro-lambda)
+* [C.160: 연산자를 정의할때는 전통적인 사용을 모방하라](#Ro-conventional)
+* [C.161: 대칭적인 연산자는 비멤버 함수로 정의하라](#Ro-symmetric)
+* [C.162: 거의 동등한 연산들을 중복정의하라](#Ro-equivalent)
+* [C.163: 거의 동등한 연산들'만' 중복정의하라](#Ro-equivalent-2)
+* [C.164: 암묵적 형변환 연산자들을 지양하라](#Ro-conversion)
+* [C.165: 커스터마이징이 필요하면 `using`을 사용하라](#Ro-custom)
+* [C.166: 단항 연산자 `&`는 스마트 포인터와 참조 체계를 따르는 경우에만 중복정의하라](#Ro-address-of)
+* [C.167: 연산자는 전통적인 의미를 수행하는데 사용하라](#Ro-overload)
+* [C.168: 연산자를 중복정의는 피연산자의 네임스페이스에 하라](#Ro-namespace)
+* [C.170: 람다를 중복 정의하고 싶다면, 제네릭 람다를 사용하라](#Ro-lambda)
 
-### <a name="Ro-conventional"></a>C.160: Define operators primarily to mimic conventional usage
+### <a name="Ro-conventional"></a>C.160: 연산자를 정의할때는 전통적인 사용을 모방하라
 
 ##### Reason
 
@@ -4297,7 +4307,7 @@ Overload rule summary:
     };
 ```
 
-Here, the conventional semantics is maintained: [Copies compare equal](#SS-copy).
+이 예시에선 전통적인 의미구조를 따른다: [복사된 개체는 동등한 값을 가진다](#SS-copy).
 
 ##### Example, bad
 
@@ -4307,19 +4317,19 @@ Here, the conventional semantics is maintained: [Copies compare equal](#SS-copy)
 
 ##### Note
 
-Nonmember operators should be either friends or defined in [the same namespace as their operands](#Ro-namespace).
-[Binary operators should treat their operands equivalently](#Ro-symmetric).
+멤버가 아닌 연산자들은 friend이거나 [피연산자들과 같은 네임스페이스에 정의되어야 한다](#Ro-namespace).
+[이항 연산자들은 피연산자를 동등하게 다뤄야 한다](#Ro-symmetric).
 
 ##### Enforcement
 
-Possibly impossible.
+거의 불가능하다
 
-### <a name="Ro-symmetric"></a>C.161: Use nonmember functions for symmetric operators
+### <a name="Ro-symmetric"></a>C.161: 대칭적인 연산자는 비멤버 함수로 정의하라
 
 ##### Reason
 
-If you use member functions, you need two.
-Unless you use a nonmember function for (say) `==`, `a == b` and `b == a` will be subtly different.
+연산자 정의에 멤버함수를 사용하면 피연산자 타입마다 멤버함수가 필요하다.
+가령 `==` 연산자에 비 멤버 함수를 사용하지 않는다면, `a == b`와 `b == a`가 미묘하게 다를 것이다.
 
 ##### Example
 
@@ -4329,17 +4339,17 @@ Unless you use a nonmember function for (say) `==`, `a == b` and `b == a` will b
 
 ##### Enforcement
 
-Flag member operator functions.
+멤버 함수인 연산자들을 지적하라.
 
-### <a name="Ro-equivalent"></a>C.162: Overload operations that are roughly equivalent
+### <a name="Ro-equivalent"></a>C.162: 거의 동등한 연산들을 중복정의하라
 
 ##### Reason
 
-Having different names for logically equivalent operations on different argument types is confusing, leads to encoding type information in function names, and inhibits generic programming.
+논리적으로 같은 연산이 다른 타입에 다른 이름을 가지는 것은 혼란스럽고, 타입 정보를 함수 이름에 집어넣게 된다. 제네릭 프로그래밍에도 방해된다.
 
 ##### Example
 
-Consider:
+다음과 같은 예를 생각해보라:
 
 ```c++
     void print(int a);
@@ -4347,7 +4357,7 @@ Consider:
     void print(const string&);
 ```
 
-These three functions all print their arguments (appropriately). Conversely:
+이 세 함수들은 인자를 출력한다. 다른 경우:
 
 ```c++
     void print_int(int a);
@@ -4355,57 +4365,55 @@ These three functions all print their arguments (appropriately). Conversely:
     void print_string(const string&);
 ```
 
-These three functions all print their arguments (appropriately). Adding to the name just introduced verbosity and inhibits generic code.
+이 세 함수들은 인자를 출력한다. 인자 타입을 이름에 붙이는 것은 불필요하고 일반적인 코드를 작성하지 못하게 한다.
 
 ##### Enforcement
 
 ???
 
-### <a name="Ro-equivalent-2"></a>C.163: Overload only for operations that are roughly equivalent
+### <a name="Ro-equivalent-2"></a>C.163: 거의 동등한 연산들'만' 중복정의하라
 
 ##### Reason
 
-Having the same name for logically different functions is confusing and leads to errors when using generic programming.
+논리적으로 다른 함수가 같은 이름을 가지는 것은 혼란을 일으키고 제네릭 프로그래밍에서 오류로 이어진다.
 
 ##### Example
 
-Consider:
+다음과 같은 예를 생각해보라:
 
 ```c++
     void open_gate(Gate& g);   // remove obstacle from garage exit lane
     void fopen(const char* name, const char* mode);   // open file
 ```
 
-The two operations are fundamentally different (and unrelated) so it is good that their names differ. Conversely:
+이 두 함수는 근본적으로 다르고 연관성이 없다. 따라서 다른 이름을 가지는 것이 좋다. 다른 경우:
 
 ```c++
     void open(Gate& g);   // remove obstacle from garage exit lane
     void open(const char* name, const char* mode ="r");   // open file
 ```
 
-The two operations are still fundamentally different (and unrelated) but the names have been reduced to their (common) minimum, opening opportunities for confusion.
-Fortunately, the type system will catch many such mistakes.
+이 두 연산은 여전히 근본적으로 다르고 연관성을 가지지 않는다. 하지만 이름이 축약되었고 혼란의 가능성을 만든다. 다행히도, 이들의 시그니처가 다르기 때문에 타입시스템이 실수를 잡아낼 것이다.
 
 ##### Note
 
-Be particularly careful about common and popular names, such as `open`, `move`, `+`, and `==`.
+`open`, `move`, `+`, `==`과 같이 일반적이고 많이 쓰이는 이름에는 특히 주의하라. 
 
 ##### Enforcement
 
 ???
 
-### <a name="Ro-conversion"></a>C.164: Avoid implicit conversion operators
+### <a name="Ro-conversion"></a>C.164: 암묵적 형변환 연산자들을 지양하라
 
 ##### Reason
 
-Implicit conversions can be essential (e.g., `double` to `int`) but often cause surprises (e.g., `String` to C-style string).
+묵시적 변환이 필수적일 수 있다 (`double`에서 `int`로 바꾼다던지). 하지만 (`String`에서 C-style 문자열이 되는 것처럼) 의도치 않은 동작이 생기기도 한다. 
 
 ##### Note
 
-Prefer explicitly named conversions until a serious need is demonstrated.
-By "serious need" we mean a reason that is fundamental in the application domain (such as an integer to complex number conversion)
-and frequently needed. Do not introduce implicit conversions (through conversion operators or non-`explicit` constructors)
-just to gain a minor convenience.
+정말 필요한 경우가 발생하지 않는다면 명시적 변환을 선호하라.
+"정말 필요한"은 응용 프로그램의 영역에서 기본적이고 자연스러우며 자주 필요한 경우를 의미한다. (가령 정수를 복소수로 변환하는 것처럼) 
+(변환 연산자 또는 암묵적 생성자를 통해서) 암묵적 변환을 사용하지 마라. 약간의 편안함만 얻을 수 있을 뿐이다.
 
 ##### Example
 
@@ -4430,7 +4438,7 @@ just to gain a minor convenience.
     }
 ```
 
-The surprising and potentially damaging implicit conversion can occur in arbitrarily hard-to spot contexts, e.g.,
+이런 놀랍고 잠재적 피해가 발생할 수 있는 암묵적 변환은 찾아내기 어려운 문맥 속에서 발생할 수 있다. 예를 들어,
 
 ```c++
     S1 ff();
@@ -4441,13 +4449,13 @@ The surprising and potentially damaging implicit conversion can occur in arbitra
     }
 ```
 
-The string returned by `ff()` is destroyed before the returned pointer into it can be used.
+`ff()`에서 반환된 문자열이 포인터가 사용되기 전에 파괴된다.
 
 ##### Enforcement
 
-Flag all conversion operators.
+모든 형변환 연산자를 지적하라
 
-### <a name="Ro-custom"></a>C.165: Use `using` for customization points
+### <a name="Ro-custom"></a>C.165: 커스터마이징이 필요하면 `using`을 사용하라
 
 ##### Reason
 
@@ -4500,12 +4508,11 @@ This is done by including the general function in the lookup for the function:
 Unlikely, except for known customization points, such as `swap`.
 The problem is that the unqualified and qualified lookups both have uses.
 
-### <a name="Ro-address-of"></a>C.166: Overload unary `&` only as part of a system of smart pointers and references
+### <a name="Ro-address-of"></a>C.166: 단항 연산자 `&`는 스마트 포인터와 참조 체계를 따르는 경우에만 중복정의하라
 
 ##### Reason
 
-The `&` operator is fundamental in C++.
-Many parts of the C++ semantics assumes its default meaning.
+`&` 연산자는 C++에서 필수적이다. C++ 에서 사용되는 의미구조의 많은 부분이 기본적인 의미를 전제하고 있다.
 
 ##### Example
 
@@ -4527,20 +4534,20 @@ Many parts of the C++ semantics assumes its default meaning.
 
 ##### Note
 
-If you "mess with" operator `&` be sure that its definition has matching meanings for `->`, `[]`, `*`, and `.` on the result type.
-Note that operator `.` currently cannot be overloaded so a perfect system is impossible.
-We hope to remedy that: <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4477.pdf>.
-Note that `std::addressof()` always yields a built-in pointer.
+`&` 연산자로 "뭔가 하려면" `->`, `[]`, `*`, `.` 연산자들에 적합한 정의(반환 타입)를 가지도록 하라. `.` 연산자는 현재로써는 중복정의할 수 없기 때문에 완벽한 체계를 갖추는 것은 불가능하다.
+
+다음 문서를 보기를 권한다: <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4477.pdf>.
+`std::addressof()`는 항상 내장 포인터 타입을 반환한다는 점에 유의하라.
 
 ##### Enforcement
 
-Tricky. Warn if `&` is user-defined without also defining `->` for the result type.
+까다롭다. `&` 연산자가 `->`와 함께 사용자 정의되지 않았다면 경고한다.
 
-### <a name="Ro-overload"></a>C.167: Use an operator for an operation with its conventional meaning
+### <a name="Ro-overload"></a>C.167: 연산자는 전통적인 의미를 수행하는데 사용하라
 
 ##### Reason
 
-Readability. Convention. Reusability. Support for generic code
+가독성, 관례적 의미, 재사용성, 일반화된 코드에 도움이 된다
 
 ##### Example
 
@@ -4556,7 +4563,7 @@ Readability. Convention. Reusability. Support for generic code
     }
 ```
 
-By itself, `cout_my_class` would be OK, but it is not usable/composable with code that rely on the `<<` convention for output:
+그 자체로, `cout_my_class`는 문제가 없다. 하지만 관례적으로 출력에 사용하는 `<<` 연산자에 맞게 작성할 수 없다:
 
 ```c++
     My_class var { /* ... */ };
@@ -4566,26 +4573,24 @@ By itself, `cout_my_class` would be OK, but it is not usable/composable with cod
 
 ##### Note
 
-There are strong and vigorous conventions for the meaning most operators, such as
+대부분의 연산자들은 강력하고 흔히 사용되는 의미를 가지고 있다
 
-* comparisons (`==`, `!=`, `<`, `<=`, `>`, and `>=`),
-* arithmetic operations (`+`, `-`, `*`, `/`, and `%`)
-* access operations (`.`, `->`, unary `*`, and `[]`)
-* assignment (`=`)
+* 비교 (`==`, `!=`, `<`, `<=`, `>`, `>=`),
+* 산술 연산 (`+`, `-`, `*`, `/`, `%`)
+* 접근 연산 (`.`, `->`, 단항 `*`, `[]`)
+* 대입 (`=`)
 
-Don't define those unconventionally and don't invent your own names for them.
+관례적으로 사용되어온 의미와 다르게 정의하거나 새롭게 의미를 부여해서 사용하지 말아라.
 
 ##### Enforcement
 
-Tricky. Requires semantic insight.
+까다롭다. 의미구조에 대한 통찰이 필요하다.
 
-### <a name="Ro-namespace"></a>C.168: Define overloaded operators in the namespace of their operands
+### <a name="Ro-namespace"></a>C.168: 연산자를 중복정의는 피연산자의 네임스페이스에 하라
 
 ##### Reason
 
-Readability.
-Ability for find operators using ADL.
-Avoiding inconsistent definition in different namespaces
+가독성. 인자 기반 탐색(ADL)이 가능하다. 다른 네임스페이스에 정의하는 것은 일관적이지 않다.
 
 ##### Example
 
@@ -4597,7 +4602,7 @@ Avoiding inconsistent definition in different namespaces
     bool x = (s == s);
 ```
 
-This is what a default `==` would do, if we had such defaults.
+기본적인 `==` 연산자가 하는 일이다.
 
 ##### Example
 
@@ -4629,34 +4634,32 @@ This is what a default `==` would do, if we had such defaults.
     }
 ```
 
-Here, the meaning of `!s` differs in `N` and `M`.
-This can be most confusing.
-Remove the definition of `namespace M` and the confusion is replaced by an opportunity to make the mistake.
+네임스페이스 `N`과 `M` 에서 `!s`의 의미가 달라진다. 굉장히 혼란스러울 수 있다. `namespace M`의 정의를 제거하면 실수가 발생할 가능성의 사라진다.
 
 ##### Note
 
-If a binary operator is defined for two types that are defined in different namespaces, you cannot follow this rule.
-For example:
+이항 연산자가 다른 네임스페이스에 있는 두 타입에 대해서 정의되었다면, 이 규칙을 따를 수 없다.
+예를 들어:
 
 ```c++
     Vec::Vector operator*(const Vec::Vector&, const Mat::Matrix&);
 ```
 
-This may be something best avoided.
+이런 경우는 피하는 것이 최선이다.
 
 ##### See also
 
-This is a special case of the rule that [helper functions should be defined in the same namespace as their class](#Rc-helper).
+[보조 함수들은 관련 클래스와 같은 namespace에 배치하라](#Rc-helper)는 규칙의 특별한 경우에 해당한다
 
 ##### Enforcement
 
-* Flag operator definitions that are not it the namespace of their operands
+* 피연산자의 네임스페이스에 위치하지 않은 연산자 정의를 지적한다
 
-### <a name="Ro-lambda"></a>C.170: If you feel like overloading a lambda, use a generic lambda
+### <a name="Ro-lambda"></a>C.170: 람다를 중복 정의하고 싶다면, 제네릭 람다를 사용하라
 
 ##### Reason
 
-You cannot overload by defining two different lambdas with the same name.
+같은 이름으로 두개의 서로 다른 람다를 중복 정의할 수 없다.
 
 ##### Example
 
@@ -4673,7 +4676,7 @@ You cannot overload by defining two different lambdas with the same name.
 
 ##### Enforcement
 
-The compiler catches the attempt to overload a lambda.
+컴파일러가 람다를 중복 정의하려는 시도를 잡아낸다.
 
 ## <a name="SS-union"></a>C.union: 공용체(Union)
 
