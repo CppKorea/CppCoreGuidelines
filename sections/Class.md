@@ -2955,17 +2955,17 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 * [C.132: 이유없이 함수를 `virtual`로 만들지 말아라](#Rh-virtual)
 * [C.133: `protected` 데이터를 지양하라](#Rh-protected)
 * [C.134: `const`가 아닌 모든 데이터 멤버들이 같은 접근 레벨을 가지도록 하라](#Rh-public)
-* [C.135: 다른 인터페이스를 표현하기 위해 다중 상속을 사용하라](#Rh-mi-interface)
-* [C.136: 구현 속성의 결합을 표현하기 위해 다중 상속을 사용하라](#Rh-mi-implementation)
-* [C.137: Use `virtual` bases to avoid overly general base classes](#Rh-vbase)
-* [C.138: Create an overload set for a derived class and its bases with `using`](#Rh-using)
+* [C.135: 서로 다른 인터페이스를 표현하기 위해 다중 상속을 사용하라](#Rh-mi-interface)
+* [C.136: 구현 특성(attribute)의 결합을 표현하기 위해 다중 상속을 사용하라](#Rh-mi-implementation)
+* [C.137: 지나치게 일반적인 상위 클래스를 피하기 위해 `virtual`을 사용하라](#Rh-vbase)
+* [C.138: `using`을 사용해 상위/하위 클래스를 위한 중복 정의 집합을 만들어라](#Rh-using)
 * [C.139: `final`은 필요한 만큼만 사용하라](#Rh-final)
 * [C.140: 가상 함수와 그 구현 함수에 서로 다른 기본 인자를 사용하지 마라](#Rh-virtual-default-arg)
 
 계층 구조 내 개체 접근 규칙 요약:
 
 * [C.145: 다형적인 개체들은 포인터와 참조를 통해 접근하라](#Rh-poly)
-* [C.146:  클래스 계층구조 탐색이 불가피한 경우에만 `dynamic_cast`를 사용하라](#Rh-dynamic_cast)
+* [C.146: 클래스 계층구조 탐색이 불가피한 경우에만 `dynamic_cast`를 사용하라](#Rh-dynamic_cast)
 * [C.147: 필요한 클래스를 찾지 못한 경우가 오류에 해당하는 경우 `dynamic_cast`를 참조 타입에 사용하라](#Rh-ref-cast)
 * [C.148: 필요한 클래스를 찾지 못한 경우가 대안으로 사용된다면 `dynamic_cast`를 포인터 타입에 사용하라](#Rh-ptr-cast)
 * [C.149: 동적 할당한 개체의 소멸을 잊지 않도록 `unique_ptr` 혹은 `shared_ptr`를 사용하라](#Rh-smart)
@@ -3228,7 +3228,7 @@ C++ 프로그래머들에게 STL 컨테이너는 친숙하고 근본적으로 �
 
 #### Discussion
 
-우리는 이 규칙을 통해 2가지 오류 없애고자 한다:
+우리는 이 규칙을 통해 2가지 오류를 없애고자 한다:
 
 * **암묵적 가상함수**
    * 프로그래머가 암묵적 가상 함수를 의도했으며, 실제로 그에 해당하는 경우  
@@ -3629,38 +3629,38 @@ protected 멤버 함수에는 문제가 없다.
 
 ##### Reason
 
-Prevention of logical confusion leading to errors.
-If the non-`const` data members don't have the same access level, the type is confused about what it's trying to do.
-Is it a type that maintains an invariant or simply a collection of values?
+생각하기에 혼란스럽지 않아 오류를 예방한다.
+`const` 멤버들이 서로 다른 접근 레벨을 가지고 있다면, 그 타입이 어떤 일을 하는 것인지 혼란스러울 것이다.
+타입이 불변조건을 유지하기 위한 것인가? 혹은 단순히 값의 집합을 표현한 것인가?
 
 ##### Discussion
 
-The core question is: What code is responsible for maintaining a meaningful/correct value for that variable?
+하나의 변수에 대해 어떤 코드가 유의미하고 정확한 값을 관리하는 책임이 있는지 고민해야 한다.
 
-There are exactly two kinds of data members:
+데이터 멤버에는 2가지 종류가 있다:
 
-* A: Ones that don't participate in the object's invariant. Any combination of values for these members is valid.
-* B: Ones that do participate in the object's invariant. Not every combination of values is meaningful (else there'd be no invariant). Therefore all code that has write access to these variables must know about the invariant, know the semantics, and know (and actively implement and enforce) the rules for keeping the values correct.
+* A: 개체의 불변조건과 무관한 경우. 이 멤버들이 어떤 값(혹은 값의 조합)을 가져도 유효하다
+* B: 개체의 불변조건으로 기능하는 경우, 모든 값의 조합이 의미를 가지지는 않는다. 따라서 이 변수들의 값을 변경하는 모든 코드는 불변조건을 알고, 유지하기 위한 규칙들을 고려해야 한다.
 
-Data members in category A should just be `public` (or, more rarely, `protected` if you only want derived classes to see them). They don't need encapsulation. All code in the system might as well see and manipulate them.
+A 그룹에 속하는 데이터 멤버들은 단순히 `public` (혹은, 드물지만 하위 클래스에서 볼 수 있도록 `protected`)이면 된다. 캡슐화가 필요하지 않다. 멤버를 볼 수 있는 코드는 이들을 변경할 수 있다.
 
-Data members in category B should be `private` or `const`. This is because encapsulation is important. To make them non-`private` and non-`const` would mean that the object can't control its own state: An unbounded amount of code beyond the class would need to know about the invariant and participate in maintaining it accurately -- if these data members were `public`, that would be all calling code that uses the object; if they were `protected`, it would be all the code in current and future derived classes. This leads to brittle and tightly coupled code that quickly becomes a nightmare to maintain. Any code that inadvertently sets the data members to an invalid or unexpected combination of values would corrupt the object and all subsequent uses of the object.
+B 그룹에 속하는 데이터 멤버들은 `private`혹은 `const`여야 한다. 이 경우에는 캡슐화가 필요하기 때문이다. 이들이 `private`이나 `const`가 아니라는 것은 개체가 자신의 상태를 관리하지 않는다는 의미가 된다: 클래스의 다른 코드들이 불변조건을 알고 정확하게 유지해야 한다. 그리고 그런 코드가 제한없이 늘어날 수 있다. 이 변수들이 `public`이 되면 모든 사용 코드가 불변조건을 고려해야 하며, `protected`이라면 (현재와 미래의) 모든 하위 클래스들이 포함된다.
+이는 망가지기 쉽고 강하게 결합된 코드를 만들게 된다. 유지보수가 악몽과 같을 것이다. 의도치 않게 어떤 코드가 데이터 멤버를 잘못된(invalid) 값으로 만들면 개체의 현재 상태와 이후의 사용에 영향을 줄 것이다.
 
-Most classes are either all A or all B:
+대부분의 클래스들은 A와 B로 구분된다:
 
-* *All public*: If you're writing an aggregate bundle-of-variables without an invariant across those variables, then all the variables should be `public`.
-  [By convention, declare such classes `struct` rather than `class`](#Rc-struct)
-* *All private*: If you're writing a type that maintains an invariant, then all the non-`const` variables should be private -- it should be encapsulated.
+* *All public*: 변수들의 불변조건이 없는 집합을 만든다면 모든 변수가 `public`이 되어야 한다. [이런 경우는 `class` 보다는 `struct`로 선언하라](#Rc-struct)
+* *All private*: 불변조건이 있다면, 모든 `const`가 아닌 변수들은 `private`이 되어야 한다 -- 캡슐화 하라
 
 ##### Exception
 
-Occasionally classes will mix A and B, usually for debug reasons. An encapsulated object may contain something like non-`const` debug instrumentation that isn't part of the invariant and so falls into category A -- it isn't really part of the object's value or meaningful observable state either. In that case, the A parts should be treated as A's (made `public`, or in rarer cases `protected` if they should be visible only to derived classes) and the B parts should still be treated like B's (`private` or `const`).
+경우에 따라선 클래스들이 디버깅을 위해 A와 B를 혼합할 수도 있다. 캡슐화된 개체가 `const`가 아닌 디버깅 정보를 포할 수도 있다. 이는 불변조건에 포함되지 않고 -- 개체가 관리하는 값의 일부가 아니고 관찰되어야 하는 부분이 아니기 때문에 A에 속한다. 이때는 A에 해당하는 영역 (`public` 혹은 `protected`)은 A 처럼, 나머지 영역은(`private` or `const`) B 그룹 처럼 관리하면 된다.
 
 ##### Enforcement
 
-Flag any class that has non-`const` data members with different access levels.
+`const`가 아닌 데이터 멤버들이 서로 다른 접근레벨을 가진 클래스를 지적한다.
 
-### <a name="Rh-mi-interface"></a>C.135: Use multiple inheritance to represent multiple distinct interfaces
+### <a name="Rh-mi-interface"></a>C.135: 서로 다른 인터페이스를 표현하기 위해 다중 상속을 사용하라
 
 ##### Reason
 
@@ -3674,26 +3674,25 @@ Flag any class that has non-`const` data members with different access levels.
     };
 ```
 
-`istream` provides the interface to input operations; `ostream` provides the interface to output operations.
-`iostream` provides the union of the `istream` and `ostream` interfaces and the synchronization needed to allow both on a single stream.
+`istream`은 입력 연산에 필요한 인터페이스를 제공한다. `ostream`은 출력 연산에 필요한 인터페이스를 제공한다.
+`iostream`은 `istream`과 `ostream` 인터페이스를 결합하면서 단일 스트림에서의 입출력 동기화를 제공한다.
 
 ##### Note
 
-This is a very common use of inheritance because the need for multiple different interfaces to an implementation is common
-and such interfaces are often not easily or naturally organized into a single-rooted hierarchy.
+하나의 구현에 대해 여러 다른 인터페이스가 필요한 경우 쉽게 볼 수 있다. 그런 인터페이스들은 하나의 계층구조로 조직화하기 쉽지 않다.
 
 ##### Note
 
-Such interfaces are typically abstract classes.
+이런 인터페이스들은 보통 추상 클래스들이다.
 
 ##### Enforcement
 
 ???
 
-### <a name="Rh-mi-implementation"></a>C.136: Use multiple inheritance to represent the union of implementation attributes
+### <a name="Rh-mi-implementation"></a>C.136: 구현 특성(attribute)의 결합을 표현하기 위해 다중 상속을 사용하라
 
 ##### Reason
-
+ 
 Some forms of mixins have state and often operations on that state.
 If the operations are virtual the use of inheritance is necessary, if not using inheritance can avoid boilerplate and forwarding.
 
@@ -3705,8 +3704,8 @@ If the operations are virtual the use of inheritance is necessary, if not using 
     };
 ```
 
-`istream` provides the interface to input operations (and some data); `ostream` provides the interface to output operations (and some data).
-`iostream` provides the union of the `istream` and `ostream` interfaces and the synchronization needed to allow both on a single stream.
+`istream`은 입력 연산에 필요한 인터페이스를 제공한다. `ostream`은 출력 연산에 필요한 인터페이스를 제공한다.
+`iostream`은 `istream`과 `ostream` 인터페이스를 결합하면서 단일 스트림에서의 입출력 동기화를 제공한다.
 
 ##### Note
 
@@ -3714,21 +3713,18 @@ If the operations are virtual the use of inheritance is necessary, if not using 
 
 ##### Example
 
-Sometimes, an "implementation attribute" is more like a "mixin" that determine the behavior of an implementation and inject
-members to enable the implementation of the policies it requires.
-For example, see `std::enable_shared_from_this`
-or various bases from boost.intrusive (e.g. `list_base_hook` or `intrusive_ref_counter`).
+경우에 따라서는 "구현 특성(implementation attribute)"이 구현체의 행위를 결정하고 구현체가 요구받는 정책을 따르도록 멤버를 주입하는 "혼합(mixin)" 처럼 보인다.
+`std::enable_shared_from_this` 혹은 boost.intrusive의 `list_base_hook` 혹은 `intrusive_ref_counter`를 예로 들 수 있다.
 
 ##### Enforcement
 
 ???
 
-### <a name="Rh-vbase"></a>C.137: Use `virtual` bases to avoid overly general base classes
+### <a name="Rh-vbase"></a>C.137: 지나치게 일반적인 상위 클래스를 피하기 위해 `virtual`을 사용하라
 
 ##### Reason
 
- Allow separation of shared data and interface.
- To avoid all shared data to being put into an ultimate base class.
+공유 데이터와 인터페이스의 분리가 가능하게 만든다. 공유 데이터가 최상위 클래스에 배치되는 것을 막는다.
 
 ##### Example
 
@@ -3760,28 +3756,27 @@ or various bases from boost.intrusive (e.g. `list_base_hook` or `intrusive_ref_c
     };
 ```
 
-Factoring out `Utility` makes sense if many derived classes share significant "implementation details."
+`Utility`를 추출하는 것은 수많은 하위 클래스들이 "구현 내용(implementation details)"의 많은 부분을 공유한다면 이치에 맞는 작업이다.
 
 ##### Note
 
-Obviously, the example is too "theoretical", but it is hard to find a *small* realistic example.
-`Interface` is the root of an [interface hierarchy](#Rh-abstract)
-and `Utility` is the root of an [implementation hierarchy](#Rh-kind).
-Here is [a slightly more realistic example](https://www.quora.com/What-are-the-uses-and-advantages-of-virtual-base-class-in-C%2B%2B/answer/Lance-Diduck) with an explanation.
+이 예시는 명백히 너무 "이론적"이다. 하지만 *작은 규모*의 실제적인 예시를 찾기는 어렵다.
+`Interface`는 [인터페이스 계층](#Rh-abstract)의 정점이고, `Utility`는 [구현 계층](#Rh-kind)의 정점이다.
+설명을 포함한 [좀 더 사실적인 예시는 여기에 있다](https://www.quora.com/What-are-the-uses-and-advantages-of-virtual-base-class-in-C%2B%2B/answer/Lance-Diduck).
 
 ##### Note
 
-Often, linearization of a hierarchy is a better solution.
+때로는 계층을 선형화(linearization)하는 것이 나은 방법일 수 있다
 
 ##### Enforcement
 
-Flag mixed interface and implementation hierarchies.
+인터페이스 계층과 구현 계층이 혼재된 경우 지적한다.
 
-### <a name="Rh-using"></a>C.138: Create an overload set for a derived class and its bases with `using`
+### <a name="Rh-using"></a>C.138: `using`을 사용해 상위/하위 클래스를 위한 중복 정의 집합을 만들어라
 
 ##### Reason
 
-Without a using declaration, member functions in the derived class hide the entire inherited overload sets.
+using 선언이 없으면, 하위 클래스의 멤버 함수들이 상속받은 중복정의 집합을 덮어쓴다(hide).
 
 ##### Example, bad
 
@@ -3816,9 +3811,9 @@ Without a using declaration, member functions in the derived class hide the enti
 
 ##### Note
 
-This issue affects both virtual and nonvirtual member functions
+이 이슈는 가상/비 가상 멤버 함수 모두에 적용된다.
 
-For variadic bases, C++17 introduced a variadic form of the using-declaration,
+상위 클래스를 가변적으로 결정할 수 있도록, C++17은 가변 using 선언을 추가했다(introduced).
 
 ```c++
     template <class... Ts>
@@ -3829,13 +3824,13 @@ For variadic bases, C++17 introduced a variadic form of the using-declaration,
 
 ##### Enforcement
 
-Diagnose name hiding
+이름을 덮어쓰는 경우를 찾아낸다
 
-### <a name="Rh-final"></a>C.139: Use `final` sparingly
+### <a name="Rh-final"></a>C.139: `final`은 필요한 만큼만 사용하라
 
 ##### Reason
 
-Capping a hierarchy with `final` is rarely needed for logical reasons and can be damaging to the extensibility of a hierarchy.
+`final`은 계층구조의 확장성을 저해한다는 점 때문에 필요한 경우가 거의 없다.
 
 ##### Example, bad
 
@@ -3850,34 +3845,34 @@ Capping a hierarchy with `final` is rarely needed for logical reasons and can be
 
 ##### Note
 
-Not every class is meant to be a base class.
-Most standard-library classes are examples of that (e.g., `std::vector` and `std::string` are not designed to be derived from).
-This rule is about using `final` on classes with virtual functions meant to be interfaces for a class hierarchy.
+모든 클래스가 상위 클래스로써 작성되지는 않는다. 대부분의 표준 라이브러리 클래스들이 이런 경우에 속한다 (예컨대, `std::vector`와 `std::string`는 하위 클래스를 고려하지 않는다). 
+이 규칙은 클래스 계층구조 내에서 인터페이스로 동작하는 가상 함수들을 가진 클래스들에 `final`을 사용하는 경우에 대한 것이다.
 
 ##### Note
 
-Capping an individual virtual function with `final` is error-prone as `final` can easily be overlooked when defining/overriding a set of functions.
-Fortunately, the compiler catches such mistakes: You cannot re-declare/re-open a `final` member in a derived class.
+가상 함수들을 `final`로 마감하는 것은 `final`이 함수들의 정의/재정의를 찾아내지 못하도록 하기 때문에 오류를 발생시킬 수 있다. 
+운좋게도, 컴파일러가 이런 실수를 찾아낸다: 하위 클래스의 `final`을 다시 선언하거나 재정의할 수 없다.
 
 ##### Note
 
-Claims of performance improvements from `final` should be substantiated.
-Too often, such claims are based on conjecture or experience with other languages.
+`final`로 성능이 개선될 것이라는 주장에는 근거가 없다. 대부분 그런 주장은 추측이거나 다른 언어에서의 경험에 근거한 것이다.
 
-There are examples where `final` can be important for both logical and performance reasons.
-One example is a performance-critical AST hierarchy in a compiler or language analysis tool.
-New derived classes are not added every year and only by library implementers.
-However, misuses are (or at least have been) far more common.
+`final`이 논리적인 이유와 성능 측면에서 중요한 예시가 있다. 
+
+ * 컴파일러나 언어 분석 도구에서 사용하는 (성능기준이 높은) AST 계층
+ * 시간이 지나도 새로운 하위 클래스가 추가되지 않고 라이브러리 구현자에 의해서만 추가된다
+
+하지만 잘못 사용하는 경우가 훨씬 더 많다.
 
 ##### Enforcement
 
-Flag uses of `final`.
+`final`을 사용하면 지적한다
 
-### <a name="Rh-virtual-default-arg"></a>C.140: Do not provide different default arguments for a virtual function and an overrider
+### <a name="Rh-virtual-default-arg"></a>C.140: 가상 함수와 그 구현 함수에 서로 다른 기본 인자를 사용하지 마라
 
 ##### Reason
 
-That can cause confusion: An overrider does not inherit default arguments.
+혼란을 일으킨다: 재정의한 코드가 기본 인자를 상속받지 않는다.
 
 ##### Example, bad
 
@@ -3901,7 +3896,7 @@ That can cause confusion: An overrider does not inherit default arguments.
 
 ##### Enforcement
 
-Flag default arguments on virtual functions if they differ between base and derived declarations.
+가상함수의 기본인자가 상위/하위 클래스의 선언에서 서로 다르면 지적한다
 
 ## C.hier-access: 계층 구조 내 개체 접근
 
@@ -3949,7 +3944,7 @@ Both `d`s are sliced.
 
 모든 절단(slicing)을 지적하라.
 
-### <a name="Rh-dynamic_cast"></a>C.146: Use `dynamic_cast` where class hierarchy navigation is unavoidable
+### <a name="Rh-dynamic_cast"></a>C.146: 클래스 계층구조 탐색이 불가피한 경우에만 `dynamic_cast`를 사용하라
 
 ##### Reason
 
@@ -3979,7 +3974,7 @@ Both `d`s are sliced.
     }
 ```
 
-Use of the other casts can violate type safety and cause the program to access a variable that is actually of type `X` to be accessed as if it were of an unrelated type `Z`:
+다른 캐스팅 방법은 타입 안전성을 해치고 프로그램이 실제로 `X`인 변수를 `Z`처럼 사용하게 만든다:
 
 ```c++
     void user2(B* pb)   // bad
@@ -4017,14 +4012,12 @@ Use of the other casts can violate type safety and cause the program to access a
 
 ##### Note
 
-Some people use `dynamic_cast` where a `typeid` would have been more appropriate;
-`dynamic_cast` is a general "is kind of" operation for discovering the best interface to an object,
-whereas `typeid` is a "give me the exact type of this object" operation to discover the actual type of an object.
-The latter is an inherently simpler operation that ought to be faster.
-The latter (`typeid`) is easily hand-crafted if necessary (e.g., if working on a system where RTTI is -- for some reason -- prohibited),
-the former (`dynamic_cast`) is far harder to implement correctly in general.
+`typeid`가 더 적절한데 `dynamic_cast`를 쓰는 사람들이 있다;
+`dynamic_cast`는 일반적으로 알려진 (개체에 가장 적합한 인터페이스를 찾기 위한) "is kind of" 연산이다.
+반면 `typeid`는 "이 개체의 정확한 타입을 찾는" 연산이다. 후자는 단순하고 더 빠르게 처리될 것이 분명하다.
+`typeid`는 필요하다면 쉽게 작성할 수 있다(모종의 이유로 RTTI가 지원되지 않는다면). `dynamic_cast`는 보통 정확하게 구현하기 훨씬 어렵다.
 
-Consider:
+다음과 같은 예를 생각해보라:
 
 ```c++
     struct B {
@@ -4057,11 +4050,10 @@ Consider:
     }
 ```
 
-The result of `pb2->id() == "D"` is actually implementation defined.
-We added it to warn of the dangers of home-brew RTTI.
-This code may work as expected for years, just to fail on a new machine, new compiler, or a new linker that does not unify character literals.
+`pb2->id() == "D"`의 결과는 실제로는 구현에 의해 결정된 것이다. 이는 직접 작성한 RTTI의 위험을 경고하기 위한 예시다.
+수년간 이 코드가 기대한 대로 동작할수도 있지만, 새로운 기계, 컴파일러, 혹은 링커에서 소스코드 내 문자(character literals)를 통일하지 않으면 실패하게 된다.
 
-If you implement your own RTTI, be careful.
+RTTI를 직접 구현하고자 한다면, 주의하라.
 
 ##### Exception
 
@@ -4070,15 +4062,16 @@ If you implement your own RTTI, be careful.
 
 당신만의 특별한 `dynamic_cast`를 만들수도 있을 것이다. 그러니, `dynamic_cast`가 정말로 당신이 생각하는 것 만큼 느리다는 것을 확실히하라. (근거 없는 루머들이 꽤 있다.) 그리고 `dynamic_cast`의 사용이 정말로 성능에 치명적이라는 것 또한 확인하라.
 
-We are of the opinion that current implementations of `dynamic_cast` are unnecessarily slow.
-For example, under suitable conditions, it is possible to perform a `dynamic_cast` in [fast constant time](http://www.stroustrup.com/fast_dynamic_casting.pdf).
-However, compatibility makes changes difficult even if all agree that an effort to optimize is worthwhile.
+이는 `dynamic_cast`의 현재 구현이 불필요하게 느린 경우에 대한 것이다. 
+예를 들어, 적절한 조건 하에서는, `dynamic_cast`를 [상수시간으로 빠르게](http://www.stroustrup.com/fast_dynamic_casting.pdf) 수행할 수 있다. 하지만, 최적화를 위해 노력할 가치가 있다는데 모두가 동의하지 않으면 호환성은 코드 변경을 어렵게 한다.
 
-In very rare cases, if you have measured that the `dynamic_cast` overhead is material, you have other means to statically guarantee that a downcast will succeed (e.g., you are using CRTP carefully), and there is no virtual inheritance involved, consider tactically resorting `static_cast` with a prominent comment and disclaimer summarizing this paragraph and that human attention is needed under maintenance because the type system can't verify correctness. Even so, in our experience such "I know what I'm doing" situations are still a known bug source.
+매우 드물게, `dynamic_cast`의 오버헤드가 문제가 된다면, 하향 캐스팅이 성공한다고 정적으로 보장되는 다른 방법을 쓸 수도 있다 (예를 들어 Curiously Recurring Template Pattern을 주의해서 쓰는 방법처럼). 
+가상 상속을 사용하지 않는다면, 확실한 주석과 함께 `static_cast`에 의존하거나 시스템이 정확성을 검증할 수 없기 때문에 유지보수에 사람이 필요하다는 조항을 작성하라.
+그렇게 하더라도, 우리 경험으로 미루어 "나는 지금 뭘 하는지 몰라요"는 버그의 근원이다.
 
 ##### Exception
 
-다음과 같은 코드:
+다음과 같은 코드는 예외로 볼 수 있다:
 
 ```c++
     template<typename B>
@@ -4108,47 +4101,49 @@ In very rare cases, if you have measured that the `dynamic_cast` overhead is mat
 
 ???
 
-### <a name="Rh-ptr-cast"></a>C.148: Use `dynamic_cast` to a pointer type when failure to find the required class is considered a valid alternative
+### <a name="Rh-ptr-cast"></a>C.148: 필요한 클래스를 찾지 못한 경우가 대안으로 사용된다면 `dynamic_cast`를 포인터 타입에 사용하라
 
 ##### Reason
 
-The `dynamic_cast` conversion allows to test whether a pointer is pointing at a polymorphic object that has a given class in its hierarchy. Since failure to find the class merely returns a null value, it can be tested during run time. This allows writing code that can choose alternative paths depending on the results.
+`dynamic_cast`는 포인터가 계층구조 내에서 다형적 개체를 가리키고 있는지 검사할 수 있도록 해준다.
+해당 클래스를 찾는데 실패할 경우 단순히 null 값을 반환하기 때문에, 실행시간에 검사하는 것이 가능하다. 이 덕분에 참색 결과에 따라 다른 방법을 선택하는 코드를 작성하는 것이 가능하다.
 
-Contrast with [C.147](#Rh-ptr-cast), where failure is an error, and should not be used for conditional execution.
+[C.147](#Rh-ptr-cast) 항목과 반대로, 탐색 실패가 오류라면, 조건부 실행에서 사용되어선 안된다.
 
 ##### Example
 
-The example below describes the `add` function of a `Shape_owner` that takes ownership of constructed `Shape` objects. The objects are also sorted into views, according to their geometric attributes.
-In this example, `Shape` does not inherit from `Geometric_attributes`. Only its subclasses do.
+아래의 예시는 `Shape_owner`의 `add` 함수가 생성된 `Shape`의 소유권을 가져가는 것을 보여준다. 개체들은 기하학적 특성에 따라 정렬된다.
+
+이 예시에선, `Shape`는 `Geometric_attributes`를 상속하지 않는다.
 
 ```c++
     void add(Shape* const item)
     {
-      // Ownership is always taken
-      owned_shapes.emplace_back(item);
+        // Ownership is always taken
+        owned_shapes.emplace_back(item);
 
-      // Check the Geometric_attributes and add the shape to none/one/some/all of the views
+        // Check the Geometric_attributes and add the shape to none/one/some/all of the views
 
-      if (auto even = dynamic_cast<Even_sided*>(item))
-      {
-        view_of_evens.emplace_back(even);
-      }
+        if (auto even = dynamic_cast<Even_sided*>(item))
+        {
+            view_of_evens.emplace_back(even);
+        }
 
-      if (auto trisym = dynamic_cast<Trilaterally_symmetrical*>(item))
-      {
-        view_of_trisyms.emplace_back(trisym);
-      }
+        if (auto trisym = dynamic_cast<Trilaterally_symmetrical*>(item))
+        {
+            view_of_trisyms.emplace_back(trisym);
+        }
     }
 ```
 
 ##### Notes
 
-A failure to find the required class will cause `dynamic_cast` to return a null value, and de-referencing a null-valued pointer will lead to undefined behavior.
-Therefore the result of the `dynamic_cast` should always be treated as if it may contain a null value, and tested.
+탐색 실패로 인해 `dynamic_cast`이 null을 반환하기 때문에, null 포인터 참조가 발생하고 미정의 동작으로 이어질 것이다.
+따라서 `dynamic_cast`의 결과는 항상 null 값인지 검사되어야 한다.
 
 ##### Enforcement
 
-* (Complex) Unless there is a null test on the result of a `dynamic_cast` of a pointer type, warn upon dereference of the pointer.
+* (복잡함) `dynamic_cast`의 포인터 타입 반환을 검사하는 코드가 없으면, 그 포인터의 사용을 경고하라
 
 ### <a name="Rh-smart"></a>C.149: 동적 할당한 개체의 소멸을 잊지 않도록 `unique_ptr` 혹은 `shared_ptr`를 사용하라
 
@@ -4459,13 +4454,13 @@ Therefore the result of the `dynamic_cast` should always be treated as if it may
 
 ##### Reason
 
-To find function objects and functions defined in a separate namespace to "customize" a common function.
+다른 네임스페이스에 위치한 함수 개체와 함수들을 찾고 보편적인 함수로 "커스터마이즈" 할 수 있다.
 
 ##### Example
 
-Consider `swap`. It is a general (standard-library) function with a definition that will work for just about any type.
-However, it is desirable to define specific `swap()`s for specific types.
-For example, the general `swap()` will copy the elements of two `vector`s being swapped, whereas a good specific implementation will not copy elements at all.
+`swap`을 생각해보라. 이 함수는 일반적인 (표준 라이브러리) 함수이고, 어떤 타입에 대해서도 동작한다.
+하지만, 어떤 타입들은 특별한 `swap()`을 정의할 필요가 있다.
+예를 들어, 일반적인 `vector`의 `swap()`은 컨테이너 내 원소들을 복사한다. 좋은 구현이라면 복사를 수행하지 않을 것이다.
 
 ```c++
     namespace N {
@@ -4480,9 +4475,8 @@ For example, the general `swap()` will copy the elements of two `vector`s being 
     }
 ```
 
-The `std::swap()` in `f1()` does exactly what we asked it to do: it calls the `swap()` in namespace `std`.
-Unfortunately, that's probably not what we wanted.
-How do we get `N::X` considered?
+`f1()`함수 안에서 `std::swap()`을 사용하는 것은 코드 그대로 실행된다: `std` 네임스페이스의 `swap()`을 호출할 것이다.
+불행히도, 그게 우리가 원하는 것은 아니다. `N::X` 타입에 맞게 호출되게 하려면 어떻게 해야 할까?
 
 ```c++
     void f2(N::X& a, N::X& b)
@@ -4491,22 +4485,24 @@ How do we get `N::X` considered?
     }
 ```
 
-But that may not be what we wanted for generic code.
-There, we typically want the specific function if it exists and the general function if not.
-This is done by including the general function in the lookup for the function:
+이 방법은 우리가 원하는 일반화된 코드가 아닐 수 있다. 
+우리는 보통 특별히 작성된 함수가 있으면 그 함수를 쓰고 그렇지 않은 경우에는 범용 함수(general function)를 호출하기를 원한다. 이는 함수 탐색에 범용 함수를 포함하는 것으로 해결할 수 있다:
 
 ```c++
     void f3(N::X& a, N::X& b)
     {
-        using std::swap;  // make std::swap available
-        swap(a, b);        // calls N::swap if it exists, otherwise std::swap
+        using std::swap;  // std::swap이 탐색되도록 한다
+        swap(a, b);       // N 네임스페이스에 swap이 존재하면 호출하고, 그렇지 않으면 std::swap을 호출한다
     }
 ```
 
 ##### Enforcement
 
-Unlikely, except for known customization points, such as `swap`.
-The problem is that the unqualified and qualified lookups both have uses.
+`swap`같이 잘 알려진 커스터마이징을 제외하면 할 수 있는게 거의 없다.
+문제는 qualified 탐색과 unqualified 탐색이 함께 사용된다는 것이다.
+
+> 역주:  
+> [이름 탐색](https://github.com/CppKorea/CppTemplateStudy/blob/master/7th%20Study/Chap13.md#2-이름-탐색) - C++ Korea Template Study
 
 ### <a name="Ro-address-of"></a>C.166: 단항 연산자 `&`는 스마트 포인터와 참조 체계를 따르는 경우에만 중복정의하라
 
@@ -4680,26 +4676,24 @@ The problem is that the unqualified and qualified lookups both have uses.
 
 ## <a name="SS-union"></a>C.union: 공용체(Union)
 
-A `union` is a `struct` where all members start at the same address so that it can hold only one member at a time.
-A `union` does not keep track of which member is stored so the programmer has to get it right;
-this is inherently error-prone, but there are ways to compensate.
+`union`은 모든 멤버가 같은 주소에서 시작하는 `struct`라고 할 수 있다. 따라서 한 시점에 하나의 멤버만 가지고 있다.
+`union`은 어던 멤버가 저장되었는지 추적하지 않기 때문에 프로그래머가 정확하게 사용해야 한다; 이는 필연적으로 오류를 발생시키지만, 이를 보완할 방법은 있다
 
-A type that is a `union` plus an indicator of which member is currently held is called a *tagged union*, a *discriminated union*, or a *variant*.
+`union`에 어떤 멤버가 사용되고 있는지 알려주도록 표지(indicator)가 추가된 것을 *tagged union*, *discriminated union*, 혹은 *variant*이라고 부른다. 
 
 공용체(Unions) 규칙 요약:
 
 * [C.180: `union`은 메모리를 절약하기 위해 사용하라](#Ru-union)
-* [C.181: `union`을 노출해서 사용하자 말아라](#Ru-naked)
-* [C.182: Use anonymous `union`s to implement tagged unions](#Ru-anonymous)
-* [C.183: Don't use a `union` for type punning](#Ru-pun)
+* [C.181: 표지 없는(naked) `union`을 사용하지 말아라](#Ru-naked)
+* [C.182: Tagged union 구현에는 익명 `union`을 사용하라](#Ru-anonymous)
+* [C.183: 타입 재해석(type punning)을 위해 `union`을 사용하지 말아라](#Ru-pun)
 * ???
 
-### <a name="Ru-union"></a>C.180: Use `union`s to save memory
+### <a name="Ru-union"></a>C.180: `union`은 메모리를 절약하기 위해 사용하라
 
 ##### Reason
 
-A `union` allows a single piece of memory to be used for different types of objects at different times.
-Consequently, it can be used to save memory when we have several objects that are never used at the same time.
+`union`은 하나의 메모리 조각이 다른 시각에 다른 타입의 개체들로 사용될 수 있도록 해준다. 결과적으로, 다른 개체들이 동시에 사용되지 않는다면 메모리를 절약하는데 사용할 수 있다.
 
 ##### Example
 
@@ -4715,7 +4709,7 @@ Consequently, it can be used to save memory when we have several objects that ar
     cout << v.d << '\n';    // write 987.654
 ```
 
-But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
+하지만 경고를 유심히 보라: [표지 없는(naked) `union`을 사용하지 말아라](#Ru-naked)
 
 ##### Example
 
@@ -4764,13 +4758,11 @@ But heed the warning: [Avoid "naked" `union`s](#Ru-naked)
 
 ???
 
-### <a name="Ru-naked"></a>C.181: Avoid "naked" `union`s
+### <a name="Ru-naked"></a>C.181: 표지 없는(naked) `union`을 사용하지 말아라
 
 ##### Reason
 
-A *naked union* is a union without an associated indicator which member (if any) it holds,
-so that the programmer has to keep track.
-Naked unions are a source of type errors.
+*표지 없는(naked) union*은 어떤 멤버를 사용하는지 알 수 없는 union을 의미한다. 이런 경우 프로그래머가 계속 추적해야 한다. 타입 오류의 원인이 된다.
 
 ##### Example, bad
 
@@ -4784,17 +4776,17 @@ Naked unions are a source of type errors.
     v.d = 987.654;  // v holds a double
 ```
 
-So far, so good, but we can easily misuse the `union`:
+여기까진 문제가 없다. 하지만 `union`은 잘못 사용하기 쉽다:
 
 ```c++
     cout << v.x << '\n';    // BAD, undefined behavior: v holds a double, but we read it as an int
 ```
 
-Note that the type error happened without any explicit cast.
-When we tested that program the last value printed was `1683627180` which it the integer value for the bit pattern for `987.654`.
-What we have here is an "invisible" type error that happens to give a result that could easily look innocent.
+명시적 변환이 없음에도 타입 오류가 발생한 점에 주목하라.
+마지막으로 이 프로그램을 테스트 했을떄 출력된 값은 `987.654`의 비트 패턴을 정수로 해석한 `1683627180`이었다.
+이 예시에서는 코드에는 문제 없어 보이지만 "보이지 않는(invisible)" 타입 오류가 발생하는 것을 보여준다.
 
-And, talking about "invisible", this code produced no output:
+그리고, "보이지 않는" 오류로, 이 코드는 아무것도 출력하지 않는다:
 
 ```c++
     v.x = 123;
@@ -4803,9 +4795,9 @@ And, talking about "invisible", this code produced no output:
 
 ##### Alternative
 
-Wrap a `union` in a class together with a type field.
+타입 필드를 추가해서 `union`을 클래스로 감싼다.
 
-The soon-to-be-standard `variant` type (to be found in `<variant>`) does that for you:
+`<variant>` 헤더의 표준 `variant` 타입이 이 일을 대신 해준다:
 
 ```c++
     variant<int, double> v;
@@ -4819,21 +4811,19 @@ The soon-to-be-standard `variant` type (to be found in `<variant>`) does that fo
 
 ???
 
-### <a name="Ru-anonymous"></a>C.182: Use anonymous `union`s to implement tagged unions
+### <a name="Ru-anonymous"></a>C.182: Tagged union 구현에는 익명 `union`을 사용하라
 
 ##### Reason
 
-A well-designed tagged union is type safe.
-An *anonymous* union simplifies the definition of a class with a (tag, union) pair.
+잘 설계된 Tagged union은 타입 안전성을 가지고 있다.
+*익명(anonymous)* union은 (tag, union) 형태의 클래스 정의를 쉽게 만들어준다.
 
 ##### Example
 
-This example is mostly borrowed from TC++PL4 pp216-218.
-You can look there for an explanation.
+이 예제는 대부분 TC++PL4 pp216-218 에서 발췌한 것이다. 설명을 원한다면 해당 문서를 참고하라.
 
-The code is somewhat elaborate.
-Handling a type with user-defined assignment and destructor is tricky.
-Saving programmers from having to write such code is one reason for including `variant` in the standard.
+예시 코드는 상세한 편이다. 이 타입에서 사용자가 정의한 대입 연산과 소멸자를 다루는 것은 꽤 신경써야 하는 작업이다. 
+이런 작업을 프로그래머가 하지 않도록 하는 것이 `variant`가 표준에 추가된 이유 중 하나다.
 
 ```c++
     class Value { // two alternative representations represented as a union
@@ -4922,13 +4912,13 @@ Saving programmers from having to write such code is one reason for including `v
 
 ???
 
-### <a name="Ru-pun"></a>C.183: Don't use a `union` for type punning
+### <a name="Ru-pun"></a>C.183: 타입 재해석(type punning)을 위해 `union`을 사용하지 말아라
 
 ##### Reason
 
-It is undefined behavior to read a `union` member with a different type from the one with which it was written.
-Such punning is invisible, or at least harder to spot than using a named cast.
-Type punning using a `union` is a source of errors.
+`union`의 멤버를 한 타입으로 값을 쓰고 다른 타입으로 읽는 것은 미정의 동작(undefined behavior)이다.
+이런 해석은 보이지 않고, 타입 이름을 사용하는 것보다 찾아내기 어렵다.
+`union`을 사용한 타입 재해석은(type punning)은 오류의 원인이다.
 
 ##### Example, bad
 
@@ -4939,7 +4929,7 @@ Type punning using a `union` is a source of errors.
     };
 ```
 
-The idea of `Pun` is to be able to look at the character representation of an `int`.
+`Pun` 타입의 의도는 `int`를 `char` 형태로 접근하는 것이다.
 
 ```c++
     void bad(Pun& u)
@@ -4949,7 +4939,7 @@ The idea of `Pun` is to be able to look at the character representation of an `i
     }
 ```
 
-If you wanted to see the bytes of an `int`, use a (named) cast:
+`int`의 바이트를 확인하고 싶다면, 타입 이름을 사용한 형변환(named cast)를 사용하라:
 
 ```c++
     void if_you_must_pun(int& x)
@@ -4960,15 +4950,15 @@ If you wanted to see the bytes of an `int`, use a (named) cast:
     }
 ```
 
-Accessing the result of an `reinterpret_cast` to a different type from the objects declared type is defined behavior (even though `reinterpret_cast` is discouraged),
-but at least we can see that something tricky is going on.
+`reinterpret_cast`을 사용해 타입을 바꿔서 접근하는 것은 정의된 행동(defined behavior)이다(비록  `reinterpret_cast`이 권장되지는 않지만).
+이러면 최소한 신경을 많이 써야하는 것들이 사라진 것을 보여준다.
 
 ##### Note
 
-Unfortunately, `union`s are commonly used for type punning.
-We don't consider "sometimes, it works as expected" a strong argument.
+불행하게도 `union`은 타입 재해석에 꽤 많이 사용된다.
+"보통의 경우, 기대한 대로 동작한다"는 것은 강한 주장이라고 생각할 수 없다.
 
-C++17 introduced a distinct type `std::byte` to facilitate operations on raw object representation.  Use that type instead of `unsigned char` or `char` for these operations.
+C++17 에서는 있는 그대로의 비트에 대해 연산을 수행할 수 있도록 `std::byte` 타입을 추가하였다. `unsigned char` 혹은 `char` 대신에 이 타입을 사용하라
 
 ##### Enforcement
 
