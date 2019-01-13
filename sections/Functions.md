@@ -1,78 +1,85 @@
 
 # <a name="S-functions"></a>F: 함수
 
-함수는 어떤 동작이나 계산을 명세하는데, 하나의 상태에서 다른 상태로 일관성 있게 넘어가는 시스템이다. 함수는 프로그램의 기초적인 설계 단위다.
+함수의 이름은 전달인자(argument)들의 요구사항을 드러내고, 인자들과 호출 결과간의 관계를 명확히 기술해야 한다.
+세부 구현은 명세가 아니다. 함수가 어떻게 작동하는지만큼이나 무엇을 하는지도 생각해 보라. 함수는 대부분 인터페이스에서 가장 중요한 부분이므로, 인터페이스 규칙도 살펴 보라.
 
-함수 이름은 인자의 요구사항, 인자간의 관계와 결과를 명확하게 기술할 수 있도록 의미있게 지어야 한다. 함수의 구현은 명세가 아니다. 
-함수가 무엇을 해야하는지, 어떻게 동작하는지를 고려해야 한다. 함수는 모든 인터페이스에서 가장 중요한 부분이다. 이에 관해서는 인터페이스 규칙을 참고 하라.
+함수는 시스템이 모순없는(consistent) 어떤 상태에서 다음 상태로 이행하도록 하는 동작(action)이나 계산(computation)을 명세하는(specify) 것이다. 이는 프로그램의 기본 재료(building block)이다.
+
+>
+> 역주:
+> * Parameter: 매개변수
+> * Argument: 전달인자
+>
 
 함수 규칙 요약:
 
 함수 정의 규칙:
 
-* [F.1: 의미있는 동작들을 "묶어서" 심사숙고해 함수 이름을 지어라](#Rf-package)
-* [F.2: 함수는 하나의 논리적 동작만 수행하도록 하라](#Rf-logical)
-* [F.3: 함수는 간결하고 단순하게 유지시켜라](#Rf-single)
-* [F.4: 함수가 컴파일 타임에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
+* [F.1: 의미있는 동작들을 "묶어서" 함수로 만들고 신중하게 이름을 지어라](#Rf-package)
+* [F.2: 함수는 하나의 논리적 동작만 수행해야 한다](#Rf-logical)
+* [F.3: 함수는 간결하고 단순하게 유지하라](#Rf-single)
+* [F.4: 함수가 컴파일 시간에 평가되어야 한다면 `constexpr`로 선언하라](#Rf-constexpr)
 * [F.5: 함수가 매우 짧고 수행시간이 중요하다면 `inline`으로 선언하라](#Rf-inline)
 * [F.6: 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라](#Rf-noexcept)
 * [F.7: 보편성을 고려한다면, 스마트 포인터 대신에 `T*`나 `T&` 타입의 인자를 사용하라](#Rf-smart)
 * [F.8: 순수 함수를 선호하라](#Rf-pure)
 * [F.9: 사용되지 않는 인자는 이름이 없어야 한다](#Rf-unused)
 
-매개 변수 전달 표현 규칙:
+매개변수 전달 표현(parameter passing expression) 규칙:
 
 * [F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라](#Rf-conventional)
-* [F.16: "입력" 매개 변수는 복사 비용이 적게드는 값 타입을 사용하거나 상수 참조형으로 전달하라](#Rf-in)
-* [F.17: "입출력" 매개 변수는 비상수 참조형으로 전달하라](#Rf-inout)
-* [F.18: "소모성" 매개 변수는 `X&&`타입과 `std::move`로 전달하라](#Rf-consume)
-* [F.19: "forward" 매개 변수는 `TP&&`타입과 `std::forward`로만 전달하라](#Rf-forward)
-* [F.20: "출력" 매개 변수로 값을 반환하는 방법을 선호하라](#Rf-out)
+* [F.16: "입력(in)" 매개변수는 복사 비용이 적게 드는 타입의 경우 값으로 전달하고, 그 외에는 상수 참조형으로 전달하라](#Rf-in)
+* [F.17: "입출력(in-out)" 매개변수는 비상수 참조형으로 전달하라](#Rf-inout)
+* [F.18: "넘겨주는(will-move-from)" 매개변수는 `X&&`타입과 `std::move`로 전달하라](#Rf-consume)
+* [F.19: "전달(forward)" 매개변수는 `TP&&`타입과 `std::forward`로만 전달하라](#Rf-forward)
+* [F.20: "출력(out)"에는 매개변수보다는 값을 반환하는 방법을 선호하라](#Rf-out)
 * [F.21: "출력"값 여러 개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
-* [F.60: "인자가 없을 수도" 있다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
-Parameter passing semantic rules:
+매개변수 전달 의미구조(parameter passing semantic) 규칙:
 
-* [F.22: Use `T*` or `owner<T*>` to designate a single object](#Rf-ptr)
-* [F.23: Use a `not_null<T>` to indicate that "null" is not a valid value](#Rf-nullptr)
-* [F.24: Use a `span<T>` or a `span_p<T>` to designate a half-open sequence](#Rf-range)
-* [F.25: Use a `zstring` or a `not_null<zstring>` to designate a C-style string](#Rf-zstring)
-* [F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed](#Rf-unique_ptr)
-* [F.27: Use a `shared_ptr<T>` to share ownership](#Rf-shared_ptr)
+* [F.22: T* 혹은 owner<T*>를 단일 개체를 지정하기 위해 사용하라](#Rf-ptr)
+* [F.23: "null"이 허용되지 않는다면 `not_null<T>`를 사용해 표시하라](#Rf-nullptr)
+* [F.24: 범위를 지정할 때는 `span<T>`혹은 `span_p<T>`를 사용하라](#Rf-range)
+* [F.25: C 스타일 문자열에는 `zstring` 혹은 `not_null<zstring>`을 사용하라](#Rf-zstring)
+* [F.26: 포인터가 필요한 곳에 소유권을 전달할 때는 `unique_ptr<T>`를 사용하라](#Rf-unique_ptr)
+* [F.27: 소유권을 공유할 때는 `shared_ptr<T>`를 사용하라](#Rf-shared_ptr)
+* [F.60: "인자가 없을 경우"를 허용한다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
-<a name="Rf-value-return"></a>값 반환 의미(semantic) 규칙:
+<a name="Rf-value-return"></a>값 반환 의미구조 규칙:
 
-* [F.42: Return a `T*` to indicate a position (only)](#Rf-return-ptr)
-* [F.43: Never (directly or indirectly) return a pointer or a reference to a local object](#Rf-dangle)
-* [F.44: Return a `T&` when copy is undesirable and "returning no object" isn't needed](#Rf-return-ref)
-* [F.45: Don't return a `T&&`](#Rf-return-ref-ref)
-* [F.46: `int` is the return type for `main()`](#Rf-main)
-* [F.47: Return `T&` from assignment operators](#Rf-assignment-op)
-* [F.48: Don't `return std::move(local)`](#Rf-return-move-local)
+* [F.42: 위치를 나타내는 경우에만 `T*`를 반환하라](#Rf-return-ptr)
+* [F.43: 절대로 (직접적이든 간접적이든) 지역 개체의 포인터나 참조를 반환하지 말아라](#Rf-dangle)
+* [F.44: 복사를 권장하지 않거나 "개체를 항상 반환"한다면 `T&`를 반환하라](#Rf-return-ref)
+* [F.45: `T&&`를 반환하지 말아라](#Rf-return-ref-ref)
+* [F.46: `main()`는 `int`를 반환해야 한다](#Rf-main)
+* [F.47: 대입 연산자는 `T&`를 반환하라](#Rf-assignment-op)
+* [F.48: `return std::move(local)`은 사용하지 말아라](#Rf-return-move-local)
 
 기타 함수 규칙:
 
-* [F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)](#Rf-capture-vs-overload)
-* [F.51: Where there is a choice, prefer default arguments over overloading](#Rf-default-args)
-* [F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms](#Rf-reference-capture)
-* [F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread](#Rf-value-capture)
-* [F.54: If you capture `this`, capture all variables explicitly (no default capture)](#Rf-this-capture)
-* [F.55: Don't use `va_arg` arguments](#F-varargs)
+* [F.50: 함수를 쓸 수 없을 때는 람다를 사용하라(지역 변수를 캡쳐하거나 지역 함수를 작성할 때)](#Rf-capture-vs-overload)
+* [F.51: 선택할 수 있다면, 중복 정의보다는 기본 전달인자를 선호하라](#Rf-default-args)
+* [F.52: 지역적으로 사용된다면 람다의 참조 캡쳐를 선호하라](#Rf-reference-capture)
+* [F.53: 지역적으로 사용되지 않는다면 참조 캡쳐를 피하라](#Rf-value-capture)
+* [F.54: `this`를 캡쳐할 때는, 모든 변수를 명시적으로 캡쳐하라(기본 캡쳐를 사용하지 않는다)](#Rf-this-capture)
+* [F.55: `va_arg` 전달인자를 사용하지 말아라](#F-varargs)
 
 함수는 람다와 함수개체와 강한 연관성을 가지고 있다.
 
-**See also**: [C.lambdas: Function objects and lambdas](#SS-lambdas)
+##### See also
+
+[C.lambdas: Function objects and lambdas](#SS-lambdas)
 
 ## <a name="SS-fct-def"></a>F.def: 함수 정의(definition)
 
-함수 정의는 함수를 선언하고 본문를 구현하는 것을 의미한다.
+함수 정의는 함수의 본문을 구현하면서 선언하는 것이다.
 
-### <a name="Rf-package"></a>F.1: "Package" meaningful operations as carefully named functions
+### <a name="Rf-package"></a>F.1: 의미있는 동작들을 "묶어서" 함수로 만들고 신중하게 이름을 지어라
 
 ##### Reason
 
-공통 코드를 만드는 것은 가독성, 재사용성을 높이고 복잡한 코드에서 오류 발생을 제한시킨다.
-만약 어떤 동작이 잘 정의되어 있다면 주변 코드로부터 분리하고 이름을 지어라.
+공통된 코드를 묶어 내면 가독성이 높아지고, 재사용하기 좋아지고, 복잡한 코드에서 오류가 나타나는 범위를 제한한다. 잘 명세된 행동이라면 이를 주변 코드로부터 분리시키고 이름을 부여하라.
 
 ##### Example, don't
 
@@ -87,14 +94,13 @@ Parameter passing semantic rules:
     }
 ```
 
-`read_and_print`는 대부분이 틀렸다.
-이 함수는 읽고, (`ostream`에) 쓰고, (`ostream`에) 오류 메시지를 쓴다. 그리고 `int`변수만을 다룬다.
-재사용되는 코드가 없고 논리적으로 분리된 동작들은 섞였고 지역변수는 사용이 끝난 후에도 존재한다.
-간단한 이 예제는 문제가 없어보이지만, 입력동작, 출력동작 그리고 오류처리가 좀 더 복잡해지면 코드가 뒤엉켜서 이해하기 어려워 진다.
+`read_and_print` 함수의 거의 모든 부분이 잘못되었다. 이 함수는 어떤 값을 읽고, `ostream`에 쓰거나 오류 메시지를 쓰는데, 오로지 `int`만을 다룬다. 
+재사용 가능한 코드가 없고, 논리적으로 별개인 동작이 뒤섞여 있으며, 지역변수는 논리상 소용이 없어진 뒤에도 남아 있다. 
+작은 예에서라면 괜찮아 보이지만, 이 입력동작, 출력동작, 그리고 오류처리가 더 복잡했더라면 뒤엉킨 코드 덩어리가 이해하기 어려워졌을 것이다.
 
 ##### Note
 
-만약 한 곳 이상에서 사용 될 중요한 람다 함수를 작성한다면 (비지역)변수에 할당하고 이름을 지어줘라.
+만약 한 곳 이상에서 사용 될 중요한 람다 함수를 작성한다면 (비지역)변수에 할당하고 이름을 부여하라.
 
 ##### Example
 
@@ -102,7 +108,7 @@ Parameter passing semantic rules:
     sort(a, b, [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); });
 ```
 
-람다에 이름을 짓게되면 표현식을 여러개의 논리적 부분으로 나눌 수 있고, 람다가 어떤 일을 하는지 가늠할 수 있다.
+람다에 이름을 부여하면 표현식을 여러 개의 논리적 부분으로 나눌 수 있고, 그 람다가 하는 일을 짐작케 할 수 있다.
 
 ```c++
     auto lessT = [](T x, T y) { return x.rank() < y.rank() && x.value() < y.value(); };
@@ -111,20 +117,20 @@ Parameter passing semantic rules:
     find_if(a, b, lessT);
 ```
 
-유지보수나 성능을 고려하면 짧은 코드가 항상 좋은것은 아니다.
+코드가 짧다고 성능이나 유지보수성이 항상 좋지만은 않다.
 
 ##### Exception
 
-반복문 몸체, 반복문 몸체로 사용되는 람다는 이름을 가질 필요가 거의 없다.
-하지만 수 십라인이 넘거나 수 페이지가 된다면 문제가 될 수 있다.
-[함수를 간결하게 유지하라](#Rf-single) 규칙은 "반복문을 간결하게 유지하라"는 규칙을 내포한다. 콜백 인자로 사용되는 람다는 재사용하지 않지만 사소하게 볼 수 없는 경우도 있다.
+반복문(loop bodies)은, 람다인 경우도 마찬가지인데, 이름을 지을 필요가 거의 없다. 
+하지만 수십 줄이나 수십 쪽에 걸친 거대한 반복문은 문제가 될 수 있다. [함수를 간결하게 유지하라](#Rf-single) 규칙에는 "반복문을 짧게 유지하라"라는 뜻도 있다. 
+이와 유사하게, 콜백 인자로 사용되는 람다는 때로 한눈에 알아볼 수 없지만, 재사용될 가망이 거의 없다. (따라서 이름을 지어 줄 필요가 거의 없다.)
 
 ##### Enforcement
 
 * [함수를 간결하게 유지하라](#Rf-single)를 참고하라
 * 동일하거나 매우 비슷한 람다가 여러 곳에서 사용되면 지적하라
 
-### <a name="Rf-logical"></a>F.2: A function should perform a single logical operation
+### <a name="Rf-logical"></a>F.2: 함수는 하나의 논리적 동작만 수행해야 한다
 
 ##### Reason
 
@@ -144,7 +150,7 @@ Parameter passing semantic rules:
     }
 ```
 
-위 함수는 특정한 입력에 속박되어 있고 다른 쓰임새는 찾을 수 없다. 대신, 함수를 의미있는 논리적 작업으로 나누고 매개 변수화하라:
+이는 특정한 입력에 매여 있는 통짜로 된 함수로, 다른 쓰임새를 찾을 수 없다. 대신에 함수를 적절한 논리적 부분으로 쪼개고 cin, cout 등은 매개변수로 사용하라:
 
 ```c++
     int read(istream& is)    // better
@@ -190,20 +196,19 @@ Parameter passing semantic rules:
 
 ##### Enforcement
 
-* 출력 매개 변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다.
+* 출력 매개변수가 2개 이상인 함수를 의심하라. 대신 반환값을 사용하라. 여러 반환값을 저장 할 수 있는 `tuple`을 사용해도 좋다.
 * 편집기 화면에 다 나오지 않을 만큼 큰 함수를 의심하라. 이런 함수는 세부 동작을 갖는 더 작은 함수들로 (이름을 잘 지어서) 나누도록 한다.
-* 7개 이상의 매개 변수를 갖는 함수를 의심하라.
+* 7개 이상의 매개변수를 갖는 함수를 의심하라.
 
-### <a name="Rf-single"></a>F.3: Keep functions short and simple
+### <a name="Rf-single"></a>F.3: 함수는 간결하고 단순하게 유지하라
 
 ##### Reason
 
-긴 함수는 읽기 어렵고 복잡하고, 변수가 필요한 유효범위 이상으로 사용되고 있을지도 모른다.  
-복잡한 제어구조를 가진 함수는 더 길고 논리적 오류가 숨겨져 있을 수 있다
+거대한 함수는 읽기 어려울 뿐더러, 복잡한 코드를 포함하거나, 필요한 유효범위 이상으로 존재하는 변수가 있을 가능성이 더 높다. 제어 구조가 복잡한 함수는 길이가 길기 마련이고, 논리 오류가 숨어있을 공산이 크다.
 
 ##### Example
 
-Consider:
+다음의 예를 보라:
 
 ```c++
     double simple_func(double val, int flag1, int flag2)
@@ -235,9 +240,7 @@ Consider:
     }
 ```
 
-이 함수는 너무 복잡하다 (그리고 너무 길다).
-모든 경우가 올바르게 처리되는지 어떻게 알 수 있겠는가?
-게다가, 이 함수는 다른 규칙들도 어기고 있다.
+이 함수는 너무 복잡하다. 가능한 모든 경우를 올바르게 다루었는지 어떻게 알겠는가? 게다가, 이 예는 다른 규칙도 어기고 있다.
 
 이렇게 바꿔쓸 수 있다:
 
@@ -267,8 +270,7 @@ Consider:
 
 ##### Note
 
-"한 화면에 맞추기"는 "너무 크게 하지 않기"를 막는 좋은 실용적인 규칙이다.
-최대 다섯줄짜리 함수를 기본으로 생각해야 한다.
+"한 화면에 맞추기"는 "너무 크게 하지 않기"에 대한 좋은 실용적인 규칙이다. 한줄에서 다섯줄 사이의 함수는 정상으로 간주한다.
 
 ##### Note
 
@@ -277,12 +279,11 @@ Consider:
 ##### Enforcement
 
 * "한 화면에 맞지 않는" 함수는 지적한다.  
-  How big is a screen? Try 60 lines by 140 characters; that's roughly the maximum that's comfortable for a book page.
+  화면은 어느정도 크기로 할 것인가? 한 줄에 140자, 60줄 화면을 사용해보라; 이는 대략 책의 한 페이지에 맞는 최대 크기이다.
 * 너무 복잡한 함수는 지적한다.  
-  How complex is too complex?
-  You could use cyclomatic complexity. Try "more than 10 logical path through." Count a simple switch as one path.
+  너무 복잡한은 어느정도를 의미하는가? 순환 복잡도(cyclomatic complexity)를 쓸 수도 있다. "10개의 논리적 경로"를 사용해보라. 단순한 switch는 하나로 세어도 좋다.
 
-### <a name="Rf-constexpr"></a>F.4: If a function may have to be evaluated at compile time, declare it `constexpr`
+### <a name="Rf-constexpr"></a>F.4: 함수가 컴파일 시간에 평가되어야 한다면 `constexpr`로 선언하라
 
 ##### Reason
 
@@ -303,7 +304,7 @@ Consider:
     }
 ```
 
-C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac()`를 재귀 형태로 작성해야 한다.
+C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac()`를 재귀를 사용해 작성해야 한다.
 
 ##### Note
 
@@ -336,37 +337,33 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 대체적으로 좋은 특성이다.
 
-When given a non-constant argument, a `constexpr` function can throw.
-If you consider exiting by throwing a side effect, a `constexpr` function isn't completely pure;
-if not, this is not an issue.
-??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?
+상수가 아닌 전달인자를 사용하면, `constexpr`는 예외를 던질 수도 있다. 
+부수효과를 남기면서 종료하는 것을 고려하고 있다면, `constexpr`는 완전히 순수한 함수는 아니게 된다; 그렇지 않다면 문제가 되지 않는다.
+
+??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?  
 "No" would be a nice answer that matches most practice.
 
 ##### Note
 
-Don't try to make all functions `constexpr`.
-Most computation is best done at run time.
+모든 함수를 `constexpr`로 작성하지는 마라. 대부분의 계산은 실행시간에 최적으로 수행된다.
 
 ##### Note
 
-Any API that may eventually depend on high-level run-time configuration or
-business logic should not be made `constexpr`. Such customization can not be
-evaluated by the compiler, and any `constexpr` functions that depended upon
-that API would have to be refactored or drop `constexpr`.
+어떤 API가 높은 수준의 실행시간 설정(configuration) 혹은 비즈니스 로직에 의존한다면 `constexpr`로 작성해선 안된다.
+그와 같은 경우는 컴파일러에 의해 평가될 수 없으며, 그 API에 의존하는 `constexpr` 함수들은 재구성(refactored)되거나 `constexpr`를 포기(drop)하게 될 것이다.
 
 ##### Enforcement
 
-Impossible and unnecessary.
-The compiler gives an error if a non-`constexpr` function is called where a constant is required.
+불가능하며 불필요하다.  
+컴파일러가 상수가 필요한 곳에 `constexpr`가 아닌 함수들이 사용되면 오류로 처리할 것이다.
 
-### <a name="Rf-inline"></a>F.5: If a function is very small and time-critical, declare it `inline`
+### <a name="Rf-inline"></a>F.5: 함수가 매우 짧고 수행시간이 중요하다면 `inline`으로 선언하라
 
 ##### Reason
 
 일부 최적화기(optimizer)는 별도로 힌트를 받지 않아도 함수 인라인화를 잘 하지만, 그에 의존해서는 안된다.
 측정하라! 지난 40년간 우리는 컴파일러가 아무런 힌트가 없어도 사람보다 더 인라인화를 잘 할거라고 약속해 왔다.
-그리고 그 약속은 아직 지켜지지 않았다.  
-`inline`키워드를 지정하는 것은 컴파일러가 일을 더 잘 할 수 있도록 한다. 독려해주는 것 입니다.
+그리고 그 약속은 아직 지켜지지 않았다. `inline`을 명시하는 것은 컴파일러가 더 나은 코드를 생성하도록 권장하는 것이다.
 
 ##### Example
 
@@ -376,8 +373,8 @@ The compiler gives an error if a non-`constexpr` function is called where a cons
 
 ##### Exception
 
-Do not put an `inline` function in what is meant to be a stable interface unless you are certain that it will not change.
-An inline function is part of the ABI.
+함수가 변하지 않을 것이라고 확신하지 않는 한, `inline`을 안정된 인터페이스 함수에 사용해선 안된다.
+인라인 함수는 ABI의 일부이다.
 
 ##### Note
 
@@ -385,7 +382,7 @@ An inline function is part of the ABI.
 
 ##### Note
 
-Member functions defined in-class are `inline` by default.
+클래스 내에 정의된 멤버 함수들은 기본적으로 `inline`이 적용된다.
 
 ##### Exception
 
@@ -395,11 +392,11 @@ Member functions defined in-class are `inline` by default.
 
 `inline`함수가 3 문장보다 길고 (클래스의 멤버 함수처럼) 다른 곳에 선언되었다면 지적한다.
 
-### <a name="Rf-noexcept"></a>F.6: If your function may not throw, declare it `noexcept`
+### <a name="Rf-noexcept"></a>F.6: 함수가 예외를 던지지 않는다면 `noexcept`로 선언하라
 
 ##### Reason
 
-예외를 던지지 않기로 했다면, 프로그램은 오류를 처리하지 않을 것이기 때문에 가능한 빠르게 종료되어야 한다. `noexcept`를 선언하면 최적화기가 선택하는 여러가지 실행경로들을 사전에 제거할 수 있도록 도와준다.
+예외를 던지지 않는다면 프로그램이 오류에 대처하리라 생각할 수 없고, 이는 최대한 빠르게 종료되어야 마땅하다. 함수를 `noexcept`로 선언하면 대안적인 실행경로가 줄어듦으로 최적화가 쉬워진다. 오류가 난 뒤 종료할 때까지 시간도 짧아진다.
 
 ##### Example
 
@@ -428,24 +425,14 @@ Member functions defined in-class are `inline` by default.
 
 ##### Note
 
-You must be aware of the execution environment that your code is running when
-deciding whether to tag a function `noexcept`, especially because of the issue
-of throwing and allocation.  Code that is intended to be perfectly general (like
-the standard library and other utility code of that sort) needs to support
-environments where a `bad_alloc` exception may be handled meaningfully.
-However, most programs and execution environments cannot meaningfully
-handle a failure to allocate, and aborting the program is the cleanest and
-simplest response to an allocation failure in those cases.  If you know that
-your application code cannot respond to an allocation failure, it may be
-appropriate to add `noexcept` even on functions that allocate.
+어떤 함수에 `noexcept`를 붙일지 말지 결정할 때는 코드가 실행되는 환경을 알고 있어야 한다. 특히나 예외를 던지는 것이 메모리 할당 문제를 일으킬 수 있다. 표준 라이브러리나 `sort`같은 여타 유틸리티 코드처럼, 완전히 일반적으로 쓰일 것을 염두에 둔 코드는 `bad_alloc` 예외가 제대로 처리되는 환경을 지원할 필요가 있다. 
+하지만 대부분의 프로그램 및 실행환경은 메모리 할당 실패를 제대로 처리하지 못하는데, 그럴 때는 프로그램을 종료시켜 버리는 것이 가장 깔끔하고 간단한 처리방법이다. 
+당신이 짠 응용프로그램 코드가 메모리 할당 실패에 대처하지 못하리라는 점을 안다면, 메모리를 할당하는 함수에도 `noexcept`를 덧붙이는 것이 적절할 수도 있다.
 
-Put another way: In most programs, most functions can throw (e.g., because they
-use `new`, call functions that do, or use library functions that reports failure
-by throwing), so don't just sprinkle `noexcept` all over the place without
-considering whether the possible exceptions can be handled.
+다르게 생각하면:  
+대부분의 프로그램에서는 함수들은 보통 예외를 던진다 (함수 안에서 `new`를 사용하거나 예외를 던지는 방식으로 실패를 알리는 함수/라이브러리를 사용하는 경우). 따라서 발생가능한 예외가 처리될 수 있는지 고민하지 않고 `noexcept`를 남발해서는 안된다.
 
-`noexcept` is most useful (and most clearly correct) for frequently used,
-low-level functions.
+`noexcept`는 빈번히 호출되는 저수준 함수들에 유용하다 (또한 정확하다).
 
 ##### Note
 
@@ -456,7 +443,7 @@ low-level functions.
 * 예외를 던질 수 없는데도 `noexcept`가 없는 함수가 있다면 지적한다
 * 예외를 던지는 `swap`, move 연산자, 소멸자 그리고 기본 생성자가 있다면 지적한다
 
-### <a name="Rf-smart"></a>F.7: For general use, take `T*` or `T&` arguments rather than smart pointers
+### <a name="Rf-smart"></a>F.7: 보편성을 고려한다면, 스마트 포인터 대신에 `T*`나 `T&` 타입의 인자를 사용하라
 
 ##### Reason
 
@@ -499,26 +486,25 @@ low-level functions.
 
 ##### Note
 
-We can catch dangling pointers statically, so we don't need to rely on resource management to avoid violations from dangling pointers.
+허상 포인터(dangling pointer)는 정적으로 잡아낼 수 있다. 때문에 허상 포인터로 인한 자원 관리에 의존할 필요는 없다.
 
-**See also**:
+##### See also
 
-* [Prefer `T*` over `T&` when "no argument" is a valid option](#Rf-ptr-ref)
-* [Smart pointer rule summary](#Rr-summary-smartptrs)
+* [전달인자가 없는 경우가 허용된다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
+* [스마트 포인터 규칙 요약](#Rr-summary-smartptrs)
 
 ##### Enforcement
 
-스마트 포인터 타입을 인자로 사용한다면 지적한다 (a type that overloads `operator->` or `operator*`) for which the ownership semantics are not used;
-that is
+소유권 의미구조를 사용하지 않는데 스마트 포인터 타입을 인자로 사용한다면 지적한다 (또는 `operator->`나 `operator*`를 중복정의한 타입). 이런 경우는
 
-* copyable but never copied/moved from or movable but never moved
-* and that is never modified or passed along to another function that could do so.
+* 복사 가능하지만 복사/이동이 발생하지 않는다 혹은 이동 가능하지만 이동하지 않는다
+* 값을 변경하지 않거나 변경하지 않는 다른 함수로 전달한다
 
-### <a name="Rf-pure"></a>F.8: Prefer pure functions
+### <a name="Rf-pure"></a>F.8: 순수 함수를 선호하라
 
 ##### Reason
 
-간결한 함수는 이유를 이해하기 쉽고, 최적화하기 쉽고(병렬화를 포함한다), 메모이제이션하기 쉽습니다.
+순수 함수는 좀 더 파악하기 쉽다. 최적화하기 쉽고(병렬화를 포함한다), 메모이제이션하기 쉽다.
 
 ##### Example
 
@@ -531,17 +517,17 @@ that is
 
 `constexpr`는 순수 함수에 속한다.
 
-When given a non-constant argument, a `constexpr` function can throw.
-If you consider exiting by throwing a side effect, a `constexpr` function isn't completely pure;
-if not, this is not an issue.
+상수가 아닌 전달인자를 사용하면, `constexpr`는 예외를 던질 수도 있다. 
+부수효과를 남기면서 종료하는 것을 고려하고 있다면, `constexpr`는 완전히 순수한 함수는 아니게 된다; 그렇지 않다면 문제가 되지 않는다.
+
 ??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?
 "No" would be a nice answer that matches most practice.
 
 ##### Enforcement
 
-Not possible.
+불가능하다.
 
-### <a name="Rf-unused"></a>F.9: Unused parameters should be unnamed
+### <a name="Rf-unused"></a>F.9: 사용되지 않는 인자는 이름이 없어야 한다
 
 ##### Reason
 
@@ -555,43 +541,44 @@ Not possible.
 
 ##### Note
 
-Allowing parameters to be unnamed was introduced in the early 1980 to address this problem.
+이 문제를 다루기 위해 1980년대 초에 이름 없는 매개변수를 허용하게 되었다
 
 ##### Enforcement
 
-Flag named unused parameters.
+이름이 있지만 사용되지 않는 매개변수를 지적한다.
 
-## <a name="SS-call"></a>F.call: 인자 전달(Parameter passing)
+## <a name="SS-call"></a>F.call: 매개변수 전달(Parameter passing)
 
 함수에 인자를 전달하고 반환값을 받는데는 다양한 방법이 있다.
 
-### <a name="Rf-conventional"></a>F.15: Prefer simple and conventional ways of passing information
+### <a name="Rf-conventional"></a>F.15: 정보를 전달 할 때 단순하고 관습적인 방법을 선호하라
 
 ##### Reason
 
 "별나면서 교묘한" 기법은 깜짝놀랄만한 버그를 만들어내거나, 다른 프로그래머가 코드를 이해하는데 어렵게 만든다.
 정말로 일반적인 기법을 넘어서는 방법으로 최적화를 해야 한다면 꼭 필요한 개선사항이라는것을 확신할 수 있어야하고, 이식성이 없을 수 있기 때문에 문서나 주석을 남겨야 한다.
 
-The following tables summarize the advice in the following Guidelines, F.16-21.
+아래의 표는 핵심 가이드라인의 조언(F.16-21)을 요약한 것이다.
 
-Normal parameter passing:
+매개변수 전달(Normal):
 
 ![Normal parameter passing table](../images/param-passing-normal.png)
 
-Advanced parameter passing:
+매개변수 전달(Advanced):
 
 ![Advanced parameter passing table](../images/param-passing-advanced.png)
 
-Use the advanced techniques only after demonstrating need, and document that need in a comment.
+필요한 경우에만 고급 기술을 사용하고, 주석으로 문서화하라.
 
-### <a name="Rf-in"></a>F.16: For "in" parameters, pass cheaply-copied types by value and others by reference to `const`
+### <a name="Rf-in"></a>F.16: "입력(in)" 매개변수는 복사 비용이 적게 드는 타입의 경우 값으로 전달하고, 그 외에는 상수 참조형으로 전달하라
 
 ##### Reason
 
-Both let the caller know that a function will not modify the argument, and both allow initialization by rvalues.
+두 경우 모두 호출자가 전달인자를 변경하지 않는다는 것을 알 수 있다. 또한 r-value 초기화를 허용한다.
 
-What is "cheap to copy" depends on the machine architecture, but two or three words (doubles, pointers, references) are usually best passed by value.
-When copying is cheap, nothing beats the simplicity and safety of copying, and for small objects (up to two or three words) it is also faster than passing by reference because it does not require an extra indirection to access from the function.
+"큰 비용 없이 복사" 한다는 것은 실행기(machine)의 구조(architecture)에 따라 다르다. 하지만 보통 2,3개의 워드(double, 포인터, 참조)를 값으로 전달할때 최적이다.
+
+비용이 적다면, 단순성과 안전성에서 복사보다 나은 방법은 없다. 또한 작은 개체(2,3개 워드까지)에 대해선 참조보다 복사가 빠른데 함수에서 간접(in-direct)접근없이 사용할 수 있기 때문이다.
 
 ##### Example
 
@@ -605,12 +592,11 @@ When copying is cheap, nothing beats the simplicity and safety of copying, and f
     void f4(const int& x);     // bad: overhead on access in f4()
 ```
 
-For advanced uses (only), where you really need to optimize for rvalues passed to "input-only" parameters:
+"입력 전용" 매개변수로 전달된 r-value를 최적화하고자 한다면:
 
-* If the function is going to unconditionally move from the argument, take it by `&&`. See [F.18](#Rf-consume).
-* If the function is going to keep a copy of the argument, in addition to passing by `const&` (for lvalues),
-  add an overload that passes the parameter by `&&` (for rvalues) and in the body `std::move`s it to its destination. Essentially this overloads a "will-move-from"; see [F.18](#Rf-consume).
-* In special cases, such as multiple "input + copy" parameters, consider using perfect forwarding. See [F.19](#Rf-forward).
+* 함수에서 무조건적으로 전달인자를 이동(move)받는다면, `&&`를 사용하라. [F.18](#Rf-consume) 참고
+* 인자의 복사본을 사용한다면, 매개변수에 (l-value인 경우) `const&`를 사용하는 함수와 (r-value인 경우) `&&`를 받아 필요한 영역에 `std::move`하는 함수를 중복 정의하라. 원래 이는 "will-move-from"을 중복정의한 것이다. [F.18](#Rf-consume) 참고
+* "입력 + 복사"가 여럿 발생하는 특별한 경우에는, "perfect forwarding" 사용을 고려하라. [F.19](#Rf-forward) 참고
 
 ##### Example
 
@@ -623,15 +609,14 @@ For advanced uses (only), where you really need to optimize for rvalues passed t
     void sink(unique_ptr<widget>);  // input only, and moves ownership of the widget
 ```
 
-Avoid "esoteric techniques" such as:
+아래와 같은 "난해한 기술"은 지양하라:
 
-* Passing arguments as `T&&` "for efficiency".
-  Most rumors about performance advantages from passing by `&&` are false or brittle (but see [F.18](#Rf-consume) and [F.19](#Rf-forward)).
-* Returning `const T&` from assignments and similar operations (see [F.47](#Rf-assignment-op).)
+* "효율적이라서" 인자를 `T&&`로 전달한다. `&&`로 전달함으로써 발생하는 성능 향상에 대한 루머는 잘못되었고 깨지기 쉽다(속단하지 말고 [F.18](#Rf-consume)와 [F.19](#Rf-forward)를 참고하라)
+* 대입에서 `const T&`를 반환하거나 비슷한 연산을 수행한다 ([F.47](#Rf-assignment-op) 참고)
 
 ##### Example
 
-Assuming that `Matrix` has move operations (possibly by keeping its elements in a `std::vector`):
+`Matrix`가 이동 연산을 지원한다고 가정하자(아마도 원소들을 `std::vector`에 보관하고 있다):
 
 ```c++
     Matrix operator+(const Matrix& a, const Matrix& b)
@@ -648,20 +633,17 @@ Assuming that `Matrix` has move operations (possibly by keeping its elements in 
 
 ##### Notes
 
-The return value optimization doesn't handle the assignment case, but the move assignment does.
-
-A reference may be assumed to refer to a valid object (language rule).
-There is no (legitimate) "null reference."
-If you need the notion of an optional value, use a pointer, `std::optional`, or a special value used to denote "no value."
+반환 값 최적화는 대입에 대해서는 동작하지 않지만, 이동 대입의 경우에는 적용된다.
+참조는 언어 규칙에 의해 유효한 개체를 가리킨다고 가정하기 때문에, null 참조는 발생하지 않는다.
+optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::optional` 혹은 "값이 없음"을 의미하는 특별한 값을 사용하라.
 
 ##### Enforcement
 
-* (Simple) ((Foundation)) Warn when a parameter being passed by value has a size greater than `4 * sizeof(int)`.
-  Suggest using a reference to `const` instead.
-* (Simple) ((Foundation)) Warn when a `const` parameter being passed by reference has a size less than `3 * sizeof(int)`. Suggest passing by value instead.
-* (Simple) ((Foundation)) Warn when a `const` parameter being passed by reference is `move`d.
+* (쉬움) (기본 사항) 인자의 크기가 `4 * sizeof(int)` 보다 크면 경고한다. `const` 참조를 전달하도록 제안한다
+* (쉬움) (기본 사항) `const` 참조로 전달되는 인자의 크기가 `3 * sizeof(int)`보다 작다면 경고한다. 값 전달을 대신 사용하도록 제안한다
+* (쉬움) (기본 사항) `const` 참조 매개변수가 `move`되면 경고한다
 
-### <a name="Rf-inout"></a>F.17: For "in-out" parameters, pass by reference to non-`const`
+### <a name="Rf-inout"></a>F.17: "입출력(in-out)" 매개변수는 비상수 참조형으로 전달하라
 
 ##### Reason
 
@@ -697,14 +679,14 @@ If you need the notion of an optional value, use a pointer, `std::optional`, or 
 
 ##### Enforcement
 
-* (Moderate) ((Foundation)) Warn about functions regarding reference to non-`const` parameters that do *not* write to them.
-* (Simple) ((Foundation)) Warn when a non-`const` parameter being passed by reference is `move`d.
+* (중간) (기본 사항) 함수 내에서 값을 변경하지 않는 비 `const` 참조를 경고한다
+* (쉬움) (기본 사항) `const` 참조 매개변수가 `move`되면 경고한다
 
-### <a name="Rf-consume"></a>F.18: For "will-move-from" parameters, pass by `X&&` and `std::move` the parameter
+### <a name="Rf-consume"></a>F.18: "넘겨주는(will-move-from)" 매개변수는 `X&&`타입과 `std::move`로 전달하라
 
 ##### Reason
 
-It's efficient and eliminates bugs at the call site: `X&&` binds to rvalues, which requires an explicit `std::move` at the call site if passing an lvalue.
+효율적이고 호출하는 지점에서 버그를 없앤다: `X&&`는 r-value에 연결되며(bind), l-value를 전달하는 경우 명시적으로 `std::move`를 호출해야 한다.
 
 ##### Example
 
@@ -716,15 +698,14 @@ It's efficient and eliminates bugs at the call site: `X&&` binds to rvalues, whi
     }
 ```
 
-Note that the `std::move(v)` makes it possible for `store_somewhere()` to leave `v` in a moved-from state.
-[That could be dangerous](#Rc-move-semantic).
-
+`store_somewhere()`를 호출할 때 `std::move(v)`를 사용한 결과 `v`가 값을 넘겨준(moved-from) 상태로 만든다는 점에 주의하라. 
+[이는 위험할 수도 있다](#Rc-move-semantic).
 
 ##### Exception
 
-Unique owner types that are move-only and cheap-to-move, such as `unique_ptr`, can also be passed by value which is simpler to write and achieves the same effect. Passing by value does generate one extra (cheap) move operation, but prefer simplicity and clarity first.
+`unique_ptr`와 같은 유일한 소유자 타입들은 이동만 가능(move-only)하며 쉽게 이동된다(cheap-to-move). 이 타입들은 쉽게 값 전달(pass by value) 코드를 작성하고 수행할 수 있다. 값 전달은 이동 연산이 한번 더 발생하지만, 분명함과 단순함을 우선하라.
 
-For example:
+예를 들어:
 
 ```c++
     template <class T>
@@ -735,19 +716,20 @@ For example:
 
 ##### Enforcement
 
-* Flag all `X&&` parameters (where `X` is not a template type parameter name) where the function body uses them without `std::move`.
-* Flag access to moved-from objects.
-* Don't conditionally move from objects
+* 모든 `std::move`없이 `X&&` 매개변수를 사용하면 지적한다 (이때 `X`는 템플릿 인자가 아니다)
+* 값을 넘겨준(moved-from) 개체에 접근하면 지적한다
+* 조건부로 개체를 이동시키지 말아라
 
-### <a name="Rf-forward"></a>F.19: For "forward" parameters, pass by `TP&&` and only `std::forward` the parameter
+### <a name="Rf-forward"></a>F.19: "전달(forward)" 매개변수는 `TP&&`타입과 `std::forward`로만 전달하라
 
 ##### Reason
 
-If the object is to be passed onward to other code and not directly used by this function, we want to make this function agnostic to the argument `const`-ness and rvalue-ness.
+만약 개체가 해당 함수에서 바로 사용되지 않고 다른 코드로 전달된다면, 그 함수는 전달인자가 상수(`const`)인 경우이거나 r-value인 경우에도 동작하도록 작성되어야 한다.
 
 `TP`가 템플릿형 매개변수면 `TP&&`는 포워딩 참조가 된다 -- 이 때 상수 속성과 rvalue 속성은 *무시* 되기도하고 *보존* 되기도 한다. 그래서 `T&&`를 사용하는 코드는 변수의 상수 속성과 rvalue 속성에 게의치 않는다는 의미를 내포하지만 (어차피 무시되기 때문에), 값을 전달하는 코드에서는 상수 속성과 rvalue 속성을 신경쓴다 (보존이 되기 때문에). `TP&&`형 매개변수에 임시객체가 전달되면 함수가 실행되는 동안에는 유효하기 때문에 안전하다. `TP&&`형 매개변수는 항상 `std::forward`를 이용하여 함수의 몸체에서 전달되어야 한다.
 
 ##### Example
+
 ```c++
     template <class F, class... Args>
     inline auto invoke(F f, Args&&... args) {
@@ -756,19 +738,20 @@ If the object is to be passed onward to other code and not directly used by this
 
     ??? calls ???
 ```
+
 ##### Enforcement
 
-* Flag a function that takes a `TP&&` parameter (where `TP` is a template type parameter name) and does anything with it other than `std::forward`ing it exactly once on every static path.
+* 모든 정적 경로에 대해 단 한번 `std::forward`하는 경우를 제외하고 `TP&&` 매개변수를 받는 함수를 지적한다 (`TP`는 템플릿 인자의 이름이다). 
 
-### <a name="Rf-out"></a>F.20: For "out" output values, prefer return values to output parameters
+### <a name="Rf-out"></a>F.20: "출력(out)"에는 매개변수보다는 값을 반환하는 방법을 선호하라
 
 ##### Reason
 
-A return value is self-documenting, whereas a `&` could be either in-out or out-only and is liable to be misused.
+매개변수 타입으로 `&`는 입/출력 혹은 출력으로만 쓰일 수 있는 반면, 반환 값은 잘못 사용되기 어려우며 함수의 결과라는 점을 명확히 한다.
 
-This includes large objects like standard containers that use implicit move operations for performance and to avoid explicit memory management.
+이는 성능 향상과 메모리 관리를 피하기 위해 암묵적으로 이동 연산을 사용하는 표준 컨테이너들 같은 큰 개체에도 적용된다. 
 
-If you have multiple values to return, [use a tuple](#Rf-out-multi) or similar multi-member type.
+만약 다수의 값을 반환해야 한다면, [tuple](#Rf-out-multi)이나 멤버를 가진 타입을 사용하라.
 
 ##### Example
 
@@ -782,10 +765,9 @@ If you have multiple values to return, [use a tuple](#Rf-out-multi) or similar m
 
 ##### Note
 
-A `struct` of many (individually cheap-to-move) elements may be in aggregate expensive to move.
+(각각의 이동 비용이 크지 않은) 멤버를 많이 가진 `struct`는 전체적으로는 이동 비용이 클 수 있다.
 
-It is not recommended to return a `const` value.
-Such older advice is now obsolete; it does not add value, and it interferes with move semantics.
+`const` 값을 반환하는 것은 추천하지 않는다. 오래된 조언들은 무의미하다: 의미도 없고 이동 의미구조를 방해한다.
 
 ```c++
     const vector<int> fct();    // bad: that "const" is more trouble than it is worth
@@ -799,14 +781,14 @@ Such older advice is now obsolete; it does not add value, and it interferes with
     }
 ```
 
-The argument for adding `const` to a return value is that it prevents (very rare) accidental access to a temporary.
-The argument against is prevents (very frequent) use of move semantics.
+반환 값에 `const`를 사용하는 것은 임시 변수에 대한 (굉장히 드문) 우발적 접근을 막기 위한 것이다.
+전달 인자에 `const`가 사용되면 (매우 자주 발생하는) 이동 의미구조를 막는다.
 
 ##### Exceptions
 
-* For non-value types, such as types in an inheritance hierarchy, return the object by `unique_ptr` or `shared_ptr`.
-* If a type is expensive to move (e.g., `array<BigPOD>`), consider allocating it on the free store and return a handle (e.g., `unique_ptr`), or passing it in a reference to non-`const` target object to fill (to be used as an out-parameter).
-* To reuse an object that carries capacity (e.g., `std::string`, `std::vector`) across multiple calls to the function in an inner loop: [treat it as an in/out parameter and pass by reference](#Rf-out-multi).
+* 상속 계층구조에 속한 타입처럼 값 타입이 아닌 경우, 개체를 `unique_ptr` 혹은 `shared_ptr`로 반환하라
+* 많약 값의 이동 비용이 크다면 (`array<BigPOD>` 같은 경우), 자유 저장소에 할당하고 그 핸들을 (`unique_ptr`와 같은) 반환하는 것을 고려하라. 또는 `const`가 아닌 참조(출력 매개변수)를 전달해 개체를 채워넣도록 하라
+* 최대 크기(capacity)를 가진 개체(예를 들어 `std::string`, `std::vector`)를 여러 함수 호출과정에서 재사용하고자 한다면, [입출력 매개변수로 참조를 전달하라](#Rf-out-multi).
 
 ##### Example
 
@@ -825,17 +807,16 @@ The argument against is prevents (very frequent) use of move semantics.
 
 ##### Enforcement
 
-* Flag reference to non-`const` parameters that are not read before being written to and are a type that could be cheaply returned; they should be "out" return values.
-* Flag returning a `const` value. To fix: Remove `const` to return a non-`const` value instead.
+* 큰 비용 없이 반환할 수 있으면서 값을 변경하기 전에 사용하는 비 `const` 참조 매개변수를 지적하라; 이들은 "출력" 반환 값이 적절하다.
+* `const` 반환 값을 지적한다. `const`를 제거하도록 권한다
 
-### <a name="Rf-out-multi"></a>F.21: To return multiple "out" values, prefer returning a struct or tuple
+### <a name="Rf-out-multi"></a>F.21: "출력"값 여러 개를 반환할 때는 튜플이나 구조체를 선호하라
 
 ##### Reason
 
-A return value is self-documenting as an "output-only" value.
-Note that C++ does have multiple return values, by convention of using a `tuple` (including `pair`),
-possibly with the extra convenience of `tie` at the call site.
-Prefer using a named struct where there are semantics to the returned value. Otherwise, a nameless `tuple` is useful in generic code.
+반환 값은 그 자체로 문서가 필요하지 않고 "출력 전용"으로 사용된다.
+C++ 에서는 다수의 값을 반환할때는 `tuple`(`pair`를 포함해)를 쓴다는 것을 기억하라, 호출한 지점에서 `tie`를 사용해 받을 것이다.
+반환 값에 의미구조가 있다면 별도의 struct 타입을 사용하라. 그렇지 않다면 일반적인 코드에서는 (이름 없는) `tuple`이 유용하다.
 
 ##### Example
 
@@ -876,7 +857,7 @@ C++11에서는 이렇게 작성할 수 있다, 결과값들을 이미 존재하�
     if (success) do_something_with(iter);
 ```
 
-With C++17 we should be able to use "structured bindings" to declare and initialize the multiple variables:
+C++ 17에서는 다수의 변수들을 선언과 동시에 초기화 할 수 있는 "structured bindings"을 지원한다:
 
 ```c++
     if (auto [ iter, success ] = my_set.insert("Hello"); success) do_something_with(iter);
@@ -884,10 +865,11 @@ With C++17 we should be able to use "structured bindings" to declare and initial
 
 ##### Exception
 
-Sometimes, we need to pass an object to a function to manipulate its state.
-In such cases, passing the object by reference [`T&`](#Rf-inout) is usually the right technique.
-Explicitly passing an in-out parameter back out again as a return value is often not necessary.
-For example:
+때에 따라서는 개체의 상태를 변경하기 위해 함수에 개체를 전달해야 할 수도 있다.
+그런 경우, 개체를 [`T&`](#Rf-inout) 참조로 전달하는 것이 많은 경우 올바른 방법이다.
+반환 값으로 입출력 매개변수를 전달하는 것은 종종 불필요하다.
+
+예를 들어:
 
 ```c++
     istream& operator>>(istream& is, string& s);    // much like std::operator>>()
@@ -897,14 +879,12 @@ For example:
     }
 ```
 
-Here, both `s` and `cin` are used as in-out parameters.
-We pass `cin` by (non-`const`) reference to be able to manipulate its state.
-We pass `s` to avoid repeated allocations.
-By reusing `s` (passed by reference), we allocate new memory only when we need to expand `s`'s capacity.
-This technique is sometimes called the "caller-allocated out" pattern and is particularly useful for types,
-such as `string` and `vector`, that needs to do free store allocations.
+여기서 `s`와 `cin` 모두 입출력 매개변수로 사용되었다.
+`cin`은 참조로 전달되어 상태를 변경할 수 있다. `s`는 반복적으로 개체를 할당하는 것을 막으려고 전달한다.
+참조로 전달된 `s`를 재사용하는 것으로, `s`의 최대 크기(capacity)를 넘어서는 경우에만 새로운 메모리 할당이 발생한다.
+이런 방법은 보통 "호출자가 미리 할당해서 출력을 받는" 패턴이라고 불리는데, `string`이나 `vector` 같은 메모리 해제가 발생하는 타입들에 유용하다.
 
-To compare, if we passed out all values as return values, we would something like this:
+비교를 위해, 값을 반환하는 방법으로 해결한다면 아래와 같이 작성하게 될 것이다:
 
 ```c++
     pair<istream&, string> get_string(istream& is);  // not recommended
@@ -919,16 +899,14 @@ To compare, if we passed out all values as return values, we would something lik
     }
 ```
 
-We consider that significantly less elegant with significantly less performance.
+생각보다 아름답지 않고 성능에도 좋지 않다.
 
-For a truly strict reading of this rule (F.21), the exception isn't really an exception because it relies on in-out parameters,
-rather than the plain out parameters mentioned in the rule.
-However, we prefer to be explicit, rather than subtle.
+이는 사실 입출력 매개변수에 의존하기 때문에 엄밀하게는 규칙(F.21)에서 말하는 출력 매개변수의 예외가 아니다. 하지만, 가이드라인이 말하지 않아서 놓치는 것보다는 명시적으로 언급하는 것이 분명하기 때문에 작성되었다.
 
 ##### Note
 
-In many cases, it may be useful to return a specific, user-defined type.
-For example:
+특정한 사용자 정의 타입을 반환하는 것이 유용한 경우도 많이 있다.
+예를 들자면:
 
 ```c++
     struct Distance {
@@ -943,35 +921,32 @@ For example:
     auto [x, y] = measure(obj4);        // don't; it's likely to be confusing
 ```
 
-The overly-generic `pair` and `tuple` should be used only when the value returned represents to independent entities rather than an abstraction.
+추상화가 아닌 독립적인 존재들(independent entities)을 표현할 때는 `pair`와 `tuple`은 필요 이상으로 범용적(overly-generic)일 수 있다.
 
-Another example, use a specific type along the lines of `variant<T, error_code>`, rather than using the generic `tuple`.
+다른 예로는, `tuple`대신 특정 타입과 비슷한 `variant<T, error_code>`를 사용하라. 
 
 ##### Enforcement
 
-* Output parameters should be replaced by return values.
-  An output parameter is one that the function writes to, invokes a non-`const` member function, or passes on as a non-`const`.
+* 출력 목적의 매개변수는 반환값으로 대체되어야 한다. 출력 매개변수는 함수(멤버함수 포함)에서 값을 변경하는 `const`가 아닌 매개변수를 의미한다.
 
-### <a name="Rf-ptr"></a>F.22: Use `T*` or `owner<T*>` to designate a single object
+### <a name="Rf-ptr"></a>F.22: T* 혹은 owner<T*>를 단일 개체를 지정하기 위해 사용하라
 
 ##### Reason
 
-Readability: it makes the meaning of a plain pointer clear.
-Enables significant tool support.
+가독성: 일반적인 포인터와 같다. 분석도구의 동작을 돕는다.
 
 ##### Note
 
-In traditional C and C++ code, plain `T*` is used for many weakly-related purposes, such as:
+전통적인 C와 C++ 코드에서는 `T*`는 서로 연관이 없는 목적들( weakly-related purposes)에 쓰여왔다:
 
-* Identify a (single) object (not to be deleted by this function)
-* Point to an object allocated on the free store (and delete it later)
-* Hold the `nullptr`
-* Identify a C-style string (zero-terminated array of characters)
-* Identify an array with a length specified separately
-* Identify a location in an array
+* (단일) 개체의 확인(identify) (함수에 의해 소멸되지 않았다는 의미)
+* 자유 저장소에 할당된 개체의 주소(나중에 해제한다)
+* `nullptr`를 담기 위한 용도
+* (0으로 끝나는 문자 배열) 전통적인 C 언어 문자열
+* 길이와 함께 전달되는 배열의 시작 지점
+* 배열 내의 위치를 표시
 
-This makes it hard to understand what the code does and is supposed to do.
-It complicates checking and tool support.
+이로 인해 코드가 어떤일을 하는지 이해하기 어려웠고, 도구에 의한 분석을 복잡하게 만들었다.
 
 ##### Example
 
@@ -987,7 +962,7 @@ It complicates checking and tool support.
     }
 ```
 
-better
+아래 코드가 더 낫다
 
 ```c++
     void use2(span<int> p, zstring s, owner<int*> q)
@@ -1000,37 +975,37 @@ better
 
 ##### Note
 
-`owner<T*>` represents ownership, `zstring` represents a C-style string.
+`owner<T*>`는 소유권을 표현한다. `zstring`은 C 언어 문자열을 의미한다.
 
-**Also**: Assume that a `T*` obtained from a smart pointer to `T` (e.g., `unique_ptr<T>`) points to a single element.
+`T*`가 `unique_ptr<T>`와 같은 스마트 포인터에서 획득되었다면 단일 개체를 의미한다.
 
-**See also**: [Support library](#S-gsl)
+##### See also
 
-**See also**: [Do not pass an array as a single pointer](#Ri-array)
+* [Support library](#S-gsl)
+* [배열을 포인터 하나로 전달하지 마라](#Ri-array)
 
 ##### Enforcement
 
-* (Simple) ((Bounds)) Warn for any arithmetic operation on an expression of pointer type that results in a value of pointer type.
+* (쉬움) (범위 관련) 포인터 값을 반환하는 산술 연산에 대해 경고한다
 
-### <a name="Rf-nullptr"></a>F.23: Use a `not_null<T>` to indicate that "null" is not a valid value
+### <a name="Rf-nullptr"></a>F.23: "null"이 허용되지 않는다면 `not_null<T>`를 사용해 표시하라
 
 ##### Reason
 
-명확성. `not_null<T>`인자는 함수 호출자가 `nullptr` 검사를 해야만 한다고 명확하게 보여준다.
-유사하게, `not_null<T>`을 반환한다면 함수 호출자는 반환 값이 `nullptr`인지 검사해야 할 필요가 없다.
+명확성. 함수 호출자가 `nullptr` 검사를 해야 하는지를 명확히 한다.
+같은 맥락으로, `not_null<T>`을 반환한다면 함수 호출자는 반환 값이 `nullptr`인지 검사해야 할 필요가 없다.
 
 ##### Example
 
-`not_null<T*>` makes it obvious to a reader (human or machine) that a test for `nullptr` is not necessary before dereference.
-Additionally, when debugging, `owner<T*>` and `not_null<T>` can be instrumented to check for correctness.
+`not_null<T*>`은 코드를 읽는 대상(기계와 사람 모두)이 `nullptr`를 검사할 필요가 없다는 것을 분명히한다. 추가적으로, 디버깅할 때, `owner<T*>`와 `not_null<T>`에서 정확성을 검사하는데 사용될 수 있다.
 
-Consider:
+다음의 사례를 고려해 보자:
 
 ```c++
     int length(Record* p);
 ```
 
-When I call `length(p)` should I check if `p` is `nullptr` first? Should the implementation of `length()` check if `p` is `nullptr`?
+`length(p)`을 호출하기 전에 `p`가 `nullptr`인지 검사해야 하는가? `length()`의 구현에서 `p`가 `nullptr`인지 검사해야 하는가? 
 
 ```c++
     // it is the caller's job to make sure p != nullptr
@@ -1042,29 +1017,26 @@ When I call `length(p)` should I check if `p` is `nullptr` first? Should the imp
 
 ##### Note
 
-A `not_null<T*>` is assumed not to be the `nullptr`; a `T*` may be the `nullptr`; both can be represented in memory as a `T*` (so no run-time overhead is implied).
+`not_null<T*>`는 `nullptr`가 아니라고 전제한다; `T*`는 `nullptr`일 수 있다; 둘 모두 `T*`로 표현되므로 실행시간 오버헤드가 발생하지 않는다.
 
 ##### Note
 
-`not_null` is not just for built-in pointers. It works for `unique_ptr`, `shared_ptr`, and other pointer-like types.
+`not_null`는 내장 포인터 타입 뿐만 아니라, `unique_ptr`, `shared_ptr`, 혹은 다른 포인터처럼 동작하는 타입들에도 동작한다
 
 ##### Enforcement
 
-* (Simple) Warn if a raw pointer is dereferenced without being tested against `nullptr` (or equivalent) within a function, suggest it is declared `not_null` instead.
-* (Simple) Error if a raw pointer is sometimes dereferenced after first being tested against `nullptr` (or equivalent) within the function and sometimes is not.
-* (Simple) Warn if a `not_null` pointer is tested against `nullptr` within a function.
-
-* (단순) 원시 포인터를 `nullptr`인지 검사하지 않고 사용하면 경고한다 `not_null`를 쓰도록 제안한다
+* (단순) 원시 포인터(raw pointer)를 `nullptr`인지 검사하지 않고 사용하면 경고한다 `not_null`를 쓰도록 제안한다
 * (단순) 포인터가 역참조 될 때 `nullptr`를 검사할 때도 있고 검사하지 않을 때도 있다면 오류로 처리한다
 * (단순) `not_null`이 `nullptr`인지 검사하는 경우 경고한다
 
-### <a name="Rf-range"></a>F.24: Use a `span<T>` or a `span_p<T>` to designate a half-open sequence
+### <a name="Rf-range"></a>F.24: 범위를 지정할 때는 `span<T>`혹은 `span_p<T>`를 사용하라
 
 ##### Reason
 
-Informal/non-explicit ranges are a source of errors.
+명시적이지 않은 범위는 오류의 원인이 된다.
 
 ##### Example
+
 ```c++
     X* find(span<X> r, const X& v);    // find v in r
 
@@ -1072,16 +1044,18 @@ Informal/non-explicit ranges are a source of errors.
     // ...
     auto p = find({vec.begin(), vec.end()}, X{});  // find X{} in vec
 ```
+
 ##### Note
 
-Ranges are extremely common in C++ code. Typically, they are implicit and their correct use is very hard to ensure.
-In particular, given a pair of arguments `(p, n)` designating an array `[p:p+n)`,
-it is in general impossible to know if there really are `n` elements to access following `*p`.
-`span<T>` and `span_p<T>` are simple helper classes designating a `[p:q)` range and a range starting with `p` and ending with the first element for which a predicate is true, respectively.
+C++ 코드에서 범위를 사용하는 경우는 무척 흔하다. 보통 그런 범위들은 암묵적이고 정확한 사용을 확신하기 매우 어렵다. 
+특히, 배열 `[p:p+n)`를 대상으로한 `(p, n)` 전달인자가 주어졌을 때, 실제로 `*p` 뒤에 `n`개의 원소가 실재하는지 아는 것은 불가능하다.
+
+`span<T>`와 `span_p<T>`는 `[p:q)`를 대상으로 앞서 언급한 명제가 사실임을 확인할 수 있도록 하는 단순한 보조(helper) 클래스이다. 
 
 ##### Example
 
-A `span` represents a range of elements, but how do we manipulate elements of that range?
+`span`은 원소들의 범위를 표현한다. 그런데 그 범위의 원소들을 어떻게 변경할 수 있을까?
+
 ```c++
     void f(span<int> s)
     {
@@ -1089,7 +1063,8 @@ A `span` represents a range of elements, but how do we manipulate elements of th
         for (int x : s) cout << x << '\n';
 
         // C-style traversal (potentially checked)
-        for (gsl::index i = 0; i < s.size(); ++i) cout << s[i] << '\n';
+        for (gsl::index i = 0; i < s.size(); ++i) 
+            cout << s[i] << '\n';
 
         // random access (potentially checked)
         s[7] = 9;
@@ -1098,19 +1073,22 @@ A `span` represents a range of elements, but how do we manipulate elements of th
         std::sort(&s[0], &s[s.size() / 2]);
     }
 ```
+
 ##### Note
 
-A `span<T>` object does not own its elements and is so small that it can be passed by value.
+`span<T>`개체는 원소를 소유하지 않며 값에 의한 전달이 가능할 정도로 작다.
 
-Passing a `span` object as an argument is exactly as efficient as passing a pair of pointer arguments or passing a pointer and an integer count.
+`span`을 인자로 전달하는 것은 포인터와 길이를 함께 전달하는 것보다 효율적이다.
 
-**See also**: [Support library](#S-gsl)
+##### See also
+
+[Support library](#S-gsl)
 
 ##### Enforcement
 
-(Complex) Warn where accesses to pointer parameters are bounded by other parameters that are integral types and suggest they could use `span` instead.
+(복잡함) 포인터와 정수를 사용해 범위가 매개변수로 전달되면 경고하고 `span`을 사용하도록 제안한다.
 
-### <a name="Rf-zstring"></a>F.25: Use a `zstring` or a `not_null<zstring>` to designate a C-style string
+### <a name="Rf-zstring"></a>F.25: C 스타일 문자열에는 `zstring` 혹은 `not_null<zstring>`을 사용하라
 
 ##### Reason
 
@@ -1139,15 +1117,19 @@ Consider:
 
 `zstring`은 소유권을 표현하지 않는다.
 
-**See also**: [Support library](#S-gsl)
+##### See also
 
-### <a name="Rf-unique_ptr"></a>F.26: Use a `unique_ptr<T>` to transfer ownership where a pointer is needed
+[Support library](#S-gsl)
+
+### <a name="Rf-unique_ptr"></a>F.26: 포인터가 필요한 곳에 소유권을 전달할 때는 `unique_ptr<T>`를 사용하라
 
 ##### Reason
 
-Using `unique_ptr` is the cheapest way to pass a pointer safely.
+`unique_ptr`는 포인터를 안전하고 부담없이(cheap) 전달하는 가장 간단한 방법이다.
 
-**See also**: [C.50](#Rc-factory) regarding when to return a `shared_ptr` from a factory.
+##### See also
+
+[C.50](#Rc-factory)는 팩토리 함수에서 `shared_ptr`를 반환하는 경우를 다룬다
 
 ##### Example
 
@@ -1167,13 +1149,13 @@ Using `unique_ptr` is the cheapest way to pass a pointer safely.
 
 ##### Note
 
-You need to pass a pointer rather than an object if what you are transferring is an object from a class hierarchy that is to be used through an interface (base class).
+클래스 계층구조에 있는 개체라면 개체 그 자체보다는 인터페이스(상위 클래스)의 포인터를 전달해야 한다. 
 
 ##### Enforcement
 
-(Simple) Warn if a function returns a locally allocated raw pointer. Suggest using either `unique_ptr` or `shared_ptr` instead.
+(단순) 함수가 유효범위 내에서 할당한 포인터를 반환한다면 경고하라. `unique_ptr` 혹은 `shared_ptr`를 쓰도록 제안하라
 
-### <a name="Rf-shared_ptr"></a>F.27: Use a `shared_ptr<T>` to share ownership
+### <a name="Rf-shared_ptr"></a>F.27: 소유권을 공유할 때는 `shared_ptr<T>`를 사용하라
 
 ##### Reason
 
@@ -1198,24 +1180,25 @@ You need to pass a pointer rather than an object if what you are transferring is
 소유자가 하나 뿐이라면 `shared_ptr`보다는 `unique_ptr`을 사용하라. 
 `shared_ptr`는 소유권의 공유를 위한 것이다.
 
-Note that pervasive use of `shared_ptr` has a cost (atomic operations on the `shared_ptr`'s reference count have a measurable aggregate cost).
+`shared_ptr`가 곳곳에서 사용되면 비용이 발생한다는 점에 주의하라(참조 카운트에 대한 원자적 연산 비용의 총합).
 
 ##### Alternative
 
-Have a single object own the shared object (e.g. a scoped object) and destroy that (preferably implicitly) when all users have completed.
+특정 범위에서만 사용되는 개체 하나가 공유 개체를 소유하도록 하라. 모든 사용자가 사라졌을때(completed) 공유 개체를 파괴하도록 한다.
 
 ##### Enforcement
 
-(Not enforceable) 제대로 탐지하기엔 너무 복잡한 패턴을 띄고 있다.
+(실행 불가) 제대로 탐지하기엔 너무 복잡한 패턴을 띄고 있다.
 
-### <a name="Rf-ptr-ref"></a>F.60: Prefer `T*` over `T&` when "no argument" is a valid option
+### <a name="Rf-ptr-ref"></a>F.60: "인자가 없을 경우"를 허용한다면 `T&`보다는 `T*`를 선호하라
 
 ##### Reason
 
-A pointer (`T*`) can be a `nullptr` and a reference (`T&`) cannot, there is no valid "null reference".
-Sometimes having `nullptr` as an alternative to indicated "no object" is useful, but if it is not, a reference is notationally simpler and might yield better code.
+포인터(`T*`)는 `nullptr`일 수 있지만, 참조(`T&`)는 그렇지 않다.
+경우에 따라서는 "개체 없음"을 표시하기 위해 `nullptr`를 사용하는 것이 유용할 수 있다. 그렇지 않다면, 참조가 더 간단하고 좋은 코드로 이어질 것이다.
 
 ##### Example
+
 ```c++
     string zstring_to_string(zstring p) // zstring is a char*; that is a C-style string
     {
@@ -1228,20 +1211,21 @@ Sometimes having `nullptr` as an alternative to indicated "no object" is useful,
         // r refers to a vector<int>; no check needed
     }
 ```
-##### Note
-
-It is possible, but not valid C++ to construct a reference that is essentially a `nullptr` (e.g., `T* p = nullptr; T& r = (T&)*p;`).
-That error is very uncommon.
 
 ##### Note
 
-If you prefer the pointer notation (`->` and/or `*` vs. `.`), `not_null<T*>` provides the same guarantee as `T&`.
+
+가능하기는 하지만, C++에서 `nullptr`인 개체를 생성하는 것은 정상적(valid)이지 않다(예를 들어, `T* p = nullptr; T& r = (T&)*p;`). 그런 오류는 굉장히 드물다(very uncommon).
+ 
+##### Note
+
+포인터 표기법을 선호한다면 (`.`보다는 `->` 혹은 `*`가 좋다면),  `not_null<T*>`이 `T&`처럼 사용될 수 있다.
 
 ##### Enforcement
 
-* Flag ???
+???
 
-### <a name="Rf-return-ptr"></a>F.42: Return a `T*` to indicate a position (only)
+### <a name="Rf-return-ptr"></a>F.42: 위치를 나타내는 경우에만 `T*`를 반환하라
 
 ##### Reason
 
@@ -1265,29 +1249,31 @@ If you prefer the pointer notation (`->` and/or `*` vs. `.`), `not_null<T*>` pro
 
 ##### Note
 
-Positions can also be transferred by iterators, indices, and references.
-A reference is often a superior alternative to a pointer [if there is no need to use `nullptr`](#Rf-ptr-ref) or [if the object referred to should not change](???).
+위치는 반복자, 색인(indices), 참조를 사용해 전달할 수 있다.
+종종 참조가 포인터보다 우월한 방법이 되기도 한다. [`nullptr`를 사용할 필요가 없는 경우](#Rf-ptr-ref) 혹은 [개체가 변경되어선 안되는 경우](???).
 
 ##### Note
 
 Do not return a pointer to something that is not in the caller's scope; see [F.43](#Rf-dangle).
 
-**See also**: [discussion of dangling pointer prevention](#???)
+##### See also
+
+[허상 포인터 예방에 대한 토의](#???) (링크 없음)
 
 ##### Enforcement
 
-* Flag `delete`, `std::free()`, etc. applied to a plain `T*`. Only owners should be deleted.
-* Flag `new`, `malloc()`, etc. assigned to a plain `T*`. Only owners should be responsible for deletion.
+* 단순한(plain) `T*`에 `delete`, `free()`등이 사용되면 지적한다. 소유권이 있을때만 delete되어야 한다.
+* 단순한(plain) `T*`에 `new`, `malloc()`등이 사용되면 지적한다. 소유권이 있을때만 delete의 책임이 발생한다.
 
-### <a name="Rf-dangle"></a>F.43: Never (directly or indirectly) return a pointer or a reference to a local object
+### <a name="Rf-dangle"></a>F.43: 절대로 (직접적이든 간접적이든) 지역 개체의 포인터나 참조를 반환하지 말아라
 
 ##### Reason
 
-To avoid the crashes and data corruption that can result from the use of such a dangling pointer.
+허상 포인터(dangling pointer)로 인한 크래시와 데이터 손상(corruption)을 방지한다.
 
 ##### Example, bad
 
-After the return from a function its local objects no longer exist:
+함수가 반환하면 지역 개체들은 더이상 존재하지 않는다:
 
 ```c++
     int* f()
@@ -1312,25 +1298,25 @@ After the return from a function its local objects no longer exist:
     }
 ```
 
-Here on one popular implementation I got the output:
+위와 같은 코드에서 아래와 같은 출력을 확인할 수 있다:
 
-```c++
+```
     *p == 999
     gx == 999
 ```
 
-I expected that because the call of `g()` reuses the stack space abandoned by the call of `f()` so `*p` refers to the space now occupied by `gx`.
+이는 `g()`에서 `f()`에서 사용한 스택 영역을 재사용했기 때문인 것으로 생각된다. `*p`에서 `gx`가 점유한 메모리 영역을 참조한 것이다.
 
-* Imagine what would happen if `fx` and `gx` were of different types.
-* Imagine what would happen if `fx` or `gx` was a type with an invariant.
-* Imagine what would happen if more that dangling pointer was passed around among a larger set of functions.
-* Imagine what a cracker could do with that dangling pointer.
+* `fx`와 `gx`가 다른 타입인 경우를 상상해보라
+* `fx`와 `gx`에 불변조건이 있는 경우를 상상해보라
+* 저런 허상 포인터가 더 많은 함수들에서 사용되었을 경우를 상상해보라
+* 악의적인 사용자(cracker)가 허상 포인터로 무엇을 할 수 있을지 상상해보라
 
-Fortunately, most (all?) modern compilers catch and warn against this simple case.
+다행스럽게도 대부분 (모든?) 최신(modern) 컴파일러들은 이런 단순한 오류를 잡아내고 경고할 수 있다.
 
 ##### Note
 
-This applies to references as well:
+이 규칙은 참조에도 해당한다:
 
 ```c++
     int& f()
@@ -1343,12 +1329,11 @@ This applies to references as well:
 
 ##### Note
 
-This applies only to non-`static` local variables.
-All `static` variables are (as their name indicates) statically allocated, so that pointers to them cannot dangle.
+`static`이 아닌 지역 변수에만 적용된다. 모든 `static`변수는 (이름에서 드러나듯이) 정적으로 할당되므로, 그 개체를 가리키는 포인터는 허상 포인터가 아니다.
 
 ##### Example, bad
 
-Not all examples of leaking a pointer to a local variable are that obvious:
+지역 변수에 대한 포인터가 새어나오는 경우가 예시처럼 분명하지 않을 수 있다: 
 
 ```c++
     int* glob;       // global variables are bad in so many ways
@@ -1372,36 +1357,37 @@ Not all examples of leaking a pointer to a local variable are that obvious:
     }
 ```
 
-Here I managed to read the location abandoned by the call of `f`.
-The pointer stored in `glob` could be used much later and cause trouble in unpredictable ways.
+이 코드에서는 `f`의 호출 이후 버려진 메모리 영역에서 값을 읽어온다. `glob`에 저장된 포인터는 예상치 못한 방법으로 멀리(later) 있는 코드에서 사용되면서 문제를 일으킬 수 있다.
 
 ##### Note
 
-The address of a local variable can be "returned"/leaked by a return statement, by a `T&` out-parameter, as a member of a returned object, as an element of a returned array, and more.
+지역변수의 주소는 return 구문이나 `T&` 출력 매개변수를 통해서 반환되거나, 반환 개체의 멤버, 배열과 같은 형태로 새어나올 수 있다.
 
 ##### Note
 
-Similar examples can be constructed "leaking" a pointer from an inner scope to an outer one;
-such examples are handled equivalently to leaks of pointers out of a function.
+유사하게 안쪽 유효범위에서 바깥 유효범위로 새어나오는 포인터의 예시들을 더 작성할 수도 있다; 그런 경우들은 함수로부터 새어나온 포인터를 처리하는 방법을 그대로 적용할 수 있다.
 
-A slightly different variant of the problem is placing pointers in a container that outlives the objects pointed to.
+이 문제의 파생으로는 컨테이너 안에 포인터를 보관하면서 개체보다 포인터가 더 오래 사용되는(outlives) 경우가 있다.
 
-**See also**: Another way of getting dangling pointers is [pointer invalidation](#???).
-It can be detected/prevented with similar techniques.
+##### See also
+
+허상 포인터에 대한 다른 방법으로는 [포인터 무효화(링크 없음)](#???)를 생각할 수 있다. 이 역시 비슷한 방법으로 탐지되고 예방할 수 있다.
 
 ##### Enforcement
 
-* Compilers tend to catch return of reference to locals and could in many cases catch return of pointers to locals.
-* Static analysis can catch many common patterns of the use of pointers indicating positions (thus eliminating dangling pointers)
+* 컴파일러가 지역변수들에 대한 참조 혹은 포인터를 반환하는 것을 잡아낼 수 있다
+* 정적 분석에서 많은 일반적인 패턴을 잡아낼 수 있다 (그러므로 허상 포인터를 제거할 수 있다)
 
-### <a name="Rf-return-ref"></a>F.44: Return a `T&` when copy is undesirable and "returning no object" isn't needed
+### <a name="Rf-return-ref"></a>F.44: 복사를 권장하지 않거나 "개체를 항상 반환"한다면 `T&`를 반환하라
 
 ##### Reason
 
 언어가 `T&`는 객체를 가리키고 있다는 것을 보장하기 때문에 `nullptr`인지 시험하는 것은 필요없다.
 
-**See also**: The return of a reference must not imply transfer of ownership:
-[discussion of dangling pointer prevention](#???) and [discussion of ownership](#???).
+##### See also
+
+참조를 반환하는 것은 소유권 이전으로 사용되어선 안된다:
+[허상 포인터 예방에 대한 토의(discussion)](#???) and [소유권에 대한 토의(discussion)](#???).
 
 ##### Example
 
@@ -1424,9 +1410,9 @@ It can be detected/prevented with similar techniques.
 
 ##### Enforcement
 
-Flag functions where no `return` expression could yield `nullptr`
+반환이 없는 경우 `nullptr`가 될 수 있는 함수들을 지적한다
 
-### <a name="Rf-return-ref-ref"></a>F.45: Don't return a `T&&`
+### <a name="Rf-return-ref-ref"></a>F.45: `T&&`를 반환하지 말아라
 
 ##### Reason
 
@@ -1434,38 +1420,36 @@ Flag functions where no `return` expression could yield `nullptr`
 
 ##### Example 
 
-A returned rvalue reference goes out of scope at the end of the full expression to which it is returned:
+r-value 참조는 반환한 표현식이 끝나면 유효범위에서 사라진다:
 
 ```c++
     auto&& x = max(0, 1);   // OK, so far
     foo(x);                 // Undefined behavior
 ```
 
-This kind of use is a frequent source of bugs, often incorrectly reported as a compiler bug.
-An implementer of a function should avoid setting such traps for users.
+이런 종류의 사용은 버그의 원인이되고, 컴파일러 버그라고 잘못 보고된다. 함수를 구현할때 사용자가 이런 함정에 빠지지 않도록 해야 한다.
 
-The [lifetime safety profile](#SS-lifetime) will (when completely implemented) catch such problems.
-
+[수명주기 안전성 분석(profile)](#SS-lifetime)에서 이런 문제를 잡아낼 것이다(완전히 구현된다면).
 
 ##### Example
 
-Returning an rvalue reference is fine when the reference to the temporary is being passed "downward" to a callee;
-then, the temporary is guaranteed to outlive the function call (see [F.18](#Rf-consume) and [F.19](#Rf-forward)).
-However, it's not fine when passing such a reference "upward" to a larger caller scope.
-For passthrough functions that pass in parameters (by ordinary reference or by perfect forwarding) and want to return values, use simple `auto` return type deduction (not `auto&&`).
+r-value 참조를 반환하는 것은 해당 임시변수에 대한 참조가 피호출자로 "하향식 전달" 되된다면 문제없다; 그런 경우, 그 임시변수는 함수 호출보다 오래 지속될 수 있다([F.18](#Rf-consume)와 [F.19](#Rf-forward)를 함께 보라).
+하지만, 호출자로 참조가 "상향식 전달"된다면 문제가 될 수 있다.
 
-Assume that `F` returns by value:
+(보통의 참조 혹은 perfect forwarding을 통해서) 함수 인자를 연속 전달(passthrough)하고자 한다면, (`auto&&`가 아니라) `auto`를 사용하라
+
+`F`가 값으로 반환한다고 가정하면:
 
 ```c++
     template<class F>
     auto&& wrapper(F f)
     {
         log_call(typeid(f)); // or whatever instrumentation
-        return f();          // BAD: returns a reference to a temporary
+        return f();          // BAD: 임시변수에 대한 참조를 반환한다
     }
 ```
 
-Better:
+이런 코드가 더 낫다:
 
 ```c++
     template<class F>
@@ -1478,59 +1462,59 @@ Better:
 
 ##### Exception
 
-`std::move` 와 `std::forward`는 `&&`를 반환하지만 이는 형변환일 뿐이다 -- used by convention only in expression contexts where a reference to a temporary object is passed along within the same expression before the temporary is destroyed. We don't know of any other good examples of returning `&&`.
+
+`std::move` 와 `std::forward`는 `&&`를 반환하지만 이는 형변환일 뿐이다 -- 표현식 문맥내에서 임시 개체가 파괴되기 전에 같은 표현식 내에서 임시 개체에 대한 참조를 전달한다.  
+우리는 `&&`를 반환하는 것의 다른 좋은 형태를 알지 못한다.
 
 ##### Enforcement
 
 `std::move` 와 `std::forward`를 제외하고 `&&`를 반환한다면 지적한다
 
-### <a name="Rf-main"></a>F.46: `int` is the return type for `main()`
+### <a name="Rf-main"></a>F.46: `main()`는 `int`를 반환해야 한다
 
 ##### Reason
 
-It's a language rule, but violated through "language extensions" so often that it is worth mentioning.
-Declaring `main` (the one global `main` of a program) `void` limits portability.
+언어 규칙으로 정해져 있지만. "언어 확장"에 의해서 너무 자주 위반된다.
+`main`(해당 프로그램의 `main` 함수)에서 `void`를 반환하도록 선언하는 것은 이식성을 제한한다.
 
 ##### Example
 
 ```c++
-	void main() { /* ... */ };  // bad, not C++
-	
-	int main()
+    void main() { /* ... */ };  // bad, not C++
+    
+    int main()
     {
-		std::cout << "This is the way to do it\n";
-	}
+        std::cout << "This is the way to do it\n";
+    }
 ```
 
 ##### Note
 
-We mention this only because of the persistence of this error in the community.
+커뮤니티에 이 문제가 남아있기 때문에 가이드라인에서 명시한다.
 
 ##### Enforcement
 
-* The compiler should do it
-* If the compiler doesn't do it, let tools flag it
+* 컴파일러에서 금지한다
+* 컴파일러가 금지하지 않는다면 분석 도구에서 이를 지적한다
 
-### <a name="Rf-assignment-op"></a>F.47: Return `T&` from assignment operators
+### <a name="Rf-assignment-op"></a>F.47: 대입 연산자는 `T&`를 반환하라
 
 ##### Reason
 
-The convention for operator overloads (especially on value types) is for
-`operator=(const T&)` to perform the assignment and then return (non-`const`)
-`*this`.  This ensures consistency with standard-library types and follows the
-principle of "do as the ints do."
+값 타입의 연산자 중복정의는 전통적으로 대입에 `operator=(const T&)`를 사용하고 `*this`를 (`const`가 아닌 형태로) 반환하는 것이다. 
+이렇게 하는 것이 표준 라이브러리 타입들과 일관성을 유지하고 "int처럼 동작하는" 원칙을 따르는 것이다.
 
 ##### Note
 
-Historically there was some guidance to make the assignment operator return `const T&`.
-This was primarily to avoid code of the form `(a = b) = c` -- such code is not common enough to warrant violating consistency with standard types.
+과거에는 대입 연산에서 `const T&`를 반환하도록 하는 가이드가 있었다.
+이는 `(a = b) = c`같은 형태의 코드를 예방하기 위한 목적이었다 -- 이런 코드는 표준 타입들과의 일관성을 해칠 정도로 빈번하지는 않다.
 
 ##### Example
 
 ```c++
     class Foo
     {
-     public:
+      public:
         ...
         Foo& operator=(const Foo& rhs) {
           // Copy members.
@@ -1542,23 +1526,21 @@ This was primarily to avoid code of the form `(a = b) = c` -- such code is not c
 
 ##### Enforcement
 
-This should be enforced by tooling by checking the return type (and return
-value) of any assignment operator.
+이 규칙은 반환 타입(과 반환 값)을 검사하는 도구에 의해서 모든 대입 연산자에 대해 적용되어야 한다. 
 
-
-### <a name="Rf-return-move-local"></a>F.48: Don't `return std::move(local)`
+### <a name="Rf-return-move-local"></a>F.48: `return std::move(local)`은 사용하지 말아라
 
 ##### Reason
 
-With guaranteed copy elision, it is now almost always a pessimization to expressly use `std::move` in a return statement.
+Guaranteed copy elision이 적용되면 `std::move`를 반환 구문에 사용할 필요가 없다.
 
 ##### Example; bad
 
 ```c++
     S f()
     {
-      S result;
-      return std::move(result);
+        S result;
+        return std::move(result);
     }
 ```
 
@@ -1567,17 +1549,16 @@ With guaranteed copy elision, it is now almost always a pessimization to express
 ```c++
     S f()
     {
-      S result;
-      return result;
+        S result;
+        return result;
     }
 ```
 
 ##### Enforcement
 
-This should be enforced by tooling by checking the return expression .
+반환 구문을 검사하는 도구에 의해서 검사되어야 한다.
 
-
-### <a name="Rf-capture-vs-overload"></a>F.50: Use a lambda when a function won't do (to capture local variables, or to write a local function)
+### <a name="Rf-capture-vs-overload"></a>F.50: 함수를 쓸 수 없을 때는 람다를 사용하라(지역 변수를 캡쳐하거나 지역 함수를 작성할 때)
 
 ##### Reason
 
@@ -1613,33 +1594,31 @@ This should be enforced by tooling by checking the return expression .
 
 ##### Enforcement
 
-* Warn on use of a named non-generic lambda (e.g., `auto x = [](int i){ /*...*/; };`) that captures nothing and appears at global scope. Write an ordinary function instead.
+* 아무것도 캡쳐하지 않는 비-제네릭 람다가 전역 범위에 나타나면 경고한다(예를 들어, `auto x = [](int i){ /*...*/; };`와 같은 형태). 이런 경우 람다 대신 평범한 함수를 작성하도록 한다.
 
-### <a name="Rf-default-args"></a>F.51: Where there is a choice, prefer default arguments over overloading
+### <a name="Rf-default-args"></a>F.51: 선택할 수 있다면, 중복 정의보다는 기본 전달인자를 선호하라
 
 ##### Reason
 
-Default arguments simply provide alternative interfaces to a single implementation.
-There is no guarantee that a set of overloaded functions all implement the same semantics.
-The use of default arguments can avoid code replication.
+기본 인자로 하나의 구현에 다른 인터페이스를 제공할 수 있다.
+모든 중복 정의가 같은 의미구조를 구현한다고 보장할 수 없다. 기본인자를 사용함으로써 코드 중복을 피할 수 있다.
 
 ##### Note
 
-There is a choice between using default argument and overloading when the alternatives are from a set of arguments of the same types.
-For example:
+전달인자가 같은 타입일 때는 기본인자와 중복정의 중에서 선택해야 할 때가 있다: 
 
 ```c++
     void print(const string& s, format f = {});
 ```
 
-as opposed to
+그 반대로는
 
 ```c++
     void print(const string& s);  // use default format
     void print(const string& s, format f);
 ```
 
-There is not a choice when a set of functions are used to do a semantically equivalent operation to a set of types. For example:
+의미구조적으로는 같은 연산이지만 전달인자의 타입이 다르다면 선택의 여지가 없다. 예를 들어:
 
 ```c++
     void print(const char&);
@@ -1649,14 +1628,13 @@ There is not a choice when a set of functions are used to do a semantically equi
 
 ##### See also
 
-
-[Default arguments for virtual functions](#Rh-virtual-default-arg)
+[가상 함수들의 기본 인자](#Rh-virtual-default-arg)
 
 ##### Enforcement
 
-    ???
+???
 
-### <a name="Rf-reference-capture"></a>F.52: Prefer capturing by reference in lambdas that will be used locally, including passed to algorithms
+### <a name="Rf-reference-capture"></a>F.52: 지역적으로 사용된다면 람다의 참조 캡쳐를 선호하라
 
 ##### Reason
 
@@ -1664,17 +1642,17 @@ There is not a choice when a set of functions are used to do a semantically equi
 
 ##### Discussion
 
-The efficiency consideration is that most types are cheaper to pass by reference than by value.
+효율적인 측면에서는 대부분의 타입들을 참조로 전달하는 것이 값으로 전달하는 것보다 효율적이다.
 
-The correctness consideration is that many calls want to perform side effects on the original object at the call site (see example below). Passing by value prevents this.
+정확성 측면에서는 연산들이 호출 지점에서 원래 개체에 부수효과를 만들길 원한다는 것을 고려해야 한다. 값으로 전달하면 이런 문제를 예방할 수 있다.
 
 ##### Note
 
-Unfortunately, there is no simple way to capture by reference to `const` to get the efficiency for a local call but also prevent side effects.
+불행하게도, 부수효과를 막기 위해 참조를 `const`로 받아올 방법이 없다
 
 ##### Example
 
-Here, a large object (a network message) is passed to an iterative algorithm, and is it not efficient or correct to copy the message (which may not be copyable):
+이 예시에서는, 큰 개체(네트워크 메세지)가 반복 알고리즘에 전달된다. 이 개체가 복사 가능하더라도 복사하는 것은 효율적이지도, 정확하지도 않다:
 
 ```c++
     std::for_each(begin(sockets), end(sockets), [&message](auto& socket)
@@ -1691,18 +1669,21 @@ Here, a large object (a network message) is passed to an iterative algorithm, an
 ```c++
     void send_packets(buffers& bufs)
     {
-        stage encryptor([] (buffer& b){ encrypt(b); });
+        stage encryptor([] (buffer& b){   encrypt(b); });
         stage compressor([&](buffer& b){ compress(b); encryptor.process(b); });
-        stage decorator([&](buffer& b){ decorate(b); compressor.process(b); });
-        for (auto& b : bufs) { decorator.process(b); }
+        stage decorator([&](buffer& b){  decorate(b); compressor.process(b); });
+        for (auto& b : bufs) { 
+            decorator.process(b);
+        }
     }  // automatically blocks waiting for pipeline to finish
 ```
 
 ##### Enforcement
 
-Flag a lambda that captures by reference, but is used other than locally within the function scope or passed to a function by reference. (Note: This rule is an approximation, but does flag passing by pointer as those are more likely to be stored by the callee, writing to a heap location accessed via a parameter, returning the lambda, etc. The Lifetime rules will also provide general rules that flag escaping pointers and references including via lambdas.)
+지역적으로 사용되지 않거나 참조로 전달되는데 참조로 캡쳐하는 람다를 지적한다.
+(주의: 이 규칙은 추정에 의한 것이다. 하지만 포인터로 전달된다면 피호출자에 저장되거나, 매개변수로 접근되거나, 람다에 의해서 반환되는 등으로 사용될 가능성이 높다. 수명주기 규칙들이 유효범위를 벗어나는 포인터나 람다를 통해 참조되는 경우를 지적하기 위한 규칙들을 제공한다.)
 
-### <a name="Rf-value-capture"></a>F.53: Avoid capturing by reference in lambdas that will be used nonlocally, including returned, stored on the heap, or passed to another thread
+### <a name="Rf-value-capture"></a>F.53: 지역적으로 사용되지 않는다면 참조 캡쳐를 피하라
 
 ##### Reason
 
@@ -1733,14 +1714,15 @@ Flag a lambda that captures by reference, but is used other than locally within 
 
 ##### Enforcement
 
-* (Simple) Warn when capture-list contains a reference to a locally declared variable
-* (Complex) Flag when capture-list contains a reference to a locally declared variable and the lambda is passed to a non-`const` and non-local context
+* (단순) 캡쳐 목록이 지역 변수를 참조하면 경고한다
+* (복잡) 캡쳐 목록이 지역 변수를 참조하고 `const`가 아니거나 비-지역적 문맥으로 전달되면 지적한다
 
-### <a name="Rf-this-capture"></a>F.54: If you capture `this`, capture all variables explicitly (no default capture)
+### <a name="Rf-this-capture"></a>F.54: `this`를 캡쳐할 때는, 모든 변수를 명시적으로 캡쳐하라(기본 캡쳐를 사용하지 않는다)
 
 ##### Reason
 
-It's confusing. Writing `[=]` in a member function appears to capture by value, but actually captures data members by reference because it actually captures the invisible `this` pointer by value. If you meant to do that, write `this` explicitly.
+명시하지 않으면 혼란스럽다. 멤버 함수 안에서 `[=]`를 사용하는 것은 값으로 캡쳐하는 것이지만, 실제로는 보이지 않는 `this`를 복사하면서 데이터 멤버를 참조하는 방식으로 캡쳐하는 것이다.
+이것이 의도된 것이라면, `this`를 명시적으로 사용해야 한다.
 
 ##### Example
 
@@ -1773,19 +1755,19 @@ It's confusing. Writing `[=]` in a member function appears to capture by value, 
 
 ##### Note
 
-This is under active discussion in standardization, and may be addressed in a future version of the standard by adding a new capture mode or possibly adjusting the meaning of `[=]`. For now, just be explicit.
+표준에서 이에 대해 계속 논의중이다. 이후 표준에서 새로운 캡쳐 방식이 도입되거나 `[=]`의 의미를 수정하는 형태로 조정될 수 있다. 
+지금은 명시적으로 코드를 작성하라.
 
 ##### Enforcement
 
-* Flag any lambda capture-list that specifies a default capture and also captures `this` (whether explicitly or via default capture)
+* 기본 캡쳐와 `this`가 캡쳐목록에 포함된 람다들을 지적한다 (명시적이든 기본 캡쳐한 것이든)
 
-### <a name="F-varargs"></a>F.55: Don't use `va_arg` arguments
+### <a name="F-varargs"></a>F.55: `va_arg` 전달인자를 사용하지 말아라
 
 ##### Reason
 
-Reading from a `va_arg` assumes that the correct type was actually passed.
-Passing to varargs assumes the correct type will be read.
-This is fragile because it cannot generally be enforced to be safe in the language and so relies on programmer discipline to get it right.
+`va_arg`에서 값을 읽어올 때는 타입이 정확히 전달되었다고 가정한다. `va_arg`에 값을 전달할때는 타입이 정확히 읽힐 것이라고 가정한다.  
+이는 위태로운 방법인데 언어에 의존하지 않고 프로그래머가 기능을 정확히 사용해야 때문이다.
 
 ##### Example
 
@@ -1811,16 +1793,16 @@ This is fragile because it cannot generally be enforced to be safe in the langua
 
 ##### Alternatives
 
-* overloading
-* variadic templates
-* `variant` arguments
+* 중복 정의(overloading)
+* 가변 템플릿(variadic templates)
+* `variant` 전달인자(argument)
 * `initializer_list` (homogeneous)
 
 ##### Note
 
-Declaring a `...` parameter is sometimes useful for techniques that don't involve actual argument passing, notably to declare "take-anything" functions so as to disable "everything else" in an overload set or express a catchall case in a template metaprogram.
+`...` 매개변수를 선언하는 것은 실제 전달인자를 포함하지 않거나, 다른 중복 정의를 허용하지 않기 위해 "인자를 무엇이든" 처리하는 함수 혹은 템플릿 메타 프로그램에서 계산 외의 경우를 잡아내는데 유용하게 쓰이기도 한다.
 
 ##### Enforcement
 
-* Issue a diagnostic for using `va_list`, `va_start`, or `va_arg`.
-* Issue a diagnostic for passing an argument to a vararg parameter of a function that does not offer an overload for a more specific type in the position of the vararg. To fix: Use a different function, or `[[suppress(types)]]`.
+* `va_list`, `va_start`, `va_arg`를 사용하면 반대한다(Issue a diagnostic).
+* 함수의 가변 매개변수로 넘기는 전달인자에 대해 보다 구체적인 중복정의를 제공하지 않는다고 이의를 제기한다(Issue a diagnostic). 수정하려면 다른 함수를 쓰거나 `[[suppress(types)]]`를 사용하도록 한다.
