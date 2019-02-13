@@ -2,34 +2,33 @@
 # <a name="S-not"></a>NR: 규칙이 아닌 것들과 근거없는 이야기들
 
 이 절은 어디선가 널리 알려졌지만, 핵심 가이드라인에서 추천하지 않는 규칙과 가이드라인들을 포함한다.
-We know full well that there have been times and places where these rules made sense, and we have used them ourselves at times.
-However, in the context of the styles of programming we recommend and support with the guidelines, these "non-rules" would do harm.
 
-Even today, there can be contexts where the rules make sense.
-For example, lack of suitable tool support can make exceptions unsuitable in hard-real-time systems,
-but please don't blindly trust "common wisdom" (e.g., unsupported statements about "efficiency");
-such "wisdom" may be based on decades-old information or experienced from languages with very different properties than C++
-(e.g., C or Java).
+이런 규칙들이 타당하던 시간과 장소가 있었다는 것을 우리는 충분히 잘 알고, 사용해왔다.
+하지만, 우리가 가이드라인을 통해 권장하고 지지하는 프로그래밍의 스타일에 미루어 봤을때, 이 "비-규칙"들은 해로울(harm) 수 있다.
 
-The positive arguments for alternatives to these non-rules are listed in the rules offered as "Alternatives".
+오늘날에도, 이 규칙들이 들어맞을 수 있다. 적절한 지원 도구가 없어 정해진 시간 안에 응답해야 하는 시스템에서 예외를 쓰지 못하는 경우를 예로 들 수 있다.
+하지만 "알려진 지혜"를 맹신해선 안된다 ("효율성"에 대한 근거 없는 문구들이라던가); 
+그런 "지혜"는 십년은 더 된 정보에 근거하거나 (C나 Java 처럼) C++와는 매우 다른 속성을 가진 언어경험에 근거한 것일 수 있다.
 
-Non-rule summary:
+이런 비-규칙들을 대신하기 위한 긍정적인 논쟁(positive arguments)들은 "대안들"에서 기술한다.
 
-* [NR.1: Don't: All declarations should be at the top of a function](#Rnr-top)
-* [NR.2: Don't: Have only a single `return`-statement in a function](#Rnr-single-return)
-* [NR.3: Don't: Don't use exceptions](#Rnr-no-exceptions)
-* [NR.4: Don't: Place each class declaration in its own source file](#Rnr-lots-of-files)
-* [NR.5: Don't: Don't do substantive work in a constructor; instead use two-phase initialization](#Rnr-two-phase-init)
-* [NR.6: Don't: Place all cleanup actions at the end of a function and `goto exit`](#Rnr-goto-exit)
-* [NR.7: Don't: Make all data members `protected`](#Rnr-protected-data)
+비-규칙 요약:
+
+* [NR.1: 금지: 모든 선언이 함수의 상단에 오게 하라](#Rnr-top)
+* [NR.2: 금지: 함수에서 오직 하나의 `return` 구문을 사용하라](#Rnr-single-return)
+* [NR.3: 금지: 예외를 사용하지 마라](#Rnr-no-exceptions)
+* [NR.4: 금지: 클래스 선언을 각각의 파일에 배치하라](#Rnr-lots-of-files)
+* [NR.5: 금지: 생성자에서 많은 일을 하지마라; 대신 2 단계 초기화를 사용하라](#Rnr-two-phase-init)
+* [NR.6: 금지: 모든 정리 동작을 함수 끝에 배치하고 `goto exit`을 사용하라](#Rnr-goto-exit)
+* [NR.7: 금지: 모든 데이터 멤버를 `protected`로 하라](#Rnr-protected-data)
 * ???
 
-### <a name="Rnr-top"></a>NR.1: Don't: All declarations should be at the top of a function
+### <a name="Rnr-top"></a>NR.1: 금지: 모든 선언이 함수의 상단에 오게 하라
 
 ##### Reason (not to follow this rule)
 
-This rule is a legacy of old programming languages that didn't allow initialization of variables and constants after a statement.
-This leads to longer programs and more errors caused by uninitialized and wrongly initialized variables.
+이 규칙은 구문이 실행된 이후의 변수와 상수의 초기화를 허용하지 않던 오래된 프로그래밍 언어들의 잔재다. 
+이 규칙은 프로그램 코드를 길게 만들고 초기화가 생략되거나 잘못된 값으로 초기화되는 것으로 인한 오류를 발생시킨다.
 
 ##### Example, bad
 
@@ -54,21 +53,21 @@ This leads to longer programs and more errors caused by uninitialized and wrongl
     }
 ```
 
-The larger the distance between the uninitialized variable and its use, the larger the chance of a bug.
-Fortunately, compilers catch many "used before set" errors.
-Unfortunately, compilers cannot catch all such errors and unfortunately, the bugs aren't always as simple to spot as in this small example.
+초기화되지 않은 변수와 실제 사용 코드의 간격이 멀어질 수록, 버그가 발생할 기회가 많아진다. 
+다행히도, 컴파일러가 많은 "값을 결정하기 전에 사용하는" 오류를 잡아낼 수 있다.
+불행하게도, 컴파일러가 모든 오류를 잡아낼 수는 없고 이 짧은 예제와 같이 쉽게 찾아낼만한 경우만 있는 것도 아니다.
 
 ##### Alternative
 
-* [Always initialize an object](#Res-always)
-* [ES.21: Don't introduce a variable (or constant) before you need to use it](#Res-introduce)
+* [언제나 개체를 초기화하라](#Res-always)
+* [ES.21: 변수(혹은 상수) 사용이 필요하기 전까지는 노출시키지 말아라](#Res-introduce)
 
-### <a name="Rnr-single-return"></a>NR.2: Don't: Have only a single `return`-statement in a function
+### <a name="Rnr-single-return"></a>NR.2: 금지: 함수에서 오직 하나의 `return` 구문을 사용하라
 
 ##### Reason (not to follow this rule)
 
-The single-return rule can lead to unnecessarily convoluted code and the introduction of extra state variables.
-In particular, the single-return rule makes it harder to concentrate error checking at the top of a function.
+함수에 반환 지점이 하나만 있으면 불필요하게 뒤얽힌 코드를 만들 수 있고 추가적인 상태 변수들을 만들게 된다.
+특히, 단일 반환 규칙은 함수 상단에서 오류 검사에 집중할 수 없게 만든다.
 
 ##### Example
 
@@ -85,7 +84,7 @@ In particular, the single-return rule makes it harder to concentrate error check
     }
 ```
 
-to use a single return only we would have to do something like
+반환 지점을 하나로 만들기 위해선 다음과 같은 일을 해야한다
 
 ```c++
     template<class T>
@@ -103,9 +102,9 @@ to use a single return only we would have to do something like
     }
 ```
 
-This is both longer and likely to be less efficient.
-The larger and more complicated the function is, the more painful the workarounds get.
-Of course many simple functions will naturally have just one `return` because of their simpler inherent logic.
+이는 더 긴 코드일 뿐만 아니라 비효율적일 수 있다. 
+함수가 커지고 복잡해질수록, 더 작성하거나 사용하기에 고통스러운 함수가 된다.
+물론 많은 단순한 함수들은 그 내용에 담겨있는 단순한 논리 덕분에 자연스럽게 하나의 `return`을 가지게 될 것이다.
 
 ##### Example
 
@@ -118,7 +117,7 @@ Of course many simple functions will naturally have just one `return` because of
     }
 ```
 
-If we applied the rule, we'd get something like
+단일 반환 규칙을 적용하면 이렇게 변한다
 
 ```c++
     int index2(const char* p)
@@ -133,121 +132,119 @@ If we applied the rule, we'd get something like
     }
 ```
 
-Note that we (deliberately) violated the rule against uninitialized variables because this style commonly leads to that.
-Also, this style is a temptation to use the [goto exit](#Rnr-goto-exit) non-rule.
+(의도적으로) 규칙을 위반했다는 점에 주목하라. 이런 코드 스타일은 보통 초기화되지 않은 변수가 있는 코드를 작성하게 된다.
+또한, 이 스타일은 [goto exit](#Rnr-goto-exit)과 같은 방식을 적용하고 싶은 유혹을 불러일으킨다.
 
 ##### Alternative
 
-* Keep functions short and simple
-* Feel free to use multiple `return` statements (and to throw exceptions).
+* 함수는 짧고 단순하게 유지하라
+* `return` 구문을 여러번 사용해도 좋다 (예외를 던져도 괜찮다)
 
-### <a name="Rnr-no-exceptions"></a>NR.3: Don't: Don't use exceptions
+### <a name="Rnr-no-exceptions"></a>NR.3: 금지: 예외를 사용하지 마라
 
 ##### Reason (not to follow this rule)
 
-There seem to be three main reasons given for this non-rule:
+이 비-규칙에는 3가지 이유가 따라온다.
 
-* exceptions are inefficient
-* exceptions lead to leaks and errors
-* exception performance is not predictable
+* 예외는 비효율적이다(inefficient)
+* 예외는 누수와 오류로 이어진다(leaks and errors)
+* 예외의 성능은 예측할 수 없다(not predictable)
 
-There is no way we can settle this issue to the satisfaction of everybody.
-After all, the discussions about exceptions have been going on for 40+ years.
-Some languages cannot be used without exceptions, but others do not support them.
-This leads to strong traditions for the use and non-use of exceptions, and to heated debates.
+이 쟁점에 대해서 모두가 만족하도록 타협할 방법은 없다.
+무엇보다, 예외에 대한 토론은 40년 넘게 이어지고 있다.
+일부 언어들은 예외 없이는 쓸수가 없고, 다른 일부는 예외를 지원하지 않기도 한다.
+이 때문에 예외를 쓰거나 쓰지 않는 강한 전통과 열띤 논쟁이 발생한다.
 
-However, we can briefly outline why we consider exceptions the best alternative for general-purpose programming
-and in the context of these guidelines.
-Simple arguments for and against are often inconclusive.
-There are specialized applications where exceptions indeed can be inappropriate
-(e.g., hard-real-time systems without support for reliable estimates of the cost of handling an exception).
+그렇지만 핵심 가이드라인을 작성하는 우리가 범용 프로그래밍에서는 예외가 최선의 방안이라고 생각하는 이유는  
+단순한 찬반 양론은 종종 결론을 내릴 수 없기 때문이다.
 
-Consider the major objections to exceptions in turn
+예외가 실제로 부적합한 특별한 응용 프로그램들도 존재한다. (예외 처리의 비용을 정확히 평가하기 위한 지원이 없으면서 시간 내 응답성을 보장해야 하는(hard-real-time) 시스템 처럼)
 
-* Exceptions are inefficient:
-Compared to what?
-When comparing make sure that the same set of errors are handled and that they are handled equivalently.
-In particular, do not compare a program that immediately terminate on seeing an error with a program
-that carefully cleans up resources before logging an error.
-Yes, some systems have poor exception handling implementations; sometimes, such implementations force us to use
-other error-handling approaches, but that's not a fundamental problem with exceptions.
-When using an efficiency argument - in any context - be careful that you have good data that actually provides
-insight into the problem under discussion.
-* Exceptions lead to leaks and errors.
-They do not.
-If your program is a rat's nest of pointers without an overall strategy for resource management,
-you have a problem whatever you do.
-If your system consists of a million lines of such code,
-you probably will not be able to use exceptions,
-but that's a problem with excessive and undisciplined pointer use, rather than with exceptions.
-In our opinion, you need RAII to make exception-based error handling simple and safe -- simpler and safer than alternatives.
-* Exception performance is not predictable.
-If you are in a hard-real-time system where you must guarantee completion of a task in a given time,
-you need tools to back up such guarantees.
-As far as we know such tools are not available (at least not to most programmers).
 
-Many, possibly most, problems with exceptions stem from historical needs to interact with messy old code.
+예외를 반대하는 주장으로 돌아와서 생각해보면
 
-The fundamental arguments for the use of exceptions are
+* 예외는 비효율적이다:  
+    무엇에 비해서 비효율적인가?
+    비교를 한다면 같은 오류 집합을 처리하고 각각을 동등하게 처리할 때를 비교해야 한다.  
+    특히, 즉시 비정상 종료하는 프로그램과 오류를 기록하기 전에 주의깊게 자원들을 정리하는 프로그램을 비교해서는 안된다.
+    실제로, 일부 시스템들은 형편없는 예외 처리 구현을 가지고 있다; 때로는 그런 구현이 다른 오류 처리 접근법들을 취할 수 밖에 없도록 만든다.   
+    하지만 그게 오류의 근본적인 문제는 아니다.
+    효율성을 따진다면 - 어떤 경우에든 - 문제에 대한 통찰을 줄 수 있는 좋은 데이터를 가졌는지 주의 깊게 따져보라.
+* 예외는 누수와 오류로 이어진다:  
+    그렇지 않다. 만약 당신의 프로그램이 자원 관리를 위한 전략 없이 완전히 꼬여있는 포인터들이라면, 
+    무엇을 하더라도 문제가 될 것이다.  
+    그런 코드가 백만줄이 있다면 예외를 쓰는 것이 불가능할 것이다, 하지만 그것은 무분별하고 과용된 포인터 사용으로 인한 문제다.  
+    우리의 의견은, 예외 기반 오류 처리를 단순하고 안전하게 하기 위해서는 RAII가 필요하다 -- 이는 예외를 쓰지 않을때보다 단순하고 안전하다.
+* 예외의 성능은 예측할 수 없다:  
+    주어진 시간 안에 작업을 마친다는 것을 보장해야 하는 시스템을 만든다면, 그런 보장을 뒷받침할 도구들이 필요하다.  
+    우리가 아는 한 그런 도구는 (최소한 대부분의 프로그래머들에게는) 없다
 
-* They clearly differentiate between erroneous return and ordinary return
-* They cannot be forgotten or ignored
-* They can be used systematically
+주로, 보통 대부분, 예외로 인한 문제는 오래된 지저분한 코드와 함께 동작해야하는 요구에 기인한다.
 
-Remember
+예외를 사용하자는 주장들 중 핵심은 
 
-* Exceptions are for reporting errors (in C++; other languages can have different uses for exceptions).
-* Exceptions are not for errors that can be handled locally.
-* Don't try to catch every exception in every function (that's tedious, clumsy, and leads to slow code).
-* Exceptions are not for errors that require instant termination of a module/system after a non-recoverable error.
+* 예외는 잘못된 반환과 정상적인 반환을 완전히 다르게 취급한다
+* 예외는 잊어버리거나 무시할 수 없다
+* 예외는 체계적으로 사용할 수 있다
+
+이 점들을 기억하라
+
+* 예외는 오류를 알리기 위한 것이다 (C++에서는 그렇다; 다른 언어들은 다른 목적으로 사용할 수도 있다).
+* 예외는 지역적으로 처리할 수 없는 오류를 위한 것이다.
+* 모든 함수에서 모든 예외를 잡으려(catch) 하지 말아라 (지루하고, 보기 흉하며, 느린 코드가 생성된다).
+* 예외는 복구할 수 없는 오류 이후 모듈/시스템을 종료하기 위한 처리방식이 아니다.
 
 ##### Example
 
+```
     ???
+```
 
 ##### Alternative
 
 * [RAII](#Re-raii)
-* Contracts/assertions: Use GSL's `Expects` and `Ensures` (until we get language support for contracts)
+* Contracts/assertions: GSL(가이드라인 지원 라이브러리) 의 `Expects`와 `Ensures`를 사용하라. (언어에서 contract를 지원하기 전까지)
 
-### <a name="Rnr-lots-of-files"></a>NR.4: Don't: Place each class declaration in its own source file
+### <a name="Rnr-lots-of-files"></a>NR.4: 금지: 클래스 선언을 각각의 파일에 배치하라
 
 ##### Reason (not to follow this rule)
 
-The resulting number of files are hard to manage and can slow down compilation.
-Individual classes are rarely a good logical unit of maintenance and distribution.
+이 규칙을 따르면서 생성되는 파일들은 관리하기 힘들고 컴파일 속도를 저하시킨다.
+각각의 클래스들이 유지보수와 배포를 위한 매우 좋은 논리적인 단위인 경우는 드물다. 
 
 ##### Example
 
+```
     ???
+```
 
 ##### Alternative
 
-* Use namespaces containing logically cohesive sets of classes and functions.
+* 네임스페이스로 서로 결합된(cohesive) 클래스들과 함수들을 포함시켜라
 
-### <a name="Rnr-two-phase-init"></a>NR.5: Don't: Don't do substantive work in a constructor; instead use two-phase initialization
+### <a name="Rnr-two-phase-init"></a>NR.5: 금지: 생성자에서 많은 일을 하지마라; 대신 2 단계 초기화를 사용하라
 
 ##### Reason (not to follow this rule)
 
-Following this rule leads to weaker invariants,
-more complicated code (having to deal with semi-constructed objects),
-and errors (when we didn't deal correctly with semi-constructed objects consistently).
+이 규칙을 따르면 불변조건이 약화되고, 더 복잡한 코드(절반만 생성된 개체들을 다뤄야 한다)와 오류(그 개체들을 일관적이고 정확한 방법으로 다루지 않았을 경우)가 발생한다.
 
 ##### Example
 
+```
     ???
+```
 
 ##### Alternative
 
-* Always establish a class invariant in a constructor.
-* Don't define an object before it is needed.
+* 생성자에서 클래스 불변조건을 확실히하라(establish)
+* 필요해지기 전까지는 개체를 정의하지 마라
 
-### <a name="Rnr-goto-exit"></a>NR.6: Don't: Place all cleanup actions at the end of a function and `goto exit`
+### <a name="Rnr-goto-exit"></a>NR.6: 금지: 모든 정리 동작을 함수 끝에 배치하고 `goto exit`을 사용하라
 
 ##### Reason (not to follow this rule)
 
-`goto` is error-prone.
-This technique is a pre-exception technique for RAII-like resource and error handling.
+`goto`는 오류에 취약하다.
+이 기술은 예외가 없었던 때 RAII 같은 자원과 오류 처리하던 방법이다.
 
 ##### Example, bad
 
@@ -265,25 +262,27 @@ This technique is a pre-exception technique for RAII-like resource and error han
     }
 ```
 
-and spot the bug.
+버그를 찾아보라.
 
 ##### Alternative
 
-* Use exceptions and [RAII](#Re-raii)
-* for non-RAII resources, use [`finally`](#Re-finally).
+* [RAII](#Re-raii)와 예외를 사용하라
+* RAII를 따르지 않는 자원에는 [`finally`](#Re-finally)를 사용하라
 
-### <a name="Rnr-protected-data"></a>NR.7: Don't: Make all data members `protected`
+### <a name="Rnr-protected-data"></a>NR.7: 금지: 모든 데이터 멤버를 `protected`로 하라
 
 ##### Reason (not to follow this rule)
 
-`protected` data is a source of errors.
-`protected` data can be manipulated from an unbounded amount of code in various places.
-`protected` data is the class hierarchy equivalent to global data.
+`protected` 데이터는 오류의 원인이 된다.  
+`protected` 데이터는 계측할 수 없는 양의 코드에 의해서, 다양한 위치에서 변경될 수 있다.  
+`protected` 데이터는 클래스 계층구조에서 전역변수와 동일하다.
 
 ##### Example
 
+```
     ???
+```
 
 ##### Alternative
 
-* [Make member data `public` or (preferably) `private`](#Rh-protected)
+* [멤버변수는 `public` 혹은 (가능한) `private`으로 하라](#Rh-protected)
