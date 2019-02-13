@@ -15,34 +15,34 @@
 * [R.1: 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동적으로 관리되도록 하라](#Rr-raii)
 * [R.2: 인터페이스에서는, 포인터는 서로 다른 개체들을 표시하기 위해서만 사용하라](#Rr-use-ptr)
 * [R.3: 원시 포인터(`T*`)는 소유를 의미하지 않는다](#Rr-ptr)
-* [R.4: 참조(a `T&`)는 소유를 의미하지 않는다](#Rr-ref)
-* [R.5: 가능한 자동 변수를 사용하라, 불필요한 동적 할당을 하지마라](#Rr-scoped)
-* [R.6: `const`가 아닌 전역 변수의 사용을 피하라](#Rr-global)
+* [R.4: 참조(`T&`)는 소유를 의미하지 않는다](#Rr-ref)
+* [R.5: 유효 범위 안의 개체를 선호하라. 불필요한 동적할당을 하지 마라](#Rr-scoped)
+* [R.6: `const`가 아닌 전역 변수를 지양하라](#Rr-global)
 
 할당과 해제 규칙 요약:
 
 * [R.10: `malloc()`과 `free()`의 사용을 피하라](#Rr-mallocfree)
-* [R.11: 직접적으로 `new`와 `delete`를 호출하는 것을 피하라](#Rr-newdelete)
-* [R.12: 명시적으로 자원이 생성되는 경우 즉시 관리 개체에게 결과를 전달하라](#Rr-immediate-alloc)
-* [R.13: 하나의 표현식에서는 한번의 자원 할당을 수행하라](#Rr-single-alloc)
-* [R.14: ??? 배열 혹은 포인터 인자 전달](#Rr-ap)
-* [R.15: 짝을 이루는 할당과 해제는 항상 오버로드 하라](#Rr-pair)
+* [R.11: 명시적인 `new`와 `delete` 호출을 지양하라](#Rr-newdelete)
+* [R.12: 명시적인 할당의 결과는 즉시 관리 개체에 전달하라](#Rr-immediate-alloc)
+* [R.13: 하나의 표현식 구문에서 명시적 자원 할당은 최대 한번만 수행하라](#Rr-single-alloc)
+* [R.14: ??? 배열 vs. 포인터 매개변수](#Rr-ap)
+* [R.15: 할당/해제가 짝을 이루도록 중복정의하라](#Rr-pair)
 
 <a name="Rr-summary-smartptrs"></a>스마트 포인터 규칙 요약:
 
-* [R.20: 소유권을 나타낼 때는 `unique_ptr`나 `shared_ptr`를 사용하라](#Rr-owner)
-* [R.21: 소유권을 공유하지 않는다면 `shared_ptr`보다 `unique_ptr`를 사용하라](#Rr-unique)
-* [R.22: `shared_ptr`를 만들 때는 `make_shared()`를 사용하라](#Rr-make_shared)
-* [R.23: `unique_ptr`를 만들 때는 `make_unique()`를 사용하라](#Rr-make_unique)
-* [R.24: `shared_ptr`의 순환 참조를 막기 위해 `std::weak_ptr`를 사용하라](#Rr-weak_ptr)
-* [R.30: 수명주기를 표현하고자 할 때만 스마트 포인터를 인자로 사용하라](#Rr-smartptrparam)
+* [R.20: 소유권을 나타내기 위해 `unique_ptr` 혹은 `shared_ptr`를 사용하라](#Rr-owner)
+* [R.21: 소유권을 공유할 필요가 없다면 `shared_ptr`보다는 `unique_ptr`를 선호하라](#Rr-unique)
+* [R.22: `shared_ptr`를 만들때는 `make_shared()`를 사용하라](#Rr-make_shared)
+* [R.23: `unique_ptr`를 만들때는 `make_unique()`를 사용하라](#Rr-make_unique)
+* [R.24: `shared_ptr`의 순환참조를 부수기 위해 `weak_ptr`를 사용하라](#Rr-weak_ptr)
+* [R.30: 수명주기 의미구조를 표현하기 위해서만 스마트 포인터를 매개변수로 사용하라](#Rr-smartptrparam)
 * [R.31: 표준 스마트 포인터를 사용하지 않고 있다면, 표준에서 사용하는 기본 패턴을 사용하라](#Rr-smart)
-* [R.32: 함수가 `widget`의 소유권을 맡는다는 것을 표현하기 위해 `unique_ptr<widget>`인자를 사용하라](#Rr-uniqueptrparam)
-* [R.33: 함수가 `widget`을 생성한다는 것을 표현하기 위해 `unique_ptr<widget>&`를 인자로 사용하라](#Rr-reseat)
-* [R.34: 함수가 소유자 중 하나라는 것을 표현하기 위해 `shared_ptr<widget>`을 인자로 사용하라](#Rr-sharedptrparam-owner)
-* [R.35: 함수가 공유 포인터를 생성한다는 것을 표현하기 위해 `shared_ptr<widget>&`를 인자로 사용하라](#Rr-sharedptrparam)
-* [R.36: Take a `const shared_ptr<widget>&` parameter to express that it might retain a reference count to the object ???](#Rr-sharedptrparam-const)
-* [R.37: Do not pass a pointer or reference obtained from an aliased smart pointer](#Rr-smartptrget)
+* [R.32: 함수가 `widget`의 소유권을 맡는다는 것을 표현하기 위해 `unique_ptr<widget>`를 매개변수로 사용하라](#Rr-uniqueptrparam)
+* [R.33: 함수가 `widget`을 새로 설정한다는 것을 표현하기 위해 `unique_ptr<widget>&`를 사용하라](#Rr-reseat)
+* [R.34: 함수가 소유자 중 하나라는 것을 표현하기 위해 `shared_ptr<widget>`를 매개변수로 사용하라](#Rr-sharedptrparam-owner)
+* [R.35: 함수가 공유 포인터를 재설정한다는 것을 표현하기 위해 `shared_ptr<widget>&`를 매개변수로 사용하라](#Rr-sharedptrparam)
+* [R.36: 함수가 개체에 대한 참조 카운트를 유지한다는 것을 표현하기 위해 `const shared_ptr<widget>&`을 매개변수로 사용하라 ???](#Rr-sharedptrparam-const)
+* [R.37: 재명명(aliased)된 스마트 포인터에서 획득한 포인터 혹은 참조를 전달하지 마라](#Rr-smartptrget)
 
 ### <a name="Rr-raii"></a>R.1: 자원 핸들과 RAII(자원 획득시 초기화)를 사용해서 자동적으로 관리되도록 하라
 
@@ -293,11 +293,11 @@ C++ 표준뿐만 아니라 대부분의 경우 참조는 소유를 하지 않는
 
 ##### See Also
 
-[The raw pointer rule](#Rr-ptr)
+[원시 포인터 규칙들](#Rr-ptr)
 
 ##### Enforcement
 
-See [the raw pointer rule](#Rr-ptr)
+[원시 포인터 규칙들](#Rr-ptr)을 보라
 
 ### <a name="Rr-scoped"></a>R.5: 유효 범위 안의 개체를 선호하라. 불필요한 동적할당을 하지 마라
 
@@ -352,11 +352,11 @@ See [the raw pointer rule](#Rr-ptr)
 
 ##### Enforcement
 
-(??? NM: Obviously we can warn about non-`const` statics ... do we want to?)
+(??? NM: `const`가 아닌 static 변수들에 대해서도 경고할 수 있을 것 같은데 ... 그렇게 해야 하는가?)
 
-## <a name="SS-alloc"></a>R.alloc: Allocation and deallocation
+## <a name="SS-alloc"></a>R.alloc: 할당과 해제
 
-### <a name="Rr-mallocfree"></a>R.10: Avoid `malloc()` and `free()`
+### <a name="Rr-mallocfree"></a>R.10: `malloc()`과 `free()`의 사용을 피하라
 
 ##### Reason
 
@@ -460,7 +460,6 @@ See [the raw pointer rule](#Rr-ptr)
 * 포인터를 초기화하기 위해 명시적인 할당을 했다면 지적하라 (문제: 직접적인 자원 할당을 얼마나 많이 인지할 수 있을 것인가?)
 
 ### <a name="Rr-single-alloc"></a>R.13: 하나의 표현식 구문에서 명시적 자원 할당은 최대 한번만 수행하라
-Perform at most one explicit resource allocation in a single expression statement
 
 ##### Reason
 
@@ -894,7 +893,7 @@ widget이 `nullptr`이 될 수 있다면 `widget*`를 넘겨받아야 하고, �
 
 ##### Reason
 
-This makes the function's ??? explicit.
+작성한 함수의 ???를 명시적으로 만든다.
 
 ##### Example, good
 
@@ -912,18 +911,19 @@ This makes the function's ??? explicit.
 * (쉬움) ((기본사항)) 함수가 `shared_ptr<T>`를 값 혹은 `const` 참조로 전달 받으면서 최소 한 경로에서 다른 `shared_ptr`에 복사하거나 이동하지 않으면 경고하라. 대신 `T*` 혹은 `T&`를 사용하도록 제안하라.
 * (쉬움) ((기본사항)) `shared_ptr<T>`을 rvalue 참조로 전달받으면 경고하라. 대신 값으로 전달받도록 제안하라.
 
-### <a name="Rr-smartptrget"></a>R.37: Do not pass a pointer or reference obtained from an aliased smart pointer
+### <a name="Rr-smartptrget"></a>R.37: 재명명(aliased)된 스마트 포인터에서 획득한 포인터 혹은 참조를 전달하지 마라
+
+> 역주: [Pointer Aliasing](https://en.wikipedia.org/wiki/Pointer_aliasing)
 
 ##### Reason
 
-Violating this rule is the number one cause of losing reference counts and finding yourself with a dangling pointer.
-Functions should prefer to pass raw pointers and references down call chains.
-At the top of the call tree where you obtain the raw pointer or reference from a smart pointer that keeps the object alive.
-You need to be sure that the smart pointer cannot inadvertently be reset or reassigned from within the call tree below.
+이 규칙을 위반하는 것은 참조 수를 잃어버리고 허상 포인터가 남도록 만드는 가장 중요한 원인이다.  
+함수는 호출이 깊어질 때 되도록 원시 포인터나 참조를 전달해야 한다. 스마트 포인터로부터 원시 포인터 혹은 참조를 획득하는 호출 트리의 최상단에서는 개체가 소멸하지 않도록 해야 한다.  
+프로그래머는 소유권을 가진 스마트 포인터가 우연치 않게 호출 트리의 하단에서 바뀌지 않도록 해야한다.
 
 ##### Note
 
-To do this, sometimes you need to take a local copy of a smart pointer, which firmly keeps the object alive for the duration of the function and the call tree.
+이를 위해서, 스마트 포인터의 지역 사본을 만들어야 할수도 있다. 이 스마트 포인터는 함수와 그 호출 트리가 지속되는 동안 개체가 살아있도록 만든다.
 
 ##### Example
 
