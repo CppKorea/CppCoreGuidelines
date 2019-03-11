@@ -336,7 +336,7 @@ C++ 에선, 동기화를 원한다면 `atomic` 타입들을 사용해야 한다:
 이러한 기법의 일관성 있는 사용은 다양한 종류의 스레드 안전 관련 오류를 컴파일 시점 오류로 만들어준다.
 이러한 주해문들은 일반적으로 지역적이며 (특정 멤버 변수를 특정 뮤텍스를 통해 보호되게 표시함으로써),
 대개의 경우 쉽게 배울 수 있다. 그러나, 다른 많은 정적 도구들과 마찬가지로,
-본디 검출되어야 하나 허용 처리되는 잘못된 거짓 음성 결과를 종종 제출할 수도 있다.
+본디 검출되어야 하나 허용 처리되는 잘못된 거짓 음성 (false negative) 결과를 종종 제출할 수도 있다.
 
 * 동적 지침 도구: Clang 의 [Thread Sanitizer](http://clang.llvm.org/docs/ThreadSanitizer.html) (aka TSAN)
 은 강력한 동적 도구의 한 예이다: 이 도구는 프로그램의 메모리 접근을 장부에 기록할 수 있도록 빌드 및 실행을 변경하여,
@@ -524,8 +524,8 @@ C++17 에서는 간단히 아래와 같이 작성하여
 
 ##### Enforcement
 
-* 재귀 용이 아닌 `mutex` 를 잠근 후 호출하는 가상 함수 호출을 표시하라
-* 재귀 용이 아닌 `mutex` 를 잠근 후 호출하는 콜백 함수 호출을 표시하라
+* 재귀 용이 아닌 `mutex` 를 잠근 후 호출하는 가상 함수 호출을 지적하라
+* 재귀 용이 아닌 `mutex` 를 잠근 후 호출하는 콜백 함수 호출을 지적하라
 
 ### <a name="Rconc-join"></a>CP.23: join 하는 `thread`를 유효범위 안의 컨테이너처럼 생각하라
 
@@ -627,7 +627,7 @@ C++17 에서는 간단히 아래와 같이 작성하여
 
 ##### Enforcement
 
-지역 변수들을 `detach()` 할지도 모르는 스레드에 전달하는 시도들을 표시하라.
+지역 변수들을 `detach()` 할지도 모르는 스레드에 전달하는 시도들을 지적하라.
 
 ### <a name="Rconc-joining_thread"></a>CP.25: `std::thread` 보다는 `gsl::joining_thread` 사용을 우선하여 고려하라
 
@@ -708,7 +708,7 @@ Detach한 스레드들은 관찰(monitor)하기가 어렵다.
 
 ##### Enforcement
 
-`std::thread` 이 사용되는 경우들을 표시하라:
+`std::thread` 이 사용되는 경우들을 지적하라:
 
 * `gsl::joining_thread` 사용을 권장한다.
 * 만약 detach 하는 경우라면, 포함되는 유효 범위에 ["exporting ownership"](#Rconc-detached_thread) 하는 것을 권장한다.
@@ -770,7 +770,7 @@ Detach한 스레드들은 관찰(monitor)하기가 어렵다.
 
 #### Enforcement
 
-`detach()` 사용을 표시하라.
+`detach()` 사용을 지적하라.
 
 ### <a name="Rconc-data-by-value"></a>CP.31: 스레드들 간의 작은 데이터 전달은 참조나 포인터보다는 값으로 전달하라
 
@@ -1358,7 +1358,7 @@ volatile 의 사용을 통한 아래의 첫 번째 시험은 스레드 안전하
 
 ##### Enforcement
 
-??? 저 idiom 확인할 수 있는 건가요?
+??? 해당 idiom 이 탐지 가능한가?
 
 ## <a name="SScp-etc"></a>CP.etc: 기타 동시성 규칙들
 
