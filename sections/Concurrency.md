@@ -35,7 +35,7 @@ C++를 사용한 동시적인(concurrent) 프로그램들을 쉽게 작성하는
 * [CP.3: 쓰기 가능한 데이터의 명시적인 공유를 최소화하라](#Rconc-data)
 * [CP.4: 스레드보단 작업 단위로 생각하라](#Rconc-task)
 * [CP.8: 동기화를 위해 `volatile`을 사용하지 말아라](#Rconc-volatile)
-* [CP.9: Whenever feasible use tools to validate your concurrent code](#Rconc-tools)
+* [CP.9: 가능한 모든 경우에, 도구 (tool) 를 이용하여 자신의 병행 실행 코드를 검증하라](#Rconc-tools)
 
 **참고**:
 
@@ -312,12 +312,12 @@ C++ 에선, 동기화를 원한다면 `atomic` 타입들을 사용해야 한다:
 ##### See also
 [`volatile`의 적절한 사용](#Rconc-volatile2)
 
-### <a name="Rconc-tools"></a>CP.9: Whenever feasible use tools to validate your concurrent code
+### <a name="Rconc-tools"></a>CP.9: 가능한 모든 경우에, 도구 (tool) 를 이용하여 자신의 병행 실행 코드를 검증하라
 
-Experience shows that concurrent code is exceptionally hard to get right
-and that compile-time checking, run-time checks, and testing are less effective at finding concurrency errors
-than they are at finding errors in sequential code.
-Subtle concurrency errors can have dramatically bad effects, including memory corruption and deadlocks.
+경험이 보여주듯, 병행 실행 코드는 올바르게 작성하기가 극히 어려우며,
+컴파일 시점 점검, 실행 시점 점검 및 테스팅을 통한 병행 실행 문제를 검출하는 것이
+순차적인 코드에서 일반적인 문제점을 찾는 것만큼 효과적이지 않다.
+미묘한 병행 실행 오류들은 메모리 손상이나 교착 상태와 같은 심각한 폐해를 가져올 수 있다.
 
 ##### Example
 
@@ -325,30 +325,30 @@ Subtle concurrency errors can have dramatically bad effects, including memory co
 
 ##### Note
 
-Thread safety is challenging, often getting the better of experienced programmers: tooling is an important strategy to mitigate those risks.
-There are many tools "out there", both commercial and open-source tools, both research and production tools.
-Unfortunately people's needs and constraints differ so dramatically that we cannot make specific recommendations,
-but we can mention:
+스레드 안전한 프로그램을 만드는 것은 숙달된 개발자들조차 종종 곤란하게 만드는 만만찮은 작업이다: 적절한 도구를 사용하는 것은 이러한 위험을 덜 수 있는 중요한 전략이다.
+이러한 도구들은 상용 / 오픈소스 와 연구용 / 생산용을 가리지 않고 다양한 형태의 수많은 종류가 제공되고 있다.
+안타깝게도, 각자의 요구 사항과 제약사항이 모두 다르므로, 특정 도구를 추천하기는 어려우나,
+몇 가지를 거론할 수는 있다:
 
-* Static enforcement tools: both [clang](http://clang.llvm.org/docs/ThreadSafetyAnalysis.html)
-and some older versions of [GCC](https://gcc.gnu.org/wiki/ThreadSafetyAnnotation)
-have some support for static annotation of thread safety properties.
-Consistent use of this technique turns many classes of thread-safety errors into compile-time errors.
-The annotations are generally local (marking a particular member variable as guarded by a particular mutex),
-and are usually easy to learn. However, as with many static tools, it can often present false negatives;
-cases that should have been caught but were allowed.
+* 정적 지침 도구: [clang](http://clang.llvm.org/docs/ThreadSafetyAnalysis.html)
+과 [GCC](https://gcc.gnu.org/wiki/ThreadSafetyAnnotation) 의
+몇몇 지난 버전들은 스레드 안전의 특성과 관련된 몇 가지 정적 주해문 (static annotation) 을 지원한다.
+이러한 기법의 일관성 있는 사용은 다양한 종류의 스레드 안전 관련 오류를 컴파일 시점 오류로 만들어준다.
+이러한 주해문들은 일반적으로 지역적이며 (특정 멤버 변수를 특정 뮤텍스를 통해 보호되게 표시함으로써),
+대개의 경우 쉽게 배울 수 있다. 그러나, 다른 많은 정적 도구들과 마찬가지로,
+본디 검출되어야 하나 허용 처리되는 잘못된 거짓 음성 (false negative) 결과를 종종 제출할 수도 있다.
 
-* dynamic enforcement tools: Clang's [Thread Sanitizer](http://clang.llvm.org/docs/ThreadSanitizer.html) (aka TSAN)
-is a powerful example of dynamic tools: it changes the build and execution of your program to add bookkeeping on memory access,
-absolutely identifying data races in a given execution of your binary.
-The cost for this is both memory (5-10x in most cases) and CPU slowdown (2-20x).
-Dynamic tools like this are best when applied to integration tests, canary pushes, or unittests that operate on multiple threads.
-Workload matters: When TSAN identifies a problem, it is effectively always an actual data race,
-but it can only identify races seen in a given execution.
+* 동적 지침 도구: Clang 의 [Thread Sanitizer](http://clang.llvm.org/docs/ThreadSanitizer.html) (aka TSAN)
+은 강력한 동적 도구의 한 예이다: 이 도구는 프로그램의 메모리 접근을 장부에 기록할 수 있도록 빌드 및 실행을 변경하여,
+해당 프로그램 실행 시 데이터 경쟁을 확실히 검출해 낼 수 있도록 한다.
+이를 위해서는 메모리 사용랑 (대부분의 경우 5-10배) 과 CPU 성능 저하 (2-20배) 를 비용으로 지불해야 한다.
+이러한 동적 도구들은 통합 테스트나 카나리아 테스트 혹은 복수의 스레드상에서 작동하는 단위 테스트에 적용하기 가장 알맞다.
+작업량이 영향을 미친다: TSAN 이 검출해 낸 문제점은 거의 항상 실질적인 데이터 경쟁을 정확하게 짚어 내지만,
+해당 실행 과정 중에 발견된 문제만이 검출 가능하다.
 
 ##### Enforcement
 
-It is up to an application builder to choose which support tools are valuable for a particular applications.
+특정 프로그램들에 있어서 어떤 도구를 사용하는 것이 유용할 것인지 고르는 것은 해당 프로그램 제작자에게 달려 있다.
 
 ## <a name="SScp-con"></a>CP.con: 동시성
 
@@ -362,12 +362,12 @@ It is up to an application builder to choose which support tools are valuable fo
 동시성 규칙 요약:
 
 * [CP.20: `lock()`/`unlock()` 대신 RAII를 사용하라](#Rconc-raii)
-* [CP.21: Use `std::lock()` or `std::scoped_lock` to acquire multiple `mutex`es](#Rconc-lock)
-* [CP.22: lock을 사용 중일때는 알 수 없는 코드를 호출하지 말아라(e.g., a callback)](#Rconc-unknown)
-* [CP.23: join하는 `thread`를 유효범위 안의 컨테이너처럼 생각하라](#Rconc-join)
+* [CP.21: 복수의 `mutex` 획득을 위해서는 `std::lock()` 이나 `std::scoped_lock` 을 사용하라](#Rconc-lock)
+* [CP.22: lock 을 사용 중일 때는 알 수 없는 코드를 호출하지 말아라(예: callback)](#Rconc-unknown)
+* [CP.23: join 하는 `thread`를 유효범위 안의 컨테이너처럼 생각하라](#Rconc-join)
 * [CP.24: `thread`를 전역 컨테이너처럼 생각하라](#Rconc-detach)
-* [CP.25: Prefer `gsl::joining_thread` over `std::thread`](#Rconc-joining_thread)
-* [CP.26: Don't `detach()` a thread](#Rconc-detached_thread)
+* [CP.25: `std::thread` 보다는 `gsl::joining_thread` 사용을 우선하여 고려하라](#Rconc-joining_thread)
+* [CP.26: 스레드를 `detach()` 하지 말아라](#Rconc-detached_thread)
 * [CP.31: 스레드들 간의 작은 데이터 전달은 참조나 포인터보다는 값으로 전달하라](#Rconc-data)
 * [CP.32: 관련 없는 `thread`간의 소유권 공유는 `shared_ptr`를 사용하라](#Rconc-shared)
 * [CP.40: 문맥 교환을 최소화하라](#Rconc-switch)
@@ -375,7 +375,7 @@ It is up to an application builder to choose which support tools are valuable fo
 * [CP.42: 조건 없이 `wait`하지 말아라](#Rconc-wait)
 * [CP.43: 임계 영역(Critical Section)에서의 시간을 최소화하라](#Rconc-time)
 * [CP.44: `lock_guard`과 `unique_lock`에는 이름을 붙여라](#Rconc-name)
-* [CP.50: Define a `mutex` together with the data it guards. Use `synchronized_value<T>` where possible](#Rconc-mutex)
+* [CP.50: `mutex` 를 보호(guard) 해야 하는 데이터와 함께 선언하라. 가능한 경우에는  `synchronized_value<T>` 를 사용하라](#Rconc-mutex)
 * ??? 언제 스핀락(spinlock)을 사용하는가
 * ??? 언제 `try_lock()`을 사용하는가
 * ??? 언제 `unique_lock`보다 `lock_guard`를 쓰는가
@@ -416,15 +416,15 @@ It is up to an application builder to choose which support tools are valuable fo
 ##### Enforcement
  `lock()`과 `unlock()`의 호출에 표식을 남겨라  ???
 
-### <a name="Rconc-lock"></a>CP.21: Use `std::lock()` or `std::scoped_lock` to acquire multiple `mutex`es
+### <a name="Rconc-lock"></a>CP.21: 복수의 `mutex` 획득을 위해서는 `std::lock()` 이나 `std::scoped_lock` 을 사용하라 
 
 ##### Reason
 
-To avoid deadlocks on multiple `mutex`es.
+복수의 `mutex` 로 인한 교착상태를 방지한다.
 
 ##### Example
 
-This is asking for deadlock:
+다음 코드는 교착 상태를 유발한다:
 
 ```c++
     // thread 1
@@ -436,7 +436,7 @@ This is asking for deadlock:
     lock_guard<mutex> lck1(m1);
 ```
 
-Instead, use `lock()`:
+대신하여 `lock()` 을 사용하라 :
 
 ```c++
     // thread 1
@@ -450,7 +450,7 @@ Instead, use `lock()`:
     lock_guard<mutex> lck1(m1, adopt_lock);
 ```
 
-or (better, but C++17 only):
+혹은 (더 좋은 방법이지만, C++17 에서만 가능한):
 
 ```c++
     // thread 1
@@ -460,31 +460,31 @@ or (better, but C++17 only):
     scoped_lock<mutex, mutex> lck2(m2, m1);
 ```
 
-Here, the writers of `thread1` and `thread2` are still not agreeing on the order of the `mutex`es, but order no longer matters.
+위 코드에서, `thread1` 과 `thread2` 의 작성자들은 여전히 `mutex` 들의 순서에 합의하지는 못했지만, 그 순서는 더 이상 문제가 되지 않는다.
 
 ##### Note
 
-In real code, `mutex`es are rarely named to conveniently remind the programmer of an intended relation and intended order of acquisition.
-In real code, `mutex`es are not always conveniently acquired on consecutive lines.
+실제 코드에서는, `mutex` 들이 서로 간의 의도된 관계나 의도된 획득 순서를 프로그래머에게 쉽게 상기시킬 수 있도록 명명돼 있는 경우가 드물다.
+또한 실제 코드에서는, `mutex` 들이 편리하게도 항상 연속된 줄에 획득이 이루어지지는 않는다.
 
-In C++17 it's possible to write plain
+C++17 에서는 간단히 아래와 같이 작성하여
 
 ```c++
     lock_guard lck1(m1, adopt_lock);
 ```
 
-and have the `mutex` type deduced.
+`mutex` 타입을 자동으로 추론되도록 할 수 있다.
 
 ##### Enforcement
 
-Detect the acquisition of multiple `mutex`es.
-This is undecidable in general, but catching common simple examples (like the one above) is easy.
+복수의 `mutex` 획득을 검출해 내라.
+일반적으로 이는 판별이 어려운 경우가 많지만, 흔히 볼 수 있는 간단한 (상단의 예제와 같은) 사례를 잡아내는 것은 어렵지 않다.
 
-### <a name="Rconc-unknown"></a>CP.22: Never call unknown code while holding a lock (e.g., a callback)
+### <a name="Rconc-unknown"></a>CP.22: lock 을 사용 중일 때는 알 수 없는 코드를 호출하지 말아라 (예: callback)
 
 ##### Reason
 
-If you don't know what a piece of code does, you are risking deadlock.
+어떤 동작을 할지 확실치 않은 코드를 호출하는 것은 교착 상태를 유발할 위험을 감수하는 것이다.
 
 ##### Example
 
@@ -498,14 +498,14 @@ If you don't know what a piece of code does, you are risking deadlock.
     }
 ```
 
-If you don't know what `Foo::act` does (maybe it is a virtual function invoking a derived class member of a class not yet written),
-it may call `do_this` (recursively) and cause a deadlock on `my_mutex`.
-Maybe it will lock on a different mutex and not return in a reasonable time, causing delays to any code calling `do_this`.
+만약 당신이 `Foo::act` 가 어떤 작업을 하는지 모른다면 (해당 함수는 아직 작성되지 않은 파생 클래스의 멤버를 호출하는 가상 함수일 수 있다),
+`do_this` 함수를 (재귀적으로) 부를 수도 있어 `my_mutex` 에 교착상태를 유발할 수 있다.
+아니면 해당 함수가 다른 뮤텍스를 잠그고 적절한 시간 안에 해제를 하지 않아, `do_this` 를 호출하는 다른 코드에 있어 지연을 유발할 수도 있다.
 
 ##### Example
 
-A common example of the "calling unknown code" problem is a call to a function that tries to gain locked access to the same object.
-Such problem can often be solved by using a `recursive_mutex`. For example:
+"미지의 코드 호출" 문제의 흔한 사례는 동일한 객체에 대해 잠금 권한을 얻으려 하는 함수를 호출하는 경우이다.
+이러한 호출 문제는 `recursive_mutex` 를 사용함으로써 종종 해결이 가능하다. 예를 들어:
 
 ```c++
     recursive_mutex my_mutex;
@@ -520,19 +520,19 @@ Such problem can often be solved by using a `recursive_mutex`. For example:
     }
 ```
 
-If, as it is likely, `f()` invokes operations on `*this`, we must make sure that the object's invariant holds before the call.
+만약, 아마도 그러하겠지만, `f()` 가 `*this` 에 대해서 어떤 작업을 수행한다고 하면, 해당 함수를 호출하기 전에 객체의 불변 조건 (invariant) 이 유지되고 있는지 확인해야 한다.
 
 ##### Enforcement
 
-* Flag calling a virtual function with a non-recursive `mutex` held
-* Flag calling a callback with a non-recursive `mutex` held
+* 재귀 용이 아닌 `mutex` 를 잠근 후 호출하는 가상 함수 호출을 지적하라
+* 재귀 용이 아닌 `mutex` 를 잠근 후 호출하는 콜백 함수 호출을 지적하라
 
-### <a name="Rconc-join"></a>CP.23: Think of a joining `thread` as a scoped container
+### <a name="Rconc-join"></a>CP.23: join 하는 `thread`를 유효범위 안의 컨테이너처럼 생각하라
 
 ##### Reason
 
-To maintain pointer safety and avoid leaks, we need to consider what pointers are used by a `thread`.
-If a `thread` joins, we can safely pass pointers to objects in the scope of the `thread` and its enclosing scopes.
+포인터 사용의 안전성과 메모리 누수 방지를 위하여, 어떤 포인터들이 `thread` 에서 사용되는지 주의 깊게 살펴야 한다.
+만약 `thread` 가 join 한다고 하면, `thread` 의 유효범위 및 포함되는 유효범위 내의 객체에 대한 포인터를 안전하게 전달할 수 있다.
 
 ##### Example
 
@@ -557,15 +557,15 @@ If a `thread` joins, we can safely pass pointers to objects in the scope of the 
     }
 ```
 
-A `gsl::joining_thread` is a `std::thread` with a destructor that joins and that cannot be `detached()`.
-By "OK" we mean that the object will be in scope ("live") for as long as a `thread` can use the pointer to it.
-The fact that `thread`s run concurrently doesn't affect the lifetime or ownership issues here;
-these `thread`s can be seen as just a function object called from `some_fct`.
+`gsl::joining_thread` 는 join 하는 소멸자를 가지고 있으며 `detached()` 될 수 없는 `std::thread` 이다.
+"OK" 라고 함은  `thread` 가 전달받은 포인터를 사용할 수 있는 한, 해당 객체가 유효범위 안에 ("살아") 있을 것임을 의미한다.
+`thread` 들이 병행 실행된다는 사실이 여기에서는 존속 기간이나 소유권 관련 문제에 있어서 아무런 영향을 미치지 않는다;
+이 `thread` 들은 단순히 `some_fct` 로부터 호출되는 함수 객체들로 볼 수 있다.
 
 ##### Enforcement
 
-Ensure that `joining_thread`s don't `detach()`.
-After that, the usual lifetime and ownership (for local objects) enforcement applies.
+`joining_thread` 가 `detach()` 되지 않도록 확인하라.
+확인이 끝난 후에는, (지역 객체들에 대한) 통상적인 존속 기간과 소유권 적용 방식을 따른다.
 
 ### <a name="Rconc-detach"></a>CP.24: `thread`를 전역 컨테이너처럼 생각하라
 
@@ -604,36 +604,36 @@ After that, the usual lifetime and ownership (for local objects) enforcement app
     }
 ```
 
-By "OK" we mean that the object will be in scope ("live") for as long as a `thread` can use the pointers to it.
-By "bad" we mean that a `thread` may use a pointer after the pointed-to object is destroyed.
-The fact that `thread`s run concurrently doesn't affect the lifetime or ownership issues here;
-these `thread`s can be seen as just a function object called from `some_fct`.
+"OK" 라고 함은  `thread` 가 전달받은 포인터를 사용할 수 있는 한, 해당 객체가 유효범위 안에 ("살아") 있을 것임을 의미한다.
+"bad" 라고 함은 `thread` 가 전달받은 포인터가 가리키는 객체가 소멸된 이후에 해당 포인터를 사용할 수도 있음을 의미한다.
+`thread` 들이 병행 실행된다는 사실이 여기에서는 존속 기간이나 소유권 관련 문제에 있어서 아무런 영향을 미치지 않는다;
+이 `thread` 들은 단순히 `some_fct` 로부터 호출되는 함수 객체들로 볼 수 있다.
 
 ##### Note
 
-Even objects with static storage duration can be problematic if used from detached threads: if the
-thread continues until the end of the program, it might be running concurrently with the destruction
-of objects with static storage duration, and thus accesses to such objects might race.
+정적 저장소 존속 기간을 가진 객체들도 detach 된 스레드에서 사용 시 문제를 야기할 수 있다:
+스레드가 프로그램의 종료 시점까지 수행된다면, 정적 저장소 존속 기간을 가진 객체들의 소멸 시점까지
+병행 실행될 수 있으며, 그로 인해 해당 객체들에 대한 접근에 있어 경쟁이 유발될 수 있다.
 
 ##### Note
 
-This rule is redundant if you [don't `detach()`](#Rconc-detached_thread) and [use `gsl::joining_thread`](#Rconc-joining_thread).
-However, converting code to follow those guidelines could be difficult and even impossible for third-party libraries.
-In such cases, the rule becomes essential for lifetime safety and type safety.
+이 규칙은 [don't `detach()`](#Rconc-detached_thread) and [use `gsl::joining_thread`](#Rconc-joining_thread) 를 따른다면 불필요하다.
+그러나, 해당 지침을 따르기 위해서 코드를 변경하는 것이 어렵거나 혹은 서드파티 라이브러리들의 경우에는 아예 불가능할 수도 있다.
+이러한 경우에는, 이 규칙이 존속기간 및 타입 안전에 필수적일 수 있다.
 
-In general, it is undecidable whether a `detach()` is executed for a `thread`, but simple common cases are easily detected.
-If we cannot prove that a `thread` does not `detach()`, we must assume that it does and that it outlives the scope in which it was constructed;
-After that, the usual lifetime and ownership (for global objects) enforcement applies.
+일반적으로 `detach()` 가 특정 `thread` 에 대해 수행되는지는 판별이 어려운 경우가 많지만, 흔히 볼 수 있는 간단한 사례는 손쉽게 검출해 낼 수 있다.
+만약 특정 `thread` 가 `detach()` 하지 않음을 입증할 수 없다면, 해당 스레드는 `detach()` 하며 최초 생성된 유효 범위를 넘어서까지 유지될 수 있다고 가정해야 한다;
+확인이 끝난 후에는, (전역 객체들에 대한) 통상적인 존속기간과 소유권 적용 방식을 따른다.
 
 ##### Enforcement
 
-Flag attempts to pass local variables to a thread that might `detach()`.
+지역 변수들을 `detach()` 할지도 모르는 스레드에 전달하는 시도들을 지적하라.
 
-### <a name="Rconc-joining_thread"></a>CP.25: Prefer `gsl::joining_thread` over `std::thread`
+### <a name="Rconc-joining_thread"></a>CP.25: `std::thread` 보다는 `gsl::joining_thread` 사용을 우선하여 고려하라
 
 ##### Reason
 
-`raii_thread`는 유효 범위가 끝날때 join한다.
+`joining_thread`는 유효 범위가 끝날 때 join 한다.
 
 Detach한 스레드들은 관찰(monitor)하기가 어렵다. 
 (잠재적으로 detach할 스레드를 포함해서) 이 스레드들에서 오류가 없다고 확신하기 어렵다.  
@@ -675,7 +675,7 @@ Detach한 스레드들은 관찰(monitor)하기가 어렵다.
 
 ##### Example, bad
 
-The code determining whether to `join()` or `detach()` may be complicated and even decided in the thread of functions called from it or functions called by the function that creates a thread:
+`join()` 혹은 `detach()` 할지를 결정하는 코드는 매우 복잡할 수 있으며 심지어는 해당 스레드가 호출하는 함수 내에서 결정되거나 해당 스레드를 생성한 함수가 호출하는 다른 함수에 의해서 결정될 수도 있다:
 
 ```c++
     void tricky(thread* t, int n)
@@ -694,33 +694,33 @@ The code determining whether to `join()` or `detach()` may be complicated and ev
     }
 ```
 
-This seriously complicates lifetime analysis, and in not too unlikely cases makes lifetime analysis impossible.
-This implies that we cannot safely refer to local objects in `use()` from the thread or refer to local objects in the thread from `use()`.
+이는 존속기간 분석을 심각할 정도로 복잡하게 만들며, 실제 일어날 수도 있는 어떤 경우들에 대해서는 분석 자체를 불가능하게도 만들 수 있다.
+이는 우리가 스레드 내부에서 `use()` 함수 내의 지역 객체들을 참조하거나 `use()` 함수에서 해당 스레드 내의 지역 객체를 참조하는 것이 안전하지 않다는 것을 의미한다.
 
 ##### Note
 
-Make "immortal threads" globals, put them in an enclosing scope, or put them on the free store rather than `detach()`.
+"종료되지 않아야 하는 스레드" 들은  `detach()` 하기보다는, 전역으로 만들어 포함되는 유효 범위 내에나 혹은 자유 영역에 위치시키도록 하라.
 [don't `detach`](#Rconc-detached_thread).
 
 ##### Note
 
-Because of old code and third party libraries using `std::thread` this rule can be hard to introduce.
+`std::thread` 를 사용하는 오래된 코드나 서드파티 라이브러리들로 인해 이 규칙은 도입하기가 어려울 수 있다.
 
 ##### Enforcement
 
-Flag uses of `std::thread`:
+`std::thread` 이 사용되는 경우들을 지적하라:
 
-* Suggest use of `gsl::joining_thread`.
-* Suggest ["exporting ownership"](#Rconc-detached_thread) to an enclosing scope if it detaches.
-* Seriously warn if it is not obvious whether if joins of detaches.
+* `gsl::joining_thread` 사용을 권장한다.
+* 만약 detach 하는 경우라면, 포함되는 유효 범위에 ["exporting ownership"](#Rconc-detached_thread) 하는 것을 권장한다.
+* join 을 하는지 detach 를 하는지 명확하지 않다면 심각하게 경고하라.
 
-### <a name="Rconc-detached_thread"></a>CP.26: Don't `detach()` a thread
+### <a name="Rconc-detached_thread"></a>CP.26: 스레드를 `detach()` 하지 말아라
 
 ##### Reason
 
-Often, the need to outlive the scope of its creation is inherent in the `thread`s task,
-but implementing that idea by `detach` makes it harder to monitor and communicate with the detached thread.
-In particular, it is harder (though not impossible) to ensure that the thread completed as expected or lives for as long as expected.
+보통, 생성된 유효범위를 넘어서서 실행이 유지되어야 하는 필요성은  `thread` 의 내재된 작업 특성이나,
+해당 특성을 `detach` 를 사용함으로써 구현하는 것은 추적 관찰 (monitor) 및 해당 스레드와의 통신을 어렵게 만든다.
+특히, (물론 불가능하지는 않지만) 스레드가 예상된 시점까지 실행이 완료되기를 보장하거나 예상된 시점까지 실행이 유지되기를 보장하는 것은 더욱 어렵다.
 
 ##### Example
 
@@ -735,15 +735,15 @@ In particular, it is harder (though not impossible) to ensure that the thread co
     }
 ```
 
-This is a reasonable use of a thread, for which `detach()` is commonly used.
-There are problems, though.
-How do we monitor the detached thread to see if it is alive?
-Something might go wrong with the heartbeat, and losing a heartbeat can be very serious in a system for which it is needed.
-So, we need to communicate with the heartbeat thread
-(e.g., through a stream of messages or notification events using a `condition_variable`).
+이는 `detach()` 가 흔히 사용되는, 스레드의 합리적인 사용 예이다.
+그러나, 여전히 문제가 있다.
+우리가 detach 된 스레드가 여전히 실행되고 있는지 어떻게 추적 관찰할 수 있는가?
+때때로 heartbeat 상에 어떤 문제가 발생할 수 있으며, heartbeat 를 잃는 것은 그것을 필요하는 시스템 상에서는 심각한 문제일 수 있다.
+따라서, 우리는 해당 스레드와 통신을 할 필요가 있다
+(e.g., 메시지 스트림이나 `condition_variable` 을 이용한 알림 이벤트를 통해서).
 
-An alternative, and usually superior solution is to control its lifetime by placing it in a scope outside its point of creation (or activation).
-For example:
+많은 경우에 더 우월하다고 볼 수 있는 대안으로는 해당 스레드를 생성되는 (혹은 활성화되는)  유효 범위 밖에 배치함으로써 존속 기간을 제어하는 것이다.
+예제:
 
 ```c++
     void heartbeat();
@@ -751,9 +751,9 @@ For example:
     gsl::joining_thread t(heartbeat);             // heartbeat is meant to run "forever"
 ```
 
-This heartbeat will (barring error, hardware problems, etc.) run for as long as the program does.
+이 heartbeat (에러나 하드웨어 문제 등을 방지하는) 는 프로그램이 실행되는 동안 유지될 것이다.
 
-Sometimes, we need to separate the point of creation from the point of ownership:
+때로는, 생성 시점과 소유권 시점을 분리할 필요가 있다:
 
 ```c++
     void heartbeat();
@@ -770,18 +770,18 @@ Sometimes, we need to separate the point of creation from the point of ownership
 
 #### Enforcement
 
-Flag `detach()`.
+`detach()` 사용을 지적하라.
 
-### <a name="Rconc-data-by-value"></a>CP.31: Pass small amounts of data between threads by value, rather than by reference or pointer
+### <a name="Rconc-data-by-value"></a>CP.31: 스레드들 간의 작은 데이터 전달은 참조나 포인터보다는 값으로 전달하라
 
 ##### Reason
 
-Copying a small amount of data is cheaper to copy and access than to share it using some locking mechanism.
-Copying naturally gives unique ownership (simplifies code) and eliminates the possibility of data races.
+소량의 데이터 복사는 잠금장치를 이용하는 것보다 복사 및 접근 비용이 저렴하다.
+복사는 자연히도 유일한 소유권을 제공하며(코드를 단순화할 수 있다) 데이터 경쟁의 가능성을 제거한다.
 
 ##### Note
 
-Defining "small amount" precisely is impossible.
+"소량" 이 정확하게 어느 정도인지를 정의하기는 불가능하다.
 
 ##### Example
 
@@ -796,15 +796,15 @@ Defining "small amount" precisely is impossible.
     }
 ```
 
-The call of `modify1` involves copying two `string` values; the call of `modify2` does not.
-On the other hand, the implementation of `modify1` is exactly as we would have written it for single-threaded code,
-whereas the implementation of `modify2` will need some form of locking to avoid data races.
-If the string is short (say 10 characters), the call of `modify1` can be surprisingly fast;
-essentially all the cost is in the `thread` switch. If the string is long (say 1,000,000 characters), copying it twice
-is probably not a good idea.
+`modify1` 호출은 두 번의 `string` 값 복사를 필요로 하지만, `modify2` 호출은 값 복사를 필요로 하지 않는다.
+반면에 `modify1` 의 구현은 우리가 단일 스레드 환경에서 작성했을 법한 코드와 정확히 동일하나,
+`modify2` 의 구현은 데이터 경쟁을 피하기 위하여 일정 형태의 잠금 기법을 이용해야 한다.
+문자열이 짧다면 (10 글자 정도), `modify1` 호출은 놀라울 정도로 빠를것이다;
+근본적으로 모든 필요한 비용은 `thread` 전환에 들어갈 뿐이기 때문이다. 만약 문자열이 길다면 (1,000,000 글자 정도),
+이를 두 번이나 복사하는 것은 좋은 선택이 아닐 것이다.
 
-Note that this argument has nothing to do with `async` as such. It applies equally to considerations about whether to use
-message passing or shared memory.
+이 논의는 `async` 등의 사용과는 아무 연관이 없음을 유의하라.
+이는 메시지 전달 방식 혹은 공유 메모리 방식을 사용을 고려할 때도 동일하게 적용된다.
 
 ##### Enforcement
 
@@ -1052,14 +1052,14 @@ RAII를 적용하지 않은 `lock()`과 `unlock()`을 지적하라.
 
 이름을 부여하지 않은 `lock_guard`와 `unique_lock`을 지적하라
 
-### <a name="Rconc-mutex"></a>CP.50: Define a `mutex` together with the data it guards. Use `synchronized_value<T>` where possible
+### <a name="Rconc-mutex"></a>CP.50: `mutex` 를 보호(guard) 해야 하는 데이터와 함께 선언하라. 가능한 경우에는  `synchronized_value<T>` 를 사용하라
 
 ##### Reason
 
-It should be obvious to a reader that the data is to be guarded and how. This decreases the chance of the wrong mutex being locked, or the mutex not being locked.
+코드를 읽는 사람에게 있어 데이터가 보호된다는 사실과 어떻게 보호될지를 분명히 전달한다. 이는 뮤텍스를 잠그지 않거나 엉뚱한 뮤텍스를 잠글 확률을 낮춘다.
 
-Using a `synchronized_value<T>` ensures that the data has a mutex, and the right mutex is locked when the data is accessed.
-See the [WG21 proposal](http://wg21.link/p0290)) to add `synchronized_value` to a future TS or revision of the C++ standard.
+`synchronized_value<T>` 를 사용하는 것은 해당 데이터가 뮤텍스를 가지고 있으며, 데이터 접근 시 해당되는 올바른 뮤텍스가 잠길 것임을 보장한다.
+`synchronized_value` 를 이후의 TS 나 C++ 표준에 추가하기 위한 [WG21 proposal](http://wg21.link/p0290)) 을 참고하라.
 
 ##### Example
 
@@ -1079,7 +1079,7 @@ See the [WG21 proposal](http://wg21.link/p0290)) to add `synchronized_value` to 
 
 ##### Enforcement
 
-??? Possible?
+??? 가능한가?
 
 ## <a name="SScp-par"></a>CP.par: 병렬성(Parallelism)
 
@@ -1255,15 +1255,15 @@ lock-free 코드를 적용하기에 앞서서 전문가가 되어라.
 * Damian Dechev and Bjarne Stroustrup: Scalable Non-blocking Concurrent Objects for Mission Critical Code. ACM OOPSLA'09. October 2009
 * Damian Dechev, Peter Pirkelbauer, Nicolas Rouquette, and Bjarne Stroustrup: Semantically Enhanced Containers for Concurrent Real-Time Systems. Proc. 16th Annual IEEE International Conference and Workshop on the Engineering of Computer Based Systems (IEEE ECBS). April 2009.
 
-### <a name="Rconc-double"></a>CP.110: Do not write your own double-checked locking for initialization
+### <a name="Rconc-double"></a>CP.110: 초기화를 위한 독자적인 이중 확인 잠금 (double-checked locking) 코드를 작성하지 말라
 
 ##### Reason
 
-Since C++11, static local variables are now initialized in a thread-safe way. When combined with the RAII pattern, static local variables can replace the need for writing your own double-checked locking for initialization. std::call_once can also achieve the same purpose. Use either static local variables of C++11 or std::call_once instead of writing your own double-checked locking for initialization.
+C++11 이후부터는, 정적 지역 변수들이 스레드 안전 (thread-safe) 한 방식으로 초기화된다. 따라서 RAII 패턴과 함께 사용 시, 정적 지역 변수들의 사용은 초기화를 위한 독자적인 이중 확인 잠금 (double-checked locking) 코드를 작성해야 할 필요성을 대체한다. 또한 std::call_once 사용 역시 동일한 목적을 달성할 수 있다. 그러므로 독자적인 이중 확인 잠금 코드를 작성하기보다는 C++11 의 정적 지역 변수나 std::call_once 을 사용하라.
 
 ##### Example
 
-Example with std::call_once.
+std::call_once 를 사용하는 예제.
 
 ```c++
     void f()
@@ -1277,7 +1277,7 @@ Example with std::call_once.
     }
 ```
 
-Example with thread-safe static local variables of C++11.
+C++11 의 스레드 안전한 정적 지역 변수를 사용하는 예제.
 
 ```c++
     void f()
@@ -1301,17 +1301,17 @@ Example with thread-safe static local variables of C++11.
 
 ??? 저 idiom 확인할 수 있는 건가요?
 
-### <a name="Rconc-double-pattern"></a>CP.111: Use a conventional pattern if you really need double-checked locking
+### <a name="Rconc-double-pattern"></a>CP.111: 이중 확인 잠금이 꼭 필요할 경우에는 전통적인 패턴을 사용하라
 
 ##### Reason
 
-Double-checked locking is easy to mess up. If you really need to write your own double-checked locking, in spite of the rules [CP.110: Do not write your own double-checked locking for initialization](#Rconc-double) and [CP.100: Don't use lock-free programming unless you absolutely have to](#Rconc-lockfree), then do it in a conventional pattern.
+이중 확인 잠금 코드는 엉망으로 만들기 쉽다. [CP.110: 초기화를 위한 독자적인 이중 확인 잠금 코드를 작성하지 말라](#Rconc-double) 및 [CP.100: 정말 필요할 때만 lock-free 프로그래밍을 사용하라](#Rconc-lockfree) 과 같은 규칙에도 불구하고 독자적인 이중 확인 잠금 코드를 작성해야만 한다면, 전통적인 패턴을 이용해서 작성하도록 하라.
 
-The uses of the double-checked locking pattern that are not in violation of [CP.110: Do not write your own double-checked locking for initialization](#Rconc-double) arise when a non-thread-safe action is both hard and rare, and there exists a fast thread-safe test that can be used to guarantee that the action is not needed, but cannot be used to guarantee the converse.
+스레드 안전하지 않은 (non-thread-safe) 특정 동작에 있어, 동작 자체가 복잡하고도 수행 빈도가 낮으며 해당 동작의 수행이 필요하지 않다는 것을 보장하는 (그 반대의 경우를 보장하기 위해서는 사용할 수 없는) 신속하고도 스레드-안전한 시험 방법이 존재하는 상황에서의 이중 확인 잠금 패턴의 사용이  [CP.110: 초기화를 위한 독자적인 이중 확인 잠금 코드를 작성하지 말라](#Rconc-double) 을 위반하지 않는 경우에 해당한다.
 
 ##### Example, bad
 
-The use of volatile does not make the first check thread-safe, see also [CP.200: Use `volatile` only to talk to non-C++ memory](#Rconc-volatile2)
+volatile 의 사용을 통한 아래의 첫 번째 시험은 스레드 안전하지 않다. [CP.200: `volatile`은 C++가 아닌 메모리에 대해서만 사용하라](#Rconc-volatile2) 을 참고하라.
 
 ```c++
     mutex action_mutex;
@@ -1341,7 +1341,7 @@ The use of volatile does not make the first check thread-safe, see also [CP.200:
     }
 ```
 
-Fine-tuned memory order may be beneficial where acquire load is more efficient than sequentially-consistent load
+획득 적재 (acquire load) 방식이 순차 일관 적재 (sequentially-consistent load) 방식보다 효율적인 경우, 미세 조정된 메모리 순서 (memory order) 를 통해 성능상 이점을 얻을 수 있다.
 
 ```c++
     mutex action_mutex;
@@ -1358,7 +1358,7 @@ Fine-tuned memory order may be beneficial where acquire load is more efficient t
 
 ##### Enforcement
 
-??? Is it possible to detect the idiom?
+??? 해당 idiom 이 탐지 가능한가?
 
 ## <a name="SScp-etc"></a>CP.etc: 기타 동시성 규칙들
 
