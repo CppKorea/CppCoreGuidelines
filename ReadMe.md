@@ -41,3 +41,4 @@
 * DongHyun Kim([knight2995](https://github.com/knight2995))
 * [leehongjoo88](https://github.com/leehongjoo88)
 * [niov64](https://github.com/niov64)
+* Ji-hoon Lee ([nochoco-lee](https://github.com/nochoco-lee))
