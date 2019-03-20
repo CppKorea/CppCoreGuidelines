@@ -96,16 +96,20 @@ C 배열은 덜 안전하고 `array`나 `vector`에 비해 가지는 장점이 �
 
 ##### Example
 
+```c++
     int v[SIZE];                        // BAD
 
     std::array<int, SIZE> w;             // ok
+```
 
 ##### Example
 
+```c++
     int* v = new int[initial_size];     // BAD, owning raw pointer
     delete[] v;                         // BAD, manual delete
 
     std::vector<int> w(initial_size);   // ok
+```
 
 ##### Note
 
@@ -155,8 +159,10 @@ C 배열은 덜 안전하고 `array`나 `vector`에 비해 가지는 장점이 �
 vector 를 요소의 크기만큼 초기화하려면, `()` 초기화를 사용하라.
 vector 를 요소의 리스트 내용으로 초기화하려면, `{}` 초기화를 사용하라.
 
+```c++
     vector<int> v1(20);  // v1 은 값이 0인 20개의 요소들을 갖는다. (vector<int>{})
     vector<int> v2 {20}; // v2 는 값이 20인 한개의 요소를 갖는다.
+```
 
 [{} 초기화 문법을 선호하라.](#Res-list).
 
@@ -197,17 +203,20 @@ vector 를 요소의 리스트 내용으로 초기화하려면, `{}` 초기화�
 
 ##### Example, bad
 
+```c++
     void f()
     {
         array<int, 10> a, b;
         memset(a.data(), 0, 10);         // BAD, 배열의 길이를 넘어서는 에러 (length = 10 * sizeof(int))
         memcmp(a.data(), b.data(), 10);  // BAD, 배열의 길이를 넘어서는 에러 (length = 10 * sizeof(int))
     }
+```
 
 또한, `std::array<>::fill()`이나 `std::fill()` 또는 비어있는 초기화문이 `memset()`보다는 나은 후보이다.
 
 ##### Example, good
 
+```c++
     void f()
     {
         array<int, 10> a, b, c{};       // c is initialized to zero
@@ -219,6 +228,7 @@ vector 를 요소의 리스트 내용으로 초기화하려면, `{}` 초기화�
           // ...
         }
     }
+```
 
 ##### Example
 
@@ -226,6 +236,7 @@ vector 를 요소의 리스트 내용으로 초기화하려면, `{}` 초기화�
 해당 코드는 `std::out_of_range`예외를 발생시킬 수 있는 각 class 의 `.at()` 멤버 함수를 호출 할 수 있다.
 아니면 경계조건 위반에 빠르게 실패하거나 사용자가 정의한 동작을 하는 `at()` 이외의 함수를 호출 할 수도 있다.
 
+```c++
     void f(std::vector<int>& v, std::array<int, 12> a, int i)
     {
         v[0] = a[0];        // BAD
@@ -236,6 +247,7 @@ vector 를 요소의 리스트 내용으로 초기화하려면, `{}` 초기화�
         v.at(0) = a.at(i);  // OK (alternative 1)
         v.at(0) = at(a, i); // OK (alternative 2)
     }
+```
 
 ##### Enforcement
 
@@ -278,6 +290,7 @@ String 요약:
 
 ##### Example
 
+```c++
     vector<string> read_until(const string& terminator)
     {
         vector<string> res;
@@ -285,12 +298,14 @@ String 요약:
             res.push_back(s);
         return res;
     }
+```
 
 `string`에서는 (유용한 기능들의 예로) `>>`와 `!=` 연산자들을 제공하고, 여기에는 어떠한 명시적인
 메모리 할당, 해제 또는 경계조건 검사 없이 `string`이 내부적으로 이들을 해결한다.
 
 C++17 에서는 함수 호출자에게 더 유연함을 제공하기 위해 `const string*` 대신에 `string_view`를 함수 인자로 사용할 수도 있다.
 
+```c++
     vector<string> read_until(string_view terminator)   // C++17
     {
         vector<string> res;
@@ -298,9 +313,11 @@ C++17 에서는 함수 호출자에게 더 유연함을 제공하기 위해 `con
             res.push_back(s);
         return res;
     }
+```
 
 `gsl::string_span`은 `std::string_view`의 대부분의 장점을 대체할 수 있는 현재 가능한 옵션일 수 있다. 간단한 예를 들면:
 
+```c++
     vector<string> read_until(string_span terminator)
     {
         vector<string> res;
@@ -308,11 +325,13 @@ C++17 에서는 함수 호출자에게 더 유연함을 제공하기 위해 `con
             res.push_back(s);
         return res;
     }
+```
 
 ##### Example, bad
 
 trivial 하지 않은 메모리 관리가 필요한 동작에 대해서는 C 스타일의 문자열을 사용하지 말라.
 
+```c++
     char* cat(const char* s1, const char* s2)   // beware!
         // return s1 + '.' + s2
     {
@@ -325,6 +344,7 @@ trivial 하지 않은 메모리 관리가 필요한 동작에 대해서는 C 스
         p[l1 + l2 + 1] = 0;
         return p;
     }
+```
 
 이 코드가 올바르게 문제를 해결했을까?
 함수 호출자가 반환된 포인터를 `free()` 해야 한다고 기억해야 할까?
@@ -348,6 +368,7 @@ trivial 하지 않은 메모리 관리가 필요한 동작에 대해서는 C 스
 
 ##### Example
 
+```c++
     vector<string> read_until(string_span terminator);
 
     void user(zstring p, const string& s, string_span ss)
@@ -357,6 +378,7 @@ trivial 하지 않은 메모리 관리가 필요한 동작에 대해서는 C 스
         auto v3 = read_until(ss);
         // ...
     }
+```
 
 ##### Note
 
@@ -376,13 +398,17 @@ C++17 에서 지원하는 `std::string_view`는 읽기 전용이다.
 
 ##### Example
 
+```c++
     void f1(const char* s); // s 는 아마도 문자열일 것이다.
+```
 
 우리가 알 수 있는 것은 이것이 nullptr 이거나 최소한 하나의 문자에 대한 포인터라는 것이다.
 
+```c++
     void f1(zstring s);     // s 는 C 스타일의 문자열이거나 nullptr 이다.
     void f1(czstring s);    // s 는 C 스타일의 상수 문자열이거나 nullptr 이다.
     void f1(std::byte* s);  // s 는 하나의 바이트에 대한 포인터이다. (C++17)
+```
 
 ##### Note
 
@@ -413,6 +439,7 @@ C++17 에서 지원하는 `std::string_view`는 읽기 전용이다.
 
 ##### Example, bad
 
+```c++
     char arr[] = {'a', 'b', 'c'};
 
     void print(const char* p)
@@ -424,6 +451,7 @@ C++17 에서 지원하는 `std::string_view`는 읽기 전용이다.
     {
         print(arr);   // 런타임 에러; 잠재적으로 매우 안좋을 수 있다.
     }
+```
 
 `arr` 배열은 0 으로 끝나지 않으므로 C 스타일의 문자열이 아니다.
 
@@ -498,10 +526,12 @@ C++17
 
 ##### Example
 
+```c++
     auto pp1 = make_pair("Tokyo", 9.00);         // {C-style string,double} intended?
     pair<string, double> pp2 = {"Tokyo", 9.00};  // a bit verbose
     auto pp3 = make_pair("Tokyo"s, 9.00);        // {std::string,double}    // C++14
     pair pp4 = {"Tokyo"s, 9.00};                 // {std::string,double}    // C++17
+```
 
 
 
@@ -535,6 +565,7 @@ Iostream 규칙 요약:
 
 ##### Example
 
+```c++
     char c;
     char buf[128];
     int i = 0;
@@ -543,12 +574,15 @@ Iostream 규칙 요약:
     if (i == 128) {
         // ... handle too long string ....
     }
+```
 
 위의 코드보다는 아래의 코드가 훨씬 간단하고 아마도 더 빠를 것이다.
 
+```c++
     string s;
     s.reserve(128);
     cin >> s;
+```
 
 여기서 `reserve(128)`는 꼭 필요한 것이 아닐 수도 있다.
 
@@ -580,17 +614,21 @@ Iostream 규칙 요약:
 
 ##### Example
 
+```c++
     // write a complex number:
     complex<double> z{ 3, 4 };
     cout << z << '\n';
+```
 
 `complex`는 사용자 정의 타입이지만 `iostream` 라이브러리에 대한 수정 없이도 이에 대한 입출력이 구현된다.
 
 ##### Example
 
+```c++
     // read a file of complex numbers:
     for (complex<double> z; cin >> z; )
         v.push_back(z);
+```
 
 ##### Exception
 
@@ -623,11 +661,13 @@ C11 에서는 더 안전한 대안으로 `gets_s()`, `scanf_s()`, 그리고 `pri
 
 ##### Example
 
+```c++
     int main()
     {
         ios_base::sync_with_stdio(false);
         // ... use iostreams ...
     }
+```
 
 ##### Enforcement
 
@@ -643,8 +683,10 @@ C11 에서는 더 안전한 대안으로 `gets_s()`, `scanf_s()`, 그리고 `pri
 
 ##### Example
 
+```c++
     cout << "Hello, World!" << endl;    // 두번의 출력 명령과 한번의 flush
     cout << "Hello, World!\n";          // flush 없는 단 한번의 출력 명령
+```
 
 ##### Note
 
