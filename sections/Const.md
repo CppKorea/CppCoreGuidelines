@@ -1,25 +1,25 @@
 
 # <a name="S-const"></a>Con: 상수와 불변성
 
-상수에 대해서는 경쟁상태가 발생하지 않는다.
+상수에 대해서는 경쟁 상태가 발생하지 않는다.
 내부의 많은 개체가 값을 바꾸지 않는 프로그램이라면 해석하기가 쉬울 것이다.
 인자로 넘어가는 개체의 상태가 바뀌지 않는 것을 보장한다면 그 인터페이스는 가독성이 굉장히 높을 것이다.
 
 상수 규칙 요약:
 
-* [Con.1: 객체가 변하지 않도록 하라](#Rconst-immutable)
-* [Con.2: 멤버 함수들은 `const`로 만들어라](#Rconst-fct)
-* [Con.3: 포인터와 참조는 `const`로 전달하라](#Rconst-ref)
+* [Con.1: 기본적으로 객체를 변경 불가능하도록 만들어라](#Rconst-immutable)
+* [Con.2: 기본적으로 멤버 함수들은 `const`로 만들어라](#Rconst-fct)
+* [Con.3: 기본적으로 포인터와 참조는 `const`로 전달하라](#Rconst-ref)
 * [Con.4: 개체 생성 이후 변하지 않는 값은 `const`로 정의하라](#Rconst-const)
-* [Con.5: 컴파일 시간에 계산될 수 있는 값은 `constexpr`를 사용하라](#Rconst-constexpr)
+* [Con.5: 컴파일 시간에 계산될 수 있는 값은 `constexpr`을 사용하라](#Rconst-constexpr)
 
-### <a name="Rconst-immutable"></a>Con.1: By default, make objects immutable
+### <a name="Rconst-immutable"></a>Con.1: 기본적으로 객체를 변경 불가능하도록 만들어라
 
 ##### Reason
 
 변하지 않는 개체는 이해하기가 더 쉽다. 값을 바꿀 필요가 있을 때에만 개체를 비-`const`로 만들어라.
 
-Prevents accidental or hard-to-notice change of value.
+의도하지 않았거나 알아차리기 어려운 값 변경을 예방한다.
 
 ##### Example
 
@@ -31,26 +31,26 @@ Prevents accidental or hard-to-notice change of value.
 
 ##### Exception
 
-Function arguments are rarely mutated, but also rarely declared const.
-To avoid confusion and lots of false positives, don't enforce this rule for function arguments.
+함수의 인자들의 값이 변경되는 경우는 드물지만, 또한 이들이 const 로 선언되는 경우 역시 드물다.
+혼동과 수많은 거짓 양성 (false positives) 테스트 결과를 피하기 위해, 이 규칙은 함수의 인자들에 대해서는 적용하지 않도록 한다.
 
 ```c++
     void f(const char* const p); // pedantic
     void g(const int i);        // pedantic
 ```
 
-Note that function parameter is a local variable so changes to it are local.
+함수의 인자는 지역 변수로써 이를 변경하는 것 역시 지역적임을 유념하라.
 
 ##### Enforcement
 
-* Flag non-`const` variables that are not modified (except for parameters to avoid many false positives)
+* 값이 변경되지 않는 비-`const` 변수들을 지적하라 (수많은 거짓 양성 테스트 결과를 피하기 위해 인자들에 대해서는 예외로 한다)
 
-### <a name="Rconst-fct"></a>Con.2: By default, make member functions `const`
+### <a name="Rconst-fct"></a>Con.2: 기본적으로 멤버 함수들은 `const`로 만들어라
 
 ##### Reason
 
-A member function should be marked `const` unless it changes the object's observable state.
-This gives a more precise statement of design intent, better readability, more errors caught by the compiler, and sometimes more optimization opportunities.
+멤버 함수가 해당 객체의 식별 가능한 상태 변경을 야기하지 않는다면 `const` 로 표시되어야 한다.
+이는 디자인 의도를 더욱 명확하게 설명하며, 향상된 가독성과 컴파일러에 의해 검출되는 더 많은 에러를 제공할 뿐만 아니라, 때에 따라서는 최적화 기회까지도 추가적으로 가져올 수 있다.
 
 ##### Example; bad
 
@@ -69,21 +69,21 @@ This gives a more precise statement of design intent, better readability, more e
 
 ##### Note
 
-It is not inherently bad to pass a pointer or reference to non-`const`,
-but that should be done only when the called function is supposed to modify the object.
-A reader of code must assume that a function that takes a "plain" `T*` or `T&` will modify the object referred to.
-If it doesn't now, it might do so later without forcing recompilation.
+비-`const` 형식의 포인터나 참조자를 전달하는 것 자체가 근본적으로 나쁜 것은 아니지만,
+이는 호출되는 함수가 해당 객체를 수정하는 경우에만 수행되어야 한다.
+코드를 읽는 독자는 "plain" `T*` 나 `T&` 를 전달받는 함수가 해당 참조가 가리키는 객체를 수정할 것이라고 가정해야 한다.
+비록 당장 현재에는 객체를 수정을 하지 않더라도, 이후에 재컴파일을 강제하지 않고도 객체를 수정하도록 변경될 수 있다.
 
 ##### Note
 
-There are code/libraries that are offer functions that declare a`T*` even though
-those function do not modify that `T`.
-This is a problem for people modernizing code.
-You can
+기존 코드/라이브러리 중 일부는 함수 내에서 `T`를 수정하지 않으면서도
+`T*` 로 선언된 함수를 제공하기도 한다.
+이는 코드를 "현대화(modernizing)" 하려는 사람들에게 문제가 될 수 있다.
+다음 방법들을 사용할 수 있다
 
-* update the library to be `const`-correct; preferred long-term solution
-* "cast away `const`"; [best avoided](#Res-casts-const)
-* provide a wrapper function
+* `const`-정확한 방식으로 라이브러리를 업데이트한다; 선호되는 장기적인 대안이다
+* "`const`속성을 cast를 통해 해지한다 "; [가능한 피하는 것이 좋다](#Res-casts-const)
+* wrapper 함수를 제공한다
 
 Example:
 
@@ -92,14 +92,14 @@ Example:
     void f(const int* p) { f(const_cast<int*>(p)); } // wrapper
 ```
 
-Note that this wrapper solution is a patch that should be used only when the declaration of `f()` cannot be modified,
-e.g. because it is in a library that you cannot modify.
+이 wrapper 해결책은 `f()` 의 선언 자체를 수정할 수 없는 경우에만
+(e.g. 수정할 수 없는 라이브러리에서 제공된다거나 하는 이유로) 사용되어야 하는 방법임을 유의하라.
 
 ##### Note
 
-A `const` member function can modify the value of an object that is `mutable` or accessed through a pointer member.
-A common use is to maintain a cache rather than repeatedly do a complicated computation.
-For example, here is a `Date` that caches (mnemonizes) its string representation to simplify repeated uses:
+`const` 멤버 함수도 `mutable` 하거나 포인터 멤버를 통해 접근되는 객체에 대해서는 값을 수정할 수 있다.
+이러한 방식의 흔한 예는 복잡한 계산을 반복적으로 하지 않기 위해 캐시를 유지하는 경우이다.
+예를 들어, 아래 `Date` 는 반복적인 사용을 단순화하기 위해 날짜의 문자열 표현을 캐시(기억) 하고 있다:
 
 ```c++
     class Date {
@@ -118,24 +118,24 @@ For example, here is a `Date` that caches (mnemonizes) its string representation
     };
 ```
 
-Another way of saying this is that `const`ness is not transitive.
-It is possible for a `const` member function to change the value of `mutable` members and the value of objects accessed
-through non-`const` pointers.
-It is the job of the class to ensure such mutation is done only when it makes sense according to the semantics (invariants)
-it offers to its users.
+이에 대해서 다른 방식으로 이야기하면, `const`함은 전이적(transitive) 이지 않다는 것이다.
+`const` 멤버 함수에게 있어 `mutable` 한 멤버의 값과
+비-`const` 포인터를 통해 접근하는 객체의 값을 변경할 수 있기 때문이다.
+클래스가 사용자들에게 제공하는 의미론(불변 조건)에 의거하여 타당하다고 여겨질 경우에만 이러한 값 변경이 이루어질 수 있도록 보장하는 것은
+해당 클래스의 역할이다.
 
 **See also**: [Pimpl](#Ri-pimpl)
 
 ##### Enforcement
 
-* Flag a member function that is not marked `const`, but that does not perform a non-`const` operation on any member variable.
+* `const` 표시가 되어 있지 않지만, 어떠한 멤버 변수에 대해서도 비-`const` 작업을 수행하지 않는 멤버 함수를 지적하라
 
-### <a name="Rconst-ref"></a>Con.3: By default, pass pointers and references to `const`s
+### <a name="Rconst-ref"></a>Con.3: 기본적으로 포인터와 참조는 `const`로 전달하라
 
 ##### Reason
 
- To avoid a called function unexpectedly changing the value.
- It's far easier to reason about programs when called functions don't modify state.
+ 호출되는 함수가 예상치 못하게 값을 변경하는 것을 방지한다.
+ 호출되는 함수가 상태를 변경하지 않는다면 프로그램의 동작을 예상하기가 훨씬 수월하다.
 
 ##### Example
 
@@ -146,8 +146,8 @@ it offers to its users.
 
 ##### Note
 
-It is not inherently bad to pass a pointer or reference to non-`const`,
-but that should be done only when the called function is supposed to modify the object.
+비-`const` 형식의 포인터나 참조자를 전달하는 것 자체가 근본적으로 나쁜 것은 아니지만,
+이는 호출되는 함수가 해당 객체를 수정하는 경우에만 수행되어야 한다.
 
 ##### Note
 
@@ -155,14 +155,14 @@ but that should be done only when the called function is supposed to modify the 
 
 ##### Enforcement
 
-* Flag function that does not modify an object passed by  pointer or reference to non-`const`
-* Flag a function that (using a cast) modifies an object passed by pointer or reference to `const`
+* 객체에 대한 포인터나 참조자를 비-`const` 형식으로 전달받지만 해당 객체를 수정하지는 않는 함수들을 지적하라
+* 객체에 대한 포인터나 참조자를 `const` 형식으로 전달받지만 (타입 변환을 통해) 해당 객체를 수정하는 함수를 지적하라
 
-### <a name="Rconst-const"></a>Con.4: Use `const` to define objects with values that do not change after construction
+### <a name="Rconst-const"></a>Con.4: 개체 생성 이후 변하지 않는 값은 `const`로 정의하라
 
 ##### Reason
 
- Prevent surprises from unexpectedly changed object values.
+ 예기치 않은 객체의 값 변경으로 인해 뜻밖의 결과가 발생하는 것을 방지한다.
 
 ##### Example
 
@@ -179,17 +179,17 @@ but that should be done only when the called function is supposed to modify the 
     }
 ```
 
-As `x` is not `const`, we must assume that it is modified somewhere in the loop.
+`x` 가 `const` 형식으로 선언되지 않았으므로, 해당 변수는 반복문 내 어디선가 값이 변경된다고 가정해야 한다.
 
 ##### Enforcement
 
-* Flag unmodified non-`const` variables.
+* 변경되지 않는 비-`const` 변수들을 지적하라.
 
-### <a name="Rconst-constexpr"></a>Con.5: Use `constexpr` for values that can be computed at compile time
+### <a name="Rconst-constexpr"></a>Con.5: 컴파일 시간에 계산될 수 있는 값은 `constexpr`을 사용하라
 
 ##### Reason
 
-Better performance, better compile-time checking, guaranteed compile-time evaluation, no possibility of race conditions.
+향상된 성능, 향상된 컴파일-시점 검사, 보장된 컴파일-시점 변환 (evaluation) 이 제공될 뿐만 아니라, 경합 조건 (race condition) 위험도 피할 수 있다.
 
 ##### Example
 
@@ -205,4 +205,4 @@ See F.4.
 
 ##### Enforcement
 
-* Flag `const` definitions with constant expression initializers.
+* 상수 표현식을 통해 초기화되는 `const` 선언을 지적하라.
