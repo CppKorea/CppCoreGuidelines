@@ -6,38 +6,38 @@
 
 인터페이스 규칙 요약:
 
-* [I.1: 인터페이스를 명확하게 만들어라](#Ri-explicit)
-* [I.2: `const`가 아닌 전역 변수를 피하라](#Ri-global)
-* [I.3: 싱글톤을 피하라](#Ri-singleton)
-* [I.4: 인터페이스를 정확하게, 강타입으로 만들어라](#Ri-typed)
+* [I.1: 인터페이스는 명확하게(explicit) 작성하라](#Ri-explicit)
+* [I.2: `const`가 아닌 전역변수를 지양하라](#Ri-global)
+* [I.3: 싱글톤 패턴을 지양하라](#Ri-singleton)
+* [I.4: 인터페이스를 타입 시스템을 정확하고 엄격하게 준수하도록 만들어라](#Ri-typed)
 * [I.5: (하나라도 있다면) 사전 조건을 기술하라](#Ri-pre)
 * [I.6: 사전 조건을 표현하고 싶다면 `Expects()`를 사용하라](#Ri-expects)
 * [I.7: 사후 조건을 기술하라](#Ri-post)
 * [I.8: 사후 조건을 표현하고 싶다면 `Ensures()`를 사용하라](#Ri-ensures)
-* [I.9:  인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라](#Ri-concepts)
+* [I.9: 인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라](#Ri-concepts)
 * [I.10: 요구된 작업의 수행 실패를 알리기 위해 예외를 사용하라](#Ri-except)
-* [I.11: 원시 포인터(`T*`) 혹은 참조(`T&`)를 사용해 소유권을 넘기지 마라](#Ri-raw)
+* [I.11: 원시 포인터(`T*`) 혹은 참조(`T&`)를 사용해 소유권을 전달하지 마라](#Ri-raw)
 * [I.12: null이 되어선 안되는 포인터는 `not_null`로 선언하라](#Ri-nullptr)
 * [I.13: 배열을 단일 포인터로 전달하지 마라](#Ri-array)
-* [I.22: 전역 개체의 복잡한 초기화를 피하라](#Ri-global-init)
+* [I.22: 전역 개체의 복잡한 초기화를 지양하라](#Ri-global-init)
 * [I.23: 함수 인자를 최소로 유지하라](#Ri-nargs)
-* [I.24: 관련없는 동일 타입의 인접한 매개 변수는 피하라](#Ri-unrelated)
+* [I.24: 관련없는 동일 타입의 인접한 매개 변수는 지양하라](#Ri-unrelated)
 * [I.25: 클래스 계층에 대한 인터페이스로 추상 클래스를 사용하라](#Ri-abstract)
 * [I.26: 크로스 컴파일러 ABI를 원한다면 C 스타일 코드를 사용하라](#Ri-abi)
-* [I.27: For stable library ABI, consider the Pimpl idiom](#Ri-pimpl)
-* [I.30: Encapsulate rule violations](#Ri-encapsulate)
+* [I.27: 변화가 적은(stable) ABI를 원한다면, Pimpl idiom 사용을 고려하라](#Ri-pimpl)
+* [I.30: 규칙을 위반할때는 캡슐화를 하라](#Ri-encapsulate)
 
 **참고할 만한 내용**:
 
-* [F: 함수(Functions)](#S-functions)
-* [C.concrete: 실제 타입(Concrete types)](#SS-concrete)
-* [C.hier: 클래스 계층(Class hierarchies)](#SS-hier)
-* [C.over: 오버로딩과 오버로딩 된 연산자(Overloading and overloaded operators)](#SS-overload)
-* [C.con: 컨테이너와 다른 리소스 핸들(Containers and other resource handles)](#SS-containers)
-* [E: 오류 처리(Error handling)](#S-errors)
-* [T: 템플릿과 제너릭 프로그래밍(Templates and generic programming)](#S-templates)
+* [F: 함수(Functions)](./Functions.md)
+* [C.concrete: 실제 타입(Concrete types)](./Class.md)
+* [C.hier: 클래스 계층(Class hierarchies)](./Class.md)
+* [C.over: 오버로딩과 오버로딩 된 연산자(Overloading and overloaded operators)](./Class.md)
+* [C.con: 컨테이너와 다른 리소스 핸들(Containers and other resource handles)](./Class.md)
+* [E: 오류 처리(Error handling)](./Errors.md)
+* [T: 템플릿과 제너릭 프로그래밍(Templates and generic programming)](./Templates.md)
 
-### <a name="Ri-explicit"></a>I.1: Make interfaces explicit
+### <a name="Ri-explicit"></a>I.1: 인터페이스는 명확하게(explicit) 작성하라
 
 ##### Reason
 
@@ -52,7 +52,7 @@
 ```c++
     int round(double d)
     {
-        return (round_up) ? ceil(d) : d;    // don't: "invisible" dependency
+        return (round_up) ? ceil(d) : d;    // 이렇게 하면 안된다: "보이지 않는" 의존성이 있다
     }
 ```
 
@@ -60,34 +60,37 @@
 
 ##### Exception
 
-때때로 우리는 환경 변수를 통해 연산의 세부 사항을 제어한다. 예를 들어, 일반적인 출력 대 상세한 출력, 디버그 대 최적화 등이 있다.  
-전역 제어를 사용하면 잠재적으로 혼란스럽다는 문제가 있기는 하지만, 그렇게 하지 않으면 고정되었을 의도를 구현하는데 세밀하게 제어할 수 있다.
+우리는 때때로 환경 변수를 통해 연산을 세세하게 제어하기도 한다. 예컨대, 일반 출력과 상세한(verbose) 출력중 하나를 사용하도록 하거나, 디버그 혹은 최적화를 선택하기도 한다.
+이런 비-지역적인(non-local) 제어를 사용하면 잠재적으로 혼란의 소지가 있지만, 대신 구현 세부사항을 제어할 수 있다. 
+이러한 제어를 사용하지 않았다면 의미구조가 고정되었을 것이다.
 
 ##### Example, bad
 
-R`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시되기 쉽다.
+`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시되기 쉽다.
 
 예를 들어:
 
 ```c++
-    // don't: no test of printf's return value
+    // 이렇게 하면 안된다: printf의 반환값을 검사하지 않는다
     fprintf(connection, "logging: %d %d %d\n", x, y, s);
 ```
 
 만약 연결(connection)이 다운되어 로그가 만들어지지 않는다면 어떨까?
 
-**Alternative**: 예외를 발생시켜라. 예외는 무시할 수 없다.
+##### Alternative
 
-**Alternative formulation**: 전역 또는 암시적 상태의 값을 통해 인터페이스로 정보가 전달되는 것을 피하라. `const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라.
+예외를 발생시켜라. 예외는 무시할 수 없다.
 
-**Alternative formulation**: 인터페이스는 함수나 함수의 집합이어야 한다. 함수는 템플릿 함수일 수 있고 함수 집합은 클래스나 클래스 템플릿일 수 있다.
+**대안 세우기(Alternative formulation)**: 전역 또는 암시적 상태의 값을 통해 인터페이스로 정보가 전달되는 것을 피하라. `const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라.
+
+**대안 세우기**: 인터페이스는 함수나 함수의 집합이어야 한다. 함수는 템플릿 함수일 수 있고 함수 집합은 클래스나 클래스 템플릿일 수 있다.
 
 ##### Enforcement
 
 * (간단함) 함수는 네임스페이스 범위에서 선언된 변수 값에 따라 제어 흐름을 결정해서는 안된다
 * (간단함) 함수는 네임스페이스 범위에서 선언된 변수에 값을 저장해서는 안된다
 
-### <a name="Ri-global"></a>I.2: Avoid non-`const` global variables
+### <a name="Ri-global"></a>I.2: `const`가 아닌 전역변수를 지양하라
 
 ##### Reason
 
@@ -121,42 +124,49 @@ R`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시�
 
 전역 변수에 반하는 규칙은 네임스페이스 범위의 변수들에도 동일하게 적용된다.
 
-**Alternative**: 복사를 피하기 위해 전역 변수(좀 더 일반화해서 네임스페이스 스코프의 데이터)를 사용한다면 `const` 레퍼런스로 개체를 전달하는 것을 고려하라.
+##### Alternative
+
+복사를 피하기 위해 전역 변수(좀 더 일반화해서 네임스페이스 스코프의 데이터)를 사용한다면 `const` 레퍼런스로 개체를 전달하는 것을 고려하라.
 다른 해결책은 개체의 상태로서의 데이터와 멤버 함수로서의 연산을 정의하는 것이다.
 
-**Warning**: 데이터 경합을 조심하라. 하나의 스레드가 실행되는 동안 다른 스레드가 전역 데이터(또는 레퍼런스로 전달된 데이터)에 접근하려고 한다면, 데이터 경합이 발생할 수 있다.
-Every pointer or reference to mutable data is a potential data race.
+##### Warning
+
+데이터 경합(data race)을 조심하라. 하나의 스레드가 실행되는 동안 다른 스레드가 전역 데이터(또는 레퍼런스로 전달된 데이터)에 접근하려고 한다면, 데이터 경합이 발생할 수 있다.
+변경 가능한(mutable) 데이터에 대한 포인터나 참조는 언제나 데이터 경합의 가능성이 있다.
 
 ##### Note
 
 변경할 수 없는 데이터에 대해서는 경합 조건(race condition)이 생기지 않는다.
 
-**References**: [함수 호출에 대한 규칙](#SS-call)
+##### References
+
+[함수 호출에 대한 규칙](#SS-call)
 
 ##### Note
 
-The rule is "avoid", not "don't use." Of course there will be (rare) exceptions, such as `cin`, `cout`, and `cerr`.
+이 규칙은 "지양하라"는 것이지, "사용하지 마라"가 아니다. 물론 (드물게) `cin`, `cout`, 그리고 `cerr` 같은 예외가 있을 것이다. 
 
 ##### Enforcement
 
-(간단함) 네임스페이스 범위 내에 정의된 `const`가 아닌 변수에 대해서 모두 보고하라.
+(간단함) 네임스페이스 범위 내에 정의된 `const`가 아닌 변수에 대해서 모두 보고한다.
 
 ### <a name="Ri-singleton"></a>I.3: Avoid singletons
 
 ##### Reason
+
 싱글톤은 기본적으로 복잡한 전역 개체이다.
 
 ##### Example
 
 ```c++
     class Singleton {
-        // ... lots of stuff to ensure that only one Singleton object is created,
-        // that it is initialized properly, etc.
+        // ... 오직 하나만 생성되었고, 적절하게 초기화 되었는지 등을 확신하기 위해서
+        // 많은 것들이 필요하다.
     };
 ```
 
 싱글톤 아이디어에는 많은 변형이 있다.
-That's part of the problem.
+이는 문제의 일부일 뿐이다.
 
 ##### Note
 
@@ -174,12 +184,11 @@ That's part of the problem.
     }
 ```
 
-이 방식은 초기화 순서와 관련된 문제에 대해 가장 효과적인 해결책 중 하나다.
-다중 스레드 환경에서 정적 개체의 초기화는 경합 조건을 유발하지 않는다. (단, 생성자 내에서 공유 개체에 부주의하게 접근하지 않아야 한다.)
+이 방법은 초기화 순서와 관련된 문제에 대해 가장 효과적인 해결책 중 하나다.
+다중 스레드 환경에서, 정적 개체의 초기화는 경합 조건을 유발하지 않는다.
+(단, 생성자 내에서 공유 개체에 부주의하게 접근하지 않아야 한다.)
 
-Note that the initialization of a local `static` does not imply a race condition.
-However, if the destruction of `X` involves an operation that needs to be synchronized we must use a less simple solution.
-For example:
+지역 `static` 변수의 초기화는 경쟁 상태의 가능성이 없다. 하지만, `X`의 소멸이 동기화가 필요한 연산을 포함한다면 조금 더 복잡한 해결책을 사용해야 한다. 예를 들어:
 
 ```c++
     X& myX()
@@ -189,12 +198,12 @@ For example:
     }
 ```
 
-Now someone must `delete` that object in some suitably thread-safe way.
-That's error-prone, so we don't use that technique unless
+이 경우 누군가 해당 개체를 스레드 안전한 방법으로 `delete`해야 한다.
+이는 오류를 만들기 쉽기 때문에, 이 방법은 아래와 같은 조건이 아니면 사용되지 않는다.
 
-* `myX` is in multi-threaded code,
-* that `X` object needs to be destroyed (e.g., because it releases a resource), and
-* `X`'s destructor's code needs to be synchronized.
+* `myX` 가 다중 스레드 환경에서 실행되는 코드이며,
+* `X` 개체가 소멸되어야만 하며(가령, 어떤 자원을 해제하기 때문에),
+* `X`의 소멸자 코드가 동기화 되어야만 한다.
 
 하나의 개체만 생성해야 하는 클래스로 싱글톤을 정의한다면 `myX`와 같은 함수는 싱글톤이 아니다. 그리고 이 유용한 테크닉은 싱글톤이 아닌 규칙에 대한 예외는 아니다.
 
@@ -202,9 +211,9 @@ That's error-prone, so we don't use that technique unless
 
 일반적으로 매우 힘들다.
 
-* `singleton`을 포함하는 이름을 가진 클래스를 찾아라
-* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾아라
-* If a class X has a public static function that contains a function-local static of the class' type X and returns a pointer or reference to it, ban that
+* `singleton`을 포함하는 이름을 가진 클래스를 찾는다
+* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾는다
+* 만약 클래스 `X`가 public static 함수를 가진다면, 그리고 해당 함수 안에서 `X`타입의 static 변수의 포인터나 참조를 반환한다면, 금지하라.
 
 ### <a name="Ri-typed"></a>I.4: Make interfaces precisely and strongly typed
 
@@ -219,15 +228,16 @@ That's error-prone, so we don't use that technique unless
 다음을 고려해 보자:
 
 ```c++
-    void pass(void* data);    // void* is suspicious
+    void pass(void* data);    // void* 가 무엇을 의미하는지, 어떻게 사용되는지 알 수 없다(suspicious)
 ```
 
 이제 피호출자에서 올바른 타입으로 사용하기 위해 `data` 포인터를 캐스팅해야 한다. 하지만 오류가 발생하기 쉽고, 구질구질하다.
 특히 인터페이스에서 `void*`를 피하라.
 대신 베이스 클래스를 가리키는 포인터나 `variant` 사용을 고려하라.
 
-**Alternative**: 때때로 템플릿 매개 변수는 `void*`를 제거하고 `T*`나 `T&`로 변환할 수 있다.
-For generic code these `T`s can be general or concept constrained template parameters.
+##### Alternative
+때때로 템플릿 매개 변수는 `void*`를 제거하고 `T*`나 `T&`로 변환할 수 있다.
+제네릭 코드에서 이렇게 사용되는 `T`들은 일반적인 혹은 컨셉(Concept)로 제한된 템플릿 인자일 수 있다.
 
 ##### Example, bad
 
