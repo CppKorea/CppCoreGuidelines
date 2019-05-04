@@ -236,6 +236,7 @@
 대신 베이스 클래스를 가리키는 포인터나 `variant` 사용을 고려하라.
 
 ##### Alternative
+
 때때로 템플릿 매개 변수는 `void*`를 제거하고 `T*`나 `T&`로 변환할 수 있다.
 제네릭 코드에서 이렇게 사용되는 `T`들은 일반적인 혹은 컨셉(Concept)로 제한된 템플릿 인자일 수 있다.
 
@@ -249,7 +250,7 @@
     draw_rect(p.x, p.y, 10, 20);          // what does 10, 20 mean?
 ```
 
-`int`는 임의 형태의 정보를 전달할 수 있어서, 네 `int`가 각각 어떤 의미를 갖는지를 유추해야 한다.
+`int`는 임의 형태의 정보를 전달할 수 있어서, `int`들이 각각 어떤 의미를 갖는지를 유추해야 한다.
 아마도 처음 두 `int`는 `x`, `y` 좌표일 것 같지만, 나머지 두 `int`는 무엇을 의미할까?  
 주석이나 매개 변수 이름이 도움을 줄 수 있지만, 명확히 할 수 있다:
 
@@ -269,10 +270,10 @@
 다음 예제에서 인터페이스만 보고는 `time_to_blink`이 무엇을 의미하는지 잘 모르겠다. 초를 의미할까? 밀리초를 의미할까?
 
 ```c++
-    void blink_led(int time_to_blink) // bad -- the unit is ambiguous
+    void blink_led(int time_to_blink) // 나쁜 코드 -- 시간의 단위를 알 수 없다
     {
         // ...
-        // do something with time_to_blink
+        // time_to_blink로 무언가 한다
         // ...
     }
 
@@ -287,10 +288,10 @@
 C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 명시적으로 표현하는데 도움이 된다.
 
 ```c++
-    void blink_led(milliseconds time_to_blink) // good -- the unit is explicit
+    void blink_led(milliseconds time_to_blink) // 좋은 코드 -- 단위를 명확히 알 수 있다
     {
         // ...
-        // do something with time_to_blink
+        // time_to_blink로 무언가 한다
         // ...
     }
 
@@ -304,12 +305,12 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 ```c++
     template<class rep, class period>
-    void blink_led(duration<rep, period> time_to_blink) // good -- accepts any unit
+    void blink_led(duration<rep, period> time_to_blink) // 좋은 코드 -- 어떤 단위로도 사용할 수 있다
     {
-        // assuming that millisecond is the smallest relevant unit
+        // millisecond가 가장 정밀한 단위라고 가정한다
         auto milliseconds_to_blink = duration_cast<milliseconds>(time_to_blink);
         // ...
-        // do something with milliseconds_to_blink
+        // milliseconds_to_blink로 무언가 한다
         // ...
     }
 
@@ -323,13 +324,14 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 ##### Enforcement
 
 * (간단함) `void*`를 매개 변수나 리턴 타입으로 사용한다면 보고한다
-* (잘하기 어려움) 다수의 내장 타입 인자를 갖는 멤버 함수를 찾는다
+* (간단함) 하나 이상의 `bool` 매개 변수를 사용한다면 보고한다
+* (잘하기 어려움) 다수의 내장 타입(primitive type) 인자를 갖는 함수를 찾는다
 
 ### <a name="Ri-pre"></a>I.5: State preconditions (if any)
 
 ##### Reason
 
-인자는 피호출자에서 적절한 사용을 제한할 수 있는 의미를 갖는다.
+전달 인자(argument)는 피호출자에서 적절한 사용을 제한할 수 있는 의미를 갖는다.
 
 ##### Example
 
@@ -339,14 +341,14 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
     double sqrt(double x);
 ```
 
-여기서 `x`는 반드시 음수가 아니어야 한다. 타입 시스템으로는 이를 (있는 그대로 쉽게) 표현할 수 없고, 그래서 다른 수단을 사용해야 한다. 예를 들어,
+여기서 `x`는 반드시 음수가 아니어야 한다. 타입 시스템으로는 이를 (있는 그대로 쉽게) 표현할 수 없기 때문에, 다른 수단을 사용해야 한다.
+예를 들어:
 
 ```c++
     double sqrt(double x); // x must be nonnegative
 ```
 
-일부 사전 조건은 단정문으로 표현하기도 한다.
-
+일부 사전 조건은 단정문(assertion)으로 표현하기도 한다.
 예를 들어:
 
 ```c++
@@ -355,24 +357,28 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 이상적으로 `Expects(x >= 0)` 조건이 `sqrt()`의 인터페이스에 일부분이 되는게 가장 좋지만 그렇게 하기는 쉽지 않다. 따라서 지금은 함수 정의부(함수 본문)에 위치시킨다.
 
-**References**: `Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
+##### References
+
+`Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
 
 ##### Note
 
-`Excepts(p != nullptr);`처럼 요구 사항의 공식적인 명세를 선호하라.
-불가능하다면, `// the sequence [p:q) is ordered using <`와 같이 영문 텍스트 주석을 사용하라.
+`Excepts(p != nullptr);`처럼 요구 사항을 정확히(formal) 명세하는 것을 선호하라.
+불가능하다면, `// the sequence [p:q) is ordered using <`와 같이 주석을 사용하라.
 
 ##### Note
 
 대부분의 멤버 함수는 클래스의 불변 조건(invariant) 중 일부에 해당하는 선행 조건을 갖고 있다.
-해당 불변 조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 멤버 함수를 통해 재구성되어야 한다.
-그래서 각 함수마다 언급할 필요는 없다.
+해당 불변 조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 멤버 함수를 통해 재구성(reestablish)되어야 한다.
+이를 각 멤버 함수마다 언급할 필요는 없다.
 
 ##### Enforcement
 
 (적용 불가능)
 
-**See also**: 포인터 전달에 대한 규칙. ???
+##### See Also
+
+포인터 전달에 대한 규칙. ???
 
 ### <a name="Ri-expects"></a>I.6: Prefer `Expects()` for expressing preconditions
 
@@ -399,7 +405,7 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 ##### Note
 
 사전 조건은 구현 부분보다는 인터페이스 부분에 포함시켜야 한다. 하지만 아직은 그렇게 할 수 있는 언어 기능이 없다.
-Once language support becomes available (e.g., see the [contract proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) we will adopt the standard version of preconditions, postconditions, and assertions.
+언어에서 이를 지원할 수 있게 된다면 (참고: [contract 제안서](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) 표준에 맞는 사전조건, 사후조건, 단정문을 적용하게 될 것이다.
 
 ##### Note
 
@@ -407,7 +413,7 @@ Once language support becomes available (e.g., see the [contract proposal](http:
 
 ##### Note
 
-No, using `unsigned` is not a good way to sidestep the problem of [ensuring that a value is nonnegative](#Res-nonnegative).
+`unsigned`를 사용하는 것은 [값이 음수가 아니라고 보장하는](#Res-nonnegative) 문제를 회피하는 좋은 방법이 아니다.
 
 ##### Enforcement
 
@@ -447,7 +453,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 악명 높은 보안 버그를 고려해 보자:
 
 ```c++
-    void f()    // problematic
+    void f()    // 문제가 있다
     {
         char buffer[MAX];
         // ...
@@ -458,7 +464,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 버퍼가 초기화되어야 하고 최적화하면서 중복되는 `memset()`의 호출을 제거했음을 설명하는 사후 조건이 없다.
 
 ```c++
-    void f()    // better
+    void f()    // 좀 더 낫다
     {
         char buffer[MAX];
         // ...
@@ -493,7 +499,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 사후 조건을 기술함으로서 언급을 명확하게 할 수 있다:
 
 ```c++
-    void manipulate(Record& r)    // postcondition: m is unlocked upon exit
+    void manipulate(Record& r)    // 사후조건: m 은 함수가 종료된 후 lock이 해제되어있다.
     {
         m.lock();
         // ... no m.unlock() ...
@@ -520,9 +526,8 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 
 ##### Enforcement
 
-(Not enforceable) This is a philosophical guideline that is infeasible to check
-directly in the general case. Domain specific checkers (like lock-holding
-checkers) exist for many toolchains.
+(적용 불가능) 이는 일반적으로 검사할 수 없는 이론적인 규칙(philosophical guide)이다.
+특정 분야에 맞춰서 검사하는 (잠금 해제 검사처럼) 도구들은 이미 여러 도구에 존재한다.
 
 ### <a name="Ri-ensures"></a>I.8: Prefer `Ensures()` for expressing postconditions
 
@@ -553,12 +558,12 @@ checkers) exist for many toolchains.
 
 이상적으로 `Ensures`는 인터페이스의 일부가 되어야 하지만, 쉽게 할 수 있는 작업이 아니다.
 현재로서는 정의 부분(함수 본문)에 위치시킨다.
-Once language support becomes available (e.g., see the [contract proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) we will adopt the standard version of preconditions, postconditions, and assertions.
+언어에서 이를 지원할 수 있게 된다면 (참고: [contract 제안서](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) 표준에 맞는 사전조건, 사후조건, 단정문을 적용하게 될 것이다.
 
 ##### Enforcement
 
 (적용 불가능) 사후 조건을 단정할 수 있는 다양한 방식을 찾는 것은 실현 가능하지 않다. 
-Warning about those that can be easily identified (`assert()`) has questionable value in the absence of a language facility.
+쉽게 확인할 수 있는 것들(`assert()`)에 대해 경고하는 것은 언어 기능이 없는 상황에서는 미심쩍을 수 있다.
 
 ### <a name="Ri-concepts"></a>I.9: If an interface is a template, document its parameters using concepts
 
@@ -586,7 +591,9 @@ Warning about those that can be easily identified (`assert()`) has questionable 
 `//`가 제거되면 대부분의 컴파일러가 `requires` 구문을 검사할 수 있을 것이다.
 현재 Concept은 GCC 6.1과 그 이후 버전에서 지원된다.
 
-**See also**: [제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 보라
+##### See Also
+
+[제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 보라
 
 ##### Enforcement
 
@@ -603,10 +610,10 @@ Warning about those that can be easily identified (`assert()`) has questionable 
 ##### Example
 
 ```c++
-    int printf(const char* ...);    // bad: return negative number if output fails
+    int printf(const char* ...);    // 나쁜 코드: 출력에 실패하면 음수를 반환한다
 
     template <class F, class ...Args>
-    // good: throw system_error if unable to start the new thread
+    // 좋은 코드: 새 스레드를 시작하지 못하면 system_error를 던진다
     explicit thread(F&& f, Args&&... args);
 ```
 
@@ -638,8 +645,8 @@ Warning about those that can be easily identified (`assert()`) has questionable 
     // ... use val ...
 ```
 
-This style unfortunately leads to uninitialized variables.
-A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0144r1.pdf) to deal with that will become available in C++17.
+안타깝게도 이런 코드 스타일은 초기화되지 않은 변수를 만들게 한다.
+이에 대응하기 위한 [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0144r1.pdf)기능이 C++17에서부터 사용 가능하다.
 
 ```c++
     auto [val, error_code] = do_something();
@@ -656,15 +663,16 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
 * 명시적인 오류 검사 및 처리는 종종 예외 처리만큼 많은 시간과 공간을 쓰기도 한다.
 * 간결한 코드는 종종 예외 처리를 포함하더라도 더 좋은 성능을 갖는다. (프로그램과 최적화를 통해 실행 경로를 단순화한다.)
 * 성능이 중요한 코드의 좋은 규칙은 오류 검사를 코드의 핵심 부분 바깥으로 옮기는 것이다 ([검사](#Rper-checking)).
-* 장기적으로 보면 정규 코드가 더 잘 최적화된다.
-* Always carefully [measure](#Rper-measure) before making performance claims.
+* 장기적으로 보면 정돈된(regular) 코드가 더 잘 최적화된다.
+* 성능에 대해 지적하기 전에는 항상 신중하게 [측정하라](#Rper-measure).
 
-**See also**: 사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
+##### See Also
+사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
 
 ##### Enforcement
 
 * (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다
-* `errno`를 살펴 봐라
+* `errno`를 탐색한다
 
 ### <a name="Ri-raw"></a>I.11: Never transfer ownership by a raw pointer (`T*`) or reference (`T&`)
 
@@ -697,11 +705,13 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
     }
 ```
 
-**Alternative**: [Pass ownership](#Rr-smartptrparam) using a "smart pointer", such as `unique_ptr` (for exclusive ownership) and `shared_ptr` (for shared ownership).
-However, that is less elegant and often less efficient than returning the object itself,
-so use smart pointers only if reference semantics are needed.
+##### Alternative
 
-**Alternative**: ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코드를 수정할 수 없는 경우가 있다.
+[소유권 전달](#Rr-smartptrparam)은 배타적 소유를 위한 `unique_ptr`와 공유를 위한 `shared_ptr` 같은 스마트 포인터를 사용하라.
+하지만 이는 개체 그 자체를 반환하는 것보다 덜 아름답고 덜 효율적이다.
+오직 참조로 사용하도록 할때만 스마트 포인터를 사용하라.
+
+ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코드를 수정할 수 없는 경우가 있다.
 이 경우, [가이드라인 지원 라이브러리](#S-gsl)의 `owner`를 사용해 포인터의 소유권을 표시하라:
 
 ```c++
@@ -720,17 +730,21 @@ so use smart pointers only if reference semantics are needed.
 
 ##### Note
 
-처리되지 않은 포인터(또는 반복자)로 전달된 모든 개체는 호출자가 소유한 것으로 간주되므로 호출자가 수명을 처리한다. Viewed another way:
-ownership transferring APIs are relatively rare compared to pointer-passing APIs,
-so the default is "no ownership transfer."
+처리되지 않은 포인터(또는 반복자)로 전달된 모든 개체는 호출자가 소유한 것으로 간주되므로 호출자가 수명을 처리한다.  
+다른 관점에서 보자면: 소유권을 전달하는 API는 포인터를 전달하는 API에 비해 상대적으로 적다. 
+그러니 일반적으로 내재된(default) 의미는 "소유권을 전달하지 않는" 것이다.
 
-**See also**: [Argument passing](#Rf-conventional), [use of smart pointer arguments](#Rr-smartptrparam), and [value return](#Rf-value-return).
+##### See Also
+
+* [인자 전달](#Rf-conventional)
+* [스마트 포인터의 사용](#Rr-smartptrparam)
+* [값 반환](#Rf-value-return)
 
 ##### Enforcement
 
-* (간단함) `owner`가 아닌 처리되지 않은 포인터의 `delete`에 대해 경고를 표시하라.
-* (간단함) 모든 코드 경로에서 `owner` 포인터를 `reset`하거나 명시적으로 `delete`를 실패하게 되면 경고를 표시하라.
-* (간단함) `new`의 반환 값이나 포인터 타입의 반환 값을 갖는 함수 호출이 처리되지 않은 포인터에 할당되면 경고를 표시하라.
+* (간단함) `owner`가 아닌 처리되지 않은 포인터의 `delete`에 대해 경고하라
+* (간단함) 모든 코드 경로에서 `owner` 포인터를 `reset`하거나 명시적으로 `delete`를 실패하게 되면 경고하라
+* (간단함) `new`의 반환 값이나 포인터 타입의 반환 값을 갖는 함수 호출이 처리되지 않은 포인터에 할당되면 경고하라
 
 ### <a name="Ri-nullptr"></a>I.12: Declare a pointer that must not be null as `not_null`
 
@@ -742,13 +756,13 @@ so the default is "no ownership transfer."
 ##### Example
 
 ```c++
-    int length(const char* p);            // it is not clear whether length(nullptr) is valid
+    int length(const char* p);            // nullptr를 사용할 수 있는지 분명하지 않다.
+    
+    length(nullptr);                      // 이렇게 사용해도 괜찮을까?
 
-    length(nullptr);                      // OK?
+    int length(not_null<const char*> p);  // 좀 더 낫다: p가 nullptr가 되면 안된다는 것을 알 수 있다.
 
-    int length(not_null<const char*> p);  // better: we can assume that p cannot be nullptr
-
-    int length(const char* p);            // we must assume that p can be nullptr
+    int length(const char* p);            // p가 nullptr가 될수 있다고 가정해야 한다.
 ```
 
 소스 코드에 의도를 명시함으로써, 컴파일러와 툴이 정적 분석을 통해 일부 오류 클래스를 찾아내는 등의 보다 나은 진단을 제공하고 분기 및 널(NULL) 검사를 제거하는 등의 최적화 작업을 수행할 수 있다.
@@ -771,33 +785,34 @@ so the default is "no ownership transfer."
 
 ##### Enforcement
 
-* (간단함) ((기초)) 함수가 모든 제어-흐름 경로에서 포인터 매개 변수에 접근하기 전에 `nullptr`인지 검사한다면, `not_null`으로 선언되어야 한다는 경고하라
+* (간단함) ((기본사항)) 함수가 모든 제어-흐름 경로에서 포인터 매개 변수에 접근하기 전에 `nullptr`인지 검사한다면, `not_null`으로 선언되어야 한다는 경고하라
 * (복잡함) 포인터 반환 값을 갖는 함수가 모든 반환 경로에서 `nullptr`이 아닌지 확인한다면, 리턴 타입을 `not_null`으로 선언해야 된다는 경고하라
 
 ### <a name="Ri-array"></a>I.13: Do not pass an array as a single pointer
 
 ##### Reason
 
-(포인터, 크기)-스타일 인터페이스는 오류가 발생하기 쉽다. 또한 (배열에 대한) 일반 포인터는 호출을 받는 곳에서 크기를 결정할 수 있도록 몇 가지 관례에 의존해야 한다.
+(포인터, 크기)-스타일 인터페이스는 오류가 발생하기 쉽다.
+또한 (배열에 대한) 일반 포인터는 피호출자에서 크기를 결정할 수 있도록 몇 가지 관례에 의존해야 한다.
 
 ##### Example
 
 다음을 고려해 보자:
 
 ```c++
-    void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
+    void copy_n(const T* p, T* q, int n); // [p:p+n)에서 [q:q+n)로 복사한다
 ```
 
-만약 `q`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 덮어쓰게 된다.
-만약 `p`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 읽을 것이다.
+만약 `q`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 덮어쓰게 된다.  
+만약 `p`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 읽을 것이다.  
 어느 쪽이나 정의되지 않은 동작을 수행하거나 매우 불쾌한 버그가 발생할 수 있다.
 
 ##### Alternative
 
-명시적인 범위 사용을 고려해 보라:
+명시적인 범위(`span`) 사용을 고려해 보라:
 
 ```c++
-    void copy(span<const T> r, span<T> r2); // copy r to r2
+    void copy(span<const T> r, span<T> r2); // r에서 r2로 복사한다
 ```
 
 ##### Example, bad
@@ -805,17 +820,21 @@ so the default is "no ownership transfer."
 다음을 고려해 보자:
 
 ```c++
-    void draw(Shape* p, int n);  // poor interface; poor code
+    void draw(Shape* p, int n);  // 허접한(poor) 인터페이스는 허접한 코드를 낳는다.
     Circle arr[10];
     // ...
     draw(arr, 10);
 ```
 
 `n`의 인수로 `10`을 전달하는 것은 실수일 수 있다. 가장 일반적인 관례는 \[`0`:`n`)이라고 가정하는 것이지만, 이러한 내용이 어디에도 언급되어 있지 않다.
-더 나쁜 부분은 어쨌든 `draw()` 호출이 컴파일된다는 것이다. 배열에서 포인터로의 암시적 변환(배열 부패)이 있었고, `Circle`에서 `Shape`로의 또 다른 암시적 변환이 있었다.
-`draw()`가 그 배열을 통해 안전하게 반복문을 수행할 수 있는 방법은 없다. 왜냐하면 요소의 크기를 알 수 있는 방법이 없기 때문이다.
+더 나쁜 부분은 어쨌든 `draw()` 호출이 컴파일된다는 것이다.
+배열에서 포인터로의 암시적 변환(배열 부패(array decay))이 있었고, `Circle`에서 `Shape`로의 또 다른 암시적 변환이 있었다.
+`draw()`가 그 배열을 통해 안전하게 반복문을 수행할 수 있는 방법은 없다.
+왜냐하면 요소의 크기를 알 수 있는 방법이 없기 때문이다.
 
-**Alternative**: 요소의 크기한계를 보장하고 위험한 암시적 변환을 방지하는 지원 클래스를 사용하라.
+##### Alternative
+
+요소의 크기한계를 보장하고 위험한 암시적 변환을 방지하는 지원 클래스를 사용하라.
 
 예를 들어:
 
@@ -823,11 +842,11 @@ so the default is "no ownership transfer."
     void draw2(span<Circle>);
     Circle arr[10];
     // ...
-    draw2(span<Circle>(arr));  // deduce the number of elements
-    draw2(arr);    // deduce the element type and array size
+    draw2(span<Circle>(arr));   // 원소의 개수를 알 수 있다(deduce)
+    draw2(arr);                 // 원소 타입과 배열의 길이를 알 수 있다
 
     void draw3(span<Shape>);
-    draw3(arr);    // error: cannot convert Circle[10] to span<Shape>
+    draw3(arr);    // 오류: Circle[10]는 span<Shape>가 될 수 없다.
 ```
 
 이 `draw2()`는 같은 양의 정보를 `draw()`에 전달하지만, 명시적으로 `Circle`이 되어야 한다는 사실을 알 수 있다.
@@ -835,7 +854,7 @@ so the default is "no ownership transfer."
 ##### Exception
 
 `zstring`과 `czstring`을 사용해 C-스타일의 `\0`로 끝나는 문자열을 나타내라.
-But when doing so, use `string_span` from the [GSL](#GSL) to prevent range errors.
+하지만 이렇게 할때는 범위 오류가 발생하지 않도록 [GSL](#GSL)의 `string_span`를 사용하라.
 
 ##### Enforcement
 
@@ -846,7 +865,7 @@ But when doing so, use `string_span` from the [GSL](#GSL) to prevent range error
 
 ##### Reason
 
-Complex initialization can lead to undefined order of execution.
+복잡한 초기화는 실행 순서를 불분명(undefined order)하게 한다.
 
 ##### Example
 
@@ -860,19 +879,19 @@ Complex initialization can lead to undefined order of execution.
     const X x = g(y);   // read y; write x
 ```
 
-Since `x` and `y` are in different translation units the order of calls to `f()` and `g()` is undefined;
-one will access an uninitialized `const`.
-This shows that the order-of-initialization problem for global (namespace scope) objects is not limited to global *variables*.
+`x`와 `y`가 서로 다른 파일(translation units)에 있기 때문에, `f()`와 `g()`의 호출 순서는 알 수 없다;
+둘 중 하나가 초기화되지 않은 `const`에 접근할 수 있다.
+이는 전역 개체들의 초기화 순서 문제가 *변수*에만 한정된것이 아님을 보여준다.
 
 ##### Note
 
-Order of initialization problems become particularly difficult to handle in concurrent code.
-It is usually best to avoid global (namespace scope) objects altogether.
+동시성을 고려한 코드에서 초기화 순서 문제는 특히 다루기가 어렵다.
+대부분의 경우 전역 개체를 사용하지 않는 것이 최선의 해결책이다.
 
 ##### Enforcement
 
-* Flag initializers of globals that call non-`constexpr` functions
-* Flag initializers of globals that access `extern` objects
+* 비 `constexpr` 함수를 호출하는 전역 초기화를 지적한다.
+* `extern` 개체에 접근하는 전역 초기화를 지적한다.
 
 ### <a name="Ri-nargs"></a>I.23: Keep the number of function arguments low
 
