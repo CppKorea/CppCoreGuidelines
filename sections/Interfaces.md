@@ -902,16 +902,13 @@ ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코�
 
 ##### Discussion
 
-The two most common reasons why functions have too many parameters are:
+함수가 너무 많은 매개변수를 가질때는 보통 2가지 이유가 있다:
 
-1. *Missing an abstraction.*
-   There is an abstraction missing, so that a compound value is being
-   passed as individual elements instead of as a single object that enforces an invariant.
-   This not only expands the parameter list, but it leads to errors because the component values
-   are no longer protected by an enforced invariant.
-
-2. *Violating "one function, one responsibility."*
-   The function is trying to do more than one job and should probably be refactored.
+1. *추상화 되지 않음*  
+   추상화를 하지 않았기 때문에 불변조건이 있는 단일 개체가 아니라 복잡하고 개별적인 형태로 값들이 전달되고 있는 것이다.
+   이는 인자 목록을 길게 만들 뿐만 아니라 인자들이 불변조건으로 보호되지 않기 때문에 오류로 이어질 가능성도 높다.
+2. *"하나의 함수가 한가지 일만 한다"는 규칙을 위반"*  
+    해당 함수가 하나를 초과하는 작업을 하고 있다. 이는 고쳐서 다시 작성해야(refactored) 한다.
 
 ##### Example
 
@@ -924,10 +921,11 @@ The two most common reasons why functions have too many parameters are:
                          OutputIterator result, Compare comp);
 ```
 
-Note that this is because of problem 1 above -- missing abstraction. Instead of passing a range (abstraction), STL passed iterator pairs (unencapsulated component values).
+앞서 지적한 1번 문제점에 해당한다 -- 
+추상화가 되지 않은 것이다. STL에서 범위(추상화된 개념)를 전달하지 않고 반복자 쌍(pair)들을 전달한다. 이는 캡슐화되지 않은 값들(unencapsulated component values)에 해당한다.
 
-여기에 4개의 템플릿 인자와 6개의 함수 인자가 있다.
-To simplify the most frequent and simplest uses, the comparison argument can be defaulted to `<`:
+여기에는 4개의 템플릿 인자와 6개의 함수 인자가 있다.
+가장 자주 보이고 단순한 사용법을 단순화하기 위해, 인자의 기본 비교를 `<`로 정할 수 있다.
 
 ```c++
     template<class InputIterator1, class InputIterator2, class OutputIterator>
@@ -946,7 +944,8 @@ To simplify the most frequent and simplest uses, the comparison argument can be 
 
 인자를 "묶어서" 그룹화하는 것은 인자의 갯수를 줄이고 검사할 기회를 늘리는 일반적인 기법이다.
 
-Alternatively, we could use concepts (as defined by the ISO TS) to define the notion of three types that must be usable for merging:
+다른 방법으로, ISO TS에서 정의한 컨셉(concepts)을 사용할수도 있다.
+세 타입이 merge에 사용될 수 있어야 한다고 정의하는 것이다.
 
 ```c++
     Mergeable{In1, In2, Out}
@@ -955,32 +954,34 @@ Alternatively, we could use concepts (as defined by the ISO TS) to define the no
 
 ##### Example
 
-The safety Profiles recommend replacing
+안전성 분석(safety profile)은 아래와 같은 코드를 
 
 ```c++
-    void f(int* some_ints, int some_ints_length);  // BAD: C style, unsafe
+    void f(int* some_ints, int some_ints_length);  // 나쁨: C 스타일, 안전하지 않다
 ```
 
-with
+아래 처럼 바꾸도록 권장한다
 
 ```c++
-    void f(gsl::span<int> some_ints);              // GOOD: safe, bounds-checked
+    void f(gsl::span<int> some_ints);              // 좋음: 안전하고 범위를 검사한다
 ```
 
-Here, using an abstraction has safety and robustness benefits, and naturally also reduces the number of parameters.
+여기서, 추상화를 사용하면 안전성과 견고함을 얻을 수 있다. 동시에 자연스럽게 인자의 수를 줄이게 된다.
 
 ##### Note
 
 얼마나 많은 인자가 있어야 너무 많다고 말할 수 있을까? 인자가 4개라면 많다고 말할 수 있다.
 4개의 인자로 가장 잘 표현할 수 있는 함수들도 있지만, 많지는 않다.
 
-**Alternative**: Use better abstraction: 인자를 의미있는 개체로 그룹화하고 개체를 전달하라. (값에 의한 전달 또는 레퍼런스에 의한 전달)
+##### Alternative
 
-**Alternative**:  더 적은 인자 갯수로 가장 일반적인 형태의 호출을 할 수 있는 디폴트 인자나 오버로드를 사용하라.
+더 나은 추상화: 인자를 의미있는 개체로 그룹화하고 개체를 전달하라. (값에 의한 전달 또는 레퍼런스에 의한 전달)
+
+더 적은 인자 갯수로 가장 일반적인 형태의 호출을 할 수 있는 디폴트 인자나 오버로드를 사용하라.
 
 ##### Enforcement
 
-* 범위 또는 뷰가 아닌 동일한 타입의 반복자(포인터 포함)를 2개 이상 선언하는 함수가 있다면 경고를 표시하라.
+* 범위 또는 뷰가 아닌 동일한 타입의 반복자(포인터 포함)를 2개 이상 선언하는 함수가 있다면 경고하라.
 * (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다.
 
 ### <a name="Ri-unrelated"></a>I.24: Avoid adjacent unrelated parameters of the same type
@@ -1007,7 +1008,7 @@ Here, using an abstraction has safety and robustness benefits, and naturally als
 
 ##### Exception
 
-If the order of the parameters is not important, there is no problem:
+만약 매개변수들의 순서가 중요하지 않다면, 문제가 없다:
 
 ```c++
     int max(int a, int b);
@@ -1023,7 +1024,7 @@ If the order of the parameters is not important, there is no problem:
 
 ##### Alternative
 
-Define a `struct` as the parameter type and name the fields for those parameters accordingly:
+`struct`를 매개변수 타입으로 정의하고 각 필드의 이름을 매개변수들에 따라 부여하라.
 
 ```c++
     struct SystemParams {
@@ -1034,8 +1035,8 @@ Define a `struct` as the parameter type and name the fields for those parameters
     void initialize(SystemParams p);
 ```
 
-This tends to make invocations of this clear to future readers, as the parameters
-are often filled in by name at the call site.
+이는 호출 지점에서 (멤버들의) 이름을 통해 값을 부여함으로써 
+나중에 코드를 읽을 사람들에게 호출을 이해하기 쉽게 한다.
 
 ##### Enforcement
 
@@ -1045,11 +1046,11 @@ are often filled in by name at the call site.
 
 ##### Reason
 
-추상 클래스는 상태가 있는 베이스 클래스보다 안정적이다.
+추상 클래스는 상태가 있는 부모 클래스보다 안정적이다.
 
 ##### Example, bad
 
-당신은 `Shape`가 어디선가 나타날 것이라고 알고 있었을 것이다. :-)
+당신은 `Shape`예제를 쓸 것이라고 예상했을 것이다. :-)
 
 ```c++
     class Shape {  // bad: interface class loaded with data
@@ -1085,7 +1086,7 @@ are often filled in by name at the call site.
 
 ##### Enforcement
 
-(간단함) `C` 클래스를 가리키는 포인터가 `C`의 베이스를 가리키는 포인터에 할당되고 베이스 클래스에 데이터 멤버가 있으면 경고를 표시하라.
+(간단함) `C` 클래스를 가리키는 포인터가 `C`의 베이스를 가리키는 포인터에 할당되고 베이스 클래스에 데이터 멤버가 있으면 경고하라.
 
 ### <a name="Ri-abi"></a>I.26: If you want a cross-compiler ABI, use a C-style subset
 
@@ -1113,13 +1114,12 @@ are often filled in by name at the call site.
 
 ##### Reason
 
-Because private data members participate in class layout and private member functions participate in overload resolution, changes to those
-implementation details require recompilation of all users of a class that uses them. A non-polymorphic interface class holding a pointer to
-implementation (Pimpl) can isolate the users of a class from changes in its implementation at the cost of an indirection.
+private 데이터는 클래스의 메모리 레이아웃에 영향을 주고 멤버 함수들은 중복정의에 영향을 미치기 때문에, 이런 구현 세부사항이 바뀌는 경우엔 사용자 코드까지 다시 컴파일되어야 한다.
+구현에 대한 포인터(Pimpl)를 사용하는 다형적이지 않은 인터페이스는 간접 참조하는 비용만으로 구현이 바뀌었을때의 여파를 사용자로부터 분리시킬 수 있다.
 
 ##### Example
 
-interface (widget.h)
+인터페이스 (widget.h)
 
 ```c++
     class widget {
@@ -1136,7 +1136,7 @@ interface (widget.h)
     };
 ```
 
-implementation (widget.cpp)
+구현 (widget.cpp)
 
 ```c++
     class widget::impl {
@@ -1153,27 +1153,27 @@ implementation (widget.cpp)
 
 ##### Notes
 
-See [GOTW #100](https://herbsutter.com/gotw/_100/) and [cppreference](http://en.cppreference.com/w/cpp/language/pimpl) for the trade-offs and additional implementation details associated with this idiom.
+이런 방법을 적용했을때의 영향을 이해하려면 
+[GOTW #100](https://herbsutter.com/gotw/_100/)와 [cppreference](http://en.cppreference.com/w/cpp/language/pimpl)를 함께 보라.
 
 ##### Enforcement
 
-(Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
+(적용 불가능) 어느 부분이 ABI의 인터페이스 부분인지 확실히 구분하기 힘들다.
 
 ### <a name="Ri-encapsulate"></a>I.30: Encapsulate rule violations
 
 ##### Reason
 
-To keep code simple and safe.
-Sometimes, ugly, unsafe, or error-prone techniques are necessary for logical or performance reasons.
-If so, keep them local, rather than "infecting" interfaces so that larger groups of programmers have to be aware of the
-subtleties.
-Implementation complexity should, if at all possible, not leak through interfaces into user code.
+코드를 단순하고 안전하게 유지한다.
+때때로 논리적이거나 성능상의 이유로 지저분하고 안전하지 않으며 오류를 일으키기 쉬운 기술들이 필요할 때도 있다.
+그렇다면, 그 코드들은 인터페이스에 노출시키지 말고 지역적으로 유지하라. 이는 보다 많은 프로그래머들이 세세하게 알 필요가 없도록 한다.
+구현의 복잡함은 인터페이스를 통해 사용자 코드에 영향을 주어서는 안된다.
 
 ##### Example
 
-Consider a program that, depending on some form of input (e.g., arguments to `main`), should consume input
-from a file, from the command line, or from standard input.
-We might write
+(`main`의 인자처럼) 특정 형태의 입력에 의존적인 프로그램을 생각해보라.
+이런 프로그램은 파일, 커맨드라인, 혹은 표준 입력으로부터 입력을 받아야 한다.
+아마 이런 코드를 작성할 것이다.
 
 ```c++
     bool owned;
@@ -1186,24 +1186,23 @@ We might write
     istream& in = *inp;
 ```
 
-This violated the rule [against uninitialized variables](#Res-always),
-the rule against [ignoring ownership](#Ri-raw),
-and the rule [against magic constants](#Res-magic).
-In particular, someone has to remember to somewhere write
+이는 [초기화되지 않은 변수를 피하라](#Res-always)는 규칙을 위반한다.
+또한 [소유권을 무시](#Ri-raw)하며, [마법 상수를 피하라](#Res-magic)는 규칙에도 반한다.
+특히, 이 코드는 누군가 어딘가에 아래와 같은 코드를 작성해야 한다는 점을 기억해야만 한다. 
 
 ```c++
     if (owned) delete inp;
 ```
 
-We could handle this particular example by using `unique_ptr` with a special deleter that does nothing for `cin`,
-but that's complicated for novices (who can easily encounter this problem) and the example is an example of a more general
-problem where a property that we would like to consider static (here, ownership) needs infrequently be addressed
-at run time.
-The common, most frequent, and safest examples can be handled statically, so we don't want to add cost and complexity to those.
-But we must also cope with the uncommon, less-safe, and necessarily more expensive cases.
-Such examples are discussed in [[Str15]](http://www.stroustrup.com/resource-model.pdf).
+이 예제에 한해서는 `unique_ptr`를 사용해 `cin`에 필요한 소멸 코드를 처리할 수 있다.
+하지만 이 문제를 접하기 쉬운 초심자(novices)에게는 그런 방법을 기대하기 어렵다. 
+동시에 이 코드는 정적인 속성(이 예시에서는, 소유권)이 실행 시간에 관리되는 일반적인 문제의 한 사례에 불과하다.
 
-So, we write a class
+보편적으로 자주 보이고 안전한 예시들은 정적으로 해결할 수 있기 때문에, 그런 코드에는 비용과 복잡성을 더하고 싶지 않다.
+하지만 보편적이지 않고, 덜 안전한, 그리고 불필요하게 비용이 드는 경우에도 대처해야 한다.
+일례가 [Str15](http://www.stroustrup.com/resource-model.pdf)에서 다루어진다.
+
+결론적으로, 우리는 이런 클래스를 작성할 것이다.
 
 ```c++
     class Istream { [[gsl::suppress(lifetime)]]
@@ -1220,10 +1219,10 @@ So, we write a class
     };
 ```
 
-Now, the dynamic nature of `istream` ownership has been encapsulated.
-Presumably, a bit of checking for potential errors would be added in real code.
+이제 동적으로 결정되는 `istream`의 소유권이 캡슐화 되었다.
+아마 실제로는 잠재적인 오류를 검사하는 코드가 더 추가될 것이다.
 
 ##### Enforcement
 
-* Hard, it is hard to decide what rule-breaking code is essential
-* Flag rule suppression that enable rule-violations to cross interfaces
+* 어렵다. 어떤 (규칙을 위반하는) 코드가 필수적인지 결정하기 어렵다
+* 인터페이스에서 규칙 위반을 허용하도록 제약하는 경우 지적한다.
