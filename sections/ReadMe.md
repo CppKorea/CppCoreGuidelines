@@ -19,42 +19,42 @@
 * 이하의 규칙들은 완성도, 일관성, 시행 가능성 등에 대해서 아직 철저하게 검증되지 않았다
 * (???)로 표시되어 있는 부분은 아직 관련 정보를 기입하지 않았음을 의미한다
 * 참조(Reference) 부분은 갱신이 필요하다; C++11 이전의 오래된 소스 코드들이 아직 많이 있다.
-* 앞으로 해야 할 일에 대한 최신 목록은 [To-do: 미분류 규칙 초안](#S-unclassified)에서 확인할 수 있다
+* 앞으로 해야 할 일에 대한 최신 목록은 [To-do: 미분류 규칙 초안](./Unclassified.md)에서 확인할 수 있다
 
 [이 가이드의 범위와 구조](#S-abstract)를 확인하거나, 읽고 싶은 부분을 클릭해 해당 내용으로 바로 이동할 수 있다.
 
-* [In: 소개](#S-introduction)
-* [P: 철학](#S-philosophy)
-* [I: 인터페이스](#S-interfaces)
-* [F: 함수](#S-functions)
-* [C: 클래스와 클래스 계층 구조](#S-class)
-* [Enum: 열거형](#S-enum)
-* [R: 리소스 관리](#S-resource)
-* [ES: 표현식과 문장](#S-expr)
-* [Per: 성능](#S-performance)
-* [CP: 동시성과 병렬처리](#S-concurrency)
-* [E: 오류 처리](Errors.md)
-* [Con: 상수와 불변성](#S-const)
-* [T: 템플릿과 제너릭 프로그래밍](#S-templates)
-* [CPL: C 스타일 프로그래밍](#S-cpl)
-* [SF: 소스 파일](#S-source)
-* [SL: 표준 라이브러리](#S-stdlib)
+* [In: 소개](./Instruction.md)
+* [P: 철학](./Philosophy.md)
+* [I: 인터페이스](./Interfaces.md)
+* [F: 함수](./Functions.md)
+* [C: 클래스와 클래스 계층 구조](./Class.md)
+* [Enum: 열거형](./Enum.md)
+* [R: 리소스 관리](./Resource.md)
+* [ES: 표현식과 문장](./Expr.md)
+* [Per: 성능](./Performance.md)
+* [CP: 동시성과 병렬처리](./Concurrency.md)
+* [E: 오류 처리](./Errors.md)
+* [Con: 상수와 불변성](./Const.md)
+* [T: 템플릿과 제너릭 프로그래밍](./Templates.md)
+* [CPL: C 스타일 프로그래밍](./CPL.md)
+* [SF: 소스 파일](./Source.md)
+* [SL: 표준 라이브러리](./SL.md)
 
 참고할 만한 내용:
 
-* [A: 설계 아이디어](#S-A)
-* [NR: 규칙이 아닌 것들과 근거없는 이야기들](#S-not)
-* [RF: 참고 자료들](#S-references)
-* [Pro: 프로파일](#S-profile)
-* [GSL: 가이드라인 지원 라이브러리](#S-gsl)
-* [NL: 이름과 만듦새 규칙들](#S-naming)
-* [FAQ: 자주 묻는 질문에 대한 대답](#S-faq)
-* [Appendix A: 라이브러리](#S-libraries)
-* [Appendix B: 모던 C++ 코드](#S-modernizing)
-* [Appendix C: 토론](#S-discussion)
-* [Appendix D: 유용한 도구들](#S-tools)
-* [용어 해설](#S-glossary)
-* [To-do: 미분류 규칙](#S-unclassified)
+* [A: 설계 아이디어](./Architecture.md)
+* [NR: 규칙이 아닌 것들과 근거없는 이야기들](./Not.md)
+* [RF: 참고 자료들](./References.md)
+* [Pro: 프로파일](./Profile.md)
+* [GSL: 가이드라인 지원 라이브러리](./GSL.md)
+* [NL: 이름과 만듦새 규칙들](./Naming.md)
+* [FAQ: 자주 묻는 질문에 대한 대답](./FAQ.md)
+* [Appendix A: 라이브러리](./appendix/Libraries.md)
+* [Appendix B: 모던 C++ 코드](./appendix/Modernizing.md)
+* [Appendix C: 토론](./appendix/DIscussion.md)
+* [Appendix D: 유용한 도구들](./appendix/Tools.md)
+* [용어 해설](./Glossary.md)
+* [To-do: 미분류 규칙](./Unclassified.md)
 
 구체적인 언어 기능과 관련된 규칙들:
 
