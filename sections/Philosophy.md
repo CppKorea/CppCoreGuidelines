@@ -621,8 +621,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 
 ##### Note
 
-개발 속도, 리소스 안정성, 테스트 단순화 등의 목표를 달성하기 위해 소모하는 시간이나 공간은 낭비가 아니다.
-"Another benefit of striving for efficiency is that the process forces you to understand the problem in more depth." - Alex Stepanov
+어떤 목표(예를 들어, 개발 속도, 리소스 안전성, 또는 테스트 단순화)를 달성하기 위해 소모하는 시간과 공간은 낭비가 아니다. "효율성을 위해 노력할 때 얻을 수 있는 또다른 이점은 그러한 행위가 문제를 더 깊이 이해할 수 있도록 강제한다는 겁니다." - Alex Stepanov
 
 ##### Example, bad
 
@@ -662,8 +661,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 
 그렇다. 풍자를 위한 예제이기는 하지만, 실제 코드에서 이보다 심각한 실수도 본 적이 있다.
 `X`의 레이아웃에 (더 많을지도 모르지만) 적어도 6바이트의 낭비가 있다는 점을 주목하라.
-복사 동작을 그럴싸하게 정의해 두다 보니 이동의 의미가 없어져 버렸다. 그래서 반환 동작이 느려졌다.
-(please note that the Return Value Optimization, RVO, is not guaranteed here).
+복사 연산을 그럴싸하게 정의해 두다 보니 이동 연산이 비활성화 됨으로써 반환 연산이 느려졌다(여기에선 반환값 최적화(Return Value Optimization, RVO)가 보장되지 않음에 주목하라).
 `buf`에서 `new`, `delete`의 사용이 중복된다. 진짜 지역 문자열을 원했다면, `string` 지역 변수를 사용했을 것이다.
 더 많은 성능 버그와 상황을 더 복잡하게 만드는 불필요한 문제가 있다.
 
@@ -676,19 +674,20 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
     }
 ```
 
-Yes, this is an example from production code.
-We leave it to the reader to figure out what's wasted.
+그렇다, 이것은 실제 코드로부터 가져온 예제이다.
+우리는 이 예제를 독자가 직접 무엇이 낭비되는지 찾게 하기 위해 남겨둔다.
 
 ##### Note
 
 낭비에 대한 각 예제는 별로 중요하지 않다. 그리고 중요했다면 이미 전문가들이 쉽게 제거했을 것이다.
 그러나 코드 전체에 걸쳐 낭비가 퍼져버리면 중요해 질 수 있고, 낭비를 제거하기 위해서 전문가들을 항상 원하는데로 데려올 수는 없다.
-이 규칙(그리고 보다 구체적인 규칙)의 목적은 C++ 사용과 관련된 대부분의 낭비를 없애기 위해서다.
+이 규칙(그리고 보다 구체적인 규칙)의 목적은 C++ 사용과 관련된 대부분의 낭비를 발생하기 전에 없애기 위해서다.
 그 후에 알고리즘이나 요구 사항과 관련된 낭비를 살펴볼 수 있다. 하지만 그건 이 가이드라인의 범위를 벗어난다.
 
 ##### Enforcement
 
-더 많은 특정 규칙들은 단순함과 쓸데없는 코드의 제거를 전반적인 목표로 하고 있다.
+더 많은 특정 규칙들은 쓸데없는 낭비의 단순화와 제거를 전반적인 목표로 하고 있다.
+* 사용자가 정의한 기본 정의가 아닌 접미 연산자 ++ 또는 -- 함수의 사용하지 않은 반환값에 표시를 한다. 대신 접두 연산자를 사용하는 것이 좋다. (주의: "사용자가 정의한 기본 정의가 아닌"은 잡음을 줄이려는 의도가 있다. 실사용에서 여전히 너무 잡음이 많을때, 이 시행을 검토하라.)
 
 ### <a name="Rp-mutable"></a>P.10: Prefer immutable data to mutable data
 
