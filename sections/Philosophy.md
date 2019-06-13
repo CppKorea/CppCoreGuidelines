@@ -689,16 +689,16 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 더 많은 특정 규칙들은 쓸데없는 낭비의 단순화와 제거를 전반적인 목표로 하고 있다.
 * 사용자가 정의한 기본 정의가 아닌 접미 연산자 ++ 또는 -- 함수의 사용하지 않은 반환값에 표시를 한다. 대신 접두 연산자를 사용하는 것이 좋다. (주의: "사용자가 정의한 기본 정의가 아닌"은 잡음을 줄이려는 의도가 있다. 실사용에서 여전히 너무 잡음이 많을때, 이 시행을 검토하라.)
 
-### <a name="Rp-mutable"></a>P.10: Prefer immutable data to mutable data
+### <a name="Rp-mutable"></a>P.10: 변경 가능한 데이터보다 불변의 데이터를 선호하라
 
 ##### Reason
 
-It is easier to reason about constants than about variables.
-Something immutable cannot change unexpectedly.
-Sometimes immutability enables better optimization.
-You can't have a data race on a constant.
+변수보다는 상수에 대한 것이 추론을 하기가 더 쉽다.
+불변한 것은 예상치 못하게 변하지 않는다.
+때때로 불변성은 더 나은 최적화가 가능하게 한다.
+당신은 상수를 경쟁상태(Race condition)로 만들 수 없다.
 
-See [Con: Constants and immutability](#S-const)
+[Con: 상수와 불변성](./Const.md)을 참조하라.
 
 ### <a name="Rp-library"></a>P.11: Encapsulate messy constructs, rather than spreading through the code
 
