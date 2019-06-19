@@ -700,13 +700,13 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 
 [Con: 상수와 불변성](./Const.md)을 참조하라.
 
-### <a name="Rp-library"></a>P.11: Encapsulate messy constructs, rather than spreading through the code
+### <a name="Rp-library"></a>P.11: 지저분한 구조가 코드를 통해 퍼지기 보단, 캠슐화를 하라.
 
 ##### Reason
 
-Messy code is more likely to hide bugs and harder to write.
-A good interface is easier and safer to use.
-Messy, low-level code breeds more such code.
+지저분한 코드는 버그를 숨기고 쓰기가 더 어렵다.
+좋은 인터페이스는 사용하기 더 쉽고 더 안전하다.
+지저분한, 저수준의 코드는 그런 코드를 더 많이 낳는다.
 
 ##### Example
 
@@ -725,9 +725,9 @@ Messy, low-level code breeds more such code.
     }
 ```
 
-This is low-level, verbose, and error-prone.
-For example, we "forgot" to test for memory exhaustion.
-Instead, we could use `vector`:
+이 것은 저수준이고, 장황하며, 에러가 발생하기 쉽다.
+예를 들어, 우리는 메모리 소모를 테스트하는 것을 잊었다.
+대신, 우리는 `vector`를 사용할 수 있었다:
 
 ```c++
     vector<int> v;
@@ -741,17 +741,17 @@ Instead, we could use `vector`:
 
 ##### Note
 
-The standards library and the GSL are examples of this philosophy.
-For example, instead of messing with the arrays, unions, cast, tricky lifetime issues, `gsl::owner`, etc.,
-that are needed to implement key abstractions, such as `vector`, `span`, `lock_guard`, and `future`, we use the libraries
-designed and implemented by people with more time and expertise than we usually have.
-Similarly, we can and should design and implement more specialized libraries, rather than leaving the users (often ourselves)
-with the challenge of repeatedly getting low-level code well.
-This is a variant of the [subset of superset principle](#R0) that underlies these guidelines.
+표준 라이브러리와 GSL은 이런 철학의 예들 이다.
+예를 들어, `vector`, `span`, `lock_guard`, `future`와 같이 핵심적인 추상화 구현에 필요한, 
+배열들과 유니온들, 캐스팅, 까다로운 생명주기 문제, `gsl::owner` 등으로 지저분하게 하는 대신, 
+우리는 우리보다 전문적이고 더 많은 시간을 투자한 사람들이 설계하고 구현한 라이브러리들을 사용한다.
+마찬가지로, 우리는 사용자들(흔히 우리 자신)을 반복적으로 낮은 수준의 코드를 얻기 쉬운 환경에 버려두지 말고,
+더 전문화된 라이브러리들을 설계하고 구현해야하고 할 수 있다.
+이것은 본 지침의 기초가 되는 [subset of superset principle](Introduction.md#R0)의 변형이다.
 
 ##### Enforcement
 
-* Look for "messy code" such as complex pointer manipulation and casting outside the implementation of abstractions.
+* 복잡한 포인터 조작이나 추상화 구현 밖에서의 캐스팅 같은 "지저분한 코드"를 찾아봐라.
 
 ### <a name="Rp-tools"></a>P.12: Use supporting tools as appropriate
 
