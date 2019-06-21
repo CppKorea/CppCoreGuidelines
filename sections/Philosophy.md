@@ -754,33 +754,33 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 
 * 복잡한 포인터 조작이나 추상화 구현 밖에서의 캐스팅 같은 "지저분한 코드"를 찾아봐라.
 
-### <a name="Rp-tools"></a>P.12: Use supporting tools as appropriate
+### <a name="Rp-tools"></a>P.12: 필요에 따라 지원 도구를 사용하라
 
 ##### Reason
 
-There are many things that are done better "by machine".
-Computers don't tire or get bored by repetitive tasks.
-We typically have better things to do than repeatedly do routine tasks.
+"기계에 의해" 더 잘 될 수 있는 많은 것들이 있다.
+컴퓨터는 반복적인 작업에 의해 지치거나 지루해 하지 않는다.
+우리는 일반적으로 반복적이고 지루한 일을 하는 것보다 더 나은 일을 한다.
 
 ##### Example
 
-Run a static analyzer to verify that your code follows the guidelines you want it to follow.
+정적 분석기를 실행하여 코드가 원하는 지침을 따르는 지 확인하라.
 
 ##### Note
 
-See
+다음을 참고하라.
 
-* [Static analysis tools](???)
-* [Concurrency tools](#Rconc-tools)
-* [Testing tools](???)
+* [정적 분석 도구들](???)
+* [동시설 도구들](#Rconc-tools)
+* [테스팅 도구들](???)
 
-There are many other kinds of tools, such as source code repositories, build tools, etc.,
-but those are beyond the scope of these guidelines.
+소스코드 저장소들, 빌드 도구들등과 같은 많은 다른 종류의 도구들이 있다.
+그러나 그것들에 대해 설명하는 것은 이 가이드라인의 범위를 벗어난다.
 
 ##### Note
 
-Be careful not to become dependent on over-elaborate or over-specialized tool chains.
-Those can make your otherwise portable code non-portable.
+지나치게 정교하거나 지나치게 특수화 된 툴 체인에 의존하지 않도록 주의하라.
+그것들은 당신의 이식가능한 코드를 이식이 불가능하도록 만들 수 있다.
 
 ### <a name="Rp-lib"></a>P.13: Use support libraries as appropriate
 
