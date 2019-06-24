@@ -43,3 +43,4 @@
 * [niov64](https://github.com/niov64)
 * Ji-hoon Lee ([nochoco-lee](https://github.com/nochoco-lee))
 * Honggyu Kim ([honggyukim](https://github.com/honggyukim))
+* Seungho Jeong ([snghojeong](https://github.com/snghojeong))
