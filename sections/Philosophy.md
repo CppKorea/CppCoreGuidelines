@@ -754,7 +754,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 
 * 복잡한 포인터 조작이나 추상화 구현 밖에서의 캐스팅 같은 "지저분한 코드"를 찾아봐라.
 
-### <a name="Rp-tools"></a>P.12: 필요에 따라 지원 도구를 사용하라
+### <a name="Rp-tools"></a>P.12: 필요에 맞게 지원 도구를 사용하라
 
 ##### Reason
 
