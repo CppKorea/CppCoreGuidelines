@@ -771,7 +771,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 다음을 참고하라.
 
 * [정적 분석 도구들](???)
-* [동시설 도구들](#Rconc-tools)
+* [동시성 도구들](#Rconc-tools)
 * [테스팅 도구들](???)
 
 소스코드 저장소들, 빌드 도구들등과 같은 많은 다른 종류의 도구들이 있다.
