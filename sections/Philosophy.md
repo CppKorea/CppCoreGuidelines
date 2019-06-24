@@ -764,7 +764,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 
 ##### Example
 
-정적 분석기를 실행하여 코드가 원하는 지침을 따르는 지 확인하라.
+정적 분석기를 실행하여 코드가 원하는 지침(Guideline)을 따르는 지 확인하라.
 
 ##### Note
 
