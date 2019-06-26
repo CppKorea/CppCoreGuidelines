@@ -782,15 +782,14 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 지나치게 정교하거나 지나치게 특수화 된 툴 체인에 의존하지 않도록 주의하라.
 그것들은 당신의 이식가능한 코드를 이식이 불가능하도록 만들 수 있다.
 
-### <a name="Rp-lib"></a>P.13: Use support libraries as appropriate
+### <a name="Rp-lib"></a>P.13: 필요에 맞게 라이브러리들을 사용하라
 
 ##### Reason
 
-Using a well-designed, well-documented, and well-supported library saves time and effort;
-its quality and documentation are likely to be greater than what you could do
-if the majority of your time must be spent on an implementation.
-The cost (time, effort, money, etc.) of a library can be shared over many users.
-A widely used library is more likely to be kept up-to-date and ported to new systems than an individual application.
+잘 설계되고(well-designed), 잘 문서화된(well-documented) 그리고 잘 지원되는(well-supported) 라이브러리들을 사용하는 것은 시간과 노력을 절약한다.
+만약에 당신의 대부분의 시간을 구현에 써야만 한다면, 이것의 품질과 문서는 당신이 만드는 것보다 더 좋을 것이다.
+라이브러리의 비용(시간, 노력, 돈, 등등)은 많은 사용자들과 공유될 수 있다.
+널리 사용되는 라이브러리는 개개의 어플리케이션에 비해, 최신으로 유지되고 새로운 시스템에 포팅이 더 잘되어 있을 것이다.
 Knowledge of a widely-used library can save time on other/future projects.
 So, if a suitable library exists for your application domain, use it.
 
