@@ -2,7 +2,7 @@
 
 표현식(expression)과 구문(statement)은 행위와 연산에 대해 표현하는 가장 직접적인 방법들이다. 구문은 지역 유효범위 내에서 선언하는 것을 말한다.
 
-이름 짓기와 주석, 들여쓰기 규칙에 대해서는, [NL: Naming and layout](#S-naming)을 참고하라.
+이름 짓기와 주석, 들여쓰기 규칙에 대해서는, [NL: Naming and layout](./Naming.md#S-naming)을 참고하라.
 
 일반적인 규칙:
 
