@@ -22,11 +22,11 @@
 * [ES.20: 항상 개체를 초기화하라](#Res-always)
 * [ES.21: 사용할 필요가 없을 때 변수나 상수를 선언하지 마라](#Res-introduce)
 * [ES.22: 변수를 초기화할 값이 생길 때까지 선언하지 마라](#Res-init)
-* [ES.23: `{}`초기화 문법을 사용하라](#Res-list)
-* [ES.24: Use a `unique_ptr<T>` to hold pointers](#Res-unique)
+* [ES.23: `{}` 초기화 문법을 사용하라](#Res-list)
+* [ES.24: 포인터는 `unique_ptr<T>`에 담아라](#Res-unique)
 * [ES.25: 값을 변경하지 않는다면 개체를 `const` 혹은 `constexpr`로 선언하라](#Res-const)
 * [ES.26: 서로 상관없는 목적에 하나의 변수를 사용하지 마라](#Res-recycle)
-* [ES.27: `std::array`나 `stack_array`를 사용하라](#Res-stack)
+* [ES.27: 스택에서 사용되는 배열은 `std::array`나 `stack_array`를 사용하라](#Res-stack)
 * [ES.28: 복잡한 초기화, 특히 `const` 변수의 초기화에는 람다를 사용하라](#Res-lambda-init)
 * [ES.30: 프로그램 텍스트를 바꾸기 위해 매크로를 사용하지 마라](#Res-macros)
 * [ES.31: 매크로를 상수나 "함수"에 사용하지 마라](#Res-macros2)
@@ -934,7 +934,7 @@ used-before-set의 위험을 감수하지 마라.
 
 ```c++
     string s;
-    // ... no use of s here ...
+    // ... s 를 사용하지 않는 부분 ...
     s = "what a waste";
 ```
 
@@ -959,22 +959,21 @@ used-before-set의 위험을 감수하지 마라.
     // that this isn't done too early can be enforced statically with only control flow
 ```
 
-This would be fine if there was a default initialization for `SomeLargeType` that wasn't too expensive.
-Otherwise, a programmer might very well wonder if every possible path through the maze of conditions has been covered.
-If not, we have a "use before set" bug. This is a maintenance trap.
+`SomeLargeType`의 기본 초기화 비용이 크다면 이 코드는 괜찮다고 할 수 있다.
+그렇지 않다면, 어떤 프로그래머는 저 복잡한 조건 속에서 모든 경우가 고려되었는지 의심할 것이다. 만약 허점이 있다면, "use before set" 버그가 된다. 유지보수의 함정인 것이다.
 
-For initializers of moderate complexity, including for `const` variables, consider using a lambda to express the initializer; see [ES.28](#Res-lambda-init).
+중간정도 복잡한 초기화에 대해서는, `const` 변수를 포함해서, 초기화에 람다를 사용하는 것을 고려해보라; [ES.28](#Res-lambda-init)를 참고하라.
 
 ##### Enforcement
 
-* Flag declarations with default initialization that are assigned to before they are first read.
-* Flag any complicated computation after an uninitialized variable and before its use.
+* 처음 개체의 값을 읽기 전에 값을 대입하는 경우, 해당 개체가 기본 초기화로 선언되었으면 지적하라
+* 초기화되지 않은 변수의 선언 이후에, 변수를 사용하기 전에 복잡한 처리(computation)이 있으면 지적하라
 
-### <a name="Res-list"></a>ES.23: Prefer the `{}` initializer syntax
+### <a name="Res-list"></a>ES.23: `{}` 초기화 문법을 사용하라
 
 ##### Reason
 
-The rules for `{}` initialization are simpler, more general, less ambiguous, and safer than for other forms of initialization.
+`{}` 초기화를 사용하라는 규칙은 쉽고, 더 일반적이며, 덜 모호하고, 다른 초기화 형태에 비해 안전하다.
 
 ##### Example
 
@@ -985,7 +984,8 @@ The rules for `{}` initialization are simpler, more general, less ambiguous, and
 
 ##### Exception
 
-For containers, there is a tradition for using `{...}` for a list of elements and `(...)` for sizes:
+컨테이너 타입들에 대해서는, `{...}`를 원소들을 나열하기 위해 사용하고 `(...)`는 크기를 나타내는데 사용한다는 전통(tradition)이 있다:
+
 ```c++
     vector<int> v1(10);    // vector of 10 elements with the default value 0
     vector<int> v2 {10};   // vector of 1 element with the value 10
@@ -993,7 +993,7 @@ For containers, there is a tradition for using `{...}` for a list of elements an
 
 ##### Note
 
-`{}`-initializers do not allow narrowing conversions.
+`{}` 초기화는 값의 범위가 줄어드는 타입변환(narrowing conversion)을 허용하지 않는다.
 
 ##### Example
 
@@ -1004,10 +1004,13 @@ For containers, there is a tradition for using `{...}` for a list of elements an
 
 ##### Note
 
-`{}` initialization can be used for all initialization; other forms of initialization can't:
+`{}` 초기화는 다른 형태의 초기화와 달리 모든 경우의 초기화에 사용될 수 있다:
+
 ```c++
     auto p = new vector<int> {1, 2, 3, 4, 5};   // initialized vector
-    D::D(int a, int b) :m{a, b} {   // member initializer (e.g., m might be a pair)
+
+    D::D(int a, int b) :m{a, b} {   // member initializer 
+                                    // (e.g., m might be a pair)
         // ...
     };
     X var {};   // initialize var to be empty
@@ -1019,23 +1022,26 @@ For containers, there is a tradition for using `{...}` for a list of elements an
 
 ##### Note
 
-Initialization of a variable declared using `auto` with a single value, e.g., `{v}`, had surprising results until C++17.
-The C++17 rules are somewhat less surprising:
+`auto`로 선언한 변수를 하나의 값으로 초기화 하는것, 예를 들어, `{v}`형태는 C++ 17 이전까지는 예상밖의 결과를 낳는다.
+C++ 17의 규칙은 상대적으로 덜 놀랍다:
+
 ```c++
-    auto x1 {7};        // x1 is an int with the value 7
+    auto x1 {7};    // x1 is an int with the value 7
     auto x2 = {7};  // x2 is an initializer_list<int> with an element 7
 
     auto x11 {7, 8};    // error: two initializers
     auto x22 = {7, 8};  // x2 is an initializer_list<int> with elements 7 and 8
 ```
-So use `={...}` if you really want an `initializer_list<T>`
+
+따라서 `initializer_list<T>`를 의도했다면 `={...}`를 사용하라.
+
 ```c++
     auto fib10 = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55};   // fib10 is a list
 ```
 
 ##### Note
 
-Old habits die hard, so this rule is hard to apply consistently, especially as there are so many cases where `=` is innocent.
+오래된 습관은 지우기 어렵다는 것을 생각하면, 이 규칙은 꾸준히 적용하기는 어렵다. 특히 `=`에 문제가 없는 경우가 너무나도 많다.
 
 ##### Example
 
@@ -1051,22 +1057,21 @@ Old habits die hard, so this rule is hard to apply consistently, especially as t
         // ...
     }
 ```
-**See also**: [Discussion](#???)
 
 ##### Enforcement
 
-Tricky.
+까다롭다(Tricky).
 
-* Don't flag uses of `=` for simple initializers.
-* Look for `=` after `auto` has been seen.
+* 단순한 초기화를 위한 `=`는 지적하지 않는다
+* `auto` 이후에 `=`가 사용된 경우를 찾는다
 
-### <a name="Res-unique"></a>ES.24: Use a `unique_ptr<T>` to hold pointers
+### <a name="Res-unique"></a>ES.24: 포인터는 `unique_ptr<T>`에 담아라
 
 ##### Reason
 
-Using `std::unique_ptr` is the simplest way to avoid leaks. It is reliable, it
-makes the type system do much of the work to validate ownership safety, it
-increases readability, and it has zero or near zero run-time cost.
+`std::unique_ptr`는 누수를 피하기 위한 가장 쉬운 방법이다.
+이 방법은 믿을 수 있고, 타입 시스템이 안전한 소유권 관리를 위해 일하도록 만든다.
+가독성을 향상시키고 실행시간 비용이 0에 가깝다.
 
 ##### Example
 
@@ -1083,14 +1088,15 @@ increases readability, and it has zero or near zero run-time cost.
         // ...
     }
 ```
+
 If `leak == true` the object pointed to by `p2` is leaked and the object pointed to by `p1` is not.
 The same is the case when `at()` throws.
 
 ##### Enforcement
 
-Look for raw pointers that are targets of `new`, `malloc()`, or functions that may return such pointers.
+`new`, `malloc()` 혹은 그 결과를 반환하는 함수의 대상이 되는 원시 포인터를 찾는다.
 
-### <a name="Res-const"></a>ES.25: Declare an object `const` or `constexpr` unless you want to modify its value later on
+### <a name="Res-const"></a>ES.25: 값을 변경하지 않는다면 개체를 `const` 혹은 `constexpr`로 선언하라
 
 ##### Reason
 
@@ -1112,7 +1118,7 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
 변수가 실제로 값이 바뀌는지 안 바뀌는지 보고 바뀐다면 지적한다.
 불행하게도, `const`가 아닌 개체가 값을 바꾸려 *의도*했는지 찾아내는 것은 불가능하다.
 
-### <a name="Res-recycle"></a>ES.26: Don't use a variable for two unrelated purposes
+### <a name="Res-recycle"></a>ES.26: 서로 상관없는 목적에 하나의 변수를 사용하지 마라
 
 ##### Reason
 
@@ -1131,7 +1137,10 @@ Look for raw pointers that are targets of `new`, `malloc()`, or functions that m
 
 ##### Note
 
-As an optimization, you may want to reuse a buffer as a scratch pad, but even then prefer to limit the variable's scope as much as possible and be careful not to cause bugs from data left in a recycled buffer as this is a common source of security bugs.
+초기화를 위해서, buffer를 재사용하고 싶을수도 있다.
+하지만 그렇더라도 변수의 범위를 최대한 제한하고 buffer에 남겨진 데이터로 인해 버그가 발생하지 않도록 주의하라.
+재사용된 버퍼는 보안관련 버그의 원인이 되기도 한다.
+
 ```c++
     void write_to_file() {
         std::string buffer;             // to avoid reallocations on every loop iteration
@@ -1154,7 +1163,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 
 재활용되는 변수가 있다면 지적한다.
 
-### <a name="Res-stack"></a>ES.27: Use `std::array` or `stack_array` for arrays on the stack
+### <a name="Res-stack"></a>ES.27: 스택에서 사용되는 배열은 `std::array`나 `stack_array`를 사용하라
 
 ##### Reason
 
@@ -1198,10 +1207,10 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
 
 ##### Enforcement
 
-* 상수 길이를 가지지 않는 배열이라면 표시한다. (C 언어의 가변길이배열(VLA))
+* 상수 길이를 가지지 않는 배열이라면 지적한다. (C 언어의 가변길이배열(VLA))
 * 배열 길이로 지역 상수를 사용하지 않으면 지적한다
 
-### <a name="Res-lambda-init"></a>ES.28: Use lambdas for complex initialization, especially of `const` variables
+### <a name="Res-lambda-init"></a>ES.28: 복잡한 초기화, 특히 `const` 변수의 초기화에는 람다를 사용하라
 
 ##### Reason
 
@@ -1243,6 +1252,7 @@ As an optimization, you may want to reuse a buffer as a scratch pad, but even th
         return s;
     }(); // note ()
 ```
+
 가능하다면 `enum`같은 쉬운 방법으로 조건을 줄여라. 분기 선택과 초기화를 뒤섞어선 안된다.
 
 ##### Enforcement
