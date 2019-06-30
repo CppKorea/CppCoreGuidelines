@@ -28,24 +28,24 @@
 * [ES.26: 서로 상관없는 목적에 하나의 변수를 사용하지 마라](#Res-recycle)
 * [ES.27: 스택에서 사용되는 배열은 `std::array`나 `stack_array`를 사용하라](#Res-stack)
 * [ES.28: 복잡한 초기화, 특히 `const` 변수의 초기화에는 람다를 사용하라](#Res-lambda-init)
-* [ES.30: 프로그램 텍스트를 바꾸기 위해 매크로를 사용하지 마라](#Res-macros)
+* [ES.30: 프로그램 텍스트를 다루기(manipulate) 위해 매크로를 사용하지 마라](#Res-macros)
 * [ES.31: 매크로를 상수나 "함수"에 사용하지 마라](#Res-macros2)
-* [ES.32: 모든 매크로는 `ALL_CAPS`형태로 선언하라](#Res-ALL_CAPS)
+* [ES.32: 모든 매크로는 `ALL_CAPS` 형태로 선언하라](#Res-ALL_CAPS)
 * [ES.33: 매크로를 사용해야만 한다면, 고유한 이름을 사용하라](#Res-MACROS)
 * [ES.34: (C-스타일의) 가변인자 함수를 정의하지 마라](#Res-ellipses)
 
 표현식 규칙:
 
 * [ES.40: 복잡한 표현식을 피하라](#Res-complicated)
-* [ES.41: 연산자 우선순위가 혼동된다면, 소괄호를 사용하라](#Res-parens)
+* [ES.41: 연산자 우선순위가 불분명하면, 소괄호를 사용하라(parenthesize)](#Res-parens)
 * [ES.42: 포인터는 간단하고 직관적인 형태로 사용하라](#Res-ptr)
-* [ES.43: Avoid expressions with undefined order of evaluation](#Res-order)
+* [ES.43: 평가 순서가 정의되지 않은 표현식은 사용하지 마라](#Res-order)
 * [ES.44: 함수 인자가 표현식 평가 순서의 영향을 받지 않게 하라](#Res-order-fct)
-* [ES.45: "만능 상수"를 피하자. 상징적인 상수를 사용하자](#Res-magic)
+* [ES.45: 이유를 알 수 없는 상수(magic constant)를 사용하지 마라; 상징적인 상수를 사용하라](#Res-magic)
 * [ES.46: 타입 범위를 축소하는 변환을 피하라](#Res-narrowing)
 * [ES.47: `0` 혹은 `NULL`보다는 `nullptr`를 사용하라](#Res-nullptr)
-* [ES.48: Avoid casts](#Res-casts)
-* [ES.49: If you must use a cast, use a named cast](#Res-casts-named)
+* [ES.48: 타입 변환(cast)을 피하라](#Res-casts)
+* [ES.49: 타입 변환을 사용해야만 한다면, 알려진 방법으로 변환(named cast)하라](#Res-casts-named)
 * [ES.50: `const`를 제거하지 마라](#Res-casts-const)
 * [ES.55: 범위 검사가 필요하지 않도록 하라](#Res-range-checking)
 * [ES.56: `std::move()`는 개체를 다른 유효범위로 명시적으로 옮겨야 할때만 사용하라](#Res-move)
@@ -1260,7 +1260,7 @@ The same is the case when `at()` throws.
 어렵다. 잘 해도 경험적인(heuristic) 수준. 
 루프를 사용해 값을 설정하는 초기화 안된 변수을 찾아라.
 
-### <a name="Res-macros"></a>ES.30: Don't use macros for program text manipulation
+### <a name="Res-macros"></a>ES.30: 프로그램 텍스트를 다루기(manipulate) 위해 매크로를 사용하지 마라
 
 ##### Reason
 
@@ -1274,35 +1274,40 @@ The same is the case when `at()` throws.
 ```c++
     #define Case break; case   /* BAD */
 ```
-This innocuous-looking macro makes a single lower case `c` instead of a `C` into a bad flow-control bug.
+
+이 문제 없어 보이는 매크로는 `C`대신 `c`가 사용되면 악질적인(bad) 제어흐름 버그로 이어진다.
 
 ##### Note
 
-이 규칙은 `#ifdef`문에서 설정제어를 위해 매크로를 사용하는 것은 금하지 않는다.
+이 규칙은 `#ifdef`문에서 설정제어를 위해 매크로를 사용하는 것은 막지 않는다.
 
-In the future, modules are likely to eliminate the need for macros in configuration control.
+미래에 모듈이 도입되면 설정을 제어하기 위한 매크로는 사라지게 될 것이다.
 
 ##### Note
 
-This rule is meant to also discourage use of `#` for stringification and `##` for concatenation.
-As usual for macros, there are uses that are "mostly harmless", but even these can create problems for tools,
-such as auto completers, static analyzers, and debuggers.
-Often the desire to use fancy macros is a sign of an overly complex design.
-Also, `#` and `##` encourages the definition and use of macros:
+이 규칙이 의도하는 것은 `#`을 사용해 문자를 만들어내거나 `##`를 사용해 접합(concat)하는 것이다. 
+보통의 매크로들 처럼, "거의 무해한" 경우도 있다. 하지만 자동 완성기, 정적 분석기, 디버거와 같은 도구에게는 문제가 된다.
+
+경우에 따라서는 근사한 매크로를 사용하는 것이 과도하게 복잡한 설계가 있다는 신호일 수 있다.
+또한, `#`와 `##`를 사용하면 매크로를 정의하고 사용하도록 유도(encourage)한다:
+
 ```c++
     #define CAT(a, b) a ## b
     #define STRINGIFY(a) #a
 
     void f(int x, int y)
     {
-        string CAT(x, y) = "asdf";   // BAD: hard for tools to handle (and ugly)
+        string CAT(x, y) = "asdf";   // BAD: 툴에서 다루기 어렵다 (그리고 못생겼다)
         string sx2 = STRINGIFY(x);
         // ...
     }
 ```
-There are workarounds for low-level string manipulation using macros. For example:
+
+매크로없이 문자열을 조작하기 위한 방법(workaround)이 있다.
+예를 들자면:
+
 ```c++
-    string s = "asdf" "lkjh";   // ordinary string literal concatenation
+    string s = "asdf" "lkjh";   // 평범한 문자열 리터럴 접합 (literal concatenation)
 
     enum E { a, b };
 
@@ -1321,15 +1326,16 @@ There are workarounds for low-level string manipulation using macros. For exampl
         // ...
     }
 ```
-This is not as convenient as a macro to define, but as easy to use, has zero overhead, and is typed and scoped.
 
-In the future, static reflection is likely to eliminate the last needs for the preprocessor for program text manipulation.
+매크로만큼 편리한 것은 아니지만, 쉽게 사용할 수 있고, 오버헤드를 발생시키지 않으며, 타입과 유효범위의 영향을 받는다.
+
+미래에는 정적 리플렉션(static reflection)이 전처리기를 사용해 문자열을 다루는 것을 없애게 될 것이다.
 
 ##### Enforcement
 
 소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리를 질러라.
 
-### <a name="Res-macros2"></a>ES.31: Don't use macros for constants or "functions"
+### <a name="Res-macros2"></a>ES.31: 매크로를 상수나 "함수"에 사용하지 마라
 
 ##### Reason
 
@@ -1344,19 +1350,23 @@ In the future, static reflection is likely to eliminate the last needs for the p
     #define PI 3.14
     #define SQUARE(a, b) (a * b)
 ```
+
 `SQUARE`에 잘 알려진 버그가 없다고 하더라도 더 잘 동작하는 대안이 있다.
 
 예를 들면:
+
 ```c++
     constexpr double pi = 3.14;
-    template<typename T> T square(T a, T b) { return a * b; }
+
+    template<typename T> 
+    T square(T a, T b) { return a * b; }
 ```
 
 ##### Enforcement
 
 소스제어(`#ifdef`같은)에 사용하지 않는 매크로를 본다면 소리를 질러라.
 
-### <a name="Res-ALL_CAPS"></a>ES.32: Use `ALL_CAPS` for all macro names
+### <a name="Res-ALL_CAPS"></a>ES.32: 모든 매크로는 `ALL_CAPS` 형태로 선언하라
 
 ##### Reason
 
@@ -1367,18 +1377,18 @@ In the future, static reflection is likely to eliminate the last needs for the p
 ```c++
     #define forever for (;;)   /* very BAD */
 
-    #define FOREVER for (;;)   /* Still evil, but at least visible to humans */
+    #define FOREVER for (;;)   /* 여전히 사악하지만, 최소한 사람은 매크로라는걸 알 수 있다 */
 ```
 
 ##### Enforcement
 
 소문자로 작성된 매크로를 본다면 소리를 질러라.
 
-### <a name="Res-MACROS"></a>ES.33: If you must use macros, give them unique names
+### <a name="Res-MACROS"></a>ES.33: 매크로를 사용해야만 한다면, 고유한 이름을 사용하라
 
 ##### Reason
 
-Macros do not obey scope rules.
+매크로는 유효범위 규칙을 따르지 않는다.
 
 ##### Example
 
@@ -1390,27 +1400,28 @@ Macros do not obey scope rules.
 
 ##### Note
 
-Avoid macros if you can: [ES.30](#Res-macros), [ES.31](#Res-macros2), and [ES.32](#Res-ALL_CAPS).
-However, there are billions of lines of code littered with macros and a long tradition for using and overusing macros.
-If you are forced to use macros, use long names and supposedly unique prefixes (e.g., your organization's name) to lower the likelihood of a clash.
+가능하다면 매크로는 사용하지 마라: [ES.30](#Res-macros), [ES.31](#Res-macros2), 그리고 [ES.32](#Res-ALL_CAPS)를 참고하라.
+
+안타깝게도, 매크로를 사용하거나 남용하는 긴 전통과 함께 매크로의 영향을 받는 코드가 수십억 줄은 있을 것이다. 매크로를 사용해야만 한다면, 긴 이름을 사용하고 고유한 접두사(prefix)를 붙여서 (당신이 속한 조직의 이름이라던지) 이름이 충돌할 가능성을 낮춰라.
 
 ##### Enforcement
 
-Warn against short macro names.
+짧은 매크로 이름에 대해서 경고하라.
 
-### <a name="Res-ellipses"></a> ES.34: Don't define a (C-style) variadic function
+### <a name="Res-ellipses"></a> ES.34: (C-스타일의) 가변인자 함수를 정의하지 마라
 
 ##### Reason
 
-Not type safe.
-Requires messy cast-and-macro-laden code to get working right.
+타입 안전하지 않다.
+정확하게 동작하기 위해서 지저분한 변환/매크로 코드가 필요하다.
 
 ##### Example
 
 ```c++
     #include <cstdarg>
 
-    // "severity" followed by a zero-terminated list of char*s; write the C-style strings to cerr
+    // "severity" followed by a zero-terminated list of char*s; 
+    // write the C-style strings to cerr
     void error(int severity ...)
     {
         va_list ap;             // a magic type for holding arguments
@@ -1439,7 +1450,10 @@ Requires messy cast-and-macro-laden code to get working right.
         error(7, "this", "is", an, "error"); // crash
     }
 ```
-**Alternative**: Overloading. Templates. Variadic templates.
+##### Alternative
+
+중복 정의, 템플릿, 가변 템플릿을 사용하라
+
 ```c++
     #include <iostream>
 
@@ -1470,18 +1484,18 @@ Requires messy cast-and-macro-laden code to get working right.
 
 ##### Note
 
-This is basically the way `printf` is implemented.
+이 방법으로 `printf`가 구현되어있다.
 
 ##### Enforcement
 
-* Flag definitions of C-style variadic functions.
-* Flag `#include <cstdarg>` and `#include <stdarg.h>`
+* C-스타일 가변인자 함수를 정의하면 지적하라
+* `#include <cstdarg>`와 `#include <stdarg.h>`를 지적하라
 
-## ES.expr: Expressions
+## ES.expr: 표현식
 
-Expressions manipulate values.
+표현식은 값을 조작한다(manipulate).
 
-### <a name="Res-complicated"></a>ES.40: Avoid complicated expressions
+### <a name="Res-complicated"></a>ES.40: 복잡한 표현식을 피하라
 
 ##### Reason
 
@@ -1514,18 +1528,20 @@ Expressions manipulate values.
     // bad: undefined behavior
     x = x++ + x++ + ++x;
 ```
-위의 연산식 중 몇은 의심할 여지없이 나쁘다. (정의되지 않은 행동을 야기한다.)
+
+위의 연산식 중 몇은 의심의 여지없이 나쁘다. (정의되지 않은 행동이 일어나게 한다)
 나머지는 꽤 복잡하거나 특이한 편이고, 심지어 능력있는 프로그래머도 잘못 이해하거나 문제를 간과해 버릴 만한 것도 있다.
 
 ##### Note
 
-C++17 tightens up the rules for the order of evaluation
-(left-to-right except right-to-left in assignments, and the order of evaluation of function arguments is unspecified; [see ES.43](#Res-order)),
-but that doesn't change the fact that complicated expressions are potentially confusing.
+C++17 에서는 평가 순서를 규정하고 있다.  
+오른쪽에서 왼쪽으로 대입되는 것을 제외하고 왼쪽에서 오른쪽 순서로 평가된다. 
+함수의 실행인자 평가순서는 정의되어 있지 않다; [ES.43 를 참고하라](#Res-order)
+하지만 이 규칙의 유무가 복잡한 표현식이 혼란을 만든다는 사실을 바꾸지는 않는다.
 
 ##### Note
 
-A programmer should know and use the basic rules for expressions.
+프로그래머는 표현식의 기본적인 규칙들을 알고 사용해야 한다.
 
 ##### Example
 
@@ -1553,10 +1569,10 @@ A programmer should know and use the basic rules for expressions.
 * N개 이상의 연산자 (N은 얼마가 되어야 하는가?)
 * 미묘한 우선순위규칙에 의존하기
 * 미정의 행동 (undefined behavior: 모든 미정의 행동을 잡아낼 수 있는가?)
-* implementation defined behavior?
+* 구현에 따라 달라지는 행동(implementation defined behavior)?
 * ???
 
-### <a name="Res-parens"></a>ES.41: If in doubt about operator precedence, parenthesize
+### <a name="Res-parens"></a>ES.41: 연산자 우선순위가 불분명하면, 소괄호를 사용하라(parenthesize)
 
 ##### Reason
 
@@ -1570,7 +1586,12 @@ A programmer should know and use the basic rules for expressions.
 
     if (a & flag != 0)  // bad: means a&(flag != 0)
 ```
-Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 테이블을 알고 있고, 다른 연산과 비트 연산을 섞어 사용할 때는 소괄호(parentheses)를 사용하기를 권한다.
+
+##### Note
+
+프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 테이블을 알고 있을 것을 기대한다.
+다른 연산과 비트 연산을 섞어 사용할 때는 소괄호(parentheses)를 사용하기를 권한다.
+
 ```c++
     if ((a & flag) != 0)  // OK: works as intended
 ```
@@ -1578,6 +1599,7 @@ Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 
 ##### Note
 
 아래에 대해서는 소괄호가 필요없다는 정도는 알고 있을 것이다:
+
 ```c++
     if (a < 0 || a <= max) {
         // ...
@@ -1587,10 +1609,10 @@ Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 
 ##### Enforcement
 
 * 비트 논리 연산자와 다른 연산자가 섞여 있다면 지적한다
-* 가장 왼쪽의 연산자(leftmost operator)가 할당 연산자가 아니라면 지적한다
+* 가장 왼쪽에 위치한 연산자(leftmost operator)가 할당 연산자가 아니라면 지적한다
 * ???
 
-### <a name="Res-ptr"></a>ES.42: Keep use of pointers simple and straightforward
+### <a name="Res-ptr"></a>ES.42: 포인터는 간단하고 직관적인 형태로 사용하라
 
 ##### Reason
 
@@ -1598,18 +1620,19 @@ Note: 프로그래머는 산술 연산, 논리 연산에 대해서 우선순위 
 
 ##### Note
 
-Use `gsl::span` instead.
-Pointers should [only refer to single objects](#Ri-array).
-Pointer arithmetic is fragile and easy to get wrong, the source of many, many bad bugs and security violations.
-`span` is a bounds-checked, safe type for accessing arrays of data.
-Access into an array with known bounds using a constant as a subscript can be validated by the compiler.
+포인터 대신 `gsl::span`를 사용하라.
+포인터는 [오직 하나의 개체를 가리킬 때만 사용해야 한다](./Interfaces.md#Ri-array).
+포인터의 산술연산은 잘못 사용하기 쉽고 수많은, 수많은 나쁜 버그와 보안  위험(violation)의 원인이다.
+`span`은 경계를 검사하고, 안전하게 배열의 데이터에 접근하는 타입이다.
+경계를 알 수 있는 배열에 대한 접근(subscript)에 상수를 사용하는 코드는 컴파일러가 평가할 수 있다.
 
 ##### Example, bad
 
 ```c++
     void f(int* p, int count)
     {
-        if (count < 2) return;
+        if (count < 2)
+            return;
 
         int* q = p + 1;    // BAD
 
@@ -1620,7 +1643,8 @@ Access into an array with known bounds using a constant as a subscript can be va
 
         int n = *p++;      // BAD
 
-        if (count < 6) return;
+        if (count < 6)
+            return;
 
         p[4] = 1;          // BAD
 
@@ -1635,13 +1659,15 @@ Access into an array with known bounds using a constant as a subscript can be va
 ```c++
     void f(span<int> a) // BETTER: use span in the function declaration
     {
-        if (a.size() < 2) return;
+        if (a.size() < 2)
+            return;
 
         int n = a[0];      // OK
 
         span<int> q = a.subspan(1); // OK
 
-        if (a.size() < 6) return;
+        if (a.size() < 6)
+            return;
 
         a[4] = 1;          // OK
 
@@ -1653,10 +1679,10 @@ Access into an array with known bounds using a constant as a subscript can be va
 
 ##### Note
 
-Subscripting with a variable is difficult for both tools and humans to validate as safe.
-`span` is a run-time bounds-checked, safe type for accessing arrays of data.
-`at()` is another alternative that ensures single accesses are bounds-checked.
-If iterators are needed to access an array, use the iterators from a `span` constructed over the array.
+변수를 사용해 배열에 접근하는 코드가 안전한지 평가하는 것은 도구와 사람 모두에게 어렵다.
+`span`은 실행 시간에 경계를 검사하기 때문에, 배열의 데이터에 접근할때 안전하다.
+`at()`은 한번 접근할 때 경계를 검사하는 다른 방법이다.
+배열에 접근할 때 반복자가 필요하다면, 배열에 대한 `span`을 생성하고 그에 대한 반복자를 사용하라.
 
 ##### Example, bad
 
@@ -1672,7 +1698,8 @@ If iterators are needed to access an array, use the iterators from a `span` cons
 
 ##### Example, good
 
-Use a `span`:
+`span`을 사용하면 이렇다:
+
 ```c++
     void f1(span<int, 10> a, int pos) // A1: Change parameter type to use span
     {
@@ -1687,7 +1714,9 @@ Use a `span`:
         a[pos - 1] = 2; // OK
     }
 ```
-Use a `at()`:
+
+`at()`을 사용하면 이렇다:
+
 ```c++
     void f3(array<int, 10> a, int pos) // ALTERNATIVE B: Use at() for access
     {
@@ -1709,7 +1738,8 @@ Use a `at()`:
 
 ##### Example, good
 
-Use a `span`:
+`span`을 사용하면 이렇다:
+
 ```c++
     void f1()
     {
@@ -1719,7 +1749,9 @@ Use a `span`:
             av[i] = i;
     }
 ```
-Use a `span` and range-`for`:
+
+범위 기반 `for`문에 `span`을 사용하면 이렇다:
+
 ```c++
     void f1a()
     {
@@ -1730,7 +1762,9 @@ Use a `span` and range-`for`:
              e = i++;
     }
 ```
-Use `at()` for access:
+
+접근할 때 `at()`를 사용하면 이렇다:
+
 ```c++
     void f2()
     {
@@ -1739,7 +1773,9 @@ Use `at()` for access:
             at(arr, i) = i;
     }
 ```
-Use a range-`for`:
+
+범위기반 `for`문은 이렇다:
+
 ```c++
     void f3()
     {
@@ -1751,20 +1787,22 @@ Use a range-`for`:
 
 ##### Note
 
-Tooling can offer rewrites of array accesses that involve dynamic index expressions to use `at()` instead:
+도구에서 실행시간에 결정되는 인덱스로 배열에 접근하는 표현식을 `at()`을 사용해 다시 작성하도록 할수도 있다:
+
 ```c++
     static int a[10];
 
     void f(int i, int j)
     {
-        a[i + j] = 12;      // BAD, could be rewritten as ...
-        at(a, i + j) = 12;  // OK -- bounds-checked
+        a[i + j] = 12;      // BAD, 이 코드를 다시 쓴다면 ...
+        at(a, i + j) = 12;  // OK -- 경계를 검사한다
     }
 ```
 
 ##### Example
 
-Turning an array into a pointer (as the language does essentially always) removes opportunities for checking, so avoid it
+(그동안 언어에서 해왔던 것처럼) 배열을 포인터로 바꾸는 것은 경계 검사의 기회를 없애버린다. 지양하라.
+
 ```c++
     void g(int* p);
 
@@ -1775,7 +1813,9 @@ Turning an array into a pointer (as the language does essentially always) remove
         g(&a[0]);    // OK: passing one object
     }
 ```
-If you want to pass an array, say so:
+
+배열을 전달하고 싶다면:
+
 ```c++
     void g(int* p, size_t length);  // old (dangerous) code
 
@@ -1793,38 +1833,41 @@ If you want to pass an array, say so:
 
 ##### Enforcement
 
-* Flag any arithmetic operation on an expression of pointer type that results in a value of pointer type.
-* Flag any indexing expression on an expression or variable of array type (either static array or `std::array`) where the indexer is not a compile-time constant expression with a value between `0` or and the upper bound of the array.
-* Flag any expression that would rely on implicit conversion of an array type to a pointer type.
+* 포인터 타입에 대한 산술연산을 수행하는 표현식은 지적하라
+* 배열(정적 배열 혹은 `std::array`)에 인덱스를 사용해 접근하는 표현식을 지적하라. 이때 표현식은 배열 범위 안(`0`부터 배열 끝까지)에 해당하는 컴파일 시간 상수 표현식이 아니어야 한다
+* 배열 타입에서 포인터 타입으로 묵시적 형변환에 의존하는 표현식을 지적하라
 
-This rule is part of the [bounds-safety profile](#SS-bounds).
+이 규칙은 [경계 안전성 검사](./Profile.md#SS-bounds)의 일부분이다.
 
-### <a name="Res-order"></a>ES.43: Avoid expressions with undefined order of evaluation
+### <a name="Res-order"></a>ES.43: 평가 순서가 정의되지 않은 표현식은 사용하지 마라
 
 ##### Reason
 
 그런 코드가 어떻게 동작할지는 알 수가 없다. 이식성.
-특정한 환경에는 맞을지는 몰라도, 다른 컴파일러 (혹은 사용 중인 컴파일러의 다음 버전)에서는 다를 수 있다. 혹은 최적화 설정에 따라 다를 수도 있다.
+특정한 환경에는 맞을지는 몰라도, 다른 컴파일러 (혹은 사용 중인 컴파일러의 다음 버전)에서는 다를 수 있다. 
+혹은 최적화 설정에 따라 다를 수도 있다.
 
 ##### Note
 
-C++17 tightens up the rules for the order of evaluation:
-left-to-right except right-to-left in assignments, and the order of evaluation of function arguments is unspecified.
+C++17 에서는 평가 순서를 규정하고 있다.  
+오른쪽에서 왼쪽으로 대입되는 것을 제외하고 왼쪽에서 오른쪽 순서로 평가된다. 
+함수의 실행인자 평가순서는 정의되어 있지 않다.
 
-However, remember that your code may be compiled with a pre-C++17 compiler (e.g., through cut-and-paste) so don't be too clever.
+당신의 코드가 (Ctrl + C,V 되어서) C++ 17 이전의 컴파일러로 컴파일 될 수 있다는 것을 기억하라. 너무 영리할 필요는 없다.
 
 ##### Example
 
 ```c++
     v[i] = ++i;   //  the result is undefined
 ```
-A good rule of thumb is that you should not read a value twice in an expression where you write to it.
+
+가장 좋은 규칙은 값을 변경하는 표현식에서 값을 읽지 않는 것이다.
 
 ##### Enforcement
 
 좋은 분석기를 사용해 찾을 수 있다.
 
-### <a name="Res-order-fct"></a>ES.44: Don't depend on order of evaluation of function arguments
+### <a name="Res-order-fct"></a>ES.44: 함수 인자가 표현식 평가 순서의 영향을 받지 않게 하라
 
 ##### Reason
 
@@ -1832,7 +1875,9 @@ A good rule of thumb is that you should not read a value twice in an expression 
 
 ##### Note
 
-C++17 tightens up the rules for the order of evaluation, but the order of evaluation of function arguments is still unspecified.
+C++17 에서는 평가 순서를 규정하고 있다.  
+오른쪽에서 왼쪽으로 대입되는 것을 제외하고 왼쪽에서 오른쪽 순서로 평가된다. 
+함수의 실행인자 평가순서는 정의되어 있지 않다.
 
 ##### Example
 
@@ -1840,27 +1885,34 @@ C++17 tightens up the rules for the order of evaluation, but the order of evalua
     int i = 0;
     f(++i, ++i);
 ```
-The call will most likely be `f(0, 1)` or `f(1, 0)`, but you don't know which.
-Technically, the behavior is undefined.
-In C++17, this code does not have undefined behavior, but it is still not specified which argument is evaluated first.
+
+이 함수 호출은 `f(0, 1)`혹은 `f(1, 0)`일 것이다. 하지만 어떤 것이 될지는 알 수 없다.
+기술적으로는, 어떻게 처리해야 하는지 정의되어 있지 않다.
+
+C++ 17에서는 이 코드가 미정의 행동이 아니다. 하지만 여전히 어떤 인자가 먼저 평가되는지 분명하지 않다.
 
 ##### Example
 
-Overloaded operators can lead to order of evaluation problems:
+중복정의된 연산자들은 평가순서 문제로 이어질 수 있다:
+
 ```c++
     f1()->m(f2());          // m(f1(), f2())
     cout << f1() << f2();   // operator<<(operator<<(cout, f1()), f2())
 ```
-In C++17, these examples work as expected (left to right) and assignments are evaluated right to left (just as ='s binding is right-to-left)
+
+C++ 17에서 이 예시는 기대한 대로 동작한다 (왼쪽에서 오른쪽으로 평가된다).
+그리고 `=`의 바인딩이 오른쪽에서 왼쪽으로 수행되는 것처럼 대입은 오른쪽에서 왼쪽으로 평가된다. 
+
 ```c++
-    f1() = f2();    // undefined behavior in C++14; in C++17, f2() is evaluated before f1()
+    f1() = f2();    // undefined behavior in C++14; 
+                    // in C++17, f2() is evaluated before f1()
 ```
 
 ##### Enforcement
 
 좋은 분석기를 사용해 찾을 수 있다.
 
-### <a name="Res-magic"></a>ES.45: Avoid "magic constants"; use symbolic constants
+### <a name="Res-magic"></a>ES.45: 이유를 알 수 없는 상수(magic constant)를 사용하지 마라; 상징적인 상수를 사용하라
 
 ##### Reason
 
@@ -1872,9 +1924,11 @@ In C++17, these examples work as expected (left to right) and assignments are ev
     for (int m = 1; m <= 12; ++m)   // don't: magic constant 12
         cout << month[m] << '\n';
 ```
+
 1년에 12달이 숫자로만 되어 있다면 이해가 잘 안될 것이다. 
 
 더 좋게 고치면:
+
 ```c++
     // months are indexed 1..12
     constexpr int first_month = 1;
@@ -1883,7 +1937,9 @@ In C++17, these examples work as expected (left to right) and assignments are ev
     for (int m = first_month; m <= last_month; ++m)   // better
         cout << month[m] << '\n';
 ```
+
 아예 상수를 사용하지 않으면 더 낫다:
+
 ```c++
     for (auto m : month)
         cout << m << '\n';
@@ -1893,11 +1949,11 @@ In C++17, these examples work as expected (left to right) and assignments are ev
 
 코드에 리터럴이 있다면 지적한다. `0`, `1`, `nullptr`, `\n`, `""` 등 가능한 목록은 허용하라.
 
-### <a name="Res-narrowing"></a>ES.46: Avoid lossy (narrowing, truncating) arithmetic conversions
+### <a name="Res-narrowing"></a>ES.46: 타입 범위를 축소하는 변환을 피하라
 
 ##### Reason
 
-정보를 파괴하고 전혀 기대하지 않는 값을 가지게 한다.
+정보를 파괴하고 전혀 기대하지 않은 값을 가지게 한다.
 
 ##### Example, bad
 
@@ -1918,11 +1974,14 @@ In C++17, these examples work as expected (left to right) and assignments are ev
 ##### Note
 
 gsl은 narrowing을 허용하는 `narrow_cast`와 변환시 값이 바뀌면 예외를 던지는 `narrow`("narrow if")를 제공한다:
+
 ```c++
     i = narrow_cast<int>(d);   // OK (you asked for it): narrowing: i becomes 7
     i = narrow<int>(d);        // OK: throws narrowing_error
 ```
+
 이 규칙은 부동 소수점 타입의 음수를 부호 없는 정수타입으로 변환하는 등의 손실있는 형변환까지도 포함한다:
+
 ```c++
     double d = -7.9;
     unsigned u = 0;
@@ -1934,25 +1993,28 @@ gsl은 narrowing을 허용하는 `narrow_cast`와 변환시 값이 바뀌면 예
 
 ##### Enforcement
 
-A good analyzer can detect all narrowing conversions. However, flagging all narrowing conversions will lead to a lot of false positives. Suggestions:
+좋은 분석기는 범위가 축소되는 변환을 탐지할 수 있다.
+하지만 모든 축소변환을 지적하는 것은 수많은 거짓 양성(false positive)로 이어질 것이다. 
 
-* flag all floating-point to integer conversions (maybe only `float`->`char` and `double`->`int`. Here be dragons! we need data)
-* flag all `long`->`char` (I suspect `int`->`char` is very common. Here be dragons! we need data)
-* consider narrowing conversions for function arguments especially suspect
+제안:
 
-### <a name="Res-nullptr"></a>ES.47: Use `nullptr` rather than `0` or `NULL`
+* 부동 소수점에서 정수로의 변환을 지적한다 (`float`->`char` 이나 `double`->`int`만 지적할수도 있다. 더 많은 정보가 필요하다)
+* 모든 `long`->`char` 변환을 지적한다. (`int`->`char` 변환은 상당히 일반적이다. 더 많은 정보가 필요하다)
+* 함수의 실행인자에서 축소 변환이 발생하면 특히 의심스럽게 생각한다
+
+### <a name="Res-nullptr"></a>ES.47: `0` 혹은 `NULL`보다는 `nullptr`를 사용하라
 
 ##### Reason
 
 가독성의 문제다. 기대를 벗어나지 않게 한다.
 
-`nullptr`는 `int`와 혼동의 여지가 없다. `nullptr` also has a well-specified (very restrictive) type, and thus
-works in more scenarios where type deduction might do the wrong thing on `NULL`
-or `0`.
+`nullptr`는 `int`와 혼동의 여지가 없다. 
+`nullptr`는 잘 명세된 (아주 까다로운) 타입을 가지고 있다. 그러니 `NULL` 혹은 `0`을 사용하면 잘못될 수 있는 타입 추론 상황에서 더 잘 동작할 것이다.
 
 ##### Example
 
 참고하라:
+
 ```c++
     void f(int);
     void f(char*);
@@ -1964,7 +2026,7 @@ or `0`.
 
 포인터에 `0`, `NULL`을 사용한다면 지적한다. 프로그램으로 간단하게 변환할 수 있으면 도움이 될 것이다.
 
-### <a name="Res-casts"></a>ES.48: Avoid casts
+### <a name="Res-casts"></a>ES.48: 타입 변환(cast)을 피하라
 
 ##### Reason
 
@@ -1978,28 +2040,35 @@ or `0`.
     auto q = (long long*)&d;
     cout << d << ' ' << *p << ' ' << *q << '\n';
 ```
-What would you think this fragment prints? The result is at best implementation defined. I got
+
+이 코드는 어떤 값을 출력할까?
+The result is at best implementation defined. 
+필자의 환경에서는 이런 결과가 나온다
+
 ```
     2 0 4611686018427387904
 ```
-Adding
+
+아래의 내용을 더하면,
+
 ```c++
     *q = 666;
     cout << d << ' ' << *p << ' ' << *q << '\n';
 ```
-I got
+
+이런 결과가 나온다
+
 ```
     3.29048e-321 666 666
 ```
-Surprised? I'm just glad I didn't crash the program.
+
+놀라운가? 프로그램에서 크래시나 생기지 않은게 다행이다.
 
 ##### Note
 
-Programmers who write casts typically assume that they know what they are doing,
-or that writing a cast makes the program "easier to read".
-In fact, they often disable the general rules for using values.
-Overload resolution and template instantiation usually pick the right function if there is a right function to pick.
-If there is not, maybe there ought to be, rather than applying a local fix (cast).
+타입 변환을 작성하는 프로그래머는 자신이 무엇을 하고있는지 안다고 생각한다. 또는 값을 사용할때 일반적인 규칙들을 접어두기도 한다.
+
+중복정의 선택(overload resolution)이나 템플릿 실체화(instantiation)는 보통 인자 타입이 꼭 맞는 함수를 골라낸다. 그런 함수가 없다면, 어쩌면 고쳐서(local fix) 적용할 필요가 있을지도 모르지만, 오류가 된다.
 
 ##### Note
 
@@ -2009,51 +2078,53 @@ If there is not, maybe there ought to be, rather than applying a local fix (cast
 
 ##### Note
 
-형변환을 너무 많이 쓴다고 생각된다면 근본적인 설계 문제가 있을지도 모른다.
+형변환을 너무 많이 쓴다고 생각된다면 설계에 근본적인 문제가 있을지도 모른다.
 
 ##### Exception
 
-Casting to `(void)` is the Standard-sanctioned way to turn off `[[nodiscard]]` warnings. If you are calling a function with a `[[nodiscard]]` return and you deliberately want to discard the result, first think hard about whether that is really a good idea (there is usually a good reason the author of the function or of the return type used `[[nodiscard]]` in the first place), but if you still think it's appropriate and your code reviewer agrees, write `(void)` to turn off the warning.
+Casting to `(void)` is the Standard-sanctioned way to turn off `[[nodiscard]]` warnings. 
+If you are calling a function with a `[[nodiscard]]` return and you deliberately want to discard the result, 
+first think hard about whether that is really a good idea 
+(there is usually a good reason the author of the function or of the return type used `[[nodiscard]]` in the first place), 
+but if you still think it's appropriate and your code reviewer agrees, write `(void)` to turn off the warning.
 
 ##### Alternatives
 
-Casts are widely (mis) used. Modern C++ has rules and constructs that eliminate the need for casts in many contexts, such as
+타입 변환은 널리 (잘못) 사용되고 있다. 모던 C++은 규칙을 두고 여러 방법으로 타입 변환이 필요 없도록 한다.
 
-* Use templates
-* Use `std::variant`
-* Rely on the well-defined, safe, implicit conversions between pointer types
+* 템플릿을 사용한다
+* `std::variant`을 사용한다
+* 포인터 타입 간의 잘 정의되고, 안전하고, 묵시적인 변환을 사용한다
 
 ##### Enforcement
 
-* Force the elimination of C-style casts, except on a function with a `[[nodiscard]]` return
+* `[[nodiscard]]`로 반환하는 함수를 제외하고 C-스타일 타입 변환을 없애도록 강제한다
 * Warn if there are many functional style casts (there is an obvious problem in quantifying 'many')
-* The [type profile](#Pro-type-reinterpretcast) bans `reinterpret_cast`.
-* Warn against [identity casts](#Pro-type-identitycast) between pointer types, where the source and target types are the same (#Pro-type-identitycast)
-* Warn if a pointer cast could be [implicit](#Pro-type-implicitpointercast)
+* The [type profile](./Profile.md#Pro-type-reinterpretcast) bans `reinterpret_cast`.
+* Warn against [identity casts](./Profile.md#Pro-type-identitycast) between pointer types, where the source and target types are the same (#Pro-type-identitycast)
+* 포인터가 [묵시적](./Profile.md#Pro-type-implicitpointercast)으로 변환될 수 있으면 경고한다
 
-### <a name="Res-casts-named"></a>ES.49: If you must use a cast, use a named cast
+### <a name="Res-casts-named"></a>ES.49: 타입 변환을 사용해야만 한다면, 알려진 방법으로 변환(named cast)하라
 
 ##### Reason
 
 가독성. 오류 예방.
-
-Readability. Error avoidance.
-Named cast들은 C스타일이나 함수형 형변환보다 더 구체적이며, 컴파일러가 일부 오류를 잡아낼 수 있도록 한다.
+Named cast들은 C 스타일이나 함수형 형변환보다 더 구체적이며, 컴파일러가 일부 오류를 잡아낼 수 있도록 한다.
 
 > 역주:
 > * C 스타일 형변환: `(int) a`
 > * 함수형 형변환: `int(a)`
 
-The named casts are:
+Named cast의 목록:
 
 * `static_cast`
 * `const_cast`
 * `reinterpret_cast`
 * `dynamic_cast`
-* `std::move`         // `move(x)` is an rvalue reference to `x`
-* `std::forward`      // `forward(x)` is an rvalue reference to `x`
-* `gsl::narrow_cast`  // `narrow_cast<T>(x)` is `static_cast<T>(x)`
-* `gsl::narrow`       // `narrow<T>(x)` is `static_cast<T>(x)` if `static_cast<T>(x) == x` or it throws `narrowing_error`
+* `std::move` // `move(x)`는 `x`에 대한 r-value 참조를 반환한다
+* `std::forward` // `forward(x)`는 `x`에 대한 r-value 참조를 반환한다
+* `gsl::narrow_cast` // `narrow_cast<T>(x)`는 `static_cast<T>(x)`와 동일하다
+* `gsl::narrow` // `narrow<T>(x)`는 `static_cast<T>(x)`와 동일하며, 만약 `static_cast<T>(x) == x`가 아니면 예외 `narrowing_error`를 던진다
 
 ##### Example
 
@@ -2096,11 +2167,11 @@ for example.)
 
 ##### Enforcement
 
-* C스타일, 함수형 형변환이 있다면 지적한다.
-* The [type profile](#Pro-type-reinterpretcast) bans `reinterpret_cast`.
-* The [type profile](#Pro-type-arithmeticcast) warns when using `static_cast` between arithmetic types.
+* C스타일, 함수형 형변환이 있다면 지적한다
+* The [type profile](./Profile.md#Pro-type-reinterpretcast) bans `reinterpret_cast`.
+* The [type profile](./Profile.md#Pro-type-arithmeticcast) warns when using `static_cast` between arithmetic types.
 
-### <a name="Res-casts-const"></a>ES.50: Don't cast away `const`
+### <a name="Res-casts-const"></a>ES.50: `const`를 제거하지 마라
 
 ##### Reason
 
@@ -2124,6 +2195,7 @@ for example.)
 ##### Example
 
 Sometimes, you may be tempted to resort to `const_cast` to avoid code duplication, such as when two accessor functions that differ only in `const`-ness have similar implementations. For example:
+
 ```c++
     class Bar;
 
@@ -2141,7 +2213,9 @@ Sometimes, you may be tempted to resort to `const_cast` to avoid code duplicatio
         Bar my_bar;
     };
 ```
+
 Instead, prefer to share implementations. Normally, you can just have the non-`const` function call the `const` function. However, when there is complex logic this can lead to the following pattern that still resorts to a `const_cast`:
+
 ```c++
     class Foo {
     public:
@@ -2156,9 +2230,11 @@ Instead, prefer to share implementations. Normally, you can just have the non-`c
         Bar my_bar;
     };
 ```
+
 Although this pattern is safe when applied correctly, because the caller must have had a non-`const` object to begin with, it's not ideal because the safety is hard to enforce automatically as a checker rule.
 
 Instead, prefer to put the common code in a common helper function -- and make it a template so that it deduces `const`. This doesn't use any `const_cast` at all:
+
 ```c++
     class Foo {
     public:                         // good
@@ -2185,6 +2261,7 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 이런 값은 `const_cast`를 쓰는 것보다 `mutable`이나 간접적인 방법을 사용하면 더 쉽게 처리할 수 있다.
 
 Consider keeping previously computed results around for a costly operation:
+
 ```c++
     int compute(int x); // compute a value for x; assume this to be costly
 
@@ -2212,8 +2289,10 @@ Consider keeping previously computed results around for a costly operation:
         Cache cache;
     };
 ```
+
 Here, `get_val()` is logically constant, so we would like to make it a `const` member.
 To do this we still need to mutate `cache`, so people sometimes resort to a `const_cast`:
+
 ```c++
     class X {   // Suspicious solution based on casting
     public:
@@ -2230,8 +2309,10 @@ To do this we still need to mutate `cache`, so people sometimes resort to a `con
         Cache cache;
     };
 ```
+
 Fortunately, there is a better solution:
 State that `cache` is mutable even for a `const` object:
+
 ```c++
     class X {   // better solution
     public:
@@ -2248,7 +2329,9 @@ State that `cache` is mutable even for a `const` object:
         mutable Cache cache;
     };
 ```
+
 An alternative solution would to store a pointer to the `cache`:
+
 ```c++
     class X {   // OK, but slightly messier solution
     public:
