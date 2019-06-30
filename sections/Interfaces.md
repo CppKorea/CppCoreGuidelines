@@ -1,43 +1,44 @@
 
 # <a name="S-interfaces"></a>I: 인터페이스
 
-인터페이스는 프로그램 두 부분 사이의 계약이다. 서비스의 공급자와 사용자가 기대하는 바를 정확하게 기술하는 것이 핵심이다.
+인터페이스는 프로그램 부분 사이의 계약이다. 
+서비스의 공급자와 사용자가 기대하는 바를 정확하게 기술하는 것이 핵심이다.
 좋은 인터페이스(이해하기 쉽고, 효율적인 사용을 장려하고, 쉽게 오류가 발생하지 않고, 테스트를 지원하는 등)는 아마도 코드 구성 중에서 가장 중요한 요소 중 하나다.
 
 인터페이스 규칙 요약:
 
-* [I.1: 인터페이스를 명확하게 만들어라](#Ri-explicit)
-* [I.2: `const`가 아닌 전역 변수를 피하라](#Ri-global)
-* [I.3: 싱글톤을 피하라](#Ri-singleton)
-* [I.4: 인터페이스를 정확하게, 강타입으로 만들어라](#Ri-typed)
+* [I.1: 인터페이스는 명확하게(explicit) 작성하라](#Ri-explicit)
+* [I.2: `const`가 아닌 전역변수를 지양하라](#Ri-global)
+* [I.3: 싱글톤 패턴을 지양하라](#Ri-singleton)
+* [I.4: 인터페이스가 타입 시스템을 정확하고 엄격하게 준수하도록 만들어라](#Ri-typed)
 * [I.5: (하나라도 있다면) 사전 조건을 기술하라](#Ri-pre)
 * [I.6: 사전 조건을 표현하고 싶다면 `Expects()`를 사용하라](#Ri-expects)
 * [I.7: 사후 조건을 기술하라](#Ri-post)
 * [I.8: 사후 조건을 표현하고 싶다면 `Ensures()`를 사용하라](#Ri-ensures)
-* [I.9:  인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라](#Ri-concepts)
+* [I.9: 인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라](#Ri-concepts)
 * [I.10: 요구된 작업의 수행 실패를 알리기 위해 예외를 사용하라](#Ri-except)
-* [I.11: 원시 포인터(`T*`) 혹은 참조(`T&`)를 사용해 소유권을 넘기지 마라](#Ri-raw)
+* [I.11: 원시 포인터(`T*`) 혹은 참조(`T&`)를 사용해 소유권을 전달하지 마라](#Ri-raw)
 * [I.12: null이 되어선 안되는 포인터는 `not_null`로 선언하라](#Ri-nullptr)
 * [I.13: 배열을 단일 포인터로 전달하지 마라](#Ri-array)
-* [I.22: 전역 개체의 복잡한 초기화를 피하라](#Ri-global-init)
-* [I.23: 함수 인자를 최소로 유지하라](#Ri-nargs)
-* [I.24: 관련없는 동일 타입의 인접한 매개 변수는 피하라](#Ri-unrelated)
+* [I.22: 전역 개체가 복잡하게 초기화되지 않도록 하라](#Ri-global-init)
+* [I.23: 함수 인자 개수를 최소로 유지하라](#Ri-nargs)
+* [I.24: 같은 타입의 관련없는 매개 변수가 붙어있지 않도록 하라](#Ri-unrelated)
 * [I.25: 클래스 계층에 대한 인터페이스로 추상 클래스를 사용하라](#Ri-abstract)
 * [I.26: 크로스 컴파일러 ABI를 원한다면 C 스타일 코드를 사용하라](#Ri-abi)
-* [I.27: For stable library ABI, consider the Pimpl idiom](#Ri-pimpl)
-* [I.30: Encapsulate rule violations](#Ri-encapsulate)
+* [I.27: 변화가 적은(stable) ABI를 원한다면, Pimpl idiom 사용을 고려하라](#Ri-pimpl)
+* [I.30: 규칙을 위반하는 코드는 캡슐화하라](#Ri-encapsulate)
 
 **참고할 만한 내용**:
 
-* [F: 함수(Functions)](#S-functions)
-* [C.concrete: 실제 타입(Concrete types)](#SS-concrete)
-* [C.hier: 클래스 계층(Class hierarchies)](#SS-hier)
-* [C.over: 오버로딩과 오버로딩 된 연산자(Overloading and overloaded operators)](#SS-overload)
-* [C.con: 컨테이너와 다른 리소스 핸들(Containers and other resource handles)](#SS-containers)
-* [E: 오류 처리(Error handling)](#S-errors)
-* [T: 템플릿과 제너릭 프로그래밍(Templates and generic programming)](#S-templates)
+* [F: 함수(Functions)](./Functions.md)
+* [C.concrete: 실제 타입(Concrete types)](./Class.md)
+* [C.hier: 클래스 계층(Class hierarchies)](./Class.md)
+* [C.over: 오버로딩과 오버로딩 된 연산자(Overloading and overloaded operators)](./Class.md)
+* [C.con: 컨테이너와 다른 리소스 핸들(Containers and other resource handles)](./Class.md)
+* [E: 오류 처리(Error handling)](./Errors.md)
+* [T: 템플릿과 제너릭 프로그래밍(Templates and generic programming)](./Templates.md)
 
-### <a name="Ri-explicit"></a>I.1: Make interfaces explicit
+### <a name="Ri-explicit"></a>I.1: 인터페이스는 명확하게(explicit) 작성하라
 
 ##### Reason
 
@@ -52,42 +53,47 @@
 ```c++
     int round(double d)
     {
-        return (round_up) ? ceil(d) : d;    // don't: "invisible" dependency
+        return (round_up) ? ceil(d) : d;    // 이렇게 하면 안된다: "보이지 않는" 의존성이 있다
     }
 ```
 
-`rnd(7.2)`를 두 번 호출해서 서로 다른 결과가 발생한다면 호출하는 입장에서는 함수의 의미를 명확하게 알지 못할 것이다.
+`round(7.2)`를 두 번 호출해서 서로 다른 결과가 발생한다면 호출하는 입장에서는 함수의 의미를 명확하게 알지 못할 것이다.
 
 ##### Exception
 
-때때로 우리는 환경 변수를 통해 연산의 세부 사항을 제어한다. 예를 들어, 일반적인 출력 대 상세한 출력, 디버그 대 최적화 등이 있다.  
-전역 제어를 사용하면 잠재적으로 혼란스럽다는 문제가 있기는 하지만, 그렇게 하지 않으면 고정되었을 의도를 구현하는데 세밀하게 제어할 수 있다.
+우리는 때때로 환경 변수를 통해 연산을 세세하게 제어하기도 한다. 예컨대, 일반 출력과 상세한(verbose) 출력중 하나를 사용하도록 하거나, 디버그 혹은 최적화를 선택하기도 한다.
+이런 비-지역적인(non-local) 제어를 사용하면 잠재적으로 혼란의 소지가 있지만, 대신 구현 세부사항을 제어할 수 있다. 
+이러한 제어를 사용하지 않았다면 의미구조가 고정되었을 것이다.
 
 ##### Example, bad
 
-R`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시되기 쉽다.
+`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시되기 쉽다.
 
 예를 들어:
 
 ```c++
-    // don't: no test of printf's return value
+    // 이렇게 하면 안된다: printf의 반환값을 검사하지 않는다
     fprintf(connection, "logging: %d %d %d\n", x, y, s);
 ```
 
 만약 연결(connection)이 다운되어 로그가 만들어지지 않는다면 어떨까?
 
-**Alternative**: 예외를 발생시켜라. 예외는 무시할 수 없다.
+##### Alternative
 
-**Alternative formulation**: 전역 또는 암시적 상태의 값을 통해 인터페이스로 정보가 전달되는 것을 피하라. `const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라.
+예외를 발생시켜라. 예외는 무시할 수 없다.
 
-**Alternative formulation**: 인터페이스는 함수나 함수의 집합이어야 한다. 함수는 템플릿 함수일 수 있고 함수 집합은 클래스나 클래스 템플릿일 수 있다.
+**Alternative Formulation**:  
+전역 또는 암시적 상태의 값을 통해 인터페이스로 정보가 전달되는 것을 피하라. `const`가 아닌 멤버 함수는 개체의 상태를 통해 다른 멤버 함수에게 정보를 전달한다는 점을 참고하라.
+
+**Alternative Formulation**:  
+인터페이스는 함수나 함수의 집합이어야 한다. 함수는 템플릿 함수일 수 있고 함수 집합은 클래스나 클래스 템플릿일 수 있다.
 
 ##### Enforcement
 
 * (간단함) 함수는 네임스페이스 범위에서 선언된 변수 값에 따라 제어 흐름을 결정해서는 안된다
 * (간단함) 함수는 네임스페이스 범위에서 선언된 변수에 값을 저장해서는 안된다
 
-### <a name="Ri-global"></a>I.2: Avoid non-`const` global variables
+### <a name="Ri-global"></a>I.2: `const`가 아닌 전역변수를 지양하라
 
 ##### Reason
 
@@ -102,61 +108,68 @@ R`errno`와 같이 전역 변수를 통해 오류를 보고하는 것은 무시�
 
     void compute()     // don't
     {
-        // ... use data ...
+        // ... use `data` ...
     }
 
     void output()     // don't
     {
-        // ... use data ...
+        // ... use `data` ...
     }
 ```
 
-또 어디서 `data`를 수정할 수 있는가?
+또 어디서 `data`를 수정하는지 알 수 있겠는가?
 
 ##### Note
 
-전역 상수는 유용하다.
+전역 **상수**는 유용하다.
 
 ##### Note
 
 전역 변수에 반하는 규칙은 네임스페이스 범위의 변수들에도 동일하게 적용된다.
 
-**Alternative**: 복사를 피하기 위해 전역 변수(좀 더 일반화해서 네임스페이스 스코프의 데이터)를 사용한다면 `const` 레퍼런스로 개체를 전달하는 것을 고려하라.
+##### Alternative
+
+복사를 피하기 위해 전역 변수(좀 더 일반화하자면 네임스페이스 범위의 데이터)를 사용한다면 `const` 레퍼런스로 개체를 전달하는 것을 고려하라.
 다른 해결책은 개체의 상태로서의 데이터와 멤버 함수로서의 연산을 정의하는 것이다.
 
-**Warning**: 데이터 경합을 조심하라. 하나의 스레드가 실행되는 동안 다른 스레드가 전역 데이터(또는 레퍼런스로 전달된 데이터)에 접근하려고 한다면, 데이터 경합이 발생할 수 있다.
-Every pointer or reference to mutable data is a potential data race.
+##### Warning
+
+데이터 경합(data race)을 조심하라. 하나의 스레드가 실행되는 동안 다른 스레드가 전역 데이터(또는 레퍼런스로 전달된 데이터)에 접근하려고 한다면, 데이터 경합이 발생할 수 있다.
+변경 가능한(mutable) 데이터에 대한 포인터나 참조는 언제나 데이터 경합의 가능성이 있다.
 
 ##### Note
 
 변경할 수 없는 데이터에 대해서는 경합 조건(race condition)이 생기지 않는다.
 
-**References**: [함수 호출에 대한 규칙](#SS-call)
+##### References
+
+[함수 호출에 대한 규칙](#SS-call)
 
 ##### Note
 
-The rule is "avoid", not "don't use." Of course there will be (rare) exceptions, such as `cin`, `cout`, and `cerr`.
+이 규칙은 "지양하라"는 것이지, "사용하지 마라"가 아니다. 물론 (드물게) `cin`, `cout`, 그리고 `cerr` 같은 예외가 있을 것이다. 
 
 ##### Enforcement
 
-(간단함) 네임스페이스 범위 내에 정의된 `const`가 아닌 변수에 대해서 모두 보고하라.
+(간단함) 네임스페이스 범위 내에 정의된 `const`가 아닌 변수에 대해서 모두 보고한다.
 
-### <a name="Ri-singleton"></a>I.3: Avoid singletons
+### <a name="Ri-singleton"></a>I.3: 싱글톤 패턴을 지양하라
 
 ##### Reason
+
 싱글톤은 기본적으로 복잡한 전역 개체이다.
 
 ##### Example
 
 ```c++
     class Singleton {
-        // ... lots of stuff to ensure that only one Singleton object is created,
-        // that it is initialized properly, etc.
+        // ... 오직 하나만 생성되었고, 적절하게 초기화 되었는지 등을 확신하기 위해서
+        // 많은 것들이 필요하다.
     };
 ```
 
 싱글톤 아이디어에는 많은 변형이 있다.
-That's part of the problem.
+이는 문제의 일부일 뿐이다.
 
 ##### Note
 
@@ -174,12 +187,13 @@ That's part of the problem.
     }
 ```
 
-이 방식은 초기화 순서와 관련된 문제에 대해 가장 효과적인 해결책 중 하나다.
-다중 스레드 환경에서 정적 개체의 초기화는 경합 조건을 유발하지 않는다. (단, 생성자 내에서 공유 개체에 부주의하게 접근하지 않아야 한다.)
+> 역주: Scott Meyers Singleton으로도 알려져 있습니다.
 
-Note that the initialization of a local `static` does not imply a race condition.
-However, if the destruction of `X` involves an operation that needs to be synchronized we must use a less simple solution.
-For example:
+이 방법은 초기화 순서와 관련된 문제에 대해 가장 효과적인 해결책 중 하나다.
+다중 스레드 환경에서, 정적 개체의 초기화는 경합 조건을 유발하지 않는다.
+(단, 생성자 내에서 공유 개체에 부주의하게 접근하지 않아야 한다.)
+
+지역 `static` 변수의 초기화는 경쟁 상태의 가능성이 없다. 하지만, `X`의 소멸이 동기화가 필요한 연산을 포함한다면 조금 더 복잡한 해결책을 사용해야 한다. 예를 들어:
 
 ```c++
     X& myX()
@@ -189,12 +203,12 @@ For example:
     }
 ```
 
-Now someone must `delete` that object in some suitably thread-safe way.
-That's error-prone, so we don't use that technique unless
+이 경우 누군가 해당 개체를 스레드 안전한 방법으로 `delete`해야 한다.
+이는 오류를 만들기 쉽기 때문에, 이 방법은 아래와 같은 조건이 아니면 사용되지 않는다.
 
-* `myX` is in multi-threaded code,
-* that `X` object needs to be destroyed (e.g., because it releases a resource), and
-* `X`'s destructor's code needs to be synchronized.
+* `myX` 가 다중 스레드 환경에서 실행되는 코드이며,
+* `X` 개체가 소멸되어야만 하며(가령, 어떤 자원을 해제하기 때문에),
+* `X`의 소멸자 코드가 동기화 되어야만 한다.
 
 하나의 개체만 생성해야 하는 클래스로 싱글톤을 정의한다면 `myX`와 같은 함수는 싱글톤이 아니다. 그리고 이 유용한 테크닉은 싱글톤이 아닌 규칙에 대한 예외는 아니다.
 
@@ -202,11 +216,11 @@ That's error-prone, so we don't use that technique unless
 
 일반적으로 매우 힘들다.
 
-* `singleton`을 포함하는 이름을 가진 클래스를 찾아라
-* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾아라
-* If a class X has a public static function that contains a function-local static of the class' type X and returns a pointer or reference to it, ban that
+* `singleton`을 포함하는 이름을 가진 클래스를 찾는다
+* 개체를 세거나 생성자를 검사해 단일 개체만 만들어진 클래스를 찾는다
+* 만약 클래스 `X`가 public static 함수를 가진다면, 그리고 해당 함수 안에서 `X`타입의 static 변수의 포인터나 참조를 반환한다면, 금지하라.
 
-### <a name="Ri-typed"></a>I.4: Make interfaces precisely and strongly typed
+### <a name="Ri-typed"></a>I.4: 인터페이스가 타입 시스템을 정확하고 엄격하게 준수하도록 만들어라
 
 ##### Reason
 
@@ -219,15 +233,17 @@ That's error-prone, so we don't use that technique unless
 다음을 고려해 보자:
 
 ```c++
-    void pass(void* data);    // void* is suspicious
+    void pass(void* data);    // void* 가 무엇을 의미하는지, 어떻게 사용되는지 알 수 없다(suspicious)
 ```
 
 이제 피호출자에서 올바른 타입으로 사용하기 위해 `data` 포인터를 캐스팅해야 한다. 하지만 오류가 발생하기 쉽고, 구질구질하다.
 특히 인터페이스에서 `void*`를 피하라.
 대신 베이스 클래스를 가리키는 포인터나 `variant` 사용을 고려하라.
 
-**Alternative**: 때때로 템플릿 매개 변수는 `void*`를 제거하고 `T*`나 `T&`로 변환할 수 있다.
-For generic code these `T`s can be general or concept constrained template parameters.
+##### Alternative
+
+때때로 템플릿 매개 변수는 `void*`를 제거하고 `T*`나 `T&`로 변환할 수 있다.
+제네릭 코드에서 이렇게 사용되는 `T`들은 일반적인 혹은 컨셉(Concept)로 제한된 템플릿 인자일 수 있다.
 
 ##### Example, bad
 
@@ -239,7 +255,7 @@ For generic code these `T`s can be general or concept constrained template param
     draw_rect(p.x, p.y, 10, 20);          // what does 10, 20 mean?
 ```
 
-`int`는 임의 형태의 정보를 전달할 수 있어서, 네 `int`가 각각 어떤 의미를 갖는지를 유추해야 한다.
+`int`는 임의 형태의 정보를 전달할 수 있어서, `int`들이 각각 어떤 의미를 갖는지를 유추해야 한다.
 아마도 처음 두 `int`는 `x`, `y` 좌표일 것 같지만, 나머지 두 `int`는 무엇을 의미할까?  
 주석이나 매개 변수 이름이 도움을 줄 수 있지만, 명확히 할 수 있다:
 
@@ -259,10 +275,10 @@ For generic code these `T`s can be general or concept constrained template param
 다음 예제에서 인터페이스만 보고는 `time_to_blink`이 무엇을 의미하는지 잘 모르겠다. 초를 의미할까? 밀리초를 의미할까?
 
 ```c++
-    void blink_led(int time_to_blink) // bad -- the unit is ambiguous
+    void blink_led(int time_to_blink) // 나쁜 코드 -- 시간의 단위를 알 수 없다
     {
         // ...
-        // do something with time_to_blink
+        // time_to_blink로 무언가 한다
         // ...
     }
 
@@ -277,10 +293,10 @@ For generic code these `T`s can be general or concept constrained template param
 C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 명시적으로 표현하는데 도움이 된다.
 
 ```c++
-    void blink_led(milliseconds time_to_blink) // good -- the unit is explicit
+    void blink_led(milliseconds time_to_blink) // 좋은 코드 -- 단위를 명확히 알 수 있다
     {
         // ...
-        // do something with time_to_blink
+        // time_to_blink로 무언가 한다
         // ...
     }
 
@@ -294,12 +310,12 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 ```c++
     template<class rep, class period>
-    void blink_led(duration<rep, period> time_to_blink) // good -- accepts any unit
+    void blink_led(duration<rep, period> time_to_blink) // 좋은 코드 -- 어떤 단위로도 사용할 수 있다
     {
-        // assuming that millisecond is the smallest relevant unit
+        // millisecond가 가장 정밀한 단위라고 가정한다
         auto milliseconds_to_blink = duration_cast<milliseconds>(time_to_blink);
         // ...
-        // do something with milliseconds_to_blink
+        // milliseconds_to_blink로 무언가 한다
         // ...
     }
 
@@ -313,13 +329,14 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 ##### Enforcement
 
 * (간단함) `void*`를 매개 변수나 리턴 타입으로 사용한다면 보고한다
-* (잘하기 어려움) 다수의 내장 타입 인자를 갖는 멤버 함수를 찾는다
+* (간단함) 하나 이상의 `bool` 매개 변수를 사용한다면 보고한다
+* (잘하기 어려움) 다수의 내장 타입(primitive type) 인자를 갖는 함수를 찾는다
 
-### <a name="Ri-pre"></a>I.5: State preconditions (if any)
+### <a name="Ri-pre"></a>I.5: (하나라도 있다면) 사전 조건을 기술하라
 
 ##### Reason
 
-인자는 피호출자에서 적절한 사용을 제한할 수 있는 의미를 갖는다.
+전달 인자(argument)는 피호출자에서 적절한 사용을 제한할 수 있는 의미를 갖는다.
 
 ##### Example
 
@@ -329,14 +346,14 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
     double sqrt(double x);
 ```
 
-여기서 `x`는 반드시 음수가 아니어야 한다. 타입 시스템으로는 이를 (있는 그대로 쉽게) 표현할 수 없고, 그래서 다른 수단을 사용해야 한다. 예를 들어,
+여기서 `x`는 반드시 음수가 아니어야 한다. 타입 시스템으로는 이를 (있는 그대로 쉽게) 표현할 수 없기 때문에, 다른 수단을 사용해야 한다.
+예를 들어:
 
 ```c++
     double sqrt(double x); // x must be nonnegative
 ```
 
-일부 사전 조건은 단정문으로 표현하기도 한다.
-
+일부 사전 조건은 단정문(assertion)으로 표현하기도 한다.
 예를 들어:
 
 ```c++
@@ -345,26 +362,30 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 
 이상적으로 `Expects(x >= 0)` 조건이 `sqrt()`의 인터페이스에 일부분이 되는게 가장 좋지만 그렇게 하기는 쉽지 않다. 따라서 지금은 함수 정의부(함수 본문)에 위치시킨다.
 
-**References**: `Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
+##### References
+
+`Expects()`는 [GSL](#S-gsl)에 기술되어 있다.
 
 ##### Note
 
-`Excepts(p != nullptr);`처럼 요구 사항의 공식적인 명세를 선호하라.
-불가능하다면, `// the sequence [p:q) is ordered using <`와 같이 영문 텍스트 주석을 사용하라.
+`Excepts(p != nullptr);`처럼 요구 사항을 정확히(formal) 명세하는 것을 선호하라.
+불가능하다면, `// the sequence [p:q) is ordered using <`와 같이 주석을 사용하라.
 
 ##### Note
 
 대부분의 멤버 함수는 클래스의 불변 조건(invariant) 중 일부에 해당하는 선행 조건을 갖고 있다.
-해당 불변 조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 멤버 함수를 통해 재구성되어야 한다.
-그래서 각 함수마다 언급할 필요는 없다.
+해당 불변 조건은 생성자에서 구성되는데 클래스 외부로부터 호출되는 모든 멤버 함수를 통해 재구성(reestablish)되어야 한다.
+이를 각 멤버 함수마다 언급할 필요는 없다.
 
 ##### Enforcement
 
 (적용 불가능)
 
-**See also**: 포인터 전달에 대한 규칙. ???
+##### See Also
 
-### <a name="Ri-expects"></a>I.6: Prefer `Expects()` for expressing preconditions
+포인터 전달에 대한 규칙. ???
+
+### <a name="Ri-expects"></a>I.6: 사전 조건(pre-condition)을 표현하고 싶다면 `Expects()`를 사용하라
 
 ##### Reason
 
@@ -389,7 +410,7 @@ C++11에 도입된 `std::chrono::duration` 타입은 지속 시간의 단위를 
 ##### Note
 
 사전 조건은 구현 부분보다는 인터페이스 부분에 포함시켜야 한다. 하지만 아직은 그렇게 할 수 있는 언어 기능이 없다.
-Once language support becomes available (e.g., see the [contract proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) we will adopt the standard version of preconditions, postconditions, and assertions.
+언어에서 이를 지원할 수 있게 된다면 (참고: [contract 제안서](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) 표준에 맞는 사전조건, 사후조건, 단정문을 적용하게 될 것이다.
 
 ##### Note
 
@@ -397,13 +418,13 @@ Once language support becomes available (e.g., see the [contract proposal](http:
 
 ##### Note
 
-No, using `unsigned` is not a good way to sidestep the problem of [ensuring that a value is nonnegative](#Res-nonnegative).
+`unsigned`를 사용하는 것은 [값이 음수가 아니라고 보장하는](#Res-nonnegative) 문제를 회피하는 좋은 방법이 아니다.
 
 ##### Enforcement
 
 (적용 불가능) 사전 조건이 단정될 수 있는 다양한 방법을 찾는 것은 실현 가능하지 않다. 쉽게 식별할 수 있는 것들에 대해 경고(`assert()`)를 할 수 있는 언어 기능이 없다면 의심의 여지가 생길 수 밖에 없다.
 
-### <a name="Ri-post"></a>I.7: State postconditions
+### <a name="Ri-post"></a>I.7: 사후조건(post-condition)을 기술하라
 
 ##### Reason
 
@@ -418,7 +439,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 ```
 
 여기서 부주의하게 높이와 폭이 양수여야 한다는 사전 조건 명세를 빠뜨렸다.
-역시 넓이를 구하는 알고리즘(`hieght * width`)이 정수의 최댓값보다 클 수 있다는 사후 조건 명세를 빠뜨렸다.
+역시 넓이를 구하는 알고리즘(`height * width`)이 정수의 최댓값보다 클 수 있다는 사후 조건 명세를 빠뜨렸다.
 오버플로우가 발생할 수 있다.
 
 다음 사용을 고려해 보자:
@@ -437,7 +458,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 악명 높은 보안 버그를 고려해 보자:
 
 ```c++
-    void f()    // problematic
+    void f()    // 문제가 있다
     {
         char buffer[MAX];
         // ...
@@ -448,7 +469,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 버퍼가 초기화되어야 하고 최적화하면서 중복되는 `memset()`의 호출을 제거했음을 설명하는 사후 조건이 없다.
 
 ```c++
-    void f()    // better
+    void f()    // 좀 더 낫다
     {
         char buffer[MAX];
         // ...
@@ -483,7 +504,7 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 사후 조건을 기술함으로서 언급을 명확하게 할 수 있다:
 
 ```c++
-    void manipulate(Record& r)    // postcondition: m is unlocked upon exit
+    void manipulate(Record& r)    // 사후조건: m 은 함수가 종료된 후 lock이 해제되어있다.
     {
         m.lock();
         // ... no m.unlock() ...
@@ -510,15 +531,14 @@ No, using `unsigned` is not a good way to sidestep the problem of [ensuring that
 
 ##### Enforcement
 
-(Not enforceable) This is a philosophical guideline that is infeasible to check
-directly in the general case. Domain specific checkers (like lock-holding
-checkers) exist for many toolchains.
+(적용 불가능) 이는 일반적으로 검사할 수 없는 이론적인 규칙(philosophical guide)이다.
+특정 분야에 맞춰서 검사하는 (잠금 해제 검사처럼) 도구들은 이미 여러 도구에 존재한다.
 
-### <a name="Ri-ensures"></a>I.8: Prefer `Ensures()` for expressing postconditions
+### <a name="Ri-ensures"></a>I.8: 사후 조건을 표현하고 싶다면 `Ensures()`를 사용하라
 
 ##### Reason
 
-사후 조건이라는 것을 분명히 하기 위해, 또 분석 툴을 사용하기 위해서다.
+사후 조건이라는 것을 분명히 하기 위해, 그리고 분석 도구를 사용하기 위해서다.
 
 ##### Example
 
@@ -537,20 +557,22 @@ checkers) exist for many toolchains.
 사후 조건은 주석문, `if`문, `assert()`문 등 다양한 방식으로 기술할 수 있다.
 이는 일반적인 코드와 구분을 어렵게 만들고, 갱신하기 어렵게 만들고, 툴로 조작하기 어렵게 만들며 잘못된 의미를 가질 수도 있다.
 
-**Alternative**: 이 리소스는 반드시 해제되어야 한다" 형태의 사후 조건은 [RAII](#Rc-raii)를 통해 가장 잘 나타낼 수 있다.
+##### Alternative
+
+이 리소스는 반드시 해제되어야 한다" 형태의 사후 조건은 [RAII](#Rc-raii)를 통해 가장 잘 나타낼 수 있다.
 
 ##### Note
 
 이상적으로 `Ensures`는 인터페이스의 일부가 되어야 하지만, 쉽게 할 수 있는 작업이 아니다.
 현재로서는 정의 부분(함수 본문)에 위치시킨다.
-Once language support becomes available (e.g., see the [contract proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) we will adopt the standard version of preconditions, postconditions, and assertions.
+언어에서 이를 지원할 수 있게 된다면 (참고: [contract 제안서](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf)) 표준에 맞는 사전조건, 사후조건, 단정문을 적용하게 될 것이다.
 
 ##### Enforcement
 
 (적용 불가능) 사후 조건을 단정할 수 있는 다양한 방식을 찾는 것은 실현 가능하지 않다. 
-Warning about those that can be easily identified (`assert()`) has questionable value in the absence of a language facility.
+쉽게 확인할 수 있는 것들(`assert()`)에 대해 경고하는 것은 언어 기능이 없는 상황에서는 미심쩍을 수 있다.
 
-### <a name="Ri-concepts"></a>I.9: If an interface is a template, document its parameters using concepts
+### <a name="Ri-concepts"></a>I.9: 인터페이스가 템플릿이라면 컨셉(Concept)을 사용해서 매개 변수를 문서화하라
 
 ##### Reason
 
@@ -576,13 +598,15 @@ Warning about those that can be easily identified (`assert()`) has questionable 
 `//`가 제거되면 대부분의 컴파일러가 `requires` 구문을 검사할 수 있을 것이다.
 현재 Concept은 GCC 6.1과 그 이후 버전에서 지원된다.
 
-**See also**: [제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 보라
+##### See Also
+
+[제너릭 프로그래밍](#SS-GP)과 [컨셉](#SS-t-concepts)을 참고하라
 
 ##### Enforcement
 
 (아직 적용 불가능) 언어 명세를 작성중이다. 언어 명세가 정의된 후, 비가변 템플릿 매개 변수가 (선언이나 `requires`문에 언급되지 않은) 컨셉으로 제한되지 않는다면 경고하라.
 
-### <a name="Ri-except"></a>I.10: Use exceptions to signal a failure to perform a required task
+### <a name="Ri-except"></a>I.10: 요구된 작업의 수행 실패를 알리기 위해 예외를 사용하라
 
 ##### Reason
 
@@ -593,10 +617,10 @@ Warning about those that can be easily identified (`assert()`) has questionable 
 ##### Example
 
 ```c++
-    int printf(const char* ...);    // bad: return negative number if output fails
+    int printf(const char* ...);    // 나쁜 코드: 출력에 실패하면 음수를 반환한다
 
     template <class F, class ...Args>
-    // good: throw system_error if unable to start the new thread
+    // 좋은 코드: 새 스레드를 시작하지 못하면 system_error를 던진다
     explicit thread(F&& f, Args&&... args);
 ```
 
@@ -628,8 +652,8 @@ Warning about those that can be easily identified (`assert()`) has questionable 
     // ... use val ...
 ```
 
-This style unfortunately leads to uninitialized variables.
-A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0144r1.pdf) to deal with that will become available in C++17.
+안타깝게도 이런 코드 스타일은 초기화되지 않은 변수를 만들게 한다.
+이에 대응하기 위한 [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0144r1.pdf)기능이 C++17에서부터 사용 가능하다.
 
 ```c++
     auto [val, error_code] = do_something();
@@ -644,19 +668,20 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
 "성능"이 예외를 사용하지 않아야 하는 타당한 이유라고는 생각하지 않는다.
 
 * 명시적인 오류 검사 및 처리는 종종 예외 처리만큼 많은 시간과 공간을 쓰기도 한다.
-* 간결한 코드는 종종 예외 처리를 포함하더라도 더 좋은 성능을 갖는다. (프로그램과 최적화를 통해 실행 경로를 단순화한다.)
+* 간결한 코드는 종종 예외 처리를 포함하더라도 더 좋은 성능을 갖는다. (프로그램과 최적화를 통해 실행 경로를 단순화한다)
 * 성능이 중요한 코드의 좋은 규칙은 오류 검사를 코드의 핵심 부분 바깥으로 옮기는 것이다 ([검사](#Rper-checking)).
-* 장기적으로 보면 정규 코드가 더 잘 최적화된다.
-* Always carefully [measure](#Rper-measure) before making performance claims.
+* 장기적으로 보면 정돈된(regular) 코드가 더 잘 최적화된다.
+* 성능에 대해 지적하기 전에는 항상 신중하게 [측정하라](#Rper-measure).
 
-**See also**: 사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
+##### See Also
+사전 조건, 사후 조건의 위반 보고를 위한 [I.5](#Ri-pre) 및 [I.7](#Ri-post).
 
 ##### Enforcement
 
 * (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다
-* `errno`를 살펴 봐라
+* `errno`를 탐색한다
 
-### <a name="Ri-raw"></a>I.11: Never transfer ownership by a raw pointer (`T*`) or reference (`T&`)
+### <a name="Ri-raw"></a>I.11: 원시 포인터(`T*`) 혹은 참조(`T&`)를 사용해 소유권을 전달하지 마라
 
 ##### Reason
 
@@ -687,11 +712,13 @@ A facility [structured bindings](http://www.open-std.org/jtc1/sc22/wg21/docs/pap
     }
 ```
 
-**Alternative**: [Pass ownership](#Rr-smartptrparam) using a "smart pointer", such as `unique_ptr` (for exclusive ownership) and `shared_ptr` (for shared ownership).
-However, that is less elegant and often less efficient than returning the object itself,
-so use smart pointers only if reference semantics are needed.
+##### Alternative
 
-**Alternative**: ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코드를 수정할 수 없는 경우가 있다.
+[소유권 전달](#Rr-smartptrparam)은 배타적 소유를 위한 `unique_ptr`와 공유를 위한 `shared_ptr` 같은 스마트 포인터를 사용하라.
+하지만 이는 개체 그 자체를 반환하는 것보다 덜 아름답고 덜 효율적이다.
+오직 참조로 사용하도록 할때만 스마트 포인터를 사용하라.
+
+ABI 호환성 요구 사항 또는 리소스 부족으로 인해 오래된 코드를 수정할 수 없는 경우가 있다.
 이 경우, [가이드라인 지원 라이브러리](#S-gsl)의 `owner`를 사용해 포인터의 소유권을 표시하라:
 
 ```c++
@@ -710,19 +737,23 @@ so use smart pointers only if reference semantics are needed.
 
 ##### Note
 
-처리되지 않은 포인터(또는 반복자)로 전달된 모든 개체는 호출자가 소유한 것으로 간주되므로 호출자가 수명을 처리한다. Viewed another way:
-ownership transferring APIs are relatively rare compared to pointer-passing APIs,
-so the default is "no ownership transfer."
+처리되지 않은 포인터(또는 반복자)로 전달된 모든 개체는 호출자가 소유한 것으로 간주되므로 호출자가 수명을 처리한다.  
+다른 관점에서 보자면: 소유권을 전달하는 API는 포인터를 전달하는 API에 비해 상대적으로 적다. 
+그러니 일반적으로 내재된(default) 의미는 "소유권을 전달하지 않는" 것이다.
 
-**See also**: [Argument passing](#Rf-conventional), [use of smart pointer arguments](#Rr-smartptrparam), and [value return](#Rf-value-return).
+##### See Also
+
+* [인자 전달](#Rf-conventional)
+* [스마트 포인터의 사용](#Rr-smartptrparam)
+* [값 반환](#Rf-value-return)
 
 ##### Enforcement
 
-* (간단함) `owner`가 아닌 처리되지 않은 포인터의 `delete`에 대해 경고를 표시하라.
-* (간단함) 모든 코드 경로에서 `owner` 포인터를 `reset`하거나 명시적으로 `delete`를 실패하게 되면 경고를 표시하라.
-* (간단함) `new`의 반환 값이나 포인터 타입의 반환 값을 갖는 함수 호출이 처리되지 않은 포인터에 할당되면 경고를 표시하라.
+* (간단함) `owner`가 아닌 처리되지 않은 포인터의 `delete`에 대해 경고하라
+* (간단함) 모든 코드 경로에서 `owner` 포인터를 `reset`하거나 명시적으로 `delete`를 실패하게 되면 경고하라
+* (간단함) `new`의 반환 값이나 포인터 타입의 반환 값을 갖는 함수 호출이 처리되지 않은 포인터에 할당되면 경고하라
 
-### <a name="Ri-nullptr"></a>I.12: Declare a pointer that must not be null as `not_null`
+### <a name="Ri-nullptr"></a>I.12: null이 되어선 안되는 포인터는 `not_null`로 선언하라
 
 ##### Reason
 
@@ -732,13 +763,13 @@ so the default is "no ownership transfer."
 ##### Example
 
 ```c++
-    int length(const char* p);            // it is not clear whether length(nullptr) is valid
+    int length(const char* p);            // nullptr를 사용할 수 있는지 분명하지 않다.
+    
+    length(nullptr);                      // 이렇게 사용해도 괜찮을까?
 
-    length(nullptr);                      // OK?
+    int length(not_null<const char*> p);  // 좀 더 낫다: p가 nullptr가 되면 안된다는 것을 알 수 있다.
 
-    int length(not_null<const char*> p);  // better: we can assume that p cannot be nullptr
-
-    int length(const char* p);            // we must assume that p can be nullptr
+    int length(const char* p);            // p가 nullptr가 될수 있다고 가정해야 한다.
 ```
 
 소스 코드에 의도를 명시함으로써, 컴파일러와 툴이 정적 분석을 통해 일부 오류 클래스를 찾아내는 등의 보다 나은 진단을 제공하고 분기 및 널(NULL) 검사를 제거하는 등의 최적화 작업을 수행할 수 있다.
@@ -761,33 +792,34 @@ so the default is "no ownership transfer."
 
 ##### Enforcement
 
-* (간단함) ((기초)) 함수가 모든 제어-흐름 경로에서 포인터 매개 변수에 접근하기 전에 `nullptr`인지 검사한다면, `not_null`으로 선언되어야 한다는 경고하라
+* (간단함) ((기본사항)) 함수가 모든 제어-흐름 경로에서 포인터 매개 변수에 접근하기 전에 `nullptr`인지 검사한다면, `not_null`으로 선언되어야 한다는 경고하라
 * (복잡함) 포인터 반환 값을 갖는 함수가 모든 반환 경로에서 `nullptr`이 아닌지 확인한다면, 리턴 타입을 `not_null`으로 선언해야 된다는 경고하라
 
-### <a name="Ri-array"></a>I.13: Do not pass an array as a single pointer
+### <a name="Ri-array"></a>I.13: 배열을 단일 포인터로 전달하지 마라
 
 ##### Reason
 
-(포인터, 크기)-스타일 인터페이스는 오류가 발생하기 쉽다. 또한 (배열에 대한) 일반 포인터는 호출을 받는 곳에서 크기를 결정할 수 있도록 몇 가지 관례에 의존해야 한다.
+(포인터, 크기)-스타일 인터페이스는 오류가 발생하기 쉽다.
+또한 (배열에 대한) 일반 포인터는 피호출자에서 크기를 결정할 수 있도록 몇 가지 관례에 의존해야 한다.
 
 ##### Example
 
 다음을 고려해 보자:
 
 ```c++
-    void copy_n(const T* p, T* q, int n); // copy from [p:p+n) to [q:q+n)
+    void copy_n(const T* p, T* q, int n); // [p:p+n)에서 [q:q+n)로 복사한다
 ```
 
-만약 `q`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 덮어쓰게 된다.
-만약 `p`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 읽을 것이다.
+만약 `q`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 덮어쓰게 된다.  
+만약 `p`가 가리키는 배열의 원소 갯수가 `n`보다 적다면 어떻게 될까? 관계없는 메모리를 읽을 것이다.  
 어느 쪽이나 정의되지 않은 동작을 수행하거나 매우 불쾌한 버그가 발생할 수 있다.
 
 ##### Alternative
 
-명시적인 범위 사용을 고려해 보라:
+명시적인 범위(`span`) 사용을 고려해 보라:
 
 ```c++
-    void copy(span<const T> r, span<T> r2); // copy r to r2
+    void copy(span<const T> r, span<T> r2); // r에서 r2로 복사한다
 ```
 
 ##### Example, bad
@@ -795,17 +827,21 @@ so the default is "no ownership transfer."
 다음을 고려해 보자:
 
 ```c++
-    void draw(Shape* p, int n);  // poor interface; poor code
+    void draw(Shape* p, int n);  // 허접한(poor) 인터페이스는 허접한 코드를 낳는다.
     Circle arr[10];
     // ...
     draw(arr, 10);
 ```
 
 `n`의 인수로 `10`을 전달하는 것은 실수일 수 있다. 가장 일반적인 관례는 \[`0`:`n`)이라고 가정하는 것이지만, 이러한 내용이 어디에도 언급되어 있지 않다.
-더 나쁜 부분은 어쨌든 `draw()` 호출이 컴파일된다는 것이다. 배열에서 포인터로의 암시적 변환(배열 부패)이 있었고, `Circle`에서 `Shape`로의 또 다른 암시적 변환이 있었다.
-`draw()`가 그 배열을 통해 안전하게 반복문을 수행할 수 있는 방법은 없다. 왜냐하면 요소의 크기를 알 수 있는 방법이 없기 때문이다.
+더 나쁜 부분은 어쨌든 `draw()` 호출이 컴파일된다는 것이다.
+배열에서 포인터로의 암시적 변환(배열 부패(array decay))이 있었고, `Circle`에서 `Shape`로의 또 다른 암시적 변환이 있었다.
+`draw()`가 그 배열을 통해 안전하게 반복문을 수행할 수 있는 방법은 없다.
+왜냐하면 요소의 크기를 알 수 있는 방법이 없기 때문이다.
 
-**Alternative**: 요소의 크기한계를 보장하고 위험한 암시적 변환을 방지하는 지원 클래스를 사용하라.
+##### Alternative
+
+요소의 크기한계를 보장하고 위험한 암시적 변환을 방지하는 지원 클래스를 사용하라.
 
 예를 들어:
 
@@ -813,11 +849,11 @@ so the default is "no ownership transfer."
     void draw2(span<Circle>);
     Circle arr[10];
     // ...
-    draw2(span<Circle>(arr));  // deduce the number of elements
-    draw2(arr);    // deduce the element type and array size
+    draw2(span<Circle>(arr));   // 원소의 개수를 알 수 있다(deduce)
+    draw2(arr);                 // 원소 타입과 배열의 길이를 알 수 있다
 
     void draw3(span<Shape>);
-    draw3(arr);    // error: cannot convert Circle[10] to span<Shape>
+    draw3(arr);    // 오류: Circle[10]는 span<Shape>가 될 수 없다.
 ```
 
 이 `draw2()`는 같은 양의 정보를 `draw()`에 전달하지만, 명시적으로 `Circle`이 되어야 한다는 사실을 알 수 있다.
@@ -825,18 +861,18 @@ so the default is "no ownership transfer."
 ##### Exception
 
 `zstring`과 `czstring`을 사용해 C-스타일의 `\0`로 끝나는 문자열을 나타내라.
-But when doing so, use `string_span` from the [GSL](#GSL) to prevent range errors.
+하지만 이렇게 할때는 범위 오류가 발생하지 않도록 [GSL](#GSL)의 `string_span`를 사용하라.
 
 ##### Enforcement
 
 * (간단함) ((경계)) 배열 타입에서 포인터 타입으로의 암시적 변환에 의존하는 표현식에 대해 경고를 표시하라. string/czstring 포인터 타입에 대해서는 예외를 허용한다.
 * (간단함) ((경계)) 포인터 타입의 값을 가져오는 포인터 타입의 표현식에 대한 산술 연산에 대해 경고를 표시하라. zstring/czstring 포인터 타입에 대해서는 예외를 허용한다.
 
-### <a name="Ri-global-init"></a>I.22: Avoid complex initialization of global objects
+### <a name="Ri-global-init"></a>I.22: 전역 개체가 복잡하게 초기화되지 않도록 하라
 
 ##### Reason
 
-Complex initialization can lead to undefined order of execution.
+복잡한 초기화는 실행 순서를 불분명(undefined order)하게 한다.
 
 ##### Example
 
@@ -850,39 +886,36 @@ Complex initialization can lead to undefined order of execution.
     const X x = g(y);   // read y; write x
 ```
 
-Since `x` and `y` are in different translation units the order of calls to `f()` and `g()` is undefined;
-one will access an uninitialized `const`.
-This shows that the order-of-initialization problem for global (namespace scope) objects is not limited to global *variables*.
+`x`와 `y`가 서로 다른 파일(translation units)에 있기 때문에, `f()`와 `g()`의 호출 순서는 알 수 없다;
+둘 중 하나가 초기화되지 않은 `const`에 접근할 수 있다.
+이는 전역 개체들의 초기화 순서 문제가 *변수*에만 한정된것이 아님을 보여준다.
 
 ##### Note
 
-Order of initialization problems become particularly difficult to handle in concurrent code.
-It is usually best to avoid global (namespace scope) objects altogether.
+동시성을 고려한 코드에서 초기화 순서 문제는 특히 다루기가 어렵다.
+대부분의 경우 전역 개체를 사용하지 않는 것이 최선의 해결책이다.
 
 ##### Enforcement
 
-* Flag initializers of globals that call non-`constexpr` functions
-* Flag initializers of globals that access `extern` objects
+* 비 `constexpr` 함수를 호출하는 전역 초기화를 지적한다.
+* `extern` 개체에 접근하는 전역 초기화를 지적한다.
 
-### <a name="Ri-nargs"></a>I.23: Keep the number of function arguments low
+### <a name="Ri-nargs"></a>I.23: 함수 인자 개수를 최소로 유지하라
 
 ##### Reason
 
 인자 갯수가 많으면 혼란을 일으킬 수 있다.
-인자를 많이 전달하는 것은 다른 대안에 비해 비용이 많이 든다.
+인자를 많이 전달하는 것은 다른 방법에 비해 비용이 많이 든다.
 
 ##### Discussion
 
-The two most common reasons why functions have too many parameters are:
+함수가 너무 많은 매개변수를 가질때는 보통 2가지 이유가 있다:
 
-1. *Missing an abstraction.*
-   There is an abstraction missing, so that a compound value is being
-   passed as individual elements instead of as a single object that enforces an invariant.
-   This not only expands the parameter list, but it leads to errors because the component values
-   are no longer protected by an enforced invariant.
-
-2. *Violating "one function, one responsibility."*
-   The function is trying to do more than one job and should probably be refactored.
+1. *추상화 되지 않음*  
+   추상화를 하지 않았기 때문에 불변조건이 있는 단일 개체가 아니라 복잡하고 개별적인 형태로 값들이 전달되고 있는 것이다.
+   이는 인자 목록을 길게 만들 뿐만 아니라 인자들이 불변조건으로 보호되지 않기 때문에 오류로 이어질 가능성도 높다.
+2. *"하나의 함수가 한가지 일만 한다"는 규칙을 위반"*  
+   해당 함수가 하나를 초과하는 작업을 하고 있다. 이는 고쳐서 다시 작성해야(refactor) 한다.
 
 ##### Example
 
@@ -895,10 +928,11 @@ The two most common reasons why functions have too many parameters are:
                          OutputIterator result, Compare comp);
 ```
 
-Note that this is because of problem 1 above -- missing abstraction. Instead of passing a range (abstraction), STL passed iterator pairs (unencapsulated component values).
+앞서 지적한 1번 문제점에 해당한다 -- 
+추상화가 되지 않은 것이다. STL에서 범위(추상화된 개념)를 전달하지 않고 반복자 쌍(pair)들을 전달한다. 이는 캡슐화되지 않은 값들(unencapsulated component values)에 해당한다.
 
-여기에 4개의 템플릿 인자와 6개의 함수 인자가 있다.
-To simplify the most frequent and simplest uses, the comparison argument can be defaulted to `<`:
+여기에는 4개의 템플릿 인자와 6개의 함수 인자가 있다.
+가장 자주 보이고 단순한 사용법을 단순화하기 위해, 인자의 기본 비교를 `<`로 정할 수 있다.
 
 ```c++
     template<class InputIterator1, class InputIterator2, class OutputIterator>
@@ -917,7 +951,8 @@ To simplify the most frequent and simplest uses, the comparison argument can be 
 
 인자를 "묶어서" 그룹화하는 것은 인자의 갯수를 줄이고 검사할 기회를 늘리는 일반적인 기법이다.
 
-Alternatively, we could use concepts (as defined by the ISO TS) to define the notion of three types that must be usable for merging:
+다른 방법으로, ISO TS에서 정의한 컨셉(concepts)을 사용할수도 있다.
+세 타입이 merge에 사용될 수 있어야 한다고 정의하는 것이다.
 
 ```c++
     Mergeable{In1, In2, Out}
@@ -926,35 +961,37 @@ Alternatively, we could use concepts (as defined by the ISO TS) to define the no
 
 ##### Example
 
-The safety Profiles recommend replacing
+안전성 분석(safety profile)은 아래와 같은 코드를 
 
 ```c++
-    void f(int* some_ints, int some_ints_length);  // BAD: C style, unsafe
+    void f(int* some_ints, int some_ints_length);  // 나쁨: C 스타일, 안전하지 않다
 ```
 
-with
+아래 처럼 바꾸도록 권장한다
 
 ```c++
-    void f(gsl::span<int> some_ints);              // GOOD: safe, bounds-checked
+    void f(gsl::span<int> some_ints);              // 좋음: 안전하고 범위를 검사한다
 ```
 
-Here, using an abstraction has safety and robustness benefits, and naturally also reduces the number of parameters.
+여기서, 추상화를 사용하면 안전성과 견고함을 얻을 수 있다. 동시에 자연스럽게 인자의 수를 줄이게 된다.
 
 ##### Note
 
 얼마나 많은 인자가 있어야 너무 많다고 말할 수 있을까? 인자가 4개라면 많다고 말할 수 있다.
 4개의 인자로 가장 잘 표현할 수 있는 함수들도 있지만, 많지는 않다.
 
-**Alternative**: Use better abstraction: 인자를 의미있는 개체로 그룹화하고 개체를 전달하라. (값에 의한 전달 또는 레퍼런스에 의한 전달)
+##### Alternative
 
-**Alternative**:  더 적은 인자 갯수로 가장 일반적인 형태의 호출을 할 수 있는 디폴트 인자나 오버로드를 사용하라.
+더 나은 추상화: 인자를 의미있는 개체로 그룹화하고 개체를 전달하라. (값에 의한 전달 또는 레퍼런스에 의한 전달)
+
+더 적은 인자 갯수로 가장 일반적인 형태의 호출을 할 수 있는 디폴트 인자나 오버로드를 사용하라.
 
 ##### Enforcement
 
-* 범위 또는 뷰가 아닌 동일한 타입의 반복자(포인터 포함)를 2개 이상 선언하는 함수가 있다면 경고를 표시하라.
+* 범위 또는 뷰가 아닌 동일한 타입의 반복자(포인터 포함)를 2개 이상 선언하는 함수가 있다면 경고하라.
 * (적용 불가능) 철저한 점검이 불가능한 철학적 가이드라인이다.
 
-### <a name="Ri-unrelated"></a>I.24: Avoid adjacent unrelated parameters of the same type
+### <a name="Ri-unrelated"></a>I.24: 같은 타입의 관련없는 매개 변수가 붙어있지 않도록 하라
 
 ##### Reason
 
@@ -978,7 +1015,7 @@ Here, using an abstraction has safety and robustness benefits, and naturally als
 
 ##### Exception
 
-If the order of the parameters is not important, there is no problem:
+만약 매개변수들의 순서가 중요하지 않다면, 문제가 없다:
 
 ```c++
     int max(int a, int b);
@@ -994,7 +1031,7 @@ If the order of the parameters is not important, there is no problem:
 
 ##### Alternative
 
-Define a `struct` as the parameter type and name the fields for those parameters accordingly:
+`struct`를 매개변수 타입으로 정의하고 각 필드의 이름을 매개변수들에 따라 부여하라.
 
 ```c++
     struct SystemParams {
@@ -1005,22 +1042,22 @@ Define a `struct` as the parameter type and name the fields for those parameters
     void initialize(SystemParams p);
 ```
 
-This tends to make invocations of this clear to future readers, as the parameters
-are often filled in by name at the call site.
+이는 호출 지점에서 (멤버들의) 이름을 통해 값을 부여함으로써 
+나중에 코드를 읽을 사람들에게 호출을 이해하기 쉽게 한다.
 
 ##### Enforcement
 
 (간단함) 연속하는 두 매개 변수가 동일한 타입을 공유하는 경우 경고를 표시하라.
 
-### <a name="Ri-abstract"></a>I.25: Prefer abstract classes as interfaces to class hierarchies
+### <a name="Ri-abstract"></a>I.25: 클래스 계층(hierarchy)에 대한 인터페이스로 추상 클래스를 사용하라
 
 ##### Reason
 
-추상 클래스는 상태가 있는 베이스 클래스보다 안정적이다.
+추상 클래스(abstract class)는 상태가 있는 부모 클래스보다 안정적이다.
 
 ##### Example, bad
 
-당신은 `Shape`가 어디선가 나타날 것이라고 알고 있었을 것이다. :-)
+당신은 `Shape`예제를 쓸 것이라고 예상했을 것이다. :-)
 
 ```c++
     class Shape {  // bad: interface class loaded with data
@@ -1056,9 +1093,9 @@ are often filled in by name at the call site.
 
 ##### Enforcement
 
-(간단함) `C` 클래스를 가리키는 포인터가 `C`의 베이스를 가리키는 포인터에 할당되고 베이스 클래스에 데이터 멤버가 있으면 경고를 표시하라.
+(간단함) `C` 클래스를 가리키는 포인터가 `C`의 베이스를 가리키는 포인터에 할당되고 베이스 클래스에 데이터 멤버가 있으면 경고하라.
 
-### <a name="Ri-abi"></a>I.26: If you want a cross-compiler ABI, use a C-style subset
+### <a name="Ri-abi"></a>I.26: 크로스 컴파일러 ABI를 원한다면 C 스타일 코드를 사용하라
 
 ##### Reason
 
@@ -1080,17 +1117,16 @@ are often filled in by name at the call site.
 
 (적용 불가능) 인터페이스가 ABI의 일부가 되는 부분을 확실하게 식별하기는 어렵다.
 
-### <a name="Ri-pimpl"></a>I.27: For stable library ABI, consider the Pimpl idiom
+### <a name="Ri-pimpl"></a>I.27: 변화가 적은(stable) ABI를 원한다면, Pimpl idiom 사용을 고려하라
 
 ##### Reason
 
-Because private data members participate in class layout and private member functions participate in overload resolution, changes to those
-implementation details require recompilation of all users of a class that uses them. A non-polymorphic interface class holding a pointer to
-implementation (Pimpl) can isolate the users of a class from changes in its implementation at the cost of an indirection.
+private 데이터는 클래스의 메모리 레이아웃에 영향을 주고 멤버 함수들은 중복정의에 영향을 미치기 때문에, 이런 구현 세부사항이 바뀌는 경우엔 사용자 코드까지 다시 컴파일되어야 한다.
+구현에 대한 포인터(Pimpl)를 사용하는 다형적이지 않은 인터페이스는 간접 참조하는 비용만으로 구현이 바뀌었을때의 여파를 사용자로부터 분리시킬 수 있다.
 
 ##### Example
 
-interface (widget.h)
+인터페이스 (widget.h)
 
 ```c++
     class widget {
@@ -1107,7 +1143,7 @@ interface (widget.h)
     };
 ```
 
-implementation (widget.cpp)
+구현 (widget.cpp)
 
 ```c++
     class widget::impl {
@@ -1124,27 +1160,27 @@ implementation (widget.cpp)
 
 ##### Notes
 
-See [GOTW #100](https://herbsutter.com/gotw/_100/) and [cppreference](http://en.cppreference.com/w/cpp/language/pimpl) for the trade-offs and additional implementation details associated with this idiom.
+이런 방법을 적용했을때의 영향을 이해하려면 
+[GOTW #100](https://herbsutter.com/gotw/_100/)와 [cppreference](http://en.cppreference.com/w/cpp/language/pimpl)를 함께 보라.
 
 ##### Enforcement
 
-(Not enforceable) It is difficult to reliably identify where an interface forms part of an ABI.
+(적용 불가능) 어느 부분이 ABI의 인터페이스 부분인지 확실히 구분하기 힘들다.
 
-### <a name="Ri-encapsulate"></a>I.30: Encapsulate rule violations
+### <a name="Ri-encapsulate"></a>I.30: 규칙을 위반하는 코드는 캡슐화하라
 
 ##### Reason
 
-To keep code simple and safe.
-Sometimes, ugly, unsafe, or error-prone techniques are necessary for logical or performance reasons.
-If so, keep them local, rather than "infecting" interfaces so that larger groups of programmers have to be aware of the
-subtleties.
-Implementation complexity should, if at all possible, not leak through interfaces into user code.
+코드를 단순하고 안전하게 유지한다.
+때때로 논리적이거나 성능상의 이유로 지저분하고 안전하지 않으며 오류를 일으키기 쉬운 기술들이 필요할 때도 있다.
+그렇다면, 그 코드들은 인터페이스에 노출시키지 말고 지역적으로 유지하라. 이는 보다 많은 프로그래머들이 세세하게 알 필요가 없도록 한다.
+구현의 복잡함은 인터페이스를 통해 사용자 코드에 영향을 주어서는 안된다.
 
 ##### Example
 
-Consider a program that, depending on some form of input (e.g., arguments to `main`), should consume input
-from a file, from the command line, or from standard input.
-We might write
+(`main`의 인자처럼) 특정 형태의 입력에 의존적인 프로그램을 생각해보라.
+이런 프로그램은 파일, 커맨드라인, 혹은 표준 입력으로부터 입력을 받아야 한다.
+아마 이런 코드를 작성할 것이다.
 
 ```c++
     bool owned;
@@ -1157,24 +1193,23 @@ We might write
     istream& in = *inp;
 ```
 
-This violated the rule [against uninitialized variables](#Res-always),
-the rule against [ignoring ownership](#Ri-raw),
-and the rule [against magic constants](#Res-magic).
-In particular, someone has to remember to somewhere write
+이는 [초기화되지 않은 변수를 피하라](#Res-always)는 규칙을 위반한다.
+또한 [소유권을 무시](#Ri-raw)하며, [마법 상수를 피하라](#Res-magic)는 규칙에도 반한다.
+특히, 이 코드는 누군가 어딘가에 아래와 같은 코드를 작성해야 한다는 점을 기억해야만 한다. 
 
 ```c++
     if (owned) delete inp;
 ```
 
-We could handle this particular example by using `unique_ptr` with a special deleter that does nothing for `cin`,
-but that's complicated for novices (who can easily encounter this problem) and the example is an example of a more general
-problem where a property that we would like to consider static (here, ownership) needs infrequently be addressed
-at run time.
-The common, most frequent, and safest examples can be handled statically, so we don't want to add cost and complexity to those.
-But we must also cope with the uncommon, less-safe, and necessarily more expensive cases.
-Such examples are discussed in [[Str15]](http://www.stroustrup.com/resource-model.pdf).
+이 예제에 한해서는 `unique_ptr`를 사용해 `cin`에 필요한 소멸 코드를 처리할 수 있다.
+하지만 이 문제를 접하기 쉬운 초심자(novices)에게는 그런 방법을 기대하기 어렵다. 
+동시에 이 코드는 정적인 속성(이 예시에서는, 소유권)이 실행 시간에 관리되는 일반적인 문제의 한 사례에 불과하다.
 
-So, we write a class
+보편적으로 자주 보이고 안전한 예시들은 정적으로 해결할 수 있기 때문에, 그런 코드에는 비용과 복잡성을 더하고 싶지 않다.
+하지만 보편적이지 않고, 덜 안전한, 그리고 불필요하게 비용이 드는 경우에도 대처해야 한다.
+일례가 [Str15](http://www.stroustrup.com/resource-model.pdf)에서 다루어진다.
+
+결론적으로, 우리는 이런 클래스를 작성할 것이다.
 
 ```c++
     class Istream { [[gsl::suppress(lifetime)]]
@@ -1191,10 +1226,10 @@ So, we write a class
     };
 ```
 
-Now, the dynamic nature of `istream` ownership has been encapsulated.
-Presumably, a bit of checking for potential errors would be added in real code.
+이제 동적으로 결정되는 `istream`의 소유권이 캡슐화 되었다.
+아마 실제로는 잠재적인 오류를 검사하는 코드가 더 추가될 것이다.
 
 ##### Enforcement
 
-* Hard, it is hard to decide what rule-breaking code is essential
-* Flag rule suppression that enable rule-violations to cross interfaces
+* 어렵다. 어떤 (규칙을 위반하는) 코드가 필수적인지 결정하기 어렵다
+* 인터페이스에서 규칙 위반을 허용하도록 제약하는 경우 지적한다.
