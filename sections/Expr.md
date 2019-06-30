@@ -684,18 +684,18 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 
 ##### Enforcement
 
-* Flag reuse of a name in nested local scopes
-* Flag reuse of a member name as a local variable in a member function
-* Flag reuse of a global name as a local variable or a member name
-* Flag reuse of a base class member name in a derived class (except for function names)
+* 더 깊은(nested) 지역범위에서 이름을 재사용하면 지적하라
+* 멤버 함수에서 멤버 이름을 지역변수의 이름으로 사용하면 지적하라
+* 전역범위의 이름을 지역 변수 혹은 멤버의 이름으로 사용하면 지적하라
+* 상위 클래스 멤버의 이름을 하위 클래스에서 재사용하면 지적하라 (함수 이름은 제외)
 
 ### <a name="Res-always"></a>ES.20: 항상 개체를 초기화하라
 
 ##### Reason
 
-Avoid used-before-set errors and their associated undefined behavior.
-Avoid problems with comprehension of complex initialization.
-Simplify refactoring.
+값을 저장하기 전에 사용하는 오류와 관련된 미정의 행동(undefined behavior)를 방지한다.
+복잡한 초기화를 이해하면서 생기는 문제를 예방한다.
+리팩토링이 쉬워진다.
 
 ##### Example
 
@@ -707,32 +707,35 @@ Simplify refactoring.
         i = 7;   // initialize i
     }
 ```
-No, `i = 7` does not initialize `i`; it assigns to it. Also, `i` can be read in the `...` part. Better:
+
+이런 코드는 좋지 않다. `i = 7`는 `i`를 초기화하는 것이 아니다; 변수에 값을 대입을 하는 것이다.
+또한, `i`는 `...`부분에서 값을 읽을 수 있다. 이렇게 작성하는 것이 더 좋다:
+
 ```c++
     void use(int arg)   // OK
     {
-        int i = 7;   // OK: initialized
-        string s;    // OK: default initialized
+        int i = 7;   // OK: 초기화한다
+        string s;    // OK: 기본값으로 초기화한다
         // ...
     }
 ```
 
 ##### Note
 
-The *always initialize* rule is deliberately stronger than the *an object must be set before used* language rule.
-The latter, more relaxed rule, catches the technical bugs, but:
+*언제나 초기화하라*는 규칙은 *개체는 사용되기 전에 값을 가져야 한다*는 언어 규칙보다 (의도적으로) 엄격하다.
+후자는 더 완화된 규칙으로, 기술적인 버그를 잡을수는 있다, 하지만:
 
-* It leads to less readable code
-* It encourages people to declare names in greater than necessary scopes
-* It leads to harder to read code
-* It leads to logic bugs by encouraging complex code
-* It hampers refactoring
+* 가독성이 더 낮다
+* 필요한 범위 이상으로 이름을 선언하도록 만든다
+* 복잡한 코드로 인한 논리적 버그를 발생시킨다
+* 리팩토링을 방해한다
 
-The *always initialize* rule is a style rule aimed to improve maintainability as well as a rule protecting against used-before-set errors.
+*언제나 초기화하라*는 규칙은 값을 저장하지 않고 사용하는 오류를 막는 것 이외에도 유지보수성을 높이는데 초점을 둔 규칙이다.
 
 ##### Example
 
-Here is an example that is often considered to demonstrate the need for a more relaxed rule for initialization
+초기화에 대한 좀 더 약한 규칙이 필요한 경우를 보여주는 예시가 있다
+
 ```c++
     widget i;    // "widget" a type that's expensive to initialize, possibly a large POD
     widget j;
@@ -746,15 +749,17 @@ Here is an example that is often considered to demonstrate the need for a more r
         j = f4();
     }
 ```
-This cannot trivially be rewritten to initialize `i` and `j` with initializers.
-Note that for types with a default constructor, attempting to postpone initialization simply leads to a default initialization followed by an assignment.
-A popular reason for such examples is "efficiency", but a compiler that can detect whether we made a used-before-set error can also eliminate any redundant double initialization.
 
-Assuming that there is a logical connection between `i` and `j`, that connection should probably be expressed in code:
+이런 코드는 `i`와 `j`를 초기화 하는 형태로 다시 작성하기 어렵다.
+기본 생성자를 가지는 타입들에 대해서는, 초기화를 지연하는 코드는 기본 초기화를 하고 대입이 따라오는 구조가 된다.
+이런 예시처럼 작성되는 이유는 보통 "효율적이기" 때문이다. 하지만 컴파일러가 값을 설정하지 않고 사용하는 오류를 찾을 수 있다면 초기화의 중복을 제거할수도 있다.
+
+`i`와 `j`에 논리적인 상관관계가 있다고 가정하자. 이런 연결은 코드에 나타났을 것이다:
+
 ```c++
     pair<widget, widget> make_related_widgets(bool x)
     {
-        return (x) ? {f1(), f2()} : {f3(), f4() };
+        return (x) ? {f1(), f2()} : {f3(), f4()};
     }
 
     auto [i, j] = make_related_widgets(cond);    // C++17
@@ -762,13 +767,14 @@ Assuming that there is a logical connection between `i` and `j`, that connection
 
 ##### Note
 
-Complex initialization has been popular with clever programmers for decades.
-It has also been a major source of errors and complexity.
-Many such errors are introduced during maintenance years after the initial implementation.
+복잡한 초기화는 수십년간 똑똑한 프로그래머들이 자주 사용해왔다.
+동시에 복잡성과 오류의 주 원인이기도 했다.
+이런 오류들은 초기 구현 이후 유지보수 단게에서 많이 발견되었다.
 
 ##### Example
 
-This rule covers member variables.
+이 규칙은 멤버 변수에도 적용된다.
+
 ```c++
     class X {
     public:
@@ -785,48 +791,63 @@ This rule covers member variables.
         const int cm3;
     };
 ```
-The compiler will flag the uninitialized `cm3` because it is a `const`, but it will not catch the lack of initialization of `m3`.
-Usually, a rare spurious member initialization is worth the absence of errors from lack of initialization and often an optimizer
-can eliminate a redundant initialization (e.g., an initialization that occurs immediately before an assignment).
+
+컴파일러가 `cm3`가 `const`인데도 초기화되지 않은 것을 지적할 것이다. 하지만 이는 `m3`이 초기화되지 않은 것을 잡아내지는 않는다.
+
+많은 경우, a rare spurious member initialization is worth the absence of errors from lack of initialization 
+또 경우에 따라 최적화기에서 불필요한(redundant) 초기화를 제거할수도 있다.
+(예컨대, 대입 직전에 초기화를 수행하는 경우)
 
 ##### Exception
 
-If you are declaring an object that is just about to be initialized from input, initializing it would cause a double initialization.
-However, beware that this may leave uninitialized data beyond the input -- and that has been a fertile source of errors and security breaches:
+입력에 따라 초기화되는 개체를 선언하고 있다면, 그 개체를 초기화 하는 것은 초기화를 2번 수행하는 것이다.
+하지만, 이런 방법은 입력 이후에 초기화하지 않은 부분을 남길수도 있다는 점에 유의하라 -- 이는 보안과 관련된 오류의 온상(fertile source)이 되어왔다.
+
 ```c++
     constexpr int max = 8 * 1024;
-    int buf[max];         // OK, but suspicious: uninitialized
+    int buf[max];       // OK, but suspicious: uninitialized
     f.read(buf, max);
 ```
-The cost of initializing that array could be significant in some situations.
-However, such examples do tend to leave uninitialized variables accessible, so they should be treated with suspicion.
+
+상황에 따라 배열을 초기화하는 비용이 막대할수도 있다.
+하지만, 그런 경우는 초기화되지 않은 부분에 접근할 수 있도록 의도한 것이며, 초기화되지 않았다는 사실을 고려하면서 사용한다.
+
 ```c++
     constexpr int max = 8 * 1024;
-    int buf[max] = {};   // zero all elements; better in some situations
+    int buf[max] = {};  // 모든 원소들을 0으로 초기화한다
+                        // 어떤 상황에서는 더 나은 방법이 된다
     f.read(buf, max);
 ```
-When feasible use a library function that is known not to overflow. For example:
+
+할 수 있다면 오버플로우가 발생하지 않는 라이브러리 함수를 사용하라. 예를 들어:
+
 ```c++
     string s;   // s is default initialized to ""
     cin >> s;   // s expands to hold the string
 ```
+
 Don't consider simple variables that are targets for input operations exceptions to this rule:
+
 ```c++
     int i;   // bad
     // ...
     cin >> i;
 ```
-In the not uncommon case where the input target and the input operation get separated (as they should not) the possibility of used-before-set opens up.
+
+보통 입력의 대상과 입력 처리가 분리되는 경우 (그러면 안되지만) used-before-set의 가능성이 발생한다.
+
 ```c++
-    int i2 = 0;   // better, assuming that zero is an acceptable value for i2
+    int i2 = 0;   // 좀 더 나은 코드, 0이 i2에 허용되는 값이라고 가정한다
     // ...
     cin >> i2;
 ```
-A good optimizer should know about input operations and eliminate the redundant operation.
+
+좋은 최적화기는 입력 처리(operation)를 알고있어야 하며, 중복된 부분을 제거해야 한다
 
 ##### Example
 
-Using a value representing "uninitialized" is a symptom of a problem and not a solution:
+"초기화되지 않은" 상태를 보여주는 값을 사용하는 것은 해결방법이 아니며 문제가 있는 것이다:
+
 ```c++
     widget i = uninit;  // bad
     widget j = uninit;
@@ -844,11 +865,14 @@ Using a value representing "uninitialized" is a symptom of a problem and not a s
         j = f4();
     }
 ```
-Now the compiler cannot even simply detect a used-before-set. Further, we've introduced complexity in the state space for widget: which operations are valid on an `uninit` widget and which are not?
+
+이 코드는 이제 컴파일러가 used-before-set을 쉽게 탐지할 수 없게 되었다.
+더욱이 widget의 상태 공간을 더 복잡하게 만들었다: `uninit` 값을 가진 widget에는 어떤 처리가 허용(valid)되고 어떤 처리가 허용되지 않을까?
 
 ##### Note
 
-Sometimes, a lambda can be used as an initializer to avoid an uninitialized variable:
+어떨때는 람다를 초기화의 도구로 사용할수도 있다:
+
 ```c++
     error_code ec;
     Value v = [&] {
@@ -857,28 +881,35 @@ Sometimes, a lambda can be used as an initializer to avoid an uninitialized vari
         return p.second;
     }();
 ```
-or maybe:
+
+또는 이렇게 할수도 있다:
+
 ```c++
     Value v = [] {
         auto p = get_value();   // get_value() returns a pair<error_code, Value>
-        if (p.first) throw Bad_value{p.first};
+        if (p.first) 
+            throw Bad_value{p.first};
         return p.second;
     }();
 ```
-**See also**: [ES.28](#Res-lambda-init)
+
+##### See also
+
+[ES.28](#Res-lambda-init)
 
 ##### Enforcement
 
-* Flag every uninitialized variable.
-  Don't flag variables of user-defined types with default constructors.
-* Check that an uninitialized buffer is written into *immediately* after declaration.
-  Passing an uninitialized variable as a reference to non-`const` argument can be assumed to be a write into the variable.
+* 모든 초기화되지 않은 변수들을 지적한다.  
+  기본 생성자를 가진 사용자 정의 타입 변수들은 지적하지 않는다.
+* 초기화되지 않은 버퍼가 선언 *하자마자* 쓰기-접근 되는지 검사하라.  
+  비-`const` 참조 실행인자(argument)로 전달하는 경우는 쓰기-접근으로 가정한다. 
 
-### <a name="Res-introduce"></a>ES.21: Don't introduce a variable (or constant) before you need to use it
+### <a name="Res-introduce"></a>ES.21: 사용할 필요가 없을 때 변수나 상수를 선언하지 마라
 
 ##### Reason
 
-Readability. To limit the scope in which the variable can be used.
+가독성.
+변수가 사용될 수 있는 범위를 제한한다
 
 ##### Example
 
@@ -889,13 +920,15 @@ Readability. To limit the scope in which the variable can be used.
 ```
 ##### Enforcement
 
-Flag declarations that are distant from their first use.
+개체의 선언과 처음 사용되는 곳이 떨어져 있으면(distant from) 지적한다
 
-### <a name="Res-init"></a>ES.22: Don't declare a variable until you have a value to initialize it with
+### <a name="Res-init"></a>ES.22: 변수를 초기화할 값이 생길 때까지 선언하지 마라
 
 ##### Reason
 
-Readability. Limit the scope in which a variable can be used. Don't risk used-before-set. Initialization is often more efficient than assignment.
+가독성. 변수가 사용될 수 있는 범위를 제한한다.
+used-before-set의 위험을 감수하지 마라.
+대입보다 초기화가 더 효율적일 수 있다.
 
 ##### Example, bad
 
@@ -908,9 +941,10 @@ Readability. Limit the scope in which a variable can be used. Don't risk used-be
 ##### Example, bad
 
 ```c++
-    SomeLargeType var;   // ugly CaMeLcAsEvArIaBlE
+    SomeLargeType var;  // ugly CaMeLcAsEvArIaBlE 
+                        //      (Camel Case Variable)
 
-    if (cond)   // some non-trivial condition
+    if (cond)   // 좀 중요한 조건
         Set(&var);
     else if (cond2 || !cond3) {
         var = Set2(3.14);
@@ -921,8 +955,10 @@ Readability. Limit the scope in which a variable can be used. Don't risk used-be
             var += e;
     }
 
-    // use var; that this isn't done too early can be enforced statically with only control flow
+    // var를 사용한다; 
+    // that this isn't done too early can be enforced statically with only control flow
 ```
+
 This would be fine if there was a default initialization for `SomeLargeType` that wasn't too expensive.
 Otherwise, a programmer might very well wonder if every possible path through the maze of conditions has been covered.
 If not, we have a "use before set" bug. This is a maintenance trap.
