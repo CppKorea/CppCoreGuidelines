@@ -1,24 +1,24 @@
 # <a name="S-expr"></a>ES: 표현식과 구문
 
-표현식(expression)과 구문(statement)은 행위와 연산에 대해 표현하는 가장 직접적인 방법들이다. 구문은 지역 유효범위 내에서 선언하는 것을 말한다.
+표현식(expression)과 구문(statement)은 행위와 연산에 대해 표현하는 가장 직접적인 방법들이다. 지역 유효범위 내에서의 선언 역시 구문에 포함된다.
 
 이름 짓기와 주석, 들여쓰기 규칙에 대해서는, [NL: Naming and layout](./Naming.md#S-naming)을 참고하라.
 
 일반적인 규칙:
 
 * [ES.1: 다른 라이브러리나 "직접 짠 코드" 대신 표준 라이브러리를 사용하라](#Res-lib)
-* [ES.2: 언어의 기능을 직접적으로 사용하기 보다는 적절한 추상화를 하라](#Res-abstr)
+* [ES.2: 언어 기능을 바로 사용하기는 보다 적절히 추상화하라](#Res-abstr)
 
 선언 규칙:
 
 * [ES.5: 유효범위(scope)는 작게 유지하라](#Res-scope)
-* [ES.6: for-구문에서 관련 변수들은 구문 범위 안에 두어라](#Res-cond)
-* [ES.7: 일반적이거나 지역 변수들의 이름은 짧게, 그렇지 않다면 길게 하라](#Res-name-length)
-* [ES.8: 유사해보이는 이름은 사용하지 마라](#Res-name-similar)
-* [ES.9: 이름은 `ALL_CAPS` 형태가 아니어야 한다](#Res-not-CAPS)
+* [ES.6: for 문의 변수는 유효범위를 제한하기 위해 초기화와 조건 검사부분에서만 선언하라](#Res-cond)
+* [ES.7: 일반적이거나 지역범위 변수들의 이름은 짧게, 그렇지 않다면 길게 하라](#Res-name-length)
+* [ES.8: 비슷해보이는 이름은 피하라](#Res-name-similar)
+* [ES.9: `ALL_CAPS` 같은 이름을 피하라](#Res-not-CAPS)
 * [ES.10: 선언은 (오직) 하나의 이름을 선언해야 한다](#Res-name-one)
-* [ES.11: 타입 이름의 불필요한 반복을 막기 위해 `auto`를 사용하라](#Res-auto)
-* [ES.12: 이름을 덮어쓰지 않게 하라](#Res-reuse)
+* [ES.11: 타입 이름의 불필요한 반복을 막을때는 `auto`를 사용하라](#Res-auto)
+* [ES.12: 이름을 덮어쓰지 않도록 하라](#Res-reuse)
 * [ES.20: 항상 개체를 초기화하라](#Res-always)
 * [ES.21: 사용할 필요가 없을 때 변수나 상수를 선언하지 마라](#Res-introduce)
 * [ES.22: 변수를 초기화할 값이 생길 때까지 선언하지 마라](#Res-init)
@@ -84,7 +84,7 @@
 * [ES.106: `unsigned`로 음수값을 막으려 하지 마라](#Res-nonnegative)
 * [ES.107: 배열 접근에는 `unsigned`보다는 `gsl::index`를 사용하라](#Res-subscripts)
 
-### <a name="Res-lib"></a>ES.1: Prefer the standard library to other libraries and to "handcrafted code"
+### <a name="Res-lib"></a>ES.1: 다른 라이브러리나 "직접 짠 코드" 대신 표준 라이브러리를 사용하라
 
 ##### Reason
 
@@ -97,11 +97,15 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
 ```c++
     auto sum = accumulate(begin(a), end(a), 0.0);   // good
 ```
-`accumulate`의 범위 버전이 더 낫다:
+
+`accumulate`의 Ranges 버전이 더 낫다:
+
 ```c++
     auto sum = accumulate(v, 0.0); // better
 ```
-그런데 잘 알려진 알고리즘을 직접 만들지는 말자:
+
+잘 알려진 알고리즘을 직접 만들 필요는 없다:
+
 ```c++
     int max = v.size();   // bad: verbose, purpose unstated
     double sum = 0.0;
@@ -111,18 +115,21 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
 
 ##### Exception
 
-표준라이브러리의 대다수가 동적 할당(자유 저장소)에 의존한다. 이런 부분은 알고리즘의 문제는 아닐지라도, 제한 시간 내에 응답성을 보장해야 하는 경우(hard-real-time)나 임베디드 환경에는 적합하지 않다.
+표준 라이브러리의 대다수가 동적 할당(자유 저장소)에 의존한다.
+이런 부분은 알고리즘의 문제는 아닐지라도, 제한 시간 내에 응답성을 보장해야 하는 경우(hard real-time)나 임베디드 환경에는 적합하지 않다.
 그런 경우는 비슷한 기능을 구현하여 사용하는 것을 고려해볼 수 있다. 예를 들면 표준 라이브러리 스타일로 구현된 메모리 풀 할당 컨테이너 같은 것들이다.
 
 ##### Enforcement
 
-Not easy. ??? Look for messy loops, nested loops, long functions, absence of function calls, lack of use of non-built-in types. Cyclomatic complexity?
+쉽지 않다.  
+??? 지저분한 반복문, 중첩 반복문, 긴 함수, 함수 호출의 부재, 내장 타입이 아닌 타입을 거의 사용하지 않는 경우. 순환 복잡성?
 
-### <a name="Res-abstr"></a>ES.2: Prefer suitable abstractions to direct use of language features
+### <a name="Res-abstr"></a>ES.2: 언어 기능을 바로 사용하기는 보다 적절히 추상화하라
 
 ##### Reason
 
-"적절한 추상화"(예를 들어 라이브러리나 클래스 같은 것)가 언어보다 어플리케이션의 개념에 더 가깝다. 코드를 짧고 명확하게 만들 수 있으며, 테스트하기에도 더 쉽다.
+"적절한 추상화"(예를 들어 라이브러리나 클래스 같은 것)가 언어보다 어플리케이션의 개념에 더 가깝다. 
+코드를 짧고 명확하게 만들 수 있으며, 테스트하기에도 더 쉽다.
 
 ##### Example
 
@@ -135,7 +142,9 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         return res;
     }
 ```
-아래와 같은 전통적인 코드, 시스템 레벨과 거의 동등한 로우레벨 코드는 길고, 지저분하고, 이해하기도 어렵고, 느리게 돌아간다:
+
+아래와 같은 전통적인 코드, 시스템 레벨과 거의 동등한 저수준(low-level) 코드는 길고, 지저분하고, 이해하기도 어렵고, 느리게 돌아간다:
+
 ```c++
     char** read2(istream& is, int maxelem, int maxstring, int* nread)   // bad: verbose and incomplete
     {
@@ -150,23 +159,28 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         return res;
     }
 ```
-오버플로우나 에러 핸들링 코드가 일단 한 번 들어가게 되면, 코드는 확 지저분해진다. 그리고, 리턴하는 포인터와 배열로 구현되는 C 스타일의 문자열을 `delete`를 꼭 해줘야하는 문제도 있다.
+
+오버플로우나 오류처리 코드가 한 번 들어가게 되면, 코드는 급격히 지저분해진다. 
+그리고, 리턴하는 포인터와 배열로 구현되는 C 스타일의 문자열을 `delete`를 꼭 해줘야하는 문제도 있다.
 
 ##### Enforcement
 
-Not easy. ??? Look for messy loops, nested loops, long functions, absence of function calls, lack of use of non-built-in types. Cyclomatic complexity?
+쉽지 않다.  
+??? 지저분한 반복문, 중첩 반복문, 긴 함수, 함수 호출의 부재, 내장 타입이 아닌 타입을 거의 사용하지 않는 경우. 순환 복잡성?
 
 ## ES.dcl: 선언(Declarations)
 
 선언은 구문(statement)이다. 한 선언은 임의의 유효 범위에 하나의 이름을 만들거나 이름있는 개체(named object)를 생성할 수 있다.
 
-### <a name="Res-scope"></a>ES.5: Keep scopes small
+### <a name="Res-scope"></a>ES.5: 유효범위(scope)는 작게 유지하라
 
 ##### Reason
 
 가독성이 좋아진다. 리소스 점유를 최소화할 수 있다. 값의 잘못된 사용을 피할 수 있다.
 
-**Alternative formulation**: 불필요하게 큰 스코프에 변수를 선언하지 마라
+##### Alternative Formulation
+
+불필요하게 큰 범위에 변수를 선언하지 마라
 
 ##### Example
 
@@ -174,11 +188,17 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
     void use()
     {
         int i;    // bad: i is needlessly accessible after loop
-        for (i = 0; i < 20; ++i) { /* ... */ }
-        // no intended use of i here
-        for (int i = 0; i < 20; ++i) { /* ... */ }  // good: i is local to for-loop
+        for (i = 0; i < 20; ++i) { 
+            /* ... */ 
+        }
 
-        if (auto pc = dynamic_cast<Circle*>(ps)) {  // good: pc is local to if-statement
+        // no intended use of i here
+        for (int i = 0; i < 20; ++i) { // good: i is local to for-loop
+            /* ... */
+        }
+
+        // good: pc is local to if-statement
+        if (auto pc = dynamic_cast<Circle*>(ps)) { 
             // ... deal with Circle ...
         }
         else {
@@ -199,10 +219,12 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         // ... 여기에는 fn과 is를 쓰면 안되는 200 줄짜리 코드가 들어간다 ...
     }
 ```
+
 이 코드는 길다는 문제점이 있지만, `fn`의 값과 `is`가 갖고 있는 파일 핸들이 필요 이상으로 훨씬 길게 유지된다는 게 문제다.
 이러면 함수의 뒷부분에서 `is`와 `fn`을 실수로 사용해버릴 수 있다.
 
 이럴 때는, 분할해버리는 게 낫다:
+
 ```c++
     Record load_record(const string& name)
     {
@@ -222,10 +244,10 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 
 ##### Enforcement
 
-* 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않는 경우를 지적하라
-* 파일 핸들이나 잠금과 같은 중요한 리소스를 사용하는 코드가 N  (이 값은 적당히 크다)줄 이상 계속되면 지적하라
+* 루프 바깥에서 루프 변수가 선언되고 이후에는 사용되지 않는 경우를 지적한다
+* 파일 핸들이나 잠금과 같은 중요한 리소스를 사용하는 코드가 (적당히 큰) N줄 이상 계속되면 지적한다
 
-### <a name="Res-cond"></a>ES.6: Declare names in for-statement initializers and conditions to limit scope
+### <a name="Res-cond"></a>ES.6: for 문의 변수는 유효범위를 제한하기 위해 초기화와 조건 검사부분에서만 선언하라
 
 ##### Reason
 
@@ -239,11 +261,13 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
         for (string s; cin >> s;)
             v.push_back(s);
 
-        for (int i = 0; i < 20; ++i) {   // good: i is local to for-loop
+        // good: i is local to for-loop
+        for (int i = 0; i < 20; ++i) {
             // ...
         }
 
-        if (auto pc = dynamic_cast<Circle*>(ps)) {   // good: pc is local to if-statement
+        // good: pc is local to if-statement
+        if (auto pc = dynamic_cast<Circle*>(ps)) {
             // ... deal with Circle ...
         }
         else {
@@ -259,7 +283,8 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 
 ##### C++17 example
 
-Note: C++17 also adds `if` and `switch` initializer statements. These require C++17 support.
+C++17 에서는 `if`와 `switch`에 초기화 구문이 추가되었다. C++ 17을 지원하는 경우는 아래처럼 작성할 수 있다.
+
 ```c++
     map<int, string> mymap;
 
@@ -272,10 +297,10 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 
 ##### C++17 enforcement (if using a C++17 compiler)
 
-* Flag selection/loop variables declared before the body and not used after the body
-* (hard) Flag selection/loop variables declared before the body and used after the body for an unrelated purpose.
+* 선택/반복 구문의 변수가 미리 선언되고 구문 이후에는 사용되지 않으면 지적하라
+* (어려움) 선택/반복 구문의 변수가 미리 선언되고 구문 이후에 다른 상관없는 목적으로 사용되면 지적하라
 
-### <a name="Res-name-length"></a>ES.7: Keep common and local names short, and keep uncommon and nonlocal names longer
+### <a name="Res-name-length"></a>ES.7: 일반적이거나 지역범위 변수들의 이름은 짧게, 그렇지 않다면 길게 하라
 
 ##### Reason
 
@@ -284,6 +309,7 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
 ##### Example
 
 관습적으로 쓰이는 짧은 지역변수명은 가독성을 향상시킨다:
+
 ```c++
     template<typename T>    // good
     void print(ostream& os, const vector<T>& v)
@@ -292,9 +318,11 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
             os << v[i] << '\n';
     }
 ```
-인덱스는 관습적으로 `i`라고 쓰고, 이 일반 함수에는 벡터의 의미를 알만한 힌트가 없으므로, `v`가 어떤 경우에든지 맞는 이름이다.
+
+인덱스는 관습적으로 `i`를 사용하고, 이 일반 함수에는 벡터의 의미를 알만한 힌트가 없으므로, `v`가 어떤 경우에든지 맞는 이름이다.
 
 비교:
+
 ```c++
     template<typename Element_type>   // bad: verbose, hard to read
     void print(ostream& target_stream, const vector<Element_type>& current_vector)
@@ -306,11 +334,13 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
         target_stream << current_vector[current_element_index] << '\n';
     }
 ```
+
 과장해서 표현하긴 했지만, 이것보다 더 심한 것도 본적이 있다.
 
 ##### Example
 
 관습에 따르지 않는 짧은 비지역 변수는 코드를 모호하게 만든다:
+
 ```c++
     void use1(const string& s)
     {
@@ -319,7 +349,9 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
         // ...
     }
 ```
+
 비지역 개체들에는 좀 더 가독성 있는 이름을 쓰면 나아진다:
+
 ```c++
     void use1(const string& s)
     {
@@ -328,11 +360,13 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
         // ...
     }
 ```
+
 이렇게 하면, 코드를 읽는 사람이 `trim_tail`의 의미를 알 수 있게 되고, 기억할 수 있게 된다.
 
 ##### Example, bad
 
 내용이 긴 함수의 인자는 사실상 비지역 변수라고 볼 수 있다. 따라서 인자들의 이름은 적절한 의미를 담아야 한다:
+
 ```c++
     void complicated_algorithm(vector<Record>& vr, const vector<int>& vi, map<string, int>& out)
     // read from events in vr (marking used Records) for the indices in
@@ -341,43 +375,52 @@ Note: C++17 also adds `if` and `switch` initializer statements. These require C+
         // ... 500 lines of code using vr, vi, and out ...
     }
 ```
-함수는 짧게 유지하는 것을 권장하지만, 이 룰을 모두 적용시키긴 힘들 때가 있다. 그럴 경우엔 변수명을 적절히 줘야 한다.
+
+함수는 짧게 유지하는 것을 권장하지만, 이 규칙을 모두 적용시키긴 힘들 때가 있다.
+그럴 경우엔 변수에 이름을 적절히 부여해야 한다.
 
 ##### Enforcement
 
 지역 변수와 비지역 변수의 이름이 유지되는 범위의 길이를 확인한다. 동시에 함수의 길이를 함께 고려한다.
 
-### <a name="Res-name-similar"></a>ES.8: Avoid similar-looking names
+### <a name="Res-name-similar"></a>ES.8: 비슷해보이는 이름은 피하라
 
 ##### Reason
 
-Code clarity and readability. Too-similar names slow down comprehension and increase the likelihood of error.
+코드의 명확함과 가독성.
+너무 비슷한 이름은 이해를 저해하고 오류가 발생할 소지를 낳는다.
 
 ##### Example; bad
 
 ```c++
-    if (readable(i1 + l1 + ol + o1 + o0 + ol + o1 + I0 + l0)) surprise();
+    if (readable(i1 + l1 + ol + o1 + o0 + ol + o1 + I0 + l0))
+        surprise();
 ```
 
 ##### Example; bad
 
-Do not declare a non-type with the same name as a type in the same scope. This removes the need to disambiguate with a keyword such as `struct` or `enum`. It also removes a source of errors, as `struct X` can implicitly declare `X` if lookup fails.
+같은 유효범위에서 타입이 아닌 것을 타입의 이름과 같은 이름으로 선언하지마라.
+이러면 `struct` 혹은 `enum`을 사용해서 이름의 의미을 구분할 필요가 없게 된다.
+
+`struct X` 같은 코드는 이름 탐색(lookup)이 실패하면 암묵적으로 `X`로 간주되기 때문에 오류의 원인을 제거하는 효과도 얻을 수 있다. 
+
 ```c++
     struct foo { int n; };
-    struct foo foo();       // BAD, foo is a type already in scope
-    struct foo x = foo();   // requires disambiguation
+
+    struct foo foo();       // BAD, foo는 이미 타입의 이름으로 쓰이고 있다
+    struct foo x = foo();   // 설명이 필요하다
 ```
 
 ##### Exception
 
-Antique header files might declare non-types and types with the same name in the same scope.
+좀 오래된(antique) 헤더 파일들은 타입이 아닌 것에 타입과 같은 이름을 붙여놓았을 수도 있다.
 
 ##### Enforcement
 
-* Check names against a list of known confusing letter and digit combinations.
-* Flag a declaration of a variable, function, or enumerator that hides a class or enumeration declared in the same scope.
+* 이미 알려진 (혼란을 일으키는) 글자 혹은 숫자 조합을 사용하는 이름이 있는지 검사한다
+* 변수, 함수, 열거자(enumerator)의 선언이 같은 유효범위에서 선언된 클래스 혹은 열거형을 가리는(hide) 경우 지적한다
 
-### <a name="Res-not-CAPS"></a>ES.9: Avoid `ALL_CAPS` names
+### <a name="Res-not-CAPS"></a>ES.9: `ALL_CAPS` 같은 이름을 피하라
 
 ##### Reason
 
@@ -410,7 +453,7 @@ Antique header files might declare non-types and types with the same name in the
 
 대문자만을 사용한 이름을 지적하라. 오래된 코드에 대해서는 매크로 이름으로 소문자를 섞어 사용한 경우를 지적하라
 
-### <a name="Res-name-one"></a>ES.10: Declare one name (only) per declaration
+### <a name="Res-name-one"></a>ES.10: 선언은 (오직) 하나의 이름을 선언해야 한다
 
 ##### Reason
 
@@ -420,7 +463,7 @@ Antique header files might declare non-types and types with the same name in the
 ##### Example, bad
 
 ```c++
-    char *p, c, a[7], *pp[7], **aa[10];   // yuck!
+    char *p, c, a[7], *pp[7], **aa[10];   // 윽 이게뭐야!
 ```
 
 ##### Exception
@@ -429,10 +472,13 @@ Antique header files might declare non-types and types with the same name in the
 
 ##### Exception
 
-A structured binding (C++17) is specifically designed to introduce several variables:
+C++ 17 의 structured binding은 여러 변수를 동시에 선언하기 위해 설계되었다:
+
 ```c++
     auto [iter, inserted] = m.insert_or_assign(k, val);
-    if (inserted) { /* new entry was inserted */ }
+    if (inserted) {
+        /* new entry was inserted */
+    }
 ```
 
 ##### Example
@@ -441,7 +487,9 @@ A structured binding (C++17) is specifically designed to introduce several varia
     template <class InputIterator, class Predicate>
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
 ```
-좀 더 나은 용례:
+
+컨셉(concepts)를 사용하면 이렇게 된다:
+
 ```c++
     bool any_of(InputIterator first, InputIterator last, Predicate pred);
 ```
@@ -451,14 +499,18 @@ A structured binding (C++17) is specifically designed to introduce several varia
 ```c++
     double scalbn(double x, int n);   // OK: x * pow(FLT_RADIX, n); FLT_RADIX is usually 2
 ```
+
 또는:
+
 ```c++
     double scalbn(    // better: x * pow(FLT_RADIX, n); FLT_RADIX is usually 2
         double x,     // base value
         int n         // exponent
     );
 ```
+
 또는:
+
 ```c++
     // better: base * pow(FLT_RADIX, exponent); FLT_RADIX is usually 2
     double scalbn(double base, int exponent);
@@ -469,30 +521,33 @@ A structured binding (C++17) is specifically designed to introduce several varia
 ```c++
     int a = 7, b = 9, c, d = 10, e = 3;
 ```
-In a long list of declarators is is easy to overlook an uninitialized variable.
+
+여러 변수들을 한번에 선언하는 것은 초기화되지 않은 변수를 간과하기 쉽다.
 
 ##### Enforcement
 
 변수와 상수들을 한번에 선언을 한 곳을 지적한다.(예를 들어, `int* p, q;`)
 
-### <a name="Res-auto"></a>ES.11: Use `auto` to avoid redundant repetition of type names
+### <a name="Res-auto"></a>ES.11: 타입 이름의 불필요한 반복을 막을때는 `auto`를 사용하라
 
 ##### Reason
 
-* Simple repetition is tedious and error-prone.
-* When you use `auto`, the name of the declared entity is in a fixed position in the declaration, increasing readability.
-* In a template function declaration the return type can be a member type.
+* 간단한 내용이 반복되면 지루하고 오류에 취약하다.
+* `auto`를 사용하면 선언된 개체(entity)가 그 지점에 고정되고, 가독성을 향상시킨다.
+* 템플릿 함수 선언에서는 반환 타입이 멤버 타입일 수 있다.
 
 ##### Example
 
-Consider:
+이런 코드를 생각해보자:
+
 ```c++
     auto p = v.begin();   // vector<int>::iterator
     auto h = t.future();
     auto q = make_unique<int[]>(s);
     auto f = [](int x){ return x + 10; };
 ```
-In each case, we save writing a longish, hard-to-remember type that the compiler already knows but a programmer could get wrong.
+
+각각의 경우, 타입들을 컴파일러가 이미 알고 있지만, 프로그래머가 기억하기 힘든 긴 이름의 타입을 작성할 필요가 없게 된다.
 
 ##### Example
 
@@ -503,18 +558,21 @@ In each case, we save writing a longish, hard-to-remember type that the compiler
 
 ##### Exception
 
-Avoid `auto` for initializer lists and in cases where you know exactly which type you want and where an initializer might require conversion.
+초기화 리스트(initializer list), 그리고 초기화가 당신이 의도한(그리고 정확히 알고있는) 타입으로 변환되어야 하는 경우에는 `auto`의 사용을 피하라.
 
 ##### Example
 
 ```c++
-    auto lst = { 1, 2, 3 };   // lst is an initializer list
-    auto x{1};   // x is an int (in C++17; initializer_list in C++11)
+    auto lst = { 1, 2, 3 };   // lst는 initializer_list<int> 타입이다
+
+    auto x{1};  // C++ 17에서 x는 int 타입이지만,
+                // C++ 11에서는 initializer_list로 처리된다
 ```
 
 ##### Note
 
-When concepts become available, we can (and should) be more specific about the type we are deducing:
+컨셉(concepts)을 사용할 수 있게되면, 추론되는 타입을 좀 더 분명하게 표기할 수 있다.
+
 ```c++
     // ...
     ForwardIterator p = algo(x, y, z);
@@ -523,19 +581,19 @@ When concepts become available, we can (and should) be more specific about the t
 ##### Example (C++17)
 
 ```c++
-    auto [ quotient, remainder ] = div(123456, 73);   // break out the members of the div_t result
+    auto [ quotient, remainder ] = div(123456, 73);   // 반환되는 div_t 타입의 멤버들을 분리해서 선언하게 된다
 ```
 
 ##### Enforcement
 
-Flag redundant repetition of type names in a declaration.
+선언에서 장황한(redundant) 타입 이름이 반복되면 지적한다
 
-### <a name="Res-reuse"></a>ES.12: Do not reuse names in nested scopes
+### <a name="Res-reuse"></a>ES.12: 이름을 덮어쓰지 않도록 하라
 
 ##### Reason
 
-It is easy to get confused about which variable is used.
-Can cause maintenance problems.
+어떤 변수가 사용되고 있는지 혼동하기 쉽다.
+유지보수에 문제가 될수도 있다.
 
 ##### Example, bad
 
@@ -557,17 +615,20 @@ Can cause maintenance problems.
 
     return d;
 ```
-If this is a large `if`-statement, it is easy to overlook that a new `d` has been introduced in the inner scope.
-This is a known source of bugs.
-Sometimes such reuse of a name in an inner scope is called "shadowing".
+
+예시가 아주 큰 `if` 구문이었다면, 구문 안에서 새로운 `d`가 선언되는 것을 보지 못했을 수도 있다.
+이런 코드는 버그의 원인으로 알려져있다.
+
+보통 이렇게 더 깊은 유효범위에서 같은 이름을 사용하는 것을 "shadowing"이라고도 한다.
 
 ##### Note
 
-Shadowing is primarily a problem when functions are too large and too complex.
+Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 
 ##### Example
 
-Shadowing of function arguments in the outermost block is disallowed by the language:
+가장 바깥 범위에서 함수 인자들을 가리는(shadowing) 것은 언어에서 금지하고 있다:
+
 ```c++
     void f(int x)
     {
@@ -581,7 +642,8 @@ Shadowing of function arguments in the outermost block is disallowed by the lang
 ```
 ##### Example, bad
 
-Reuse of a member name as a local variable can also be a problem:
+멤버의 이름을 지역 변수로 사용하는 것 또한 문제가 된다:
+
 ```c++
     struct S {
         int m;
@@ -602,7 +664,8 @@ Reuse of a member name as a local variable can also be a problem:
 
 ##### Exception
 
-We often reuse function names from a base class in a derived class:
+상위 클래스의 함수 이름을 하위 클래스에서 재사용하기도 한다:
+
 ```c++
     struct B {
         void f(int);
@@ -613,10 +676,11 @@ We often reuse function names from a base class in a derived class:
         using B::f;
     };
 ```
-This is error-prone.
-For example, had we forgotten the using declaration, a call `d.f(1)` would not have found the `int` version of `f`.
 
-??? Do we need a specific rule about shadowing/hiding in class hierarchies?
+이는 오류에 취약하다.
+예를 들어, using 선언을 하지 않았다면, `d.f(1)`의 호출은 `f(int)`를 찾지 못할 것이다.
+
+??? 클래스 계층구조에서 shadowing/hiding에 대한 규칙이 필요할까요?
 
 ##### Enforcement
 
@@ -625,7 +689,7 @@ For example, had we forgotten the using declaration, a call `d.f(1)` would not h
 * Flag reuse of a global name as a local variable or a member name
 * Flag reuse of a base class member name in a derived class (except for function names)
 
-### <a name="Res-always"></a>ES.20: Always initialize an object
+### <a name="Res-always"></a>ES.20: 항상 개체를 초기화하라
 
 ##### Reason
 
