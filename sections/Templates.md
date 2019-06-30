@@ -1,115 +1,113 @@
 
-# <a name="S-templates"></a>T: Templates and generic programming
+# <a name="S-templates"></a>T: 템플릿과 제네릭 프로그래밍
 
-제네릭(generic) 프로그래밍은 타입, 값, 알고리즘을 매개변수화하는 타입과 알고리즘을 사용하는 프로그래밍이다.
-C++에서 제네릭 프로그래밍은 `template`을 언어적 장치로 지원하고 있다.
+제네릭 프로그래밍(generic programming)은 **타입, 값, 알고리즘을 매개변수로 사용하는 타입과 알고리즘**을 사용한 프로그래밍을 말한다.
+C++에서는 제네릭 프로그래밍을 위한 언어적 장치로 `template`을 지원하고 있다.
 
-일반화된 함수의 인자는 인자타입과 관련된 값에 대한 요구사항들을 특징짓는다.
-C++에서 이런 요구사항은 컨셉이라는 컴파일타임 서술어로 표현된다.
+제네릭 프로그래밍의 함수들에 사용되는 인자들은 (일련의 요구사항에 따라서) 각각의 타입과 값이 규정된다. 
+C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 검사를 사용해 코드에 나타나도록 한다.
 
-템플릿은 메타프로그래밍을 목적으로 사용될 수 있다; 즉 컴파일 타임 때 코드를 만들어내는 형태의 프로그램이다.
+템플릿은 메타프로그래밍(meta-programming)에도 사용될 수 있다; 메타프로그래밍이란, 컴파일 시간에 코드를 만들어내는(compose) 프로그램을 의미한다.
 
-A central notion in generic programming is "concepts"; that is, requirements on template arguments presented as compile-time predicates.
-"Concepts" are defined in an ISO Technical specification: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-A draft of a set of standard-library concepts can be found in another ISO TS: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-Concepts are supported in GCC 6.1 and later.
-Consequently, we comment out uses of concepts in examples; that is, we use them as formalized comments only.
-If you use GCC 6.1 or later, you can uncomment them.
+제네릭 프로그래밍에서 중심이 되는 생각은 "컨셉"이다; 이는 템플릿 실행인자에 대한 요구사항들을 컴파일 시간에 검사할 수 있도록 기술하는 것이다.
+
+"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
 
 템플릿 사용 규칙 요약:
 
-* [T.1: 더 높은 코드 추상화를 위해서 템플릿을 사용하라](#Rt-raise)
-* [T.2: 다양한 인자 타입들에게 적용되는 알고리즘에 템플릿을 사용하라](#Rt-algo)
-* [T.3: 컨테이너와 구간(range)을 표현하기 위해서 템플릿을 사용하라](#Rt-cont)
+* [T.1: 코드의 추상화 수준을 높이기 위해 템플릿을 사용하라](#Rt-raise)
+* [T.2: 여러가지 실행인자 타입들에 적용되는 알고리즘을 표현할 때 템플릿을 사용하라](#Rt-algo)
+* [T.3: 컨테이너와 구간(range)을 표현할때 템플릿을 사용하라](#Rt-cont)
 * [T.4: 문법 트리 조작을 표현하기 위해 템플릿을 사용하라](#Rt-expr)
-* [T.5: 강점을 증폭시키도록 제네릭 프로그래밍과 개체지향 기술을 결합하라](#Rt-generic-oo)
+* [T.5:  제네릭 프로그래밍과 개체지향 기술을 결합해 비용이 아닌 강점을 증폭시켜라](#Rt-generic-oo)
 
 컨셉 사용 규칙 요약:
 
-* [T.10: 템플릿 인자들에 concept들을 명시하라](#Rt-concepts)
-* [T.11: 가능하다면 표준 concept들을 사용하라](#Rt-std-concepts)
-* [T.12: 지역 변수들에는 `auto`대신 concept 이름을 사용하라](#Rt-auto)
-* [T.13: 단일 타입의 인자 concept들에는 단순한 표기를 사용하라](#Rt-shorthand)
+* [T.10: 모든 템플릿 인자에 컨셉을 명시하라](#Rt-concepts)
+* [T.11: 가능한 모든 경우 표준 컨셉을 사용하라](#Rt-std-concepts)
+* [T.12: 지역 변수에 `auto` 보다는 컨셉의 이름을 사용하라](#Rt-auto)
+* [T.13: 단순하거나 단일 타입을 인자로 받는 컨셉에는 약식 표기를 사용하라](#Rt-shorthand)
 * ???
 
 컨셉 정의 규칙 요약:
 
-* [T.20: 무의미한 "concepts"는 지양하라](#Rt-low)
-* [T.21: Require a complete set of operations for a concept](#Rt-complete)
-* [T.22: Specify axioms for concepts](#Rt-axiom)
-* [T.23: 특수한 concept들을 새로운 사용 패턴을 추가해서 일반적인 concept들과 차별화 하라](#Rt-refine)
-* [T.24: Use tag classes or traits to differentiate concepts that differ only in semantics](#Rt-tag)
-* [T.25: Avoid complementary constraints](#Rt-not)
-* [T.26: Prefer to define concepts in terms of use-patterns rather than simple syntax](#Rt-use)
-* [T.30: Use concept negation (`!C<T>`) sparingly to express a minor difference](#Rt-not)
-* [T.31: Use concept disjunction (`C1<T> || C2<T>`) sparingly to express alternatives](#Rt-or)
+* [T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라](#Rt-low)
+* [T.21: 컨셉에서는 연산들의 완전한 집합(complete set)을 요구하라](#Rt-complete)
+* [T.22: 컨셉에서 쓸 수 있도록 공리를 명시하라](#Rt-axiom)
+* [T.23: 정제된 컨셉(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라](#Rt-refine)
+* [T.24: 의미구조만 다른 컨셉은 Tag 클래스 혹은 Traits를 사용해 차별화하라](#Rt-tag)
+* [T.25: 제약이 서로 대비되지 않게 하라](#Rt-not)
+* [T.26: 단순한 문법보다는 사용 패턴을 고려해서 컨셉을 정의하라](#Rt-use)
 * ???
 
 템플릿 인터페이스 규칙 요약:
 
-* [T.40: Use function objects to pass operations to algorithms](#Rt-fo)
-* [T.41: Require only essential properties in a template's concepts](#Rt-essential)
-* [T.42: Use template aliases to simplify notation and hide implementation details](#Rt-alias)
-* [T.43: Prefer `using` over `typedef` for defining aliases](#Rt-using)
-* [T.44: Use function templates to deduce class template argument types (where feasible)](#Rt-deduce)
-* [T.46: Require template arguments to be at least `Regular` or `SemiRegular`](#Rt-regular)
-* [T.47: Avoid highly visible unconstrained templates with common names](#Rt-visible)
-* [T.48: If your compiler does not support concepts, fake them with `enable_if`](#Rt-concept-def)
-* [T.49: Where possible, avoid type-erasure](#Rt-erasure)
+* [T.40: 알고리즘에 연산(operation)을 전달할때는 함수 개체를 사용하라](#Rt-fo)
+* [T.41: 템플릿의 컨셉에서는 오직 필요한 특성(property)만 요구하라](#Rt-essential)
+* [T.42: 템플릿 별칭을 구현사항을 숨기거나 표기를 간단히 할 때 사용하라](#Rt-alias)
+* [T.43: 타입에 별명을 붙일때 `typedef` 보다는 `using`을 사용하라](#Rt-using)
+* [T.44: (할 수 있다면) 함수 템플릿은 클래스 템플릿의 인자 타입을 유도(deduce)할 때 사용하라](#Rt-deduce)
+* [T.46: 템플릿 인자들은 최소한 `Regular`혹은 `SemiRegular`하도록 하라](#Rt-regular)
+* [T.47: 일반적인 이름을 가지고 있으면서 쉽게 찾을 수 있고 제약이 거의 없는 템플릿은 지양하라](#Rt-visible)
+* [T.48: 컴파일러가 컨셉을 지원하지 않는다면 `enable_if`로 유사하게 작성하라](#Rt-concept-def)
+* [T.49: 가능하다면 타입 제거는 피하라](#Rt-erasure)
 
 템플릿 정의 규칙 요약:
 
-* [T.60: Minimize a template's context dependencies](#Rt-depend)
-* [T.61: Do not over-parameterize members (SCARY)](#Rt-scary)
-* [T.62: Place non-dependent class template members in a non-templated base class](#Rt-nondependent)
-* [T.64: Use specialization to provide alternative implementations of class templates](#Rt-specialization)
-* [T.65: Use tag dispatch to provide alternative implementations of functions](#Rt-tag-dispatch)
-* [T.67: Use specialization to provide alternative implementations for irregular types](#Rt-specialization2)
-* [T.68: Use `{}` rather than `()` within templates to avoid ambiguities](#Rt-cast)
-* [T.69: Inside a template, don't make an unqualified nonmember function call unless you intend it to be a customization point](#Rt-customization)
+* [T.60: 문맥에 따라 달라질 수 있는 템플릿은 최소화 하라](#Rt-depend)
+* [T.61: 너무 많은 멤버를 매개변수화 하지 말라 (SCARY)](#Rt-scary)
+* [T.62: 종속적이지 않은 클래스 템플릿 멤버들은 템플릿이 아닌 상위 클래스에 배치하라](#Rt-nondependent)
+* [T.64: 클래스 템플릿의 대안적(alternative) 구현을 제공할 때는 특수화를 사용하라](#Rt-specialization)
+* [T.65: 함수의 대안적(alternative) 구현을 제공할 때는 Tag dispatch를 사용하라](#Rt-tag-dispatch)
+* [T.67: 정규적이지 않은 타입(irregular types)들의 대안적 구현을 제공할 때는 특수화를 사용하라](#Rt-specialization2)
+* [T.68: 모호하지 않도록 템플릿에서는 `()` 보다는 `{}`를 사용하라](#Rt-cast)
+* [T.69: 제약없는(unqualified) 비-멤버 함수 호출은 해당 부분이 변경될 수 있도록 하려는게 아니라면 템플릿 내에서 사용하지 말아라](#Rt-customization)
 
 템플릿과 상속구조 규칙 요약:
 
-* [T.80: Do not naively templatize a class hierarchy](#Rt-hier)
-* [T.81: Do not mix hierarchies and arrays](#Rt-array) // ??? somewhere in "hierarchies"
-* [T.82: Linearize a hierarchy when virtual functions are undesirable](#Rt-linear)
-* [T.83: Do not declare a member function template virtual](#Rt-virtual)
-* [T.84: Use a non-template core implementation to provide an ABI-stable interface](#Rt-abi)
-* [T.??: ????](#Rt-???)
+* [T.80: 충분한 고려 없이 클래스 계층구조를 템플릿으로 바꾸지 말아라](#Rt-hier)
+* [T.81: 계층구조와 배열을 섞어서 사용하지 말아라](#Rt-array)
+* [T.82: 가상 함수를 원하지 않는다면 계층 구조를 제거하라(linearize)](#Rt-linear)
+* [T.83: 멤버 함수는 템플릿이면서 virtual한 함수로 선언해선 안된다](#Rt-virtual)
+* [T.84: 안정된 ABI를 지원하고자 할때는 핵심 구현에 템플릿을 쓰지 마라](#Rt-abi)
+* ???
 
 가변인자 템플릿규칙 요약:
 
-* [T.100: Use variadic templates when you need a function that takes a variable number of arguments of a variety of types](#Rt-variadic)
+* [T.100: 다양한 타입을 가지고 가변적인 수의 실행인자들을 처리하는 함수가 필요할 때는 가변 템플릿을 사용하라](#Rt-variadic)
 * [T.101: ??? How to pass arguments to a variadic template ???](#Rt-variadic-pass)
 * [T.102: ??? How to process arguments to a variadic template ???](#Rt-variadic-process)
-* [T.103: Don't use variadic templates for homogeneous argument lists](#Rt-variadic-not)
-* [T.??: ????](#Rt-???)
+* [T.103: 동일 타입의 실행인자들을 위해서 가변템플릿을 사용하지 마라](#Rt-variadic-not)
+* ???
 
 메타프로그래밍 규칙 요약:
 
-* [T.120: Use template metaprogramming only when you really need to](#Rt-metameta)
-* [T.121: Use template metaprogramming primarily to emulate concepts](#Rt-emulate)
-* [T.122: Use templates (usually template aliases) to compute types at compile time](#Rt-tmp)
-* [T.123: Use `constexpr` functions to compute values at compile time](#Rt-fct)
-* [T.124: Prefer to use standard-library TMP facilities](#Rt-std-tmp)
-* [T.125: If you need to go beyond the standard-library TMP facilities, use an existing library](#Rt-lib)
-* [T.??: ????](#Rt-???)
+* [T.120: 정말 필요한 경우에만 템플릿 메타프로그래밍을 사용하라](#Rt-metameta)
+* [T.121: 컨셉을 모방(emulate)하기 위해 템플릿 메타프로그래밍을 사용하라](#Rt-emulate)
+* [T.122: 템플릿(대부분 템플릿 별칭)은 컴파일 시간에 타입을 계산할때 사용하라](#Rt-tmp)
+* [T.123: 컴파일 시간에 값을 계산한다면 `constexpr` 함수를 사용하라](#Rt-fct)
+* [T.124: 가능한 표준 라이브러리의 TMP 기능들을 사용하라](#Rt-std-tmp)
+* [T.125: 만약 표준 라이브러리의 TMP 기능으로 충분하지 않다면, 가능한 이미 존재하는 라이브러리를 사용하라](#Rt-lib)
+* ???
 
 다른 템플릿 규칙 요약:
 
-* [T.140: Name all operations with potential for reuse](#Rt-name)
-* [T.141: Use an unnamed lambda if you need a simple function object in one place only](#Rt-lambda)
-* [T.142: Use template variables to simplify notation](#Rt-var)
-* [T.143: Don't write unintentionally nongeneric code](#Rt-nongeneric)
-* [T.144: Don't specialize function templates](#Rt-specialize-function)
-* [T.150: Check that a class matches a concept using `static_assert`](#Rt-check-class)
-* [T.??: ????](#Rt-???)
+* [T.140: 재사용 가능성이 있는 모든 연산은 이름을 붙여라](#Rt-name)
+* [T.141: 단순한 함수 개체가 한곳에서만 필요하다면 이름없는 람다를 사용하라](#Rt-lambda)
+* [T.142: 템플릿 변수로 표기를 간단히 하라](#Rt-var)
+* [T.143: 범용적이지 않은 코드는 계획없이 작성하지 말아라](#Rt-nongeneric)
+* [T.144: 함수 템플릿은 특수화하지 말라](#Rt-specialize-function)
+* [T.150: 해당 클래스가 개념에 부합하는지를 `static_assert`를 사용해 확인하라](#Rt-check-class)
+* ???
 
-## <a name="SS-GP"></a>T.gp: 제네릭 프로그래밍(Generic programming)
+## <a name="SS-GP"></a>T.gp: 제네릭 프로그래밍(generic programming)
 
-제네릭 프로그래밍은 타입, 값, 알고리즘을 매개변수로 사용하는 타입과 알고리즘을 사용하는 프로그래밍이다.
+제네릭 프로그래밍은 **타입, 값, 알고리즘을 매개변수로 사용하는 타입과 알고리즘**을 사용한 프로그래밍을 말한다.
 
-### <a name="Rt-raise"></a>T.1: Use templates to raise the level of abstraction of code
+### <a name="Rt-raise"></a>T.1: 코드의 추상화 수준을 높이기 위해 템플릿을 사용하라
 
 ##### Reason
 
@@ -147,44 +145,44 @@ If you use GCC 6.1 or later, you can uncomment them.
         // requires Arithmetic<T>
     T sum(vector<T>& v, T s)
     {
-        for (auto x : v) s += x;
+        for (auto x : v)
+            s += x;
         return s;
     }
 ```
 
-`Arithmetic` concept가 `+`와 `+=`를 모두 요구한다고 가정하면, 우리는 `sum`의 사용자가 두 연산을 지원하는 산술 타입을 제공하도록 제약한 것이다.
-That is not a minimal requirement, but it gives the implementer of algorithms much needed freedom and ensures that any `Arithmetic` type
-can be used for a wide variety of algorithms.
+`Arithmetic` 컨셉이 `+`와 `+=`를 모두 요구한다고 가정하면, 우리는 `sum`의 사용자가 두 연산을 지원하는 산술 타입을 제공하도록 제약한 것이다.
+이는 연산을 구현에 필요한 만큼만 요구한 것은 아니다, 하지만 이는 알고리즘의 구현자에게 필요한 만큼의 자유를 부여하며 `Arithmetic` 타입이 알고리즘 전반에 사용될 수 있다는 것을 보증한다.
 
-더 일반적인, 재사용 가능한 코드를 위해서, `vector`와 같은 하나의 컨테이너만 사용하는 것이 아닌 `Container`또는 `Range`와 같은 더 일반적인 concept를 사용하는 것도 가능하다.
-
-##### Note
-
-If we define a template to require exactly the operations required for a single implementation of a single algorithm
-(e.g., requiring just `+=` rather than also `=` and `+`) and only those, we have overconstrained maintainers.
-We aim to minimize requirements on template arguments, but the absolutely minimal requirements of an implementation is rarely a meaningful concept.
+더 일반적인, 재사용 가능한 코드를 위해서, `vector`와 같은 하나의 컨테이너만 사용하는 것이 아닌 `Container`또는 `Range`와 같은 더 일반적인 컨셉을 사용하는 것도 가능하다.
 
 ##### Note
 
-템플릿은 모든 것을 표현하는데 사용할 수 있다. (튜링 완전성을 지닌다)
-그러나 일반화 프로그래밍의 목표는 비슷한 의미특성을 가진 타입집합에 대한 연산/알고리즘을 효과적으로 일반화하는 것이다.
+만약 템플릿이 하나의 알고리즘을 구현하기 위한 정확히 하나의 연산만을 요구한다면 (예컨대 `=`와 `+`를 요구하지 않고 `+=`만 요구하는 것), 유지보수를 지나치게 제약한 것이다.
 
-> 역주: 튜링 완전성(https://ko.wikipedia.org/wiki/%ED%8A%9C%EB%A7%81_%EC%99%84%EC%A0%84)
+우리의 의도는 템플릿 인자에 대한 요구사항을 최소화하는 것이다. 하지만 구현에서 필요한 만큼만 요구하는 것은 유의미한 컨셉일 가능성이 낮다.
+> We aim to minimize requirements on template arguments, but the absolutely minimal requirements of an implementation is rarely a meaningful concept.
 
 ##### Note
 
-The `requires` in the comments are uses of `concepts`.
-"Concepts" are defined in an ISO Technical specification: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-Concepts are supported in GCC 6.1 and later.
-Consequently, we comment out uses of concepts in examples; that is, we use them as formalized comments only.
-If you use GCC 6.1 or later, you can uncomment them.
+템플릿은 모든 것을 표현할 수 있다 ([튜링 완전성]((https://ko.wikipedia.org/wiki/%ED%8A%9C%EB%A7%81_%EC%99%84%EC%A0%84))을 지닌다).
+그러나 제네릭 프로그래밍의 목표는 비슷한 특성(property)을 가진 타입집합에 대한 연산/알고리즘을 효과적으로 일반화하는 것이다.
+
+##### Note
+
+주석처리된 `requires`는 `concepts`를 사용하는 부분이다.
+
+"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
 
 ##### Enforcement
 
 * 컨셉없이 특정 연산자를 바로 사용하는 것같은, 과도하게 단순한 요구사항을 가진 알고리즘이 있다면 지적한다
 * "과도하게 단순한" 컨셉 정의가 있다면 지적하지 않는다; 더 쓸만한 컨셉을 위해 만들었을지도 모른다.
 
-### <a name="Rt-algo"></a>T.2: Use templates to express algorithms that apply to many argument types
+### <a name="Rt-algo"></a>T.2: 여러가지 실행인자 타입들에 적용되는 알고리즘을 표현할 때 템플릿을 사용하라
 
 ##### Reason
 
@@ -211,11 +209,9 @@ STL의 기본사항이다. `find` 알고리즘은 모든 종류의 입력 범위
 
 ##### Enforcement
 
-??? tough, probably needs a human
+??? 어렵다, 사람이 해야할수도 있다
 
-### <a name="Rt-cont"></a>T.3: Use templates to express containers and ranges
-
-> 역주 : 구간(range)
+### <a name="Rt-cont"></a>T.3: 컨테이너와 구간(range)을 표현할때 템플릿을 사용하라
 
 ##### Reason
 
@@ -256,29 +252,33 @@ STL은 이 접근법을 사용한다.
 
 메크로 뒤에서 `void*`를 숨기는 것은 그저 문제를 어렵게 할 뿐이다. 새로운 혼란을 야기한다.
 
-**Exceptions**: 고정된 ABI 지원 인터페이스가 필요하다면 기본 구현을 제공하고, 그 형태에 따라 타입에 안전한 템플릿을 표현해야 한다. [Stable base](#Rt-abi)를 참조하라.
+##### Exceptions
+
+고정된 ABI 지원 인터페이스가 필요하다면 기본 구현을 제공하고, 그 형태에 따라 타입에 안전한 템플릿을 표현해야 한다. [안정된 기본 클래스 규칙](#Rt-abi)을 참조하라.
 
 ##### Enforcement
 
 * `void*`과 하위레벨 구현코드 외에 형변환을 사용한다면 지적한다.
 
-### <a name="Rt-expr"></a>T.4: Use templates to express syntax tree manipulation
+### <a name="Rt-expr"></a>T.4: 문법 트리 조작을 표현하기 위해 템플릿을 사용하라
 
 ##### Reason
 
- ???
+???
 
 ##### Example
 
 ???
 
-**Exceptions**: ???
+##### Exceptions
 
-### <a name="Rt-generic-oo"></a>T.5: Combine generic and OO techniques to amplify their strengths, not their costs
+???
+
+### <a name="Rt-generic-oo"></a>T.5: 제네릭 프로그래밍과 개체지향 기술을 결합해 비용이 아닌 강점을 증폭시켜라
 
 ##### Reason
 
-제네릭 프로그래밍과 개체지향 기술은 상호보완적이다.
+제네릭 프로그래밍과 개체지향 기술은 상호보완적(complementary)이다.
 
 ##### Example
 
@@ -298,14 +298,14 @@ STL은 이 접근법을 사용한다.
 
 ##### Example
 
-동적인 것은 정적인 것을 돕는다: 일반적이고, 편리하며, 정적으로 결합된(bound) 인터페이스를 제공하라. 내부적으로는 (dispatch dynmically)동적으로 구현하라. 그렇게 함으로써 일관적인 개체를 만들어라(offer a uniform object layout).  
+동적인 것은 정적인 것을 돕는다: 일반적이고, 편리하며, 정적으로 결합된(bound) 인터페이스를 제공하라. 내부적으로는 동적으로 구현하라. 그렇게 함으로써 일관적인 개체를 만들어라(offer a uniform object layout).  
 
-Examples include type erasure as with `std::shared_ptr`'s deleter (but [don't overuse type erasure](#Rt-erasure)).
+예시로는 `std::shared_ptr`의 제거 함수(deleter) 타입 제거를 들 수 있다. (하지만 [타입 제거를 남용하지 마라](#Rt-erasure))
 
 ##### Note
 
-클래스 템플릿에 있는 비상속함수(nonvirtual function)는 사용되지 않으면 생성되지(instantiated) 않는다. -- 가상함수는 언제나 인스턴스화된다.
-이는 코드크기를 늘리고 필요치도 않는 함수를 인스턴스화함으로써 일반화 타입에 대한 제약을 심화시킬지도 모른다.
+클래스 템플릿에 있는 비상속함수(nonvirtual function)는 사용되지 않으면 생성되지(instantiated) 않는다. -- 가상함수는 언제나 실체화(instantiate)된다.
+이는 코드크기를 늘리고 필요치도 않는 함수를 실체화함으로써 일반화 타입에 대한 제약을 심화시킬지도 모른다.
 
 ##### See also
 
@@ -315,45 +315,45 @@ Examples include type erasure as with `std::shared_ptr`'s deleter (but [don't ov
 
 ##### Enforcement
 
-See the reference to more specific rules.
+보다 구체적인 규칙들은 위의 참조링크로 확인하라.
 
-## <a name="SS-concepts"></a>T.concepts: Concept rules
+## <a name="SS-concepts"></a>T.concepts: 컨셉 규칙들
 
 컨셉(Concept)은 템플릿 인자들에 대한 요구사항을 지정하기 위한 기능이다.
 컨셉은 [ISO technical specification](#Ref-conceptsTS)이지만, 현재는 GCC만 이를 지원하고 있다.  
 컨셉은 제네릭 프로그래밍에서의 사고에 중요한 역할을 하며, 미래의 (표준을 비롯한) C++ 라이브러리들의 많은 작업의 기초가 될 것이다.
 
-이후의 규칙들은 컨셉이 지원된다고 가정한다
+이 항목의 규칙들은 컨셉이 지원된다고 가정한다
 
 컨셉 사용 규칙 요약:
 
-* [T.10: Specify concepts for all template arguments](#Rt-concepts)
-* [T.11: Whenever possible use standard concepts](#Rt-std-concepts)
-* [T.12: Prefer concept names over `auto`](#Rt-auto)
-* [T.13: Prefer the shorthand notation for simple, single-type argument concepts](#Rt-shorthand)
+* [T.10: 모든 템플릿 인자에 컨셉을 명시하라](#Rt-concepts)
+* [T.11: 가능한 모든 경우 표준 컨셉을 사용하라](#Rt-std-concepts)
+* [T.12: 지역 변수에 `auto` 보다는 컨셉의 이름을 사용하라](#Rt-auto)
+* [T.13: 단순하거나 단일 타입을 인자로 받는 컨셉에는 약식 표기를 사용하라](#Rt-shorthand)
 * ???
 
 컨셉 정의 규칙 요약:
 
-* [T.20: Avoid "concepts" without meaningful semantics](#Rt-low)
-* [T.21: Require a complete set of operations for a concept](#Rt-complete)
-* [T.22: Specify axioms for concepts](#Rt-axiom)
-* [T.23: Differentiate a refined concept from its more general case by adding new use patterns](#Rt-refine)
-* [T.24: Use tag classes or traits to differentiate concepts that differ only in semantics](#Rt-tag)
-* [T.25: Avoid complimentary constraints](#Rt-not)
-* [T.26: Prefer to define concepts in terms of use-patterns rather than simple syntax](#Rt-use)
+* [T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라](#Rt-low)
+* [T.21: 컨셉에서는 연산들의 완전한 집합(complete set)을 요구하라](#Rt-complete)
+* [T.22: 컨셉에서 쓸 수 있도록 공리를 명시하라](#Rt-axiom)
+* [T.23: 정제된 컨셉(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라](#Rt-refine)
+* [T.24: 의미구조만 다른 컨셉은 Tag 클래스 혹은 Traits를 사용해 차별화하라](#Rt-tag)
+* [T.25: 제약이 서로 대비되지 않게 하라](#Rt-not)
+* [T.26: 단순한 문법보다는 사용 패턴을 고려해서 컨셉을 정의하라](#Rt-use)
 * ???
 
 ## <a name="SS-concept-use"></a>T.con-use: 컨셉 사용(Concept use)
 
-### <a name="Rt-concepts"></a>T.10: Specify concepts for all template arguments
+### <a name="Rt-concepts"></a>T.10: 모든 템플릿 인자에 컨셉을 명시하라
 
 ##### Reason
 
 정확함과 가독성.
 템플릿 인자의 가정된 의미(문법과 의미구조)는 템플릿 인터페이스의 기본이다.
 컨셉은 문서화와 템플릿용 오류 처리를 경이적으로 개선시킨다.
-템플릿 인자를 위한 개념을 기술하는 것은 강력한 디자인 도구가 된다.
+템플릿 인자에 적용되는 개념을 기술하는 것은 강력한 디자인 도구가 된다.
 
 ##### Example
 
@@ -380,11 +380,10 @@ See the reference to more specific rules.
 
 ##### Note
 
-"Concepts" are defined in an ISO Technical specification: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-A draft of a set of standard-library concepts can be found in another ISO TS: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-Concepts are supported in GCC 6.1 and later.
-Consequently, we comment out uses of concepts in examples; that is, we use them as formalized comments only.
-If you use GCC 6.1 or later, you can uncomment them:
+"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
 
 ```c++
     template<typename Iter, typename Val>
@@ -403,28 +402,29 @@ If you use GCC 6.1 or later, you can uncomment them:
 
 템플릿 메타프로그래밍 코드의 한 부분으로써 우리가 표현식 트리를 조작하고, 타입 검사를 연기할때만 필요하다.
 
-**References**: TC++PL4, Palo Alto TR, Sutton
+##### References
+
+TC++PL 4, Palo Alto TR, Sutton
 
 ##### Enforcement
 
 컨셉을 사용하지 않은 템플릿 타입 인자가 있다면 지적한다
 
-### <a name="Rt-std-concepts"></a>T.11: Whenever possible use standard concepts
+### <a name="Rt-std-concepts"></a>T.11: 가능한 모든 경우 표준 컨셉을 사용하라
 
 ##### Reason
 
-"Standard" concepts (as provided by the [GSL](#S-GSL) and the [Ranges TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf), and hopefully soon the ISO standard itself)
-saves us the work of thinking up our own concepts, are better thought out than we can manage to do in a hurry, and improves interoperability.
+"표준" 컨셉(GSL과 [Ranges TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)에서 제공하는)은 우리 자신만의 컨셉을 생각할 필요가 없도록 한다. 동시에 우리가 조급하게 관리하는 것보다 더 깊이 생각한 결과물이며, 상호 동작성을 개선한다.
 
 ##### Note
 
-새로운 일반화 라이브러리를 만들지 않는한 필요한 많은 컨셉은 이미 표준 라이브러리 안에 정의되어 있다.
+새로운 일반화 라이브러리를 만들지 않는 한 필요한 많은 컨셉이 이미 표준 라이브러리 안에 정의되어 있다.
 
 ##### Example (using TS concepts)
 
 ```c++
     template<typename T>
-        // don't define this: Sortable is in the GSL
+        // 이런 컨셉을 정의할 필요 없다: GSL에 Sortable이 정의되어 있다
     concept Ordered_container = Sequence<T> && Random_access<Iterator<T>> && Ordered<Value_type<T>>;
 
     void sort(Ordered_container& s);
@@ -435,7 +435,7 @@ saves us the work of thinking up our own concepts, are better thought out than w
 `Sortable`을 사용하는 것이 더 좋고 단순하다:
 
 ```c++
-    void sort(Sortable& s);   // better
+    void sort(Sortable& s);   // 더 나은 방법
 ```
 
 ##### Note
@@ -453,7 +453,7 @@ saves us the work of thinking up our own concepts, are better thought out than w
 * 제약조건이 없는 인자, 비표준 컨셉을 쓰는 템플릿, 공리(axiom)없이 'homebrew' 컨셉을 쓰는 템플릿을 찾는다
 * 컨셉 발견 툴을 개발하라. [초기 실험](http://www.stroustrup.com/sle2010_webversion.pdf) 참조
 
-### <a name="Rt-auto"></a>T.12: Prefer concept names over `auto` for local variables
+### <a name="Rt-auto"></a>T.12: 지역 변수에 `auto` 보다는 컨셉의 이름을 사용하라
 
 ##### Reason
 
@@ -471,7 +471,9 @@ saves us the work of thinking up our own concepts, are better thought out than w
 
 * ???
 
-### <a name="Rt-shorthand"></a>T.13: Prefer the shorthand notation for simple, single-type argument concepts
+### <a name="Rt-shorthand"></a>T.13: 단순하거나 단일 타입을 인자로 받는 컨셉에는 약식 표기를 사용하라
+
+> 역주: 약식 표기(shorthand notation)
 
 ##### Reason
 
@@ -496,11 +498,10 @@ saves us the work of thinking up our own concepts, are better thought out than w
 
 ##### Note
 
-"Concepts" are defined in an ISO Technical specification: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-A draft of a set of standard-library concepts can be found in another ISO TS: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-Concepts are supported in GCC 6.1 and later.
-Consequently, we comment out uses of concepts in examples; that is, we use them as formalized comments only.
-If you use a compiler that supports concepts (e.g., GCC 6.1 or later), you can remove the `//`.
+"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다.
 
 ##### Enforcement
 
@@ -509,15 +510,15 @@ If you use a compiler that supports concepts (e.g., GCC 6.1 or later), you can r
 
 ## <a name="SS-concepts-def"></a>T.concepts.def: 컨셉 정의(Concept definition rules) 규칙
 
-Defining good concepts is non-trivial.
-Concepts are meant to represent fundamental concepts in an application domain (hence the name "concepts").
-Similarly throwing together a set of syntactic constraints to be used for a the arguments for a single class or algorithm is not what concepts were designed for
-and will not give the full benefits of the mechanism.
+좋은 컨셉을 정의하는 것은 사소한 일이 아니다.
+컨셉은 Application 범위에서 기초적인 개념을 표현하기 위한 것이다 (그렇기 때문에 "concepts"라고 이름지어졌다).
 
-Obviously, defining concepts will be most useful for code that can use an implementation (e.g., GCC 6.1 or later),
-but defining concepts is in itself a useful design technique and help catch conceptual errors and clean up the concepts (sic!) of an implementation.
+하나의 클래스나 알고리즘을 문법적으로 제약하는 것은 컨셉이 의도하는 바가 아니며, 컨셉의 메커니즘을 적용했을 때의 효율을 완전히 끌어낼 수 없다.
 
-### <a name="Rt-low"></a>T.20: Avoid "concepts" without meaningful semantics
+분명, 컨셉을 정의하는 것은 컨셉 구현을 사용할 수 있는 (예컨대 GCC 6.1 이후의 버전으로 컴파일 되는) 코드에 유용할 것이다.
+그 이외에도 컨셉을 정의하는것 자체가 유용한 설계 기술이 될 것이며 개념 차원의 오류를 잡아내거나 구현 코드의 개념을 정리하도록 도울 것이다. 
+
+### <a name="Rt-low"></a>T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라
 
 ##### Reason
 
@@ -529,7 +530,7 @@ but defining concepts is in itself a useful design technique and help catch conc
 
 ```c++
     template<typename T>
-    concept Addable = has_plus<T>;    // bad; insufficient
+    concept Addable = has_plus<T>;    // bad; 불충분하다
 
     template<Addable N> auto algo(const N& a, const N& b) // use two numbers
     {
@@ -547,7 +548,7 @@ but defining concepts is in itself a useful design technique and help catch conc
 ```
 
 아마도 문자열 접합일 수도 있고, 실수였을 수도 있다. 여기서 뺄샘 연산을 지원하도록 한다면 완전히 다른 타입들로만 사용가능할 것이다.
-이 `Addable`은 교환법칙이 성립해야 한다는 수학적인 규칙에 위배된다: `a+b == b+a`
+예시의 `Addable`은 교환법칙이 성립해야 한다는 수학적인 규칙에 위배된다: `a+b == b+a`
 
 ##### Note
 
@@ -557,7 +558,8 @@ but defining concepts is in itself a useful design technique and help catch conc
 
 ```c++
     template<typename T>
-    // The operators +, -, *, and / for a number are assumed to follow the usual mathematical rules
+    // The operators +, -, *, and / for a number are assumed to 
+    //  follow the usual mathematical rules
     concept Number = has_plus<T>
                      && has_minus<T>
                      && has_multiply<T>
@@ -580,14 +582,16 @@ but defining concepts is in itself a useful design technique and help catch conc
 
 ##### Note
 
-Concepts with multiple operations have far lower chance of accidentally matching a type than a single-operation concept.
+다수의 연산으로 정의한 컨셉은 하나의 연산으로 정의한 컨셉보다 의도치 않은 타입을 허용할 가능성이 낮다.
 
 ##### Enforcement
 
-* Flag single-operation `concepts` when used outside the definition of other `concepts`.
-* Flag uses of `enable_if` that appears to simulate single-operation `concepts`.
+* 하나의 연산으로 정의한 `concepts`이 다른 `concepts`들을 정의하는 코드 이외의 코드에서 사용되면 지적하라 
+* `enable_if`가 하나의 연산으로 정의한 `concepts`처럼 사용되고 있으면 지적하라
 
-### <a name="Rt-complete"></a>T.21: Require a complete set of operations for a concept
+### <a name="Rt-complete"></a>T.21: 컨셉에서는 연산들의 완전한 집합을 요구하라
+
+> Require a complete set of operations for a concept  
 
 ##### Reason
 
@@ -595,7 +599,7 @@ Concepts with multiple operations have far lower chance of accidentally matching
 
 ##### Note
 
-This is a specific variant of the general rule that [a concept must make semantic sense](#Rt-low).
+이 규칙은 보다 일반적인 규칙인 [컨셉은 의미구조적으로 적절해야 한다](#Rt-low)에서 파생된 것이다.
 
 ##### Example, bad (using TS concepts)
 
@@ -606,15 +610,15 @@ This is a specific variant of the general rule that [a concept must make semanti
 문맥적으로 무의미 하다. 
 최소한 `+`, `-` 정도는 있어야 쓸만하다.
 
-완전한 연산 집합의 예를 들자면 다음과 같다
+연산들의 완전한 집합(complete set)을 예시하자면 다음과 같다
 
-* `Arithmetic`: `+`, `-`, `*`, `/`, `+=`, `-=`, `*=`, `/=`
-* `Comparable`: `<`, `>`, `<=`, `>=`, `==`, `!=`
+* 산술(Arithmetic)연산의 집합: `+`, `-`, `*`, `/`, `+=`, `-=`, `*=`, `/=`
+* 비교(Comparable)연산의 집합: `<`, `>`, `<=`, `>=`, `==`, `!=`
 
 ##### Note
 
-This rule applies whether we use direct language support for concepts or not.
-It is a general design rule that even applies to non-templates:
+이 규칙은 컨셉의 지원여부와 무관하게 적용될 수 있다.
+이는 비-템플릿 코드에 적용되는 일반적인 설계 규칙이다:
 
 ```c++
     class Minimal {
@@ -625,25 +629,25 @@ It is a general design rule that even applies to non-templates:
     bool operator<(const Minimal&, const Minimal&);
 
     Minimal operator+(const Minimal&, const Minimal&);
-    // no other operators
+    // 다른 연산자는 없다
 
     void f(const Minimal& x, const Minimal& y)
     {
         if (!(x == y)) { /* ... */ }    // OK
-        if (x != y) { /* ... */ }       // surprise! error
+        if (x != y) { /* ... */ }       // 이런! 컴파일 오류다
 
         while (!(x < y)) { /* ... */ }  // OK
-        while (x >= y) { /* ... */ }    // surprise! error
+        while (x >= y) { /* ... */ }    // 이런! 컴파일 오류다
 
         x = x + y;          // OK
-        x += y;             // surprise! error
+        x += y;             // 이런! 컴파일 오류다
     }
 ```
 
-This is minimal, but surprising and constraining for users.
-It could even be less efficient.
+이는 아주 작은 예시지만, 사용자들의 기대에 어긋나고 코드를 제약한다(surprising and constraining).
+능률을 떨어뜨릴 수도 있다.
 
-The rule supports the view that a concept should reflect a (mathematically) coherent set of operations.
+이 규칙은 연산들이 수학적으로 일관성 있는 집합(coherent set of operations)을 반영해야 한다는 관점을 뒷받침한다.
 
 ##### Example
 
@@ -672,15 +676,18 @@ The rule supports the view that a concept should reflect a (mathematically) cohe
     }
 ```
 
-It can be a nuisance to define all operators, but not hard.
-Ideally, that rule should be language supported by giving you comparison operators by default.
+모든 연산자를 정의해야 한다는 것이 번거로울 수는 있지만, 어려운 것은 아니다.
+이상적으로는, 언어가 비교 연산들을 기본적으로 제공함으로써 이 규칙을 지원해야 한다.
 
 ##### Enforcement
 
-* Flag classes that support "odd" subsets of a set of operators, e.g., `==` but not `!=` or `+` but not `-`.
-  Yes, `std::string` is "odd", but it's too late to change that.
+* 클래스가 연산들의 "완전하지 않은(odd)" 부분집합을 가지면 지적한다.
+  가령, `==`를 정의하지만 `!=`를 정의하지 않거나, `+`는 정의하지만 `-`를 정의하지 않는 경우이다.
+  `std::string`의 연산 집합은 "완전하지 않지만", 수정하기엔 너무 늦었다.
 
-### <a name="Rt-axiom"></a>T.22: Specify axioms for concepts
+### <a name="Rt-axiom"></a>T.22: 컨셉에서 쓸 수 있도록 공리를 명시하라
+
+> 역주: 공리(axiom: 증명이 없이도 자명한 것)
 
 ##### Reason
 
@@ -693,8 +700,13 @@ Ideally, that rule should be language supported by giving you comparison operato
 
 ```c++
     template<typename T>
-        // The operators +, -, *, and / for a number are assumed to follow the usual mathematical rules
-        // axiom(T a, T b) { a + b == b + a; a - a == 0; a * (b + c) == a * b + a * c; /*...*/ }
+        // 사칙연산은 기본적인 수학 규칙들을 따른다고 가정한다
+        // axiom(T a, T b) { 
+        //      a + b == b + a; 
+        //      a - a == 0; 
+        //      a * (b + c) == a * b + a * c; 
+        //      /*...*/ 
+        // }
         concept Number = requires(T a, T b) {
             {a + b} -> T;   // the result of a + b is convertible to T
             {a - b} -> T;
@@ -705,7 +717,7 @@ Ideally, that rule should be language supported by giving you comparison operato
 
 ##### Note
 
-이것은 수학적 공리(axiom: 증명이 없이도 자명한 것)를 표현한 것이다.
+이것은 수학적 공리를 표현한 것이다.
 일반적으로 공리는 증명하지 않는다. 경우에 따라 그 증명은 컴파일러의 능력을 넘어서는 것이다.
 공리가 일반적이지 않을지도 모른다. 그러나 템플릿 작성자는 실제로 사용하는 모든 입력에 대해서 공리를 가지고 있다고 가정하는게 좋다 (선행조건과 비슷하다).
 
@@ -734,19 +746,18 @@ GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ra
     }
 ```
 
-So a `Balancer` must supply at least thee operations on a tree `Node`,
-but we are not yet ready to specify detailed semantics because a new kind of balanced tree might require more operations
-and the precise general semantics for all nodes is hard to pin down in the early stages of design.
+위에 따르면 `Balancer`는 최소한 트리의 `Node`에 대한 3개 연산을 지원해야 한다.
+하지만 우리는 더 자세한 의미구조를 명시할 준비가 되지 않았는데, 새로운 형태의 균형 트리(balanced tree)가 더 많은 연산을 필요로 하거나 초기 디자인에서 모든 노드에 적용할 정확한 의미구조를 확정하기 어려울 수 있기 때문이다.
 
 의미구조가 잘 정의되지 않은 "개념"이라도 유용할 수 있다.
-For example, it allows for some checking during initial experimentation.
-그러나 안정화됐다고 생각해서는 안된다. 새로운 용례가 발견되면 불완전한 컨셉은 개선될 것이다.
+가령, 개념을 정의하는 것은 초기 실험단계에서 몇몇 사항을 검사할 수 있도록 한다.
+다만 안정화됐다고 생각해서는 안된다. 새로운 용례가 발견되면 불완전한 컨셉은 개선될 것이다.
 
 ##### Enforcement
 
 * 컨셉 정의 주석 내에 "axiom" 단어를 찾는다
 
-### <a name="Rt-refine"></a>T.23: Differentiate a refined concept from its more general case by adding new use patterns
+### <a name="Rt-refine"></a>T.23: 정제된 컨셉(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라
 
 ##### Reason
 
@@ -763,15 +774,14 @@ For example, it allows for some checking during initial experimentation.
 ```
 
 컴파일러는 요구된 연산들에 기반해서 어떤것이 필요한 연산인지 결정(determine refinement)할 수 있다. (예제에서는 `++`에 해당한다)
-This decreases the burden on implementers of these types since
-they do not need any special declarations to "hook into the concept".
-2개의 컨셉이 요구사항이 정확하게 동일하다면 그들은 논리적 동치라고 할 수 있다 (there is no refinement).
+이는 타입을 구현하는 측의 부담을 줄여주는데, "컨셉을 만족하도록" 특별한 선언을 작성할 필요가 없기 때문이다.
+2개의 컨셉이 요구사항이 정확하게 동일하다면 그들은 논리적 동치라고 할 수 있다 (개선된 점이 없다).
 
 ##### Enforcement
 
 * 다른 컨셉과 요구사항이 정확하게 일치하는 컨셉이 있다면 지적한다. 차이를 분명하게 하고 싶다면 [T.24](#Rt-tag)를 참조하라.
 
-### <a name="Rt-tag"></a>T.24: Use tag classes or traits to differentiate concepts that differ only in semantics
+### <a name="Rt-tag"></a>T.24: 의미구조만 다른 컨셉은 Tag 클래스 혹은 Traits를 사용해 차별화하라
 
 ##### Reason
 
@@ -790,7 +800,7 @@ they do not need any special declarations to "hook into the concept".
 
 라이브러리 프로그래머가 `is_contiguous`를 적절하게 정의해야 한다.
 
-Wrapping a tag class into a concept leads to a simpler expression of this idea:
+컨셉으로 Tag 클래스를 감싸면 비슷한 표현이 된다:
 
 ```c++
     template<typename I> concept Contiguous = is_contiguous<I>::value;
@@ -799,7 +809,7 @@ Wrapping a tag class into a concept leads to a simpler expression of this idea:
     concept bool Contiguous_iter = RA_iter<I> && Contiguous<I>;
 ```
 
-The programmer (in a library) must define `is_contiguous` (a trait) appropriately.
+이렇게 하면 라이브러리 프로그래머가 `is_contiguous` 특성(trait)을 적절히 정의해야만 한다.
 
 ##### Note
 
@@ -811,12 +821,15 @@ The programmer (in a library) must define `is_contiguous` (a trait) appropriatel
 * 컴파일러는 동일한 컨셉을 애매하게 사용하는 것을 지적한다
 * 동일한 컨셉을 정의한다면 지적한다
 
-### <a name="Rt-not"></a>T.25: Avoid complementary constraints
+### <a name="Rt-not"></a>T.25: 제약이 서로 대비되지 않게 하라
+
+> Avoid complementary constraints
 
 ##### Reason
 
-단순명료. 유지보수가 좋음.
-Functions with complementary requirements expressed using negation are brittle.
+단순명료하다. 유지보수하기 좋다.
+
+부정(negation)을 사용해 서로 대비되는 요구사항을 가지는 함수들은 믿고 쓰기 어렵다(brittle).
 
 ##### Example (using TS concepts)
 
@@ -855,7 +868,7 @@ Functions with complementary requirements expressed using negation are brittle.
 
 ##### Note
 
-Complementary constraints are unfortunately common in `enable_if` code:
+불행하게도 `enable_if`를 사용하는 코드에서 서로 대비되는 제약을 자주 확인할 수 있다:
 
 ```c++
     template<typename T>
@@ -886,7 +899,7 @@ Now the opportunities for errors multiply.
 * `C<T>`, `!C<T>`를 같이 가진 함수들이 있다면 지적한다
 * 정반대 제약조건이 있다면 모두 지적한다
 
-### <a name="Rt-use"></a>T.26: Prefer to define concepts in terms of use-patterns rather than simple syntax
+### <a name="Rt-use"></a>T.26: 단순한 문법보다는 사용 패턴을 고려해서 컨셉을 정의하라
 
 ##### Reason
 
@@ -895,14 +908,13 @@ Now the opportunities for errors multiply.
 
 ##### Example (using TS concepts)
 
-You might be tempted to define a concept `Equality` like this:
+`Equality`를 아래처럼 정의하고 싶을 것이다:
 
 ```c++
     template<typename T> concept Equality = has_equal<T> && has_not_equal<T>;
 ```
 
-Obviously, it would be better and easier just to use the standard `EqualityComparable`,
-but - just as an example - if you had to define such a concept, prefer:
+표준에서 `EqualityComparable`을 지원하는게 더 낫고 쉬울 것이라는 점은 명백하다. 하지만 - 예를 들어 - 그런 컨셉을 정의해야 한다면:
 
 ```c++
     template<typename T> concept Equality = requires(T a, T b) {
@@ -913,26 +925,24 @@ but - just as an example - if you had to define such a concept, prefer:
     }
 ```
 
-as opposed to defining two meaningless concepts `has_equal` and `has_not_equal` just as helpers in the definition of `Equality`.
-By "meaningless" we mean that we cannot specify the semantics of `has_equal` in isolation.
+`Equality`의 정의 안에 무의미한 컨셉인 `has_equal`와 `has_not_equal` 2개를 정의하는 것 대신에, 위와 같은 형태를 지향하라.
+여기서 "무의미한"이란 `has_equal`의 의미구조를 독럽적으로(in isolation) 정의할 수 없다는 것을 의미한다.
 
 ##### Enforcement
 
 ???
 
-## <a name="SS-temp-interface"></a> 템플릿 인터페이스(Template interfaces)
+## <a name="SS-temp-interface"></a> 템플릿 인터페이스(Template Interfaces)
 
-Over the years, programming with templates have suffered from a weak distinction between the interface of a template
-and its implementation.
-Before concepts, that distinction had no direct language support.
-However, the interface to a template is a critical concept - a contract between a user and an implementer - and should be carefully designed.
+지난 수년동안, 템플릿을 사용한 프로그래밍은 템플릿의 인터페이스와 구현을 분명히 구분하지 않아 고통받았다.
+컨셉 이전에는, 이 구분을 위한 언어차원의 지원이 없었다. 그러나 템플릿에 대한 인터페이스는 매우 중요한 개념- 사용자와 구현자간의 계약 -이고, 마땅히 신중하게 설계되어야 한다.
 
-### <a name="Rt-fo"></a>T.40: Use function objects to pass operations to algorithms
+### <a name="Rt-fo"></a>T.40: 알고리즘에 연산(operation)을 전달할때는 함수 개체를 사용하라
 
 ##### Reason
 
-함수객체는 함수에 대한 "단순" 포인터에 비해 인터페이스를 통해 많은 정보를 전달할 수 있다.
-보통은 함수개체를 전달하는 것이 함수포인터에 비해 더 나은 성능을 보인다.
+함수 개채(function object)는 함수에 대한 "단순" 포인터에 비해 인터페이스를 통해 많은 정보를 전달할 수 있다.
+보통은 함수 개체를 전달하는 것이 함수 포인터에 비해 더 나은 성능을 보인다.
 
 ##### Example (using TS concepts)
 
@@ -948,11 +958,11 @@ However, the interface to a template is a critical concept - a contract between 
     auto z = find_if(v, Greater_than<double>(7));        // function object: carries the needed data
 ```
 
-You can, of course, generalize those functions using `auto` or (when and where available) concepts. For example:
+물론 저런 함수들을 `auto` 또는 컨셉을 사용해서 일반화 할 수 있다. 예를 들어:
 
 ```c++
-    auto y1 = find_if(v, [](Ordered x) { return x > 7; }); // require an ordered type
-    auto z1 = find_if(v, [](auto x) { return x > 7; });    // hope that the type has a >
+    auto y1 = find_if(v, [](Ordered x) { return x > 7; }); // Ordered 컨셉을 만족하는 타입
+    auto z1 = find_if(v, [](auto x) { return x > 7; });    // 해당 타입이 > 연산자를 지원하기를 기대한다
 ```
 
 ##### Note
@@ -966,9 +976,9 @@ You can, of course, generalize those functions using `auto` or (when and where a
 ##### Enforcement
 
 * 함수 템플릿 인자에 포인터가 있다면 지적한다
-* 템플릿에 함수 포인터가 인자로 전달된다면 지적한다 (false positives의 위험이 있다)
+* 템플릿에 함수 포인터가 인자로 전달된다면 지적한다 (false positive의 위험이 있다)
 
-### <a name="Rt-essential"></a>T.41: Require only essential properties in a template's concepts
+### <a name="Rt-essential"></a>T.41: 템플릿의 컨셉에서는 오직 필요한 특성(property)만 요구하라
 
 ##### Reason
 
@@ -976,7 +986,7 @@ You can, of course, generalize those functions using `auto` or (when and where a
 
 ##### Example (using TS concepts)
 
-Consider, a `sort` instrumented with (oversimplified) simple debug support:
+이런 경우를 생각해보라, `sort`는 (좀 심하게 단순하지만) 디버깅 지원을 포함하고 있다:
 
 ```c++
     void sort(Sortable& s)  // sort sequence s
@@ -987,7 +997,7 @@ Consider, a `sort` instrumented with (oversimplified) simple debug support:
     }
 ```
 
-Should this be rewritten to:
+아래처럼 다시 작성되어야 한다:
 
 ```c++
     template<Sortable S>
@@ -1000,38 +1010,37 @@ Should this be rewritten to:
     }
 ```
 
-After all, there is nothing in `Sortable` that requires `iostream` support.
-On the other hand, there is nothing in the fundamental idea of sorting that says anything about debugging.
+결론적으로 `Sortable`에는 `iostream`을 지원한다는 요구사항이 전혀 없다는 것이다.
+반대로 말해, 정렬이라는 개념은 디버깅과는 완전히 무관하다.
 
 ##### Note
 
-If we require every operation used to be listed among the requirements, the interface becomes unstable:
-Every time we change the debug facilities, the usage data gathering, testing support, error reporting, etc.
-The definition of the template would need change and every use of the template would have to be recompiled.
-This is cumbersome, and in some environments infeasible.
+수행하는 모든 처리(operation)를 요구사항으로 나열하면, 그 인터페이스는 불안정하게 된다:
+디버깅 관련 기능을 변경하거나, 사용 데이터를 수집하거나, 테스트를 지원하거나, 오류를 보고하거나 등등
 
-Conversely, if we use an operation in the implementation that is not guaranteed by concept checking,
-we may get a late compile-time error.
+템플릿의 정의가 바뀌고 해당 템플릿의 모든 사용코드가 다시 컴파일되어야 할 것이다.
+이는 다루기 힘든 문제고, 어떤 환경에서는 현실적이지 않다.
 
-By not using concept checking for properties of a template argument that is not considered essential,
-we delay checking until instantiation time.
-We consider this a worthwhile tradeoff.
+반대로, 컨셉을 사용한 검사를 보장하지 않는 구현을 사용한다면, 컴파일 시간 오류를 뒤늦게 확인하게 될 것이다.
 
-Note that using non-local, non-dependent names (such as `debug` and `cerr`) also introduces context dependencies that may lead to "mysterious" errors.
+필수적이지 않은 템플릿 실행인자들의 속성을 컨셉을 사용해 검사하지 않는 경우, 이는 실체화 시간까지 검사를 미루게 된다.
+우리는 이 방식이 그럴만한 가치가 있는 타협(worthwhile tradeoff)이라고 생각한다.
+
+지역적이지 않고, 의존적이지 않은 이름들을(`debug` 나 `cerr` 같은) 사용하는 것은 문맥 의존적인 코드를 낳고, 이는 "원인이 분명하지 않은(mysterious)" 오류들로 이어질 수 있다는 점에 주의하라.
 
 ##### Note
 
-It can be hard to decide which properties of a type is essential and which are not.
+타입의 어떤 속성이 필수적인지 결정하기 어려울 수 있다.
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-alias"></a>T.42: Use template aliases to simplify notation and hide implementation details
+### <a name="Rt-alias"></a>T.42: 템플릿 별칭을 구현사항을 숨기거나 표기를 간단히 할 때 사용하라
 
 ##### Reason
 
-가독성을 좋게 하며, 구현 내용을 숨긴다.
+가독성을 좋게 하며, 구현 내용(implementation detail)을 숨긴다.
 템플릿 별칭은 타입을 계산하기 위한 많은 특성(traits)을 사용하는 것을 대체해준다.
 타입 특성을 숨기기 위해 쓰일 수도 있다.
 
@@ -1060,7 +1069,7 @@ It can be hard to decide which properties of a type is essential and which are n
     }
 
     template<typename T>
-    using Value_type = typename container_traits<T>::value_type;
+    using value_type = typename container_traits<T>::value_type;
 ```
 
 이것은 `value_type`을 쓰는 사용자가 `value_type`의 구현을 알 필요가 없게 한다.
@@ -1070,21 +1079,21 @@ It can be hard to decide which properties of a type is essential and which are n
     void user2(T& c)
     {
         // ...
-        Value_type<T> x;
+        value_type<T> x;
         // ...
     }
 ```
 
 ##### Note
 
-A simple, common use could be expressed: "Wrap traits!"
+간단하고 일반적인 사용은 "특성(traits)으로 감싸라!"라고 할 수 있겠다
 
 ##### Enforcement
 
-* `using`으로 선언이외에 중의성 제거용으로 `typename`을 사용한다면 지적한다
+* `using`으로 선언 이외에 중의성 제거용으로 `typename`을 사용한다면 지적한다
 * ???
 
-### <a name="Rt-using"></a>T.43: Prefer `using` over `typedef` for defining aliases
+### <a name="Rt-using"></a>T.43: 타입에 별명을 붙일때 `typedef` 보다는 `using`을 사용하라
 
 ##### Reason
 
@@ -1110,7 +1119,7 @@ A simple, common use could be expressed: "Wrap traits!"
 
 * `typedef`를 사용하고 있다면 지적하라. "아주 많이" 나올 것이다. :-(
 
-### <a name="Rt-deduce"></a>T.44: Use function templates to deduce class template argument types (where feasible)
+### <a name="Rt-deduce"></a>T.44: (할 수 있다면) 함수 템플릿은 클래스 템플릿의 인자 타입을 유도(deduce)할 때 사용하라
 
 ##### Reason
 
@@ -1140,10 +1149,10 @@ A simple, common use could be expressed: "Wrap traits!"
 
 ##### Note
 
-Note that C++17 will make this rule redundant by allowing the template arguments to be deduced directly from constructor arguments:
+C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인자들로부터 바로 유도할 수 있도록 하고 있다.
 [Template parameter deduction for constructors (Rev. 3)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0091r1.html).
 
-For example:
+예를 들어:
 
 ```c++
     tuple t1 = {1, "Hamlet"s, 3.14}; // deduced: tuple<int, string, double>
@@ -1153,13 +1162,11 @@ For example:
 
 명시적으로 특수화된 타입이 사용된 인자들의 타입과 정확히 일치하는 부분을 지적하라.
 
-### <a name="Rt-regular"></a>T.46: Require template arguments to be at least `Regular` or `SemiRegular`
+### <a name="Rt-regular"></a>T.46: 템플릿 인자들은 최소한 `Regular`혹은 `SemiRegular`하도록 하라
 
 ##### Reason
 
-Readability.
-Preventing surprises and errors.
-Most uses support that anyway.
+가독성. 뜻하지 않은 오류를 예방한다. 대부분의 타입들이 이를 지원한다.
 
 ##### Example
 
@@ -1183,19 +1190,18 @@ Most uses support that anyway.
 
 ##### Note
 
-Semiregular requires default constructible.
+`SemiRegular` 타입은 기본생성이 가능하다.
 
 ##### Enforcement
 
-* Flag types that are not at least `SemiRegular`.
+* 템플릿의 인자가 `SemiRegular`하지 않으면 지적한다
 
-### <a name="Rt-visible"></a>T.47: Avoid highly visible unconstrained templates with common names
+### <a name="Rt-visible"></a>T.47: 일반적인 이름을 가지고 있으면서 쉽게 찾을 수 있고 제약이 거의 없는 템플릿은 지양하라
 
 ##### Reason
 
-An unconstrained template argument is a perfect match for anything so such a template can be preferred over more specific types that require minor conversions.
-This is particularly annoying/dangerous when ADL is used.
- Common names make this problem more likely.
+제약하지 않은 템플릿 인자는 어떤 타입도 들어맞을 수 있으므로 그런 템플릿들이 약간의 변환이 필요한 타입들에 적용되어버릴 수 있다.
+이는 ADL(Argument Dependent Lookup)이 사용되었을때 특히 짜증나고 위험한 코드가 된다. 일반적인 이름(common name)이 사용되면 이 문제가 더 자주 발생할 수 있다.
 
 ##### Example
 
@@ -1203,11 +1209,17 @@ This is particularly annoying/dangerous when ADL is used.
     namespace Bad {
         struct S { int m; };
         template<typename T1, typename T2>
-        bool operator==(T1, T2) { cout << "Bad\n"; return true; }
+        bool operator==(T1, T2) { 
+            cout << "Bad\n"; 
+            return true; 
+        }
     }
 
     namespace T0 {
-        bool operator==(int, Bad::S) { cout << "T0\n"; return true; }  // compare to int
+        bool operator==(int, Bad::S) { // compare to int
+            cout << "T0\n"; 
+            return true;
+        }  
 
         void test()
         {
@@ -1219,62 +1231,64 @@ This is particularly annoying/dangerous when ADL is used.
     }
 ```
 
-This prints `T0` and `Bad`.
+이 코드는 `T0`와 `Bad`를 출력한다.
 
-Now the `==` in `Bad` was designed to cause trouble, but would you have spotted the problem in real code?
-The problem is that `v.size()` returns an `unsigned` integer so that a conversion is needed to call the local `==`;
-the `==` in `Bad` requires no conversions.
-Realistic types, such as the standard-library iterators can be made to exhibit similar anti-social tendencies.
-
-##### Note
-
-If an unconstrained template is defined in the same namespace as a type,
-that unconstrained template can be found by ADL (as happened in the example).
-That is, it is highly visible.
+여기서 `Bad`에 있는 `==` 중복정의가 문제를 일으키고 있다, 실제 코드에서 문제를 눈치챌 수 있었는가?
+문제는 `v.size()`가 `unsigned` 정수를 반환하고, 이것이 타입 변환을 필요로하는 지역 `==` 대신 타입변환이 필요 없는 `Bad`의 `==`를 선택하도록 한다는 것이다.
+표준 라이브러리의 반복자같은 현실적으로 사용되는 타입(realistic type)들은 이런 반-사회적인 기술들을 금하도록 만들 수 있다.
 
 ##### Note
 
-This rule should not be necessary, but the committee cannot agree to exclude unconstrained templated from ADL.
+같은 네임스페이스에서 제약없는 템플릿이 정의되어 있다면, 그 템플릿은 ADL에 의해서 (예제에서 발생한 것처럼) 발견될 것이다. 
+이 말인 즉, 그 템플릿이 쉽게 찾을 수 있다(highly visible)는 것이다. 
 
-Unfortunately this will get many false positives; the standard library violates this widely, by putting many unconstrained templates and types into the single namespace `std`.
+##### Note
+
+이 규칙은 필수가 되어선 안된다. 하지만 표준 위원회에서는 ADL에서 제약 없는 템플릿을 제외하는것에 동의하지 않는다.
+
+불행하게도 이 규칙이 많은 false positives로 이어질 수 있다; 표준 라이브러리는 수많은 제약 없는 템플릿은 하나의 네임스페이스(`std`)에 배치함으로써 이 규칙을 광범위하게 위반한다. 
 
 ##### Enforcement
 
-Flag templates defined in a namespace where concrete types are also defined (maybe not feasible until we have concepts).
+네임스페이스에서 구체적인 타입을 사용하는 템플릿이 같이 정의되어 있다면 지적한다. (컨셉이 가능해지기 전까지는 현실적으로 실행하기 어려울 수 있다)
 
-### <a name="Rt-concept-def"></a>T.48: If your compiler does not support concepts, fake them with `enable_if`
+### <a name="Rt-concept-def"></a>T.48: 컴파일러가 컨셉을 지원하지 않는다면 `enable_if`로 유사하게 작성하라
 
 ##### Reason
 
-Because that's the best we can do without direct concept support.
-`enable_if` can be used to conditionally define functions and to select among a set of functions.
+컨셉 지원이 없는 상황에서 최선이다.
+`enable_if`는 조건에 따라 함수를 정의하거나 여러 함수 중 하나를 선택할때 사용할 수 있다.
 
 ##### Example
 
+```
     enable_if<???>
+```
 
 ##### Note
 
-Beware of [complementary constraints](# T.25).
-Faking concept overloading using `enable_if` sometimes forces us to use that error-prone design technique.
+[complementary constraints](#T.25)에 유의하라.
+컨셉 오버로딩을 `enable_if`로 꾸미는(fake) 것은 오류에 취약한 설계 기법을 쓰도록 할 수도 있다.
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-erasure"></a>T.49: Where possible, avoid type-erasure
+### <a name="Rt-erasure"></a>T.49: 가능하다면 타입 제거는 피하라
 
 > 역주 : 타입 제거(type-erasure)
 
 ##### Reason
 
-타입제거는 서로 다른 컴파일 범위로 전달되는 타입 정보가 없어지므로 특별한 간접효과가 발생한다.
+타입 제거는 서로 다른 컴파일 범위로 전달되는 타입 정보가 없어지므로 특별한 간접효과가 발생한다.
 
 ##### Example
 
     ???
 
-**Exceptions**: `std::function`와 같은 경우처럼 때로는 타입제거가 적절할 수 있다.
+##### Exception
+
+`std::function`와 같은 경우처럼 때로는 타입제거가 적절할 수 있다.
 
 ##### Enforcement
 
@@ -1286,11 +1300,10 @@ Faking concept overloading using `enable_if` sometimes forces us to use that err
 
 ## <a name="SS-temp-def"></a>T.def: 템플릿 정의(Template definitions)
 
-A template definition (class or function) can contain arbitrary code, so only a comprehensive review of C++ programming techniques would cover this topic.
-However, this section focuses on what is specific to template implementation.
-In particular, it focuses on a template definition's dependence on its context.
+템플릿 정의 (클래스 혹은 함수)는 임의의 코드를 포함할 수 있기 때문에, C++ 프로그래밍 기술에 대한 종합적인 설명만이 이 내용을 다룬다.
+이 부분에서는 특별한 템플릿 구현, 특히, 그 코드의 문맥에 의존하는 템플릿 정의에 대해 중점적으로 다룰 것이다.
 
-### <a name="Rt-depend"></a>T.60: Minimize a template's context dependencies
+### <a name="Rt-depend"></a>T.60: 문맥에 따라 달라질 수 있는 템플릿은 최소화 하라
 
 ##### Reason
 
@@ -1304,42 +1317,43 @@ In particular, it focuses on a template definition's dependence on its context.
     template<typename C>
     void sort(C& c)
     {
-        std::sort(begin(c), end(c)); // necessary and useful dependency
+        std::sort(begin(c), end(c)); // 필요하고 실용적인 의존성
     }
 
     template<typename Iter>
     Iter algo(Iter first, Iter last) {
         for (; first != last; ++first) {
-            auto x = sqrt(*first); // potentially surprising dependency: which sqrt()?
-            helper(first, x);      // potentially surprising dependency:
-                                   // helper is chosen based on first and x
-            TT var = 7;            // potentially surprising dependency: which TT?
+            auto x = sqrt(*first); // 잠재적 의존성: 어떤 sqrt를 의미하는 것인가?
+            helper(first, x);      // 잠재적 의존성:
+                                   //   helper는 first와 x에 의해서 결정된다
+            TT var = 7;            // 잠재적 의존성: TT 는 어떤 타입 의미하는가?
         }
     }
 ```
 
 ##### Note
 
-Templates typically appear in header files so their context dependencies are more vulnerable to `#include` order dependencies than functions in `.cpp` files.
+템플릿들은 일반적으로 헤더 파일들에 정의되기 때문에 `.cpp`파일에서 `#include`순서의 영향을 받을 소지가 더 크다(more vulnerable).
 
 ##### Note
 
-인자에만 템플릿을 동작하게 하는 것이 의존도를 최소한으로 줄일 수 있는 한가지 방법인데 일반적으로는 다루기 힘들다.
-For example, an algorithm usually uses other algorithms and invoke operations that does not exclusively operate on arguments.
-And don't get us started on macros!
+인자만을 사용해서 템플릿을 동작하게 하는 것이 의존도를 최소한으로 줄일 수 있는 한가지 방법인데 일반적으로는 힘들다.
+예를 들어, 다른 알고리즘을 사용하는 한 알고리즘은 실행 인자만 사용하는 것은 아니다. 매크로를 사용하게 하지 말라!
 
-**See also**: [T.69](#Rt-customization)
+##### See also
+
+[T.69](#Rt-customization)
 
 ##### Enforcement
 
 ??? 까다롭다(Tricky)
 
-### <a name="Rt-scary"></a>T.61: Do not over-parameterize members (SCARY)
+### <a name="Rt-scary"></a>T.61: 너무 많은 멤버를 매개변수화 하지 말라 (SCARY)
 
 ##### Reason
 
 템플릿 매개변수로 쓰이지 않는 멤버는 구체적인 템플릿 매개변수를 제외하고 사용될 수 없다.
-이는 템플릿 사용을 제한하고 보통 코드 사이즈를 증가시킨다.
+이는 보통 템플릿 사용을 제한하고 코드 사이즈를 증가시킨다.
 
 ##### Example, bad
 
@@ -1367,8 +1381,10 @@ And don't get us started on macros!
     List<int, My_allocator> lst2;
 ```
 
-아무 문제 없어 보인다. but now `Link` formally depends on the allocator (even though it doesn't use the allocator). This forces redundant instantiations that can be surprisingly costly in some real-world scenarios.
-Typically, the solution is to make what would have been a nested class non-local, with its own minimal set of template parameters.
+아무 문제 없어 보인다.
+하지만 이 코드에서 `Link`는 allocator에 종속적이다(비록 allocator를 사용하지 않더라도).
+이런 코드는 중복적인 실체화(instantiation)가 발생하도록 강제하고, 실제 사례에서는 생각 이상의 비용을 발생시킬 수 있다.
+일반적으로, 이에 대한 해결책은 최소한의 템플릿 매개변수로 내포된 클래스(nested class)를 분리하는 것이다.
 
 ```c++
     template<typename T>
@@ -1395,8 +1411,10 @@ Typically, the solution is to make what would have been a nested class non-local
     List<int, My_allocator> lst2;
 ```
 
-Some people found the idea that the `Link` no longer was hidden inside the list scary, so we named the technique
-[SCARY](http://www.open-std.org/jtc1/sc22/WG21/docs/papers/2009/n2911.pdf).From that academic paper: 
+어떤 이들은 `Link` 타입이 `List`안에 숨겨지지 않음으로써 템플릿 매개변수 충돌로 인한 오류가 생길 것 같지만 실제로는 제대로 구현된다는 것을 알게 되었다. 이런 기교(technique)를 
+[SCARY](http://www.open-std.org/jtc1/sc22/WG21/docs/papers/2009/n2911.pdf)라 한다.
+
+해당 문서에 따르면:
 "The acronym SCARY describes assignments and initializations that are Seemingly erroneous (appearing Constrained by conflicting generic parameters), but Actually work with the Right implementation (unconstrained bY the conflict due to minimized dependencies."
 
 ##### Enforcement
@@ -1404,11 +1422,11 @@ Some people found the idea that the `Link` no longer was hidden inside the list 
 * 멤버 타입이 의존하지 않는 템플릿 매개변수가 있다면 지적한다
 * 멤버 함수가 의존하지 않는 템플릿 매개변수가 있다면 지적한다
 
-### <a name="Rt-nondependent"></a>T.62: Place non-dependent class template members in a non-templated base class
+### <a name="Rt-nondependent"></a>T.62: 종속적이지 않은 클래스 템플릿 멤버들은 템플릿이 아닌 상위 클래스에 배치하라
 
 ##### Reason
 
- Allow the base class members to be used without specifying template arguments and without template instantiation.
+템플릿 매개변수를 명시하거나 템플릿을 실체화시키지 않고도 상위 클래스의 멤버를 사용하게 한다. 
 
 ##### Example
 
@@ -1438,28 +1456,31 @@ Some people found the idea that the `Link` no longer was hidden inside the list 
 
 ##### Note
 
-A more general version of this rule would be
-"If a template class member depends on only N template parameters out of M, place it in a base class with only N parameters."
-For N == 1, we have a choice of a base class of a class in the surrounding scope as in [T.61](#Rt-scary).
+이 규칙을 좀 더 일반화 하자면 
 
-??? What about constants? class statics?
+"템플릿 클래스의 멤버가 M개의 템플릿 매개변수 중 N개에 의존적이라면, 이들은 N개의 매개변수만을 사용하는 기본 클래스에 배치하라"
+N이 1일때는 [T.61](#Rt-scary)규칙을 충족하는 클래스 중에서 기본 클래스를 선택할 수 있다.
+
+??? 상수나 static 멤버는 어떠한가?
 
 ##### Enforcement
 
-* Flag ???
+* ???를 지적하라
 
-### <a name="Rt-specialization"></a>T.64: Use specialization to provide alternative implementations of class templates
+### <a name="Rt-specialization"></a>T.64: 클래스 템플릿의 대안적(alternative) 구현을 제공할 때는 특수화를 사용하라
 
 ##### Reason
 
 템플릿은 일반적인 인터페이스를 정의한 것이다.
-특수화는 그 인터페이스의 다른(alternative) 구현을 위한 강력한 메커니즘을 제공한다.
+특수화(specialization)는 그 인터페이스의 대안적 구현(alternative implementation)을 위한 강력한 메커니즘을 제공한다.
 
 ##### Example
 
+```
     ??? string specialization (==)
 
     ??? representation specialization ?
+```
 
 ##### Note
 
@@ -1469,13 +1490,13 @@ For N == 1, we have a choice of a base class of a class in the surrounding scope
 
 ???
 
-### <a name="Rt-tag-dispatch"></a>T.65: Use tag dispatch to provide alternative implementations of a function
+### <a name="Rt-tag-dispatch"></a>T.65: 함수의 대안적(alternative) 구현을 제공할 때는 Tag dispatch를 사용하라
 
 ##### Reason
 
-* A template defines a general interface.
-* Tag dispatch allows us to select implementations based on specific properties of an argument type.
-* Performance.
+* 템플릿은 일반화된 인터페이스를 정의한다
+* Tag dispatch는 실행 인자의 타입을 사용해서 특정한 속성에 따른 구현을 선택할 수 있도록 한다
+* 성능
 
 ##### Example
 
@@ -1518,7 +1539,7 @@ For N == 1, we have a choice of a base class of a class in the surrounding scope
 
 ##### Note
 
-`concept`이 가능하게 된다면 이런 대안은 바로 구별될 수 있을 것이다:
+Concept가 적용 가능해지면 이런 대안은 바로 구별될 수 있을 것이다:
 
 ```c++
     template<class Iter>
@@ -1539,11 +1560,11 @@ For N == 1, we have a choice of a base class of a class in the surrounding scope
 
 ???
 
-### <a name="Rt-specialization2"></a>T.67: Use specialization to provide alternative implementations for irregular types
+### <a name="Rt-specialization2"></a>T.67: 정규적이지 않은 타입(irregular types)들의 대안적 구현을 제공할 때는 특수화를 사용하라
 
 ##### Reason
 
- ???
+???
 
 ##### Example
 
@@ -1553,11 +1574,11 @@ For N == 1, we have a choice of a base class of a class in the surrounding scope
 
 ???
 
-### <a name="Rt-cast"></a>T.68: Use `{}` rather than `()` within templates to avoid ambiguities
+### <a name="Rt-cast"></a>T.68: 모호하지 않도록 템플릿에서는 `()` 보다는 `{}`를 사용하라
 
 ##### Reason
 
- `()` is vulnerable to grammar ambiguities.
+`()` 는 문법적으로 모호한 경우가 발생한다(vulnerable to grammar ambiguities).
 
 ##### Example
 
@@ -1565,57 +1586,60 @@ For N == 1, we have a choice of a base class of a class in the surrounding scope
     template<typename T, typename U>
     void f(T t, U u)
     {
-        T v1(x);    // is v1 a function of a variable?
-        T v2 {x};   // variable
-        auto x = T(u);  // construction or cast?
+        T v1(x);    // v1은 변수를 사용하는 함수인가?
+        T v2 {x};   // v2가 변수라는 것을 바로 알 수 있다
+        auto x = T(u);  // 개체 생성인가? 타입 변환인가?
     }
 
     f(1, "asdf"); // bad: cast from const char* to int
 ```
 
+> 참고: [Why C++ Sails When the Vasa Sank](https://youtu.be/ltCgzYcpFUI?t=350)
+
+
 ##### Enforcement
 
-* flag `()` initializers
-* flag function-style casts
+* 초기화에 `()`를 사용하면 지적하라
+* 함수처럼 보이는 타입 변환(cast)을 지적하라
 
-### <a name="Rt-customization"></a>T.69: Inside a template, don't make an unqualified nonmember function call unless you intend it to be a customization point
+### <a name="Rt-customization"></a>T.69: 제약없는(unqualified) 비-멤버 함수 호출은 해당 부분이 변경될 수 있도록 하려는게 아니라면 템플릿 내에서 사용하지 말아라
+
+> Inside a template, don't make an unqualified nonmember function call unless you intend it to be a customization point
 
 ##### Reason
 
-* Provide only intended flexibility.
-* Avoid vulnerability to accidental environmental changes.
+* 의도한만큼만 유연성을 제공하라.
+* 의도치 않은 환경적 변화에 대한 취약함이 발생하지 않도록 한다.
 
 ##### Example
 
-There are three major ways to let calling code customize a template.
+호출하는 코드에서 템플릿을 의도적으로 조정하도록 허용하는데는 주로 3가지 방법이 있다.
 
 ```c++
     template<class T>
-        // Call a member function
+        // 1. 멤버 함수를 호출한다
     void test1(T t)
     {
-        t.f();    // require T to provide f()
+        t.f();    // f() 함수를 제공하는 타입 T를 요구한다
     }
 
     template<class T>
     void test2(T t)
-        // Call a nonmember function without qualification
+        // 2. 제한하지 않은(without qualification) 비-멤버함수 
     {
-        f(t);  // require f(/*T*/) be available in caller's scope or in T's namespace
+        f(t);  // 호출자의 범위(scope) 혹은 T의 네임스페이스에서 사용할 수 있는 f(/*T*/)를 요구한다
     }
 
     template<class T>
     void test3(T t)
-        // Invoke a "trait"
+        // 3. "trait" 을 통해서 호출한다
     {
-        test_traits<T>::f(t); // require customizing test_traits<>
-                              // to get non-default functions/types
+        test_traits<T>::f(t); // 기본 함수/타입을 사용하지 않을때는 
+                              // test_traits<> 를 조작(customize)하도록 한다. 
     }
 ```
 
-A trait is usually a type alias to compute a type,
-a `constexpr` function to compute a value,
-or a traditional traits template to be specialized on the user's type.
+trait은 보통 타입을 계산하기 위한 타입이거나, 값을 계산하는 `constexpr` 함수이거나, 사용자의 타입으로 특수화되는 전통적인 traits 템플릿을 의미한다.
 
 ##### Note
 
@@ -1626,12 +1650,12 @@ or a traditional traits template to be specialized on the user's type.
 
 * In a template, flag an unqualified call to a nonmember function that passes a variable of dependent type when there is a nonmember function of the same name in the template's namespace.
 
-## <a name="SS-temp-hier"></a>T.temp-hier: 템플릿과 클래스 계층
+## <a name="SS-temp-hier"></a>T.temp-hier: 템플릿과 클래스 계층구조
 
 C++에서 템플릿은 제네릭 프로그래밍을 지원하기 위한 핵심기능이다. 동시에 클래스 계층은 개체지향 프로그래밍의 근간이라고 할 수 있다.
 이 두개 언어 기능은 합해서 효과적으로 사용할 수 있다. 다만 몇가지 디자인 함정은 피해야 한다.
 
-### <a name="Rt-hier"></a>T.80: Do not naively templatize a class hierarchy
+### <a name="Rt-hier"></a>T.80: 충분한 고려 없이 클래스 계층구조를 템플릿으로 바꾸지 말아라
 
 ##### Reason
 
@@ -1667,14 +1691,14 @@ C++에서 템플릿은 제네릭 프로그래밍을 지원하기 위한 핵심�
 
 ##### Note
 
-In many cases you can provide a stable interface by not parameterizing a base;
-see ["stable base"](#Rt-abi) and [OO and GP](#Rt-generic-oo)
+많은 경우 기본 클래스를 파라미터로 사용하지 않음으로써 안정적인 인터페이스를 지원할 수 있다;
+["stable base"](#Rt-abi) 와 [OO and GP](#Rt-generic-oo)를 함께보라.
 
 ##### Enforcement
 
 * 템플릿 인자에 의존하는 가상함수가 있다면 지적하라
 
-### <a name="Rt-array"></a>T.81: Do not mix hierarchies and arrays
+### <a name="Rt-array"></a>T.81: 계층구조와 배열을 섞어서 사용하지 말아라
 
 ##### Reason
 
@@ -1704,9 +1728,11 @@ see ["stable base"](#Rt-abi) and [OO and GP](#Rt-generic-oo)
 
 절대로 이런 코드를 작성하지 마라.
 
-Note that `maul()` violates the a [`T*` points to an individual object rule](#Rf-ptr).
+`maul()`이 [`T*`는 개별적인(individual) 개체를 가리킨다는 규칙](#Rf-ptr)을 위반한다는 점을 눈여겨 보라.
 
-**Alternative**: 적당한 (템플릿) 컨테이너를 사용하라.
+##### Alternative
+
+적당한 (템플릿) 컨테이너를 사용하라.
 
 ```c++
     void maul2(Fruit* p)
@@ -1728,7 +1754,7 @@ Note that `maul()` violates the a [`T*` points to an individual object rule](#Rf
 
 * 이 공포스러운 문제를 찾아내야 한다!
 
-### <a name="Rt-linear"></a>T.82: Linearize a hierarchy when virtual functions are undesirable
+### <a name="Rt-linear"></a>T.82: 가상 함수를 원하지 않는다면 계층 구조를 제거하라(linearize)
 
 ##### Reason
 
@@ -1742,7 +1768,7 @@ Note that `maul()` violates the a [`T*` points to an individual object rule](#Rf
 
 ???
 
-### <a name="Rt-virtual"></a>T.83: Do not declare a member function template virtual
+### <a name="Rt-virtual"></a>T.83: 멤버 함수는 템플릿이면서 virtual한 함수로 선언해선 안된다
 
 ##### Reason
 
@@ -1765,13 +1791,13 @@ C++이 지원하지 않는다.
 
 ##### Alternative
 
-Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 계산
+Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 분석한다.
 
 ##### Enforcement
 
 컴파일러가 처리한다.
 
-### <a name="Rt-abi"></a>T.84: Use a non-template core implementation to provide an ABI-stable interface
+### <a name="Rt-abi"></a>T.84: 안정된 ABI를 지원하고자 할때는 핵심 구현에 템플릿을 쓰지 마라
 
 ##### Reason
 
@@ -1817,25 +1843,29 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 계산
 
 기본 타입을 분리하는 대신에 일반적으로는 `void`, `void*`에 대해서 특수화하고 핵심 `void` 구현에서 안전하게 `T`로 형변환하도록 템플릿을 가지도록 한다.
 
-**Alternative**: [Pimpl](#Ri-pimpl)을 사용할수도 있다
+##### Alternative
+
+[Pimpl](#Ri-pimpl)을 사용할수도 있다
 
 ##### Enforcement
 
 ???
 
-## <a name="SS-variadic"></a>T.var: Variadic template rules
+## <a name="SS-variadic"></a>T.var: 가변 템플릿 규칙들
 
 ???
 
-### <a name="Rt-variadic"></a>T.100: Use variadic templates when you need a function that takes a variable number of arguments of a variety of types
+### <a name="Rt-variadic"></a>T.100: 다양한 타입을 가지고 가변적인 수의 실행인자들을 처리하는 함수가 필요할 때는 가변 템플릿을 사용하라
 
 ##### Reason
 
-가변인자 템플릿은 가장 일반화 메커니즘이면서 동시에 효율적이고, 타입안정성을 지닌다. C 형식의 가변인자를 사용하지 말아라.
+가변인자 템플릿은 가장 일반화된 메커니즘이면서 동시에 효율적이고, 타입안정성을 지닌다. C 형식의 가변인자를 사용하지 말아라.
 
 ##### Example
 
+```
     ??? printf
+```
 
 ##### Enforcement
 
@@ -1849,13 +1879,15 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 계산
 
 ##### Example
 
+```
     ??? 이동만 가능하거나 인자 참조에 주의하라
+```
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-variadic-process"></a>T.102: How to process arguments to a variadic template
+### <a name="Rt-variadic-process"></a>T.102: ??? How to process arguments to a variadic template ???
 
 ##### Reason
 
@@ -1863,21 +1895,25 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 계산
 
 ##### Example
 
+```
     ??? forwarding, type checking, references
+```
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-variadic-not"></a>T.103: Don't use variadic templates for homogeneous argument lists
+### <a name="Rt-variadic-not"></a>T.103: 동일 타입의 실행인자들을 위해서 가변템플릿을 사용하지 마라
 
 ##### Reason
 
-`initializer_list`같은 형태로 같은 타입의 인자들을 더 정확히 지정할 수 있다.
+같은 타입의 인자들은 `initializer_list` 형태로 더 정확히 명시할 수 있다.
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
@@ -1890,7 +1926,7 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 계산
 
 템플릿은 튜링 완전성을 가진 (modulo memory capacity) 덕타이핑을 제공한다.이를 위해 필요한 문법과 기술은 아주 끔찍하다(horrendous).
 
-### <a name="Rt-metameta"></a>T.120: Use template metaprogramming only when you really need to
+### <a name="Rt-metameta"></a>T.120: 정말 필요한 경우에만 템플릿 메타프로그래밍을 사용하라
 
 ##### Reason
 
@@ -1902,30 +1938,41 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 계산
 
 ##### Example, bad
 
+```
     ???
+```
 
 ##### Example, bad
 
+```
     enable_if
+```
+
 
 대안으로, 컨셉을 사용하라. [언어가 지원하지 않는 컨셉을 사용하는 방법](#Rt-emulate)을 참고하라.
 
 ##### Example
 
-    ??? good
+```
+    ??? 좋은 예제가 필요하다
+```
 
-**Alternative**: 만약 결과가 타입이 아니라 값이라면 [`constexpr` 함수](#Rt-fct)를 사용하라.
+##### Alternative
+
+만약 결과가 타입이 아니라 값이라면 [`constexpr` 함수](#Rt-fct)를 사용하라.
 
 ##### Note
 
 템플릿 메타프로그래밍을 전처리 매크로로 대신하고 싶다고 느낀다면 너무 나간것이다.
 
-### <a name="Rt-emulate"></a>T.121: Use template metaprogramming primarily to emulate concepts
+### <a name="Rt-emulate"></a>T.121: 컨셉을 모방(emulate)하기 위해 템플릿 메타프로그래밍을 사용하라
+
+> Use template metaprogramming primarily to emulate concepts
 
 ##### Reason
 
 컨셉 개념이 널리 사용될때까지 TMP를 사용해서 에뮬레이트해야 할 것이다.
-Use cases that require concepts (e.g. overloading based on concepts) are among the most common (and simple) uses of TMP.
+(컨셉에 기반한 중복정의와 같이) 컨셉이 필요한 경우(usecase)들은 보통 TMP를 사용하고 있다. 
 
 ##### Example
 
@@ -1953,7 +2000,7 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
 
 ???
 
-### <a name="Rt-tmp"></a>T.122: Use templates (usually template aliases) to compute types at compile time
+### <a name="Rt-tmp"></a>T.122: 템플릿(대부분 템플릿 별칭)은 컴파일 시간에 타입을 계산할때 사용하라
 
 ##### Reason
 
@@ -1965,17 +2012,19 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
 
 ##### Example
 
+```
     ??? big object / small object optimization
+```
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-fct"></a>T.123: Use `constexpr` functions to compute values at compile time
+### <a name="Rt-fct"></a>T.123: 컴파일 시간에 값을 계산한다면 `constexpr` 함수를 사용하라
 
 ##### Reason
 
-함수는 값계산을 표현하는데 가장 분명하고 일반적인 방법이다.
+함수는 값 계산을 표현하는데 가장 분명하고 일반적인 방법이다.
 때때로 `constexpr` 함수는 일반 함수보다 컴파일 비용이 적다.
 
 ##### Note
@@ -1990,7 +2039,8 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
     constexpr T pow(T v, int n)   // power/exponential
     {
         T res = 1;
-        while (n--) res *= v;
+        while (n--) 
+            res *= v;
         return res;
     }
 
@@ -1999,9 +2049,9 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
 
 ##### Enforcement
 
-* Flag template metaprograms yielding a value. These should be replaced with `constexpr` functions.
+* 값을 계산해내는 템플릿 메타프로그램들을 지적하라. 이들은 `constexpr` 함수로 대체되어야 한다.
 
-### <a name="Rt-std-tmp"></a>T.124: Prefer to use standard-library TMP facilities
+### <a name="Rt-std-tmp"></a>T.124: 가능한 표준 라이브러리의 TMP 기능들을 사용하라
 
 ##### Reason
 
@@ -2009,23 +2059,27 @@ Use cases that require concepts (e.g. overloading based on concepts) are among t
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-lib"></a>T.125: If you need to go beyond the standard-library TMP facilities, use an existing library
+### <a name="Rt-lib"></a>T.125: 만약 표준 라이브러리의 TMP 기능으로 충분하지 않다면, 가능한 이미 존재하는 라이브러리를 사용하라
 
 ##### Reason
 
-Getting advanced TMP facilities is not easy and using a library makes you part of a (hopefully supportive) community.
+좀더 고급한(advanced) TMP 기능들은 작성하는 것은 쉽지 않은 일이고, 라이브러리를 사용하는 것은 커뮤니티에 도움이 된다(hopefully supportive).
 
-정말 필요한 경우에만 자신만의 "상급 TMP 지원"을 작성하라.
+정말 필요한 경우에만 자신만의 "고급 TMP 지원"을 작성하라.
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
@@ -2033,7 +2087,7 @@ Getting advanced TMP facilities is not easy and using a library makes you part o
 
 ## <a name="SS-temp-other"></a> 기타 템플릿 규칙
 
-### <a name="Rt-name"></a>T.140: Name all operations with potential for reuse
+### <a name="Rt-name"></a>T.140: 재사용 가능성이 있는 모든 연산은 이름을 붙여라
 
 ##### Reason
 
@@ -2057,21 +2111,26 @@ Getting advanced TMP facilities is not easy and using a library makes you part o
 
     auto x = find_if(vr.begin(), vr.end(),
         [&](Rec& r) {
-            if (r.name.size() != n.size()) return false; // name to compare to is in n
+            if (r.name.size() != n.size()) // name to compare to is in n
+                return false; 
             for (int i = 0; i < r.name.size(); ++i)
-                if (tolower(r.name[i]) != tolower(n[i])) return false;
+                if (tolower(r.name[i]) != tolower(n[i])) 
+                    return false;
             return true;
         }
     );
 ```
 
-There is a useful function lurking here (case insensitive string comparison), as there often is when lambda arguments get large.
+이 코드에는 유용한 함수(대소문자 구분이 없는 문자열 비교)가 숨어있다. 람다의 실행인자(argument)들이 많아지면 이런일이 생긴다.
 
 ```c++
     bool compare_insensitive(const string& a, const string& b)
     {
-        if (a.size() != b.size()) return false;
-        for (int i = 0; i < a.size(); ++i) if (tolower(a[i]) != tolower(b[i])) return false;
+        if (a.size() != b.size()) 
+            return false;
+        for (int i = 0; i < a.size(); ++i) 
+            if (tolower(a[i]) != tolower(b[i])) 
+                return false;
         return true;
     }
 
@@ -2080,7 +2139,7 @@ There is a useful function lurking here (case insensitive string comparison), as
     );
 ```
 
-Or maybe (if you prefer to avoid the implicit name binding to n):
+혹은, (`n`에 묵시적으로 이름이 묶이는(binding) 것을 피하고 싶다면) 아래처럼 작성할수도 있다:
 
 ```c++
     auto cmp_to_n = [&n](const string& a) { return compare_insensitive(a, n); };
@@ -2101,10 +2160,10 @@ Or maybe (if you prefer to avoid the implicit name binding to n):
 
 ##### Enforcement
 
-* (hard) flag similar lambdas
+* (어려움) 유사한 람다를 지적하라
 * ???
 
-### <a name="Rt-lambda"></a>T.141: Use an unnamed lambda if you need a simple function object in one place only
+### <a name="Rt-lambda"></a>T.141: 단순한 함수 개체가 한곳에서만 필요하다면 이름없는 람다를 사용하라
 
 ##### Reason
 
@@ -2125,21 +2184,25 @@ Or maybe (if you prefer to avoid the implicit name binding to n):
 
 * 동일한, 거의 동일한 람다를 찾는다 (이름있는 함수 혹은 이름있는 람다로 바꾸도록 한다).
 
-### <a name="Rt-var"></a>T.142?: Use template variables to simplify notation
+### <a name="Rt-var"></a>T.142?: 템플릿 변수로 표기를 간단히 하라
 
 ##### Reason
 
-가독성 개선
+더 읽기 좋다
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
 ???
 
-### <a name="Rt-nongeneric"></a>T.143: Don't write unintentionally nongeneric code
+### <a name="Rt-nongeneric"></a>T.143: 범용적이지 않은 코드는 계획없이 작성하지 말아라
+
+> Don't write unintentionally nongeneric code
 
 ##### Reason
 
@@ -2150,11 +2213,11 @@ Or maybe (if you prefer to avoid the implicit name binding to n):
 반복자(iterator) 비교에는 `<`대신 `!=`를 사용하라; `!=`는 순서의 영향을 받지 않기 때문에 더 많은 경우에 사용할 수 있다.
 
 ```c++
-    for (auto i = first; i < last; ++i) {   // less generic
+    for (auto i = first; i < last; ++i) {   // 비교가 가능해야만 사용할 수 있다
         // ...
     }
 
-    for (auto i = first; i != last; ++i) {   // good; more generic
+    for (auto i = first; i != last; ++i) {  // good; 좀 더 범용적(generic)이다 
         // ...
     }
 ```
@@ -2200,33 +2263,37 @@ Or maybe (if you prefer to avoid the implicit name binding to n):
 ##### Enforcement
 
 * 반복자 비교에 `!=` 대신에 `<`를 쓴다면 지적하라
-* Flag `x.size() == 0` when `x.empty()` or `x.is_empty()` is available. Emptiness works for more containers than size(), because some containers don't know their size or are conceptually of unbounded size.
+* `x.empty()` 혹은 `x.is_empty()` 표현이 가능하다면 `x.size() == 0`의 사용을 지적한다. 보다 많은 컨테이너 타입들이 `size()`보다는 비어있는지를 검사하는 것을 지원한다. 이런 경우는 크기를 알 수 없거나, 개념적으로 크기 제한이 없기 때문이다.
 * 상속된 타입에 대한 포인터나 참조를 가지고 있지만 기본 타입으로 선언된 함수만 사용하는 함수가 있다면 지적한다
 
-### <a name="Rt-specialize-function"></a>T.144: Don't specialize function templates
+### <a name="Rt-specialize-function"></a>T.144: 함수 템플릿은 특수화하지 말라
 
 ##### Reason
 
 언어규칙에 따라 함수 템플릿을 부분적으로 특수화할 수 없다.
-함수템플릿을 전부 특수화할 수 있지만 그 대신으로 오버로딩하고 싶을 것이다. 함수 템플릿 특수화는 오버로딩으로 해석되지 때문에 원하는대로 동작하지 않는다.
+함수 템플릿을 전부 특수화할 수 있지만 그 대신으로 오버로딩하고 싶을 것이다. 함수 템플릿 특수화는 오버로딩으로 해석되기 때문에 원하는대로 동작하지 않는다.
 드물지만 적절히 특수화할 수 있는 클래스 템플릿과 연계함으로써 실제로 특수화를 할 수 있다.
 
 ##### Example
 
+```
     ???
+```
 
-**Exceptions**: 함수템플릿을 특수화할 타당한 이유가 있다면 클래스 템플릿에 위임할 단 한개의 함수템플릿을 작성해라.
+##### Exceptions
+
+함수 템플릿을 특수화할 타당한 이유가 있다면 클래스 템플릿을 사용하는 함수 템플릿을 하나만 작성하라.
 그리고 클래스 템플릿을 특수화하라. (부분 특수화를 작성하는 것까지 포함하라)
 
 ##### Enforcement
 
-* 함수템플릿을 특수화하고 있다면 지적하라. 가능하다면 오버로딩으로 대신하라
+* 함수 템플릿을 특수화하고 있다면 지적하라. 가능하다면 오버로딩으로 대신하라
 
-### <a name="Rt-check-class"></a>T.150: Check that a class matches a concept using `static_assert`
+### <a name="Rt-check-class"></a>T.150: 해당 클래스가 개념에 부합하는지를 `static_assert`를 사용해 확인하라
 
 ##### Reason
 
-If you intend for a class to match a concept, verifying that early saves users pain.
+클래스가 컨셉을 만족시키는지 확인해야 한다면, 일찍 검사하는 것이 사용자들의 고통을 줄여준다.
 
 ##### Example
 
@@ -2241,13 +2308,13 @@ If you intend for a class to match a concept, verifying that early saves users p
     };
 ```
 
-Somewhere, possibly in an implementation file, let the compiler check the desired properties of `X`:
+구현파일 안의 어디선가 컴파일러가 `X`가 의도한 속성(desired properties)을 검사할 수 있도록 하라:
 
 ```c++
-    static_assert(Default_constructible<X>);    // error: X has no default constructor
-    static_assert(Copyable<X>);                 // error: we forgot to define X's move constructor
+    static_assert(default_constructible<X>);    // error: X 는 기본 생성자가 없다.
+    static_assert(copyable<X>);                 // error: X의 이동 생성자를 정의하지 않았다.
 ```
 
 ##### Enforcement
 
-Not feasible.
+마땅히 검사할 방법이 없다(Not feasible).
