@@ -58,19 +58,19 @@
 
 구문 규칙:
 
-* [ES.70: 선택을 하는 경우에는 `switch`-구문을 사용하라](#Res-switch-if)
-* [ES.71: 가능하다면 범위기반 `for`-구문을 사용하라](#Res-for-range)
+* [ES.70: 선택을 하는 경우에는 `if`구문보다는 `switch`구문을 사용하라](#Res-switch-if)
+* [ES.71: 가능하다면 일반 `for`구문 보다 범위기반 `for`-구문을 사용하라](#Res-for-range)
 * [ES.72: 루프 변수가 있다면 `while`-구문보다 `for`-구문을 사용하라](#Res-for-while)
 * [ES.73: 루프 변수가 없다면 `for`-구문보다 `while`-구문을 사용하라](#Res-while-for)
-* [ES.74:  루프 변수는 `for`-구문의 초기화 부분에서 선언하라](#Res-for-init)
+* [ES.74: 루프 변수는 `for`-구문의 초기화 부분에서 선언하라](#Res-for-init)
 * [ES.75: `do`-구문을 사용하지 마라](#Res-do)
 * [ES.76: `goto`를 사용하지 마라](#Res-goto)
 * [ES.77: `break`와 `continue`의 사용을 최소화하라](#Res-continue)
 * [ES.78: 내용이 있는 `case`는 `break`하라](#Res-break)
-* [ES.79: 일반적인 경우를 처리하기 위해서 `default`를 사용하라](#Res-default)
-* [ES.84: 이름이 없는 지역변수는 선언하지 마라](#Res-noname)
-* [ES.85: Make empty statements visible](#Res-empty)
-* [ES.86: for 루프에서 루프 변수를 변경하지 마라](#Res-loop-counter)
+* [ES.79: (오직) 일반적인 경우를 처리하기 위해서 `default`를 사용하라](#Res-default)
+* [ES.84: 이름이 없는 지역변수는 선언(하려고)하지 마라](#Res-noname)
+* [ES.85: 비어있는 구문은 눈에띄게 하라](#Res-empty)
+* [ES.86: for 반복문(body) 안에서 루프 변수를 변경하지 마라](#Res-loop-counter)
 * [ES.87: 조건에 불필요한 `==`나 `!=`를 사용하지 마라](#Res-if)
 
 산술연산 규칙:
@@ -2889,17 +2889,19 @@ This rule is part of the [lifetime safety profile](#SS-lifetime)
 * Flag a dereference of a pointer that may have been invalidated by a `delete`
 * Flag a dereference to a pointer to a container element that may have been invalidated by dereference
 
-## ES.stmt: Statements
+## ES.stmt: 구문(statement)
 
-Statements control the flow of control (except for function calls and exception throws, which are expressions).
+구문은 제어 흐름(the flow of control)을 통제(control)한다.
+(함수 호출과 예외를 던지는 것은 표현식이다)
 
-### <a name="Res-switch-if"></a>ES.70: Prefer a `switch`-statement to an `if`-statement when there is a choice
+### <a name="Res-switch-if"></a>ES.70: 선택을 하는 경우에는 `if`구문보다는 `switch`구문을 사용하라
 
 ##### Reason
 
-* 가독성.
+* 가독성
 * 효율성: 상수값에 대해서 비교를 수행하므로 `if`-`then`-`else`문의 연속보다 `switch`문이 더 잘 최적화될 수 있다.
-* `switch` 문은 경험적인 형태의 일관성 검사를 할 수 있게 한다. 예를 들자면, `enum` 모든 값을 확인하고 있는가? 그렇지 않다면 `default`는 있는가?
+* `switch` 문은 경험적인 형태의 일관성 검사를 할 수 있게 한다.  
+  예를 들자면, `enum` 모든 값을 확인하고 있는가? 그렇지 않다면 `default`는 있는가?
 
 ##### Example
 
@@ -2919,11 +2921,13 @@ Statements control the flow of control (except for function calls and exception 
         }
     }
 ```
+
 위의 예제가 더 좋다:
+
 ```c++
     void use2(int n)
     {
-        if (n == 0)   // bad: if-then-else chain comparing against a set of constants
+        if (n == 0)   // bad: if-then-else 가 반복되면서 상수들과 비교를 수행한다
             // ...
         else if (n == 7)
             // ...
@@ -2932,9 +2936,9 @@ Statements control the flow of control (except for function calls and exception 
 
 ##### Enforcement
 
-상수값에 대해서 체크하는 if-then-else 연속이라면 지적한다. (이 경우에만)
+상수값에 대해서 비교하는 if-then-else가 연속되면 지적한다. (이 경우에만)
 
-### <a name="Res-for-range"></a>ES.71: Prefer a range-`for`-statement to a `for`-statement when there is a choice
+### <a name="Res-for-range"></a>ES.71: 가능하다면 일반 `for`구문 보다 범위기반 `for`-구문을 사용하라
 
 ##### Reason
 
@@ -2952,19 +2956,23 @@ Statements control the flow of control (except for function calls and exception 
     for (auto& x : v)    // OK
         cout << x << '\n';
 
-    for (gsl::index i = 1; i < v.size(); ++i) // touches two elements: can't be a range-for
+    // touches two elements: can't be a range-for
+    for (gsl::index i = 1; i < v.size(); ++i) 
         cout << v[i] + v[i - 1] << '\n';
 
-    for (gsl::index i = 0; i < v.size(); ++i) // possible side effect: can't be a range-for
+    // possible side effect: can't be a range-for
+    for (gsl::index i = 0; i < v.size(); ++i)
         cout << f(v, &v[i]) << '\n';
 
-    for (gsl::index i = 0; i < v.size(); ++i) { // body messes with loop variable: can't be a range-for
+    // body messes with loop variable: can't be a range-for
+    for (gsl::index i = 0; i < v.size(); ++i) { 
         if (i % 2 == 0)
             continue;   // skip even elements
         else
             cout << v[i] << '\n';
     }
 ```
+
 프로그래머나 좋은 정적 분석기는 `f(&v[i])`에서 `v`에 대해서 부수효과(side effect)가 일어나지 않는다고 판단할지도 모른다. 이 경우 루프를 최적화할 수 있다.
 
 루프문 내에서 "루프변수를 변경"하는 경우가 없어야 한다.
@@ -2972,27 +2980,36 @@ Statements control the flow of control (except for function calls and exception 
 ##### Note
 
 범위 기반 `for`문에서 루프변수를 복사하여 사용하지 마라:
+
 ```c++
-    for (string s : vs) // ...
+    for (string s : vs)
+        // ...
 ```
+
 위 코드는 `vs`의 원소를 `s`로 복사한다. 개선하면:
+
 ```c++
-    for (string& s : vs) // ...
+    for (string& s : vs)
+        // ...
 ```
-만약 루프 변수(`s`)가 변경되거나 복사되지 않는다면:
+
+만약 루프 변수(`s`)가 변경되거나 복사되지 않는다면 이렇게 작성하라:
+
 ```c++
-    for (const string& s : vs) // ...
+    for (const string& s : vs)
+        // ...
 ```
 
 ##### Enforcement
 
 루프를 보고 개별 요소들을 일렬로 참조하고 있고 부수효과(side effect)가 없어 보이면 `for`문으로 재작성한다.
 
-### <a name="Res-for-while"></a>ES.72: Prefer a `for`-statement to a `while`-statement when there is an obvious loop variable
+### <a name="Res-for-while"></a>ES.72: 루프 변수가 있다면 `while`-구문보다 `for`-구문을 사용하라
 
 ##### Reason
 
-가독성: 루프에 대한 전체 로직을 첫구문에서 볼 수 있다. 루프변수의 범위가 제한되는 점도 좋다.
+가독성: 루프에 대한 전체 로직을 첫구문에서 볼 수 있다. 
+루프변수의 범위가 제한되는 점도 좋다.
 
 ##### Example
 
@@ -3016,7 +3033,7 @@ Statements control the flow of control (except for function calls and exception 
 
 ???
 
-### <a name="Res-while-for"></a>ES.73: Prefer a `while`-statement to a `for`-statement when there is no obvious loop variable
+### <a name="Res-while-for"></a>ES.73: 루프 변수가 없다면 `for`-구문보다 `while`-구문을 사용하라
 
 ##### Reason
 
@@ -3026,12 +3043,14 @@ Statements control the flow of control (except for function calls and exception 
 
 ```c++
     int events = 0;
-    for (; wait_for_event(); ++events) {  // bad, confusing
+    for (; wait_for_event(); ++events) {  // bad, 혼란스럽다
         // ...
     }
 ```
-The "event loop" is misleading because the `events` counter has nothing to do with the loop condition (`wait_for_event()`).
-Better
+
+이 "이벤트 루프"는 잘못된 코드인데, `events` 카운터 변수가 반복 조건에 전혀 영향을 주지 않기 때문이다 (`wait_for_event()`). 
+
+이런 코드가 더 좋다
 ```c++
     int events = 0;
     while (wait_for_event()) {      // better
@@ -3044,7 +3063,7 @@ Better
 
 Flag actions in `for`-initializers and `for`-increments that do not relate to the `for`-condition.
 
-### <a name="Res-for-init"></a>ES.74: Prefer to declare a loop variable in the initializer part of a `for`-statement
+### <a name="Res-for-init"></a>ES.74: 루프 변수는 `for`-구문의 초기화 부분에서 선언하라
 
 ##### Reason
 
@@ -3054,7 +3073,8 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 ##### Example
 
 ```c++
-    for (int i = 0; i < 100; ++i) {   // GOOD: i var is visible only inside the loop
+    // GOOD: i var is visible only inside the loop
+    for (int i = 0; i < 100; ++i) {
         // ...
     }
 ```
@@ -3062,13 +3082,17 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 ##### Example, don't
 
 ```c++
-    int j;                            // BAD: j is visible outside the loop
+    // BAD: j is visible outside the loop
+    int j;
     for (j = 0; j < 100; ++j) {
         // ...
     }
     // j is still visible here and isn't needed
 ```
-**See also**: [Don't use a variable for two unrelated purposes](#Res-recycle)
+
+##### See also
+
+[Don't use a variable for two unrelated purposes](#Res-recycle)
 
 ##### Example
 
@@ -3082,7 +3106,9 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 
 `for`문 안에서만 변하는 변수가 루프 밖에 선언되어 있지만 루프 밖에서 사용되지 않고 있다면 경고한다.
 
-**Discussion**: 루프변수를 루프구문내로 범위로 정하면 코드 최적화에 많은 도움이 된다.
+##### Discussion
+
+루프 변수를 루프 구문의 범위에 두면 코드 최적화에 많은 도움이 된다.
 귀납 변수(induction variable)가 루프구문 안에서만 접근가능함을 파악하면 
 위치이동(hoisting), 연산 부담 완화(strength reduction), 루프 내 불변코드 이동(loop-invariant code motion) 등의 최적화가 가능해진다.
 
@@ -3090,12 +3116,12 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 > * https://en.wikipedia.org/wiki/Strength_reduction
 > * https://code-examples.net/ko/docs/gcc~7/optimize-options
 
-### <a name="Res-do"></a>ES.75: Avoid `do`-statements
+### <a name="Res-do"></a>ES.75: `do`-구문을 사용하지 마라
 
 ##### Reason
 
 가독성. 오류 회피.
-종료 조건이 끝에 위치해 있고(못 보고 넘어가기 쉬운 위치.) 첫 루프에서 체크를 하지 않는다.
+종료 조건이 끝에 위치해 있고(못 보고 넘어가기 쉬운 위치) 첫 루프에서 조건을 검사하지 않는다.
 
 ##### Example
 
@@ -3109,13 +3135,13 @@ Flag actions in `for`-initializers and `for`-increments that do not relate to th
 
 ##### Note
 
-Yes, there are genuine examples where a `do`-statement is a clear statement of a solution, but also many bugs.
+물론 `do`-구문이 깔끔한 해결방법이 되는 예시도 존재한다. 하지만 동시에 많은 버그를 발생시키기도 한다.
 
 ##### Enforcement
 
-Flag `do`-statements.
+`do`-구문이 있으면 지적한다
 
-### <a name="Res-goto"></a>ES.76: Avoid `goto`
+### <a name="Res-goto"></a>ES.76: `goto`를 사용하지 마라
 
 ##### Reason
 
@@ -3125,14 +3151,13 @@ Flag `do`-statements.
 ##### Exception
 
 중첩된 루프에서 탈출.
-이런 경우라면 항상 처리의 진행방향으로 점프하라.
+이런 경우라면 항상 처리의 진행방향(forward)으로 점프하라.
 
-Breaking out of a nested loop.
-In that case, always jump forwards.
 ```c++
     for (int i = 0; i < imax; ++i)
         for (int j = 0; j < jmax; ++j) {
-            if (a[i][j] > elem_max) goto finished;
+            if (a[i][j] > elem_max)
+                goto finished;
             // ...
         }
     finished:
@@ -3141,7 +3166,8 @@ In that case, always jump forwards.
 
 ##### Example, bad
 
-C에서 goto-exit 형태(idiom)를 꽤 많이 사용한다:
+C 에서는 goto-exit 형태(idiom)를 꽤 많이 사용한다:
+
 ```c++
     void f()
     {
@@ -3154,47 +3180,53 @@ C에서 goto-exit 형태(idiom)를 꽤 많이 사용한다:
         // ... common cleanup code ...
     }
 ```
+
 이건 소멸자를 시뮬레이션한 것이다. 리소스를 해제하는 소멸자를 가진 핸들로 선언하라.
 
-If for some reason you cannot handle all cleanup with destructors for the variables used,
-consider `gsl::finally()` as a cleaner and more reliable alternative to `goto exit`
+사용된 변수들의 소멸자로 모든 정리 작업(cleanup)을 다룰 수 없다면, 
+소멸 작업을 `goto exit` 대신 더 신뢰할 수 있는 `gsl::finally()`로 처리하는 것을 고려하라
 
 ##### Enforcement
 
 * `goto`가 보이면 지적한다. 루프 다음문으로 점프하지 않는 중첩 루프 내의 `goto`는 모두 표시하면 더 좋다.
 
-### <a name="Res-continue"></a>ES.77: Minimize the use of `break` and `continue` in loops
+### <a name="Res-continue"></a>ES.77: `break`와 `continue`의 사용을 최소화하라
 
 ##### Reason
 
-In a non-trivial loop body, it is easy to overlook a `break` or a `continue`.
+간단하지 않은(non-trivial) 반복문 내에서는 `break`혹은 `continue`를 간과하기 쉽다.
 
-A `break` in a loop has a dramatically different meaning than a `break` in a `switch`-statement
- (and you can have `switch`-statement in a loop and a loop in a `switch`-case).
+반복문에서 `break`는 `switch` 구문 내에서와는 완전히 다른 의미를 가진다. (그리고 `switch`구문 내에서 반복문을 사용하거나 반복문 안에서 `switch`를 사용하는것이 가능하다).
 
 ##### Example
 
+```
     ???
+```
 
 ##### Alternative
 
-Often, a loop that requires a `break` is a good candidate for a function (algorithm), in which case the `break` becomes a `return`.
+때때로, `break`를 필요로 하는 반복문은 함수(알고리즘)의 후보가 되기도 한다. 이 경우 `break`는 그 함수의 `return`이 된다.
 
+```
     ???
+```
 
-Often. a loop that uses `continue` can equivalently and as clearly be expressed by an `if`-statement.
+경우에 따라서는 `continue`를 사용하는 반복문은 `if` 구문을 사용해 논리적으로 동일하게 표현할 수 있다.
 
+```
     ???
+```
 
 ##### Note
 
-If you really need to break out a loop, a `break` is typically better than alternatives such as [modifying the loop variable](#Res-loop-counter) or a [`goto`](#Res-goto):
+정말로 반복문 중간에서 탈출해야 한다면, `break`는 보통 [루프 변수를 조작](#Res-loop-counter)하거나 [`goto`](#Res-goto)를 쓰는 방법보다 더 나은 방법이다.
 
 ##### Enforcement
 
 ???
 
-### <a name="Res-break"></a>ES.78: Always end a non-empty `case` with a `break`
+### <a name="Res-break"></a>ES.78: 내용이 있는 `case`는 `break`하라
 
 ##### Reason
 
@@ -3216,7 +3248,9 @@ If you really need to break out a loop, a `break` is typically better than alter
         break;
     }
 ```
+
 `break`로 안 끝나는 사항은 간과하기 쉽다. 명확하게 하라:
+
 ```c++
     switch (eventType) {
     case Information:
@@ -3230,7 +3264,9 @@ If you really need to break out a loop, a `break` is typically better than alter
         break;
     }
 ```
+
 C++17에서는, `[[fallthrough]]`를 사용하라:
+
 ```c++
     switch (eventType) {
     case Information:
@@ -3247,7 +3283,8 @@ C++17에서는, `[[fallthrough]]`를 사용하라:
 
 ##### Note
 
-단일문으로 된 여러개의 케이스 조건은 허용된다:
+단일문으로 모이는 여러개의 케이스 조건은 허용된다:
+
 ```c++
     switch (x) {
     case 'a':
@@ -3262,7 +3299,7 @@ C++17에서는, `[[fallthrough]]`를 사용하라:
 
 빈 `case`문이 아닌데 break로 끝나지 않는다면 지적한다.
 
-### <a name="Res-default"></a>ES.79: Use `default` to handle common cases (only)
+### <a name="Res-default"></a>ES.79: (오직) 일반적인 경우를 처리하기 위해서 `default`를 사용하라
 
 ##### Reason
 
@@ -3289,12 +3326,14 @@ C++17에서는, `[[fallthrough]]`를 사용하라:
         }
     }
 ```
-Here it is clear that there is a default action and that cases `a` and `b` are special.
+
+이 예시에는 기본 행동과 `a`와 `b`라는 특별한 경우를 처리한다는 것이 분명하게 나타난다.
 
 ##### Example
 
-But what if there is no default action and you mean to handle only specific cases?
-In that case, have an empty default or else it is impossible to know if you meant to handle all cases:
+기본 행동 없이 특별한 경우만 처리하려고 의도했다면 어떨까?
+그런 경우라면, 내용 없는 `default`를 두지 않으면 당신이 모든 경우를 다루도록 의도했다는 것을 알 수 없다.
+
 ```c++
     void f2(E x)
     {
@@ -3306,13 +3345,17 @@ In that case, have an empty default or else it is impossible to know if you mean
             do_something_else();
             break;
         default:
-            // do nothing for the rest of the cases
+            // 나머지 경우에는 아무것도 하지 않는다
             break;
         }
     }
 ```
-If you leave out the `default`, a maintainer and/or a compiler may reasonably assume that you intended to handle all cases:
+
+`default`를 넣지 않았다면, 그 코드를 유지보수 하는 사람 혹은 컴파일러는 당신이 당연히(reasonably) 모든 경우를 도려했다고 가정할 것이다:
+
 ```c++
+    enum E { a, b, c , d };
+
     void f2(E x)
     {
         switch (x) {
@@ -3326,23 +3369,22 @@ If you leave out the `default`, a maintainer and/or a compiler may reasonably as
         }
     }
 ```
-Did you forget case `d` or deliberately leave it out?
-Forgetting a case typically happens when a case is added to an enumeration and the person doing so fails to add it to every
-switch over the enumerators.
+
+`d`를 처리하는 것을 깜빡한 것일까? 아니면 의도적으로 제외한 것일까?
+특정한 경우가 누락되는 것은 보통 열거형의 값이 추가되면서 사람이 모든 `switch`를 갱신하지 않았을 때 발생한다.
 
 ##### Enforcement
 
-Flag `switch`-statements over an enumeration that don't handle all enumerators and do not have a `default`.
-This may yield too many false positives in some code bases; if so, flag only `switch`es that handle most but not all cases
-(that was the strategy of the very first C++ compiler).
+열거형을 검사하는 `switch`-구문에서 `default`가 없으면서 모든 열거값을 처리하지 않으면 지적하라.
+이는 너무 많은 False Positive를 낳을수도 있다; 그런 경우에는, 대부분의 값을 다루지만 모든 값을 검사하지 않는 `switch`만을 지적하라 (이는 초창기 C++ 컴파일러가 사용한 전략이다).
 
-### <a name="Res-noname"></a>ES.84: Don't (try to) declare a local variable with no name
+### <a name="Res-noname"></a>ES.84: 이름이 없는 지역변수는 선언(하려고)하지 마라
 
 ##### Reason
 
-There is no such thing.
-What looks to a human like a variable without a name is to the compiler a statement consisting of a temporary that immediately goes out of scope.
-To avoid unpleasant surprises.
+이름 없는 지역변수는 만들 수 없다.
+사람에게 이름이 없는 것처럼 보이는 변수는 컴파일러에게는 유효범위에서 바로 사라지는 임시 변수를 포함한 구문이다.
+불쾌한 이상행동(unpleasant surprise)이 일어나지 않게 한다.
 
 ##### Example, bad
 
@@ -3353,20 +3395,21 @@ To avoid unpleasant surprises.
         // ...
     }
 ```
-This declares an unnamed `lock` object that immediately goes out of scope at the point of the semicolon.
-This is not an uncommon mistake.
-In particular, this particular example can lead to hard-to find race conditions.
-There are exceedingly clever uses of this "idiom", but they are far rarer than the mistakes.
+
+이 구문은 이름 없는 `lock`개체를 선언하고 세미콜론 이후 즉시 사라지도록 한 것이다.
+
+이는 흔치 않은 실수가 아니다. 특히, 이 예시는 찾기 어려운 경쟁 조건으로 이어질수도 있다.
+이 "관용법(idiom)"을 매우 영리하게 사용하는 경우도 있지만, 그런 경우들은 실수와는 거리가 멀다.
 
 ##### Note
 
-Unnamed function arguments are fine.
+함수의 실행인자가 이름이 없는 것은 괜찮다.
 
 ##### Enforcement
 
-Flag statements that are just a temporary
+임시변수를 생성하기만 하는 구문을 지적하라.
 
-### <a name="Res-empty"></a>ES.85: Make empty statements visible
+### <a name="Res-empty"></a>ES.85: 비어있는 구문은 눈에띄게 하라
 
 ##### Reason
 
@@ -3375,10 +3418,10 @@ Flag statements that are just a temporary
 ##### Example
 
 ```c++
-    for (i = 0; i < max; ++i);   // BAD: the empty statement is easily overlooked
+    for (i = 0; i < max; ++i);   // BAD: 비어있는 구문의 존재를 못볼 수 있다
     v[i] = f(v[i]);
 
-    for (auto x : v) {           // better
+    for (auto x : v) {           // 좀 더 낫다
         // nothing
     }
     v[i] = f(v[i]);
@@ -3388,11 +3431,12 @@ Flag statements that are just a temporary
 
 블록이 아니면서 주석문을 포함하지 않는 빈 문장이 있다면 지적한다.
 
-### <a name="Res-loop-counter"></a>ES.86: Avoid modifying loop control variables inside the body of raw for-loops
+### <a name="Res-loop-counter"></a>ES.86: for 반복문(body) 안에서 루프 변수를 변경하지 마라
 
 ##### Reason
 
-The loop control up front should enable correct reasoning about what is happening inside the loop. Modifying loop counters in both the iteration-expression and inside the body of the loop is a perennial source of surprises and bugs.
+루프를 제어하는 변수는 반복문 내에서 어떤 일이 일어나는지 정확히 추론할 수 있도록 해야 한다.
+루프 카운터를 반복문 안쪽(body)이나 반복 표현식(iteration-expression)에서 변경하는 것은 늘 있는(perennial) 이상행동과 버그의 원인이다.
 
 ##### Example
 
@@ -3411,38 +3455,40 @@ The loop control up front should enable correct reasoning about what is happenin
     for (int i = 0; i < 10; ++i) {
         if (skip) { skip = false; continue; }
         //
-        if (/* something */) skip = true;  // Better: using two variable for two concepts.
+        if (/* something */) skip = true;  // Better: 두 개의 의미(concept)를 위해 두개의 변수를 사용한다.
         //
     }
 ```
 
 ##### Enforcement
 
-Flag variables that are potentially updated (have a non-`const` use) in both the loop control iteration-expression and the loop body.
+루프 제어의 반복 표현식이나 반복문 안에서 잠재적으로 변수를 갱신하면 (비-`const` 형태로 사용하면) 지적하라
 
-### <a name="Res-if"></a>ES.87: Don't add redundant `==` or `!=` to conditions
+### <a name="Res-if"></a>ES.87: 조건에 불필요한 `==`나 `!=`를 사용하지 마라
 
 ##### Reason
 
-Doing so avoids verbosity and eliminates some opportunities for mistakes.
-Helps make style consistent and conventional.
+코드를 장황하게 만드는 것을 예방하고 실수가 발생할 여지가 없도록 한다.
+코딩 스타일의 일관성이나 관습화를 돕는다.
 
 ##### Example
 
-By definition, a condition in an `if`-statement, `while`-statement, or a `for`-statement selects between `true` and `false`.
-A numeric value is compared to `0` and a pointer value to `nullptr`.
+그 정의대로, `if`-구문, `while`-구문, 혹은 `for`-구문에서 사용되는 조건은 `true`와 `false`사이에서 선택하는 것을 말한다.
+숫자는 `0`과 비교되고 포인터는 `nullptr`과 비교한다.
+
 ```c++
     // These all mean "if `p` is not `nullptr`"
     if (p) { ... }            // good
     if (p != 0) { ... }       // redundant `!=0`; bad: don't use 0 for pointers
     if (p != nullptr) { ... } // redundant `!=nullptr`, not recommended
 ```
-Often, `if (p)` is read as "if `p` is valid" which is a direct expression of the programmers intent,
-whereas `if (p != nullptr)` would be a long-winded workaround.
+
+`if (p)`가 "만약 `p`가 유효하다면"이라는 프로그래머의 의도를 그대로 반영한 의미로 읽히는 반면에, `if (p != nullptr)`는 더 많은 말(long-winded workaround)이 필요할 수 있다.
 
 ##### Example
 
-This rule is especially useful when a declaration is used as a condition
+이 규칙은 조건문에서 선언이 사용되는 경우 특히 유용하다.
+
 ```c++
     if (auto pc = dynamic_cast<Circle>(ps)) { ... } // execute is ps points to a kind of Circle, good
 
@@ -3451,47 +3497,57 @@ This rule is especially useful when a declaration is used as a condition
 
 ##### Example
 
-Note that implicit conversions to bool are applied in conditions.
-For example:
+조건문에서는 bool 타입으로의 암묵적 형변환이 발생한다는 점에 유의하라.
+예를 들어:
+
 ```c++
-    for (string s; cin >> s; ) v.push_back(s);
+    for (string s; cin >> s; ) 
+        v.push_back(s);
 ```
-This invokes `istream`'s `operator bool()`.
+
+이 코드는 `istream`의 `operator bool()`을 호출한다.
 
 ##### Note
 
-Explicit comparison of an integer to `0` is in general not redundant.
-The reason is that (as opposed to pointers and Booleans) an integer often has more than two reasonable values.
-Furthermore `0` (zero) is often used to indicate success.
-Consequently, it is best to be specific about the comparison.
+정수를 `0`과 명시적으로 비교하는 것은 일반적으로 볼 수 있고, 중복적(redundant)이지는 않다.
+그 이유는 (포인터나 불리언과는 반대로) 정수는 때로는 2개 이상의 정당한(reasonable) 값을 가지기 때문이다.
+더욱이 `0` (zero)는 종종 성공을 의미하는데 사용되기도 한다.
+결과적으로, 명시적으로 비교하는 것이 최선이다.
+
 ```c++
     void f(int i)
     {
-        if (i)            // suspect
+        if (i)            // 좀 의심스럽다
         // ...
-        if (i == success) // possibly better
+        if (i == success) // 아마도 더 나은 코드
         // ...
     }
 ```
-Always remember that an integer can have more than two values.
+
+정수가 2개 이상의 값을 가진다는 점을 항상 기억하라.
 
 ##### Example, bad
 
-It has been noted that
+알려진 코드 중 이런게 있다.
+
 ```c++
-    if(strcmp(p1, p2)) { ... }   // are the two C-style strings equal? (mistake!)
+    if(strcmp(p1, p2)) { ... }   // 두 C-스타일 문자열들이 같은가? (mistake!)
 ```
-is a common beginners error.
-If you use C-style strings, you must know the `<cstring>` functions well.
-Being verbose and writing
+
+흔히 볼 수 있는 초심자 오류다.
+C 스타일 문자열을 사용한다면 `<cstring>`의 함수들을 잘 알아야 한다.
+
+장황하게 아래처럼 작성하는 것은
+
 ```c++
-    if(strcmp(p1, p2) != 0) { ... }   // are the two C-style strings equal? (mistake!)
+    if(strcmp(p1, p2) != 0) { ... }   // 두 C-스타일 문자열들이 같은가? (mistake!)
 ```
-would not in itself save you.
+당신을 구해주지 않는다.
 
 ##### Note
 
-The opposite condition is most easily expressed using a negation:
+반대 조건은 부정(negation)을 사용해 쉽게 표현할 수 있다:
+
 ```c++
     // These all mean "if `p` is `nullptr`"
     if (!p) { ... }           // good
@@ -3501,7 +3557,7 @@ The opposite condition is most easily expressed using a negation:
 
 ##### Enforcement
 
-Easy, just check for redundant use of `!=` and `==` in conditions.
+쉽다, 조건문에서 `!=`와 `==`이 중복적으로 사용되는지 검사한다.
 
 ## <a name="SS-numbers"></a>산술연산(Arithmetic)
 
