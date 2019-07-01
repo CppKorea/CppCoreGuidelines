@@ -45,7 +45,7 @@
 * [ES.46: 타입 범위를 축소하는 변환을 피하라](#Res-narrowing)
 * [ES.47: `0` 혹은 `NULL`보다는 `nullptr`를 사용하라](#Res-nullptr)
 * [ES.48: 타입 변환(cast)을 피하라](#Res-casts)
-* [ES.49: 타입 변환을 사용해야만 한다면, 알려진 방법으로 변환(named cast)하라](#Res-casts-named)
+* [ES.49: 타입 변환을 사용해야만 한다면, 미리 정의된 방법으로 변환(named cast)하라](#Res-casts-named)
 * [ES.50: `const`를 제거하지 마라](#Res-casts-const)
 * [ES.55: 범위 검사가 필요없게 하라](#Res-range-checking)
 * [ES.56: `std::move()`는 개체를 다른 유효범위로 명시적으로 옮겨야 할때만 사용하라](#Res-move)
@@ -107,7 +107,7 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
 잘 알려진 알고리즘을 직접 만들 필요는 없다:
 
 ```c++
-    int max = v.size();   // bad: verbose, purpose unstated
+    int max = v.size();   // bad: verbose, 목적이 적혀있지 않다
     double sum = 0.0;
     for (int i = 0; i < max; ++i)
         sum = sum + v[i];
@@ -373,8 +373,9 @@ C++17 에서는 `if`와 `switch`에 초기화 구문이 추가되었다. C++ 17�
     void complicated_algorithm(vector<Record>& vr, 
                                const vector<int>& vi,
                                map<string, int>& out)
-        // read from events in vr (marking used Records) for the indices in
-        // vi placing (name, index) pairs into out
+        // vi의 인덱스들을 사용해서
+        // vr에서 이벤트를 읽고 (Records)
+        // out에 (name, index) 쌍을 넣는다
     {
         // ... 500 lines of code using vr, vi, and out ...
     }
@@ -644,6 +645,7 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
         }
     }
 ```
+
 ##### Example, bad
 
 멤버의 이름을 지역 변수로 사용하는 것 또한 문제가 된다:
@@ -741,8 +743,8 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 초기화에 대한 좀 더 약한 규칙이 필요한 경우를 보여주는 예시가 있다
 
 ```c++
-    widget i;   // "widget" a type that's expensive to initialize, 
-                // possibly a large POD
+    widget i;   // "widget" 이 초기화에 비용이 많이 드는 타입이라고 하자 
+                // 굉장히 큰 POD 일수도 있다
     widget j;
 
     if (cond) { // bad: i와 j가 "뒤늦게" 초기화된다
@@ -799,7 +801,7 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 
 컴파일러가 `cm3`가 `const`인데도 초기화되지 않은 것을 지적할 것이다. 하지만 이는 `m3`이 초기화되지 않은 것을 잡아내지는 않는다.
 
-많은 경우, a rare spurious member initialization is worth the absence of errors from lack of initialization 
+보통, 가짜(spurious) 멤버 초기화는 초기화 하지 않음으로써 오류를 만들지 않기에 그만한 가치가 있다.
 또 경우에 따라 최적화기에서 불필요한(redundant) 초기화를 제거할수도 있다.
 (예컨대, 대입 직전에 초기화를 수행하는 경우)
 
@@ -960,8 +962,8 @@ used-before-set의 위험을 감수하지 마라.
             var += e;
     }
 
-    // var를 사용한다; 
-    // that this isn't done too early can be enforced statically with only control flow
+    // var를 사용하는 코드; 
+    // 제어 흐름을 검파일 시간에 검사하는 방법으로 var를 너무 일찍 사용하지 않았다는 것을 알 수 있다
 ```
 
 `SomeLargeType`의 기본 초기화 비용이 크다면 이 코드는 괜찮다고 할 수 있다.
@@ -1560,14 +1562,14 @@ C++17 에서는 평가 순서를 규정하고 있다.
 ##### Example
 
 ```c++
-    x = k * y + z;             // OK
+    x = k * y + z;      // OK
 
-    auto t1 = k * y;           // bad: unnecessarily verbose
+    auto t1 = k * y;    // bad: 불필요하게 장황한 코드
     x = t1 + z;
 
     if (0 <= x && x < max)   // OK
 
-    auto t1 = 0 <= x;        // bad: unnecessarily verbose
+    auto t1 = 0 <= x;        // bad: 불필요하게 장황한 코드
     auto t2 = x < max;
     if (t1 && t2)            // ...
 ```
@@ -1579,7 +1581,7 @@ C++17 에서는 평가 순서를 규정하고 있다.
 
 고려할만한 것들:
 * 부수 효과(side-effect): 다수의 비지역 변수에 대한 부수 효과을 의심할 수 있다. 특히 별도의 하위 연산식에 있는 경우
-* writes to aliased variables
+* 별명용 변수(aliased variable)에 값을 쓰는 행위
 * N개 이상의 연산자 (N은 얼마가 되어야 하는가?)
 * 미묘한 우선순위규칙에 의존하기
 * 미정의 행동 (undefined behavior: 모든 미정의 행동을 잡아낼 수 있는가?)
@@ -1671,7 +1673,7 @@ C++17 에서는 평가 순서를 규정하고 있다.
 ##### Example, good
 
 ```c++
-    void f(span<int> a) // BETTER: use span in the function declaration
+    void f(span<int> a) // BETTER: 함수 선언에서 span을 사용해버린다
     {
         if (a.size() < 2)
             return;
@@ -1826,15 +1828,15 @@ C++17 에서는 평가 순서를 규정하고 있다.
     void f()
     {
         int a[5];
-        g(a);        // BAD: are we trying to pass an array?
-        g(&a[0]);    // OK: passing one object
+        g(a);        // BAD: 배열 개체를 넘기려 한것일까?
+        g(&a[0]);    // OK: 개체를 넘기고 있다
     }
 ```
 
 배열을 전달하고 싶다면:
 
 ```c++
-    void g(int* p, size_t length);  // old (dangerous) code
+    void g(int* p, size_t length);  // 오래된 (위험한) 코드
 
     void g1(span<int> av); // BETTER: get g() changed.
 
@@ -1843,8 +1845,9 @@ C++17 에서는 평가 순서를 규정하고 있다.
         int a[5];
         span<int> av = a;
 
-        g(av.data(), av.size());   // OK, if you have no choice
-        g1(a);                     // OK -- no decay here, instead use implicit span ctor
+        g(av.data(), av.size());    // OK, 선택의 여지가 없다면
+        g1(a);                      // OK -- 배열에서 포인터로의 decay가 발생하지 않는다.
+                                    // 대신 span을 생성한다
     }
 ```
 
@@ -1938,7 +1941,7 @@ C++ 17에서 이 예시는 기대한 대로 동작한다 (왼쪽에서 오른쪽
 ##### Example
 
 ```c++
-    for (int m = 1; m <= 12; ++m)   // don't: magic constant 12
+    for (int m = 1; m <= 12; ++m)   // don't: 상수 12는 무엇을 의미하는가?
         cout << month[m] << '\n';
 ```
 
@@ -1947,7 +1950,7 @@ C++ 17에서 이 예시는 기대한 대로 동작한다 (왼쪽에서 오른쪽
 더 좋게 고치면:
 
 ```c++
-    // months are indexed 1..12
+    // 1..12를 사용해서 12개월을 표현한다
     constexpr int first_month = 1;
     constexpr int last_month = 12;
 
@@ -1977,9 +1980,8 @@ C++ 17에서 이 예시는 기대한 대로 동작한다 (왼쪽에서 오른쪽
 기본적인 예제:
 ```c++
     double d = 7.9;
-    int i = d;    // bad: narrowing: i becomes 7
-    i = (int) d;  // bad: we're going to claim this is still not explicit enough
-
+    int i = d;    // bad: 축소 변환: i가 7이 된다
+    i = (int) d;  // bad: 이렇게 하더라도 충분히 분명하지 않다
     void f(int x, long y, double d)
     {
         char c1 = x;   // bad: narrowing
@@ -2035,8 +2037,8 @@ gsl은 narrowing을 허용하는 `narrow_cast`와 변환시 값이 바뀌면 예
 ```c++
     void f(int);
     void f(char*);
-    f(0);         // call f(int)
-    f(nullptr);   // call f(char*)
+    f(0);         // f(int)
+    f(nullptr);   // f(char*)
 ```
 
 ##### Enforcement
@@ -2099,7 +2101,7 @@ The result is at best implementation defined.
 
 ##### Exception
 
-Casting to `(void)` is the Standard-sanctioned way to turn off `[[nodiscard]]` warnings. 
+`(void)`로 타입을 변환하는 것은 `[nodiscard]]`경고를 막기 위해 표준에서 허용하는 방법은 아니다.
 `[[nodiscard]]` 속성이 있는 함수를 호출하면서 반환 결과를 버리기를 원한다면,
 우선 그 생각이 정말 좋은 생각인지 진지하게 고민하라
 (무엇보다 함수의 반환 타입에 `[[nodiscard]]`를 작성한데는 보통 타당한 이유가 있다),
@@ -2116,21 +2118,20 @@ Casting to `(void)` is the Standard-sanctioned way to turn off `[[nodiscard]]` w
 ##### Enforcement
 
 * `[[nodiscard]]`로 반환하는 함수를 제외하고 C-스타일 타입 변환을 없애도록 강제한다
-* Warn if there are many functional style casts (there is an obvious problem in quantifying 'many')
-* The [type profile](./Profile.md#Pro-type-reinterpretcast) bans `reinterpret_cast`.
-* Warn against [identity casts](./Profile.md#Pro-type-identitycast) between pointer types, where the source and target types are the same (#Pro-type-identitycast)
+* 함수 형태로 변환하는 일이 빈번하면 경고하라('많이' 하는 시점에서 분명 문제가 있다)
+* [타입 안전성 프로필](./Profile.md#Pro-type-reinterpretcast)은 `reinterpret_cast`를 금지한다
+* 포인터 타입 간의 [동일 타입 형변환](./Profile.md#Pro-type-identitycast)은 경고하라
 * 포인터가 [묵시적](./Profile.md#Pro-type-implicitpointercast)으로 변환될 수 있으면 경고한다
 
-### <a name="Res-casts-named"></a>ES.49: 타입 변환을 사용해야만 한다면, 알려진 방법으로 변환(named cast)하라
+### <a name="Res-casts-named"></a>ES.49: 타입 변환을 사용해야만 한다면, 미리 정의된 방법으로 변환(named cast)하라
 
 ##### Reason
 
 가독성. 오류 예방.
 Named cast들은 C 스타일이나 함수형 형변환보다 더 구체적이며, 컴파일러가 일부 오류를 잡아낼 수 있도록 한다.
 
-> 역주:
-> * C 스타일 형변환: `(int) a`
-> * 함수형 형변환: `int(a)`
+> C 스타일 변환: `(int) a`  
+> 함수형 변환: `int(a)`
 
 Named cast의 목록:
 
@@ -2149,13 +2150,14 @@ Named cast의 목록:
     class B { /* ... */ };
     class D { /* ... */ };
 
-    template<typename D> D* upcast(B* pb)
+    template<typename D> 
+    D* upcast(B* pb)
     {
-        D* pd0 = pb;                        // error: no implicit conversion from B* to D*
-        D* pd1 = (D*)pb;                    // legal, but what is done?
-        D* pd2 = static_cast<D*>(pb);       // error: D is not derived from B
-        D* pd3 = reinterpret_cast<D*>(pb);  // OK: on your head be it!
-        D* pd4 = dynamic_cast<D*>(pb);      // OK: return nullptr
+        D* pd0 = pb;        // error: B* 에서 D*로 묵시적 변환할 수 없다
+        D* pd1 = (D*)pb;    // 적법하지만, 어떻게 되겠는가?
+        D* pd2 = static_cast<D*>(pb);       // error: D 는 B의 하위 타입이 아니다
+        D* pd3 = reinterpret_cast<D*>(pb);  // OK: 정말 괜찮다면!
+        D* pd4 = dynamic_cast<D*>(pb);      // OK: nullptr를 반환한다
         // ...
     }
 ```
@@ -2186,8 +2188,8 @@ C 스타일 타입변환이 위험한 이유는 어떤 형태로의 변환도 �
 ##### Enforcement
 
 * C스타일, 함수형 형변환이 있다면 지적한다
-* The [type profile](./Profile.md#Pro-type-reinterpretcast) bans `reinterpret_cast`.
-* The [type profile](./Profile.md#Pro-type-arithmeticcast) warns when using `static_cast` between arithmetic types.
+* [타입 안전성 프로필](./Profile.md#Pro-type-reinterpretcast)은 `reinterpret_cast`를 금지한다
+* [타입 안전성 프로필](./Profile.md#Pro-type-arithmeticcast)은 `static_cast`가 산술 타입간 변환에 사용되면 경고한다
 
 ### <a name="Res-casts-const"></a>ES.50: `const`를 제거하지 마라
 
@@ -2273,8 +2275,8 @@ C 스타일 타입변환이 위험한 이유는 어떤 형태로의 변환도 �
 
 ##### Exception
 
-You may need to cast away `const` when calling `const`-incorrect functions.
-Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate the cast in one place.
+`const`-부정확(incorrect)한 함수를 호출할때 `const`를 제거해야 할수도 있다.
+그런 함수는 한 지점에서 inline `const`-정확한 함수로 감싸서 사용하라.
 
 ##### Example
 
@@ -2285,7 +2287,8 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 비용이 드는 처리를 거쳐서 계산한 결과를 유지하는 것을 고려해보라:
 
 ```c++
-    int compute(int x); // compute a value for x; assume this to be costly
+    int compute(int x); // x로부터 값을 계산한다; 
+                        // 비용이 많이 든다고 가정한다
 
     class Cache {   // int->int 처리에서 캐시를 구현한 타입
     public:
@@ -2318,7 +2321,7 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 이렇게 하려면 여전히 `cache`를 변경해야 한다. 일부는 그러지 않고 `const_cast`를 사용한다:
 
 ```c++
-    class X {   // Suspicious solution based on casting
+    class X {   // 타입 변환을 사용한 의심스러운 해결방법
     public:
         int get_val(int x) const
         {
@@ -2326,7 +2329,7 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
             if (p.first)
                 return p.second;
             int val = compute(x);
-            const_cast<Cache&>(cache).set(x, val);   // ugly
+            const_cast<Cache&>(cache).set(x, val);   // 코드가 지저분하다
             return val;
         }
         // ...
@@ -2339,7 +2342,7 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 `cache`가 `const` 개체여도 변경 가능하다고 표기(state)하는 것이다:
 
 ```c++
-    class X {   // better solution
+    class X {   // 더 나은 해결방법
     public:
         int get_val(int x) const
         {
@@ -2360,7 +2363,7 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 다른 방법은 `cache`에 대한 포인터를 보관하는 것이다:
 
 ```c++
-    class X {   // OK, but slightly messier solution
+    class X {   // OK, 하지만 조금 지저분하다
     public:
         int get_val(int x) const
         {
@@ -2452,7 +2455,7 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
     void f() {
         string s1 = "supercalifragilisticexpialidocious";
 
-        string s2 = s1;             // ok, 사본(copy)을 사져간다
+        string s2 = s1; // ok, 사본(copy)을 사져간다
         assert(s1 == "supercalifragilisticexpialidocious");  // ok
 
         // bad, s1의 값을 보존하고자 한다면 실수한 것이다
@@ -2515,26 +2518,30 @@ C++ 언어는 함수로부터의 반환처럼 개체를 이동시킬 수 있는 
     void mover(X&& x) {
         call_something(std::move(x));         // ok
         call_something(std::forward<X>(x));   // bad, don't std::forward an rvalue reference
-        call_something(x);                    // suspicious, why not std::move?
+        call_something(x);  // suspicious, why not std::move?
     }
 
     template<class T>
     void forwarder(T&& t) {
         call_something(std::move(t));         // bad, don't std::move a forwarding reference
         call_something(std::forward<T>(t));   // ok
-        call_something(t);                    // suspicious, why not std::forward?
+        call_something(t);  // suspicious, why not std::forward?
     }
 ```
 
 ##### Enforcement
 
-* Flag use of `std::move(x)` where `x` is an rvalue or the language will already treat it as an rvalue, including `return std::move(local_variable);` and `std::move(f())` on a function that returns by value.
-* Flag functions taking an `S&&` parameter if there is no `const S&` overload to take care of lvalues.
-* Flag a `std::move`s argument passed to a parameter, except when the parameter type is one of the following: an `X&&` rvalue reference; a `T&&` forwarding reference where `T` is a template parameter type; or by value and the type is move-only.
-* Flag when `std::move` is applied to a forwarding reference (`T&&` where `T` is a template parameter type). Use `std::forward` instead.
-* Flag when `std::move` is applied to other than an rvalue reference. (More general case of the previous rule to cover the non-forwarding cases.)
-* Flag when `std::forward` is applied to an rvalue reference (`X&&` where `X` is a concrete type). Use `std::move` instead.
-* Flag when `std::forward` is applied to other than a forwarding reference. (More general case of the previous rule to cover the non-moving cases.)
+* `x`가 rvalue이거나 언어에서 rvalue로 처리할때 `std::move(x)`가 사용되면 지적한다.   
+  `return std::move(local_variable);`같은 코드나 값을 반환하는 함수에서 `std::move(f())`를 포함한다
+* `S&&` 매개변수를 받는 함수가 lvalue를 처리하기 위한 `const S&` 중복정의가 없으면 지적한다
+* `std::move`로 실행인자를 전달하면 지적한다.  
+  매개변수의 타입이 `X&&`가 아니거나, 템플릿 매개변수가 `T`이면서 `T&&`로 전달하지 않거나, move만 가능한 타입의 값을 받는 경우는 제외한다
+* `std::move`가 forwarding 참조(`T`가 템플릿 매개변수 타입일때 `T&&`를 매개변수로 사용)에 적용되었으면 지적한다. 대신 `std::forward`를 사용해야 한다. 
+* `std::move`가 rvalue 참조가 아닌 부분에 사용되었으면 지적한다  
+  (이전 규칙에서 forward하지 않는 경우를 추가한 좀 더 일반화된 규칙이다)
+* `std::forward`가 rvalue 참조(`X`가 실제 타입일 때 `X&&`를 매개변수로 사용)에 사용되었으면 지적한다. 대신 `std::move`를 사용해야 한다.
+* `std::forward`가 forwarding 참조 이외에 사용되었으면 지적한다
+  (이전 규칙에서 move하지 않는 경우를 추가한 좀 더 일반화된 규칙이다)
 * Flag when an object is potentially moved from and the next operation is a `const` operation; there should first be an intervening non-`const` operation, ideally assignment, to first reset the object's value.
 
 ### <a name="Res-new"></a>ES.60: 자원을 관리하는 함수 외부에서 `new`와 `delete` 사용을 피하라
