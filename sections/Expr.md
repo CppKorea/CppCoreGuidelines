@@ -47,7 +47,7 @@
 * [ES.48: 타입 변환(cast)을 피하라](#Res-casts)
 * [ES.49: 타입 변환을 사용해야만 한다면, 알려진 방법으로 변환(named cast)하라](#Res-casts-named)
 * [ES.50: `const`를 제거하지 마라](#Res-casts-const)
-* [ES.55: 범위 검사가 필요하지 않도록 하라](#Res-range-checking)
+* [ES.55: 범위 검사가 필요없게 하라](#Res-range-checking)
 * [ES.56: `std::move()`는 개체를 다른 유효범위로 명시적으로 옮겨야 할때만 사용하라](#Res-move)
 * [ES.60: 자원을 관리하는 함수 외부에서 `new`와 `delete` 사용을 피하라](#Res-new)
 * [ES.61: 배열은 delete[]`, 단일 개체는 `delete`를 사용해서 해제하라](#Res-del)
@@ -146,7 +146,8 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
 아래와 같은 전통적인 코드, 시스템 레벨과 거의 동등한 저수준(low-level) 코드는 길고, 지저분하고, 이해하기도 어렵고, 느리게 돌아간다:
 
 ```c++
-    char** read2(istream& is, int maxelem, int maxstring, int* nread)   // bad: verbose and incomplete
+    char** read2(istream& is, int maxelem, 
+                 int maxstring, int* nread) // bad: verbose and incomplete
     {
         auto res = new char*[maxelem];
         int elemcount = 0;
@@ -161,7 +162,7 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
 ```
 
 오버플로우나 오류처리 코드가 한 번 들어가게 되면, 코드는 급격히 지저분해진다. 
-그리고, 리턴하는 포인터와 배열로 구현되는 C 스타일의 문자열을 `delete`를 꼭 해줘야하는 문제도 있다.
+그리고, 반환하는 포인터와 배열로 구현되는 C 스타일의 문자열을 `delete`를 꼭 해줘야하는 문제도 있다.
 
 ##### Enforcement
 
@@ -187,17 +188,17 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
 ```c++
     void use()
     {
-        int i;    // bad: i is needlessly accessible after loop
+        int i;    // bad: i 가 반복문 이후에도 불필요하게 접근 가능하다
         for (i = 0; i < 20; ++i) { 
             /* ... */ 
         }
 
-        // no intended use of i here
-        for (int i = 0; i < 20; ++i) { // good: i is local to for-loop
+        // 위에서 선언한 i를 사용하지 않는다
+        for (int i = 0; i < 20; ++i) { // good: i 는 for 반복문의 범위에서만 존재한다
             /* ... */
         }
 
-        // good: pc is local to if-statement
+        // good: pc 는 if 문의 범위에서만 존재한다
         if (auto pc = dynamic_cast<Circle*>(ps)) { 
             // ... deal with Circle ...
         }
@@ -238,7 +239,7 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
     void use(const string& name)
     {
         Record r = load_record(name);
-        // ... 200 lines of code ...
+        // ... 200 줄 코드 ...
     }
 ```
 
@@ -261,12 +262,12 @@ ISO C++ 표준 라이브러리는 널리 알려져있으며 테스트가 잘된 
         for (string s; cin >> s;)
             v.push_back(s);
 
-        // good: i is local to for-loop
+        // good: i 는 for 반복문의 범위에서만 존재한다
         for (int i = 0; i < 20; ++i) {
             // ...
         }
 
-        // good: pc is local to if-statement
+        // good: pc 는 if 문의 범위에서만 존재한다
         if (auto pc = dynamic_cast<Circle*>(ps)) {
             // ... deal with Circle ...
         }
@@ -289,10 +290,10 @@ C++17 에서는 `if`와 `switch`에 초기화 구문이 추가되었다. C++ 17�
     map<int, string> mymap;
 
     if (auto result = mymap.insert(value); result.second) {
-        // insert succeeded, and result is valid for this block
+        // insert가 성공했고, 반환된 결과는 이 블록에서만 유효하다(valid)
         use(result.first);  // ok
         // ...
-    } // result is destroyed here
+    } // result 는 이 시점에 파괴된다
 ```
 
 ##### C++17 enforcement (if using a C++17 compiler)
@@ -324,8 +325,9 @@ C++17 에서는 `if`와 `switch`에 초기화 구문이 추가되었다. C++ 17�
 비교:
 
 ```c++
-    template<typename Element_type>   // bad: verbose, hard to read
-    void print(ostream& target_stream, const vector<Element_type>& current_vector)
+    template<typename Element_type>   // bad: 읽기 어렵다
+    void print(ostream& target_stream, 
+               const vector<Element_type>& current_vector)
     {
         for (gsl::index current_element_index = 0;
              current_element_index < current_vector.size();
@@ -368,9 +370,11 @@ C++17 에서는 `if`와 `switch`에 초기화 구문이 추가되었다. C++ 17�
 내용이 긴 함수의 인자는 사실상 비지역 변수라고 볼 수 있다. 따라서 인자들의 이름은 적절한 의미를 담아야 한다:
 
 ```c++
-    void complicated_algorithm(vector<Record>& vr, const vector<int>& vi, map<string, int>& out)
-    // read from events in vr (marking used Records) for the indices in
-    // vi placing (name, index) pairs into out
+    void complicated_algorithm(vector<Record>& vr, 
+                               const vector<int>& vi,
+                               map<string, int>& out)
+        // read from events in vr (marking used Records) for the indices in
+        // vi placing (name, index) pairs into out
     {
         // ... 500 lines of code using vr, vi, and out ...
     }
@@ -429,13 +433,13 @@ C++17 에서는 `if`와 `switch`에 초기화 구문이 추가되었다. C++ 17�
 ##### Example
 
 ```c++
-    // somewhere in some header:
+    // 어떤 헤더파일의 어느 지점:
     #define NE !=
 
-    // somewhere else in some other header:
+    // 다른 어떤 헤더파일의 어느 지점:
     enum Coord { N, NE, NW, S, SE, SW, E, W };
 
-    // somewhere third in some poor programmer's .cpp:
+    // 어느 불쌍한 프로그래머의 .cpp 파일 어느 지점:
     switch (direction) {
     case N:
         // ...
@@ -627,7 +631,7 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 
 ##### Example
 
-가장 바깥 범위에서 함수 인자들을 가리는(shadowing) 것은 언어에서 금지하고 있다:
+가장 바깥 범위에서 함수 인자들을 가리는 것은 언어에서 금지하고 있다:
 
 ```c++
     void f(int x)
@@ -652,11 +656,11 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 
     void S::f(int x)
     {
-        m = 7;    // assign to member
+        m = 7;    // 멤버 변수에 대입한다
         if (x) {
             int m = 9;
             // ...
-            m = 99; // assign to member
+            m = 99; // 멤버 변수에 대입한다
             // ...
         }
     }
@@ -702,9 +706,9 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 ```c++
     void use(int arg)
     {
-        int i;   // bad: uninitialized variable
+        int i;   // bad: 초기화가 안된 변수
         // ...
-        i = 7;   // initialize i
+        i = 7;   // i를 초기화한다
     }
 ```
 
@@ -737,10 +741,11 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 초기화에 대한 좀 더 약한 규칙이 필요한 경우를 보여주는 예시가 있다
 
 ```c++
-    widget i;    // "widget" a type that's expensive to initialize, possibly a large POD
+    widget i;   // "widget" a type that's expensive to initialize, 
+                // possibly a large POD
     widget j;
 
-    if (cond) {  // bad: i and j are initialized "late"
+    if (cond) { // bad: i와 j가 "뒤늦게" 초기화된다
         i = f1();
         j = f2();
     }
@@ -822,11 +827,11 @@ Shadowing은 함수가 너무 크거나 복잡할때 문제가 된다.
 할 수 있다면 오버플로우가 발생하지 않는 라이브러리 함수를 사용하라. 예를 들어:
 
 ```c++
-    string s;   // s is default initialized to ""
-    cin >> s;   // s expands to hold the string
+    string s;   // s는 기본값 ""로 초기화된다
+    cin >> s;   // s가 입력 문자열을 담기 위해 확장된다
 ```
 
-Don't consider simple variables that are targets for input operations exceptions to this rule:
+입력 처리의 대상이 되는 변수들도 예외는 아니다:
 
 ```c++
     int i;   // bad
@@ -842,7 +847,7 @@ Don't consider simple variables that are targets for input operations exceptions
     cin >> i2;
 ```
 
-좋은 최적화기는 입력 처리(operation)를 알고있어야 하며, 중복된 부분을 제거해야 한다
+좋은 최적화기는 입력 처리(operation)에 대해 알고있어야 하며, 중복되는 부분을 제거해야 한다
 
 ##### Example
 
@@ -876,7 +881,7 @@ Don't consider simple variables that are targets for input operations exceptions
 ```c++
     error_code ec;
     Value v = [&] {
-        auto p = get_value();   // get_value() returns a pair<error_code, Value>
+        auto p = get_value();   // get_value()에서 pair<error_code, Value>를 반환한다
         ec = p.first;
         return p.second;
     }();
@@ -886,7 +891,7 @@ Don't consider simple variables that are targets for input operations exceptions
 
 ```c++
     Value v = [] {
-        auto p = get_value();   // get_value() returns a pair<error_code, Value>
+        auto p = get_value();   // get_value()에서 pair<error_code, Value>를 반환한다
         if (p.first) 
             throw Bad_value{p.first};
         return p.second;
@@ -1080,8 +1085,11 @@ C++ 17의 규칙은 상대적으로 덜 놀랍다:
     {
         auto p1 = make_unique<int>(7);   // OK
         int* p2 = new int{7};            // bad: might leak
+
         // ... no assignment to p2 ...
-        if (leak) return;
+        if (leak)
+            return;
+
         // ... no assignment to p2 ...
         vector<int> v(7);
         v.at(7) = 0;                    // exception thrown
@@ -1089,8 +1097,8 @@ C++ 17의 규칙은 상대적으로 덜 놀랍다:
     }
 ```
 
-If `leak == true` the object pointed to by `p2` is leaked and the object pointed to by `p1` is not.
-The same is the case when `at()` throws.
+만약 `leak`이 `true`값을 가진다면 `p2`가 가리키는 개체가 누수된다. 하지만 `p1`이 가리키는 개체는 그렇지 않다.
+`at()`이 예외를 던지는 경우에도 그렇다.
 
 ##### Enforcement
 
@@ -1100,15 +1108,16 @@ The same is the case when `at()` throws.
 
 ##### Reason
 
-실수로 값을 바꾸는 걸 막을 수 있는 방법이다. 컴파일러에게 최적화를 위한 기회를 줄 수도 있다.
+실수로 값을 바꾸는 걸 막을 수 있는 방법이다.
+컴파일러에게 최적화를 위한 기회를 줄 수도 있다.
 
 ##### Example
 
 ```c++
     void f(int n)
     {
-        const int bufmax = 2 * n + 2;  // good: we can't change bufmax by accident
-        int xmax = n;                  // suspicious: is xmax intended to change?
+        const int bufmax = 2 * n + 2;  // good: bufmax가 이후의 코드에서 실수로 변경될 가능성이 없다
+        int xmax = n;                  // suspicious: xmax를 나중에 바꾸려고 의도한 걸까?
         // ...
     }
 ```
@@ -1130,8 +1139,12 @@ The same is the case when `at()` throws.
     void use()
     {
         int i;
-        for (i = 0; i < 20; ++i) { /* ... */ }
-        for (i = 0; i < 200; ++i) { /* ... */ } // bad: i recycled
+        for (i = 0; i < 20; ++i) {
+            /* ... */
+        }
+        for (i = 0; i < 200; ++i) { // bad: i 가 재사용된다
+            /* ... */
+        }
     }
 ```
 
@@ -1179,15 +1192,15 @@ The same is the case when `at()` throws.
     void f()
     {
         int a1[n];
-        int a2[m];   // error: not ISO C++
+        int a2[m];   // error: ISO C++가 아니다
         // ...
     }
 ```
 
 ##### Note
 
-`a1` 변수선언은 C++에서는 적법하다. 그런 류의 코드가 많이 있다.
-다만 이는 길이값이 비지역 변수일 대 잘못 사용하기 쉽다. 버퍼 오버플로우, 배열을 포인터로 변환하는 등의 "유명한" 오류 원인이 된다.
+`a1` 변수선언은 C++에서는 적법하다. 이 방법을 사용한 코드가 많이 있다.
+다만 이는 길이 값이 비지역 변수인 경우 잘못 사용하기 쉽다. 버퍼 오버플로우, 배열을 포인터로 변환하는 등의 "유명한" 오류 원인이 된다.
 
 `a2` 변수선언은 C 방식으로 C++ 에서는 쓰지 않으며 보안상 문제가 있는 것으로 간주한다.
 
@@ -1222,21 +1235,22 @@ The same is the case when `at()` throws.
 ##### Example, bad
 
 ```c++
-    widget x;   // should be const, but:
-    for (auto i = 2; i <= N; ++i) {          // this could be some
-        x += some_obj.do_something_with(i);  // arbitrarily long code
-    }                                        // needed to initialize x
-    // from here, x should be const, but we can't say so in code in this style
+    widget x;   // 가능하다면 const여야 한다, 하지만:
+    for (auto i = 2; i <= N; ++i) {          // 이 부분이 x를 초기화하기 위한
+        x += some_obj.do_something_with(i);  // 좀 긴 코드라고 하자
+    }
+    // 이 지점부터, x는 const가 되어야 한다. 
+    // 하지만 이런 코딩 스타일에서는 그렇게 만들 수가 없다.
 ```
 
 ##### Example, good
 
 ```c++
     const widget x = [&]{
-        widget val;                                // assume that widget has a default constructor
-        for (auto i = 2; i <= N; ++i) {            // this could be some
-            val += some_obj.do_something_with(i);  // arbitrarily long code
-        }                                          // needed to initialize x
+        widget val; // widget이 기본 생성자를 가진다고 가정하자
+        for (auto i = 2; i <= N; ++i) {            // 이 부분이 x를 초기화하기 위한
+            val += some_obj.do_something_with(i);  // 좀 긴 코드라고 하자
+        }
         return val;
     }();
 ```
@@ -1375,7 +1389,7 @@ The same is the case when `at()` throws.
 ##### Example
 
 ```c++
-    #define forever for (;;)   /* very BAD */
+    #define forever for (;;)   /* 엄청 나쁜 코드 */
 
     #define FOREVER for (;;)   /* 여전히 사악하지만, 최소한 사람은 매크로라는걸 알 수 있다 */
 ```
@@ -1584,7 +1598,7 @@ C++17 에서는 평가 순서를 규정하고 있다.
     const unsigned int flag = 2;
     unsigned int a = flag;
 
-    if (a & flag != 0)  // bad: means a&(flag != 0)
+    if (a & flag != 0)  // bad: a & (flag != 0)를 의도했다
 ```
 
 ##### Note
@@ -1593,7 +1607,7 @@ C++17 에서는 평가 순서를 규정하고 있다.
 다른 연산과 비트 연산을 섞어 사용할 때는 소괄호(parentheses)를 사용하기를 권한다.
 
 ```c++
-    if ((a & flag) != 0)  // OK: works as intended
+    if ((a & flag) != 0)  // OK: 의도대로 동작한다
 ```
 
 ##### Note
@@ -1691,8 +1705,8 @@ C++17 에서는 평가 순서를 규정하고 있다.
     {
         a[pos / 2] = 1; // BAD
         a[pos - 1] = 2; // BAD
-        a[-1] = 3;    // BAD (but easily caught by tools) -- no replacement, just don't do this
-        a[10] = 4;    // BAD (but easily caught by tools) -- no replacement, just don't do this
+        a[-1] = 3;    // BAD (다만 도구에서 잡아낼 수 있다) -- 다른 방법이 없다. 그냥 이런 코드를 작성하지 마라
+        a[10] = 4;    // BAD (다만 도구에서 잡아낼 수 있다) -- 다른 방법이 없다. 그냥 이런 코드를 작성하지 마라
     }
 ```
 
@@ -1701,13 +1715,15 @@ C++17 에서는 평가 순서를 규정하고 있다.
 `span`을 사용하면 이렇다:
 
 ```c++
-    void f1(span<int, 10> a, int pos) // A1: Change parameter type to use span
+    // A1: 매개변수 타입을 span을 사용하도록 바꾸었다
+    void f1(span<int, 10> a, int pos) 
     {
         a[pos / 2] = 1; // OK
         a[pos - 1] = 2; // OK
     }
 
-    void f2(array<int, 10> arr, int pos) // A2: Add local span and use that
+    // A2: 지역변수로 span을 만들어 사용한다
+    void f2(array<int, 10> arr, int pos) 
     {
         span<int> a = {arr, pos};
         a[pos / 2] = 1; // OK
@@ -1718,7 +1734,8 @@ C++17 에서는 평가 순서를 규정하고 있다.
 `at()`을 사용하면 이렇다:
 
 ```c++
-    void f3(array<int, 10> a, int pos) // ALTERNATIVE B: Use at() for access
+    // ALTERNATIVE B: 원소에 접근할때 at()을 사용한다
+    void f3(array<int, 10> a, int pos) 
     {
         at(a, pos / 2) = 1; // OK
         at(a, pos - 1) = 2; // OK
@@ -1858,7 +1875,7 @@ C++17 에서는 평가 순서를 규정하고 있다.
 ##### Example
 
 ```c++
-    v[i] = ++i;   //  the result is undefined
+    v[i] = ++i;   // 결과는 알 수 없다(undefined)
 ```
 
 가장 좋은 규칙은 값을 변경하는 표현식에서 값을 읽지 않는 것이다.
@@ -1896,16 +1913,16 @@ C++ 17에서는 이 코드가 미정의 행동이 아니다. 하지만 여전히
 중복정의된 연산자들은 평가순서 문제로 이어질 수 있다:
 
 ```c++
-    f1()->m(f2());          // m(f1(), f2())
-    cout << f1() << f2();   // operator<<(operator<<(cout, f1()), f2())
+    f1()->m(f2());          // m( f1(), f2() )
+    cout << f1() << f2();   // operator<<( operator<<( cout, f1() ), f2() )
 ```
 
 C++ 17에서 이 예시는 기대한 대로 동작한다 (왼쪽에서 오른쪽으로 평가된다).
 그리고 `=`의 바인딩이 오른쪽에서 왼쪽으로 수행되는 것처럼 대입은 오른쪽에서 왼쪽으로 평가된다. 
 
 ```c++
-    f1() = f2();    // undefined behavior in C++14; 
-                    // in C++17, f2() is evaluated before f1()
+    f1() = f2();    // C++14 에서는 미정의 행동; 
+                    // C++17 에서는 f2()가 f1()보다 먼저 평가된다
 ```
 
 ##### Enforcement
@@ -2083,10 +2100,10 @@ The result is at best implementation defined.
 ##### Exception
 
 Casting to `(void)` is the Standard-sanctioned way to turn off `[[nodiscard]]` warnings. 
-If you are calling a function with a `[[nodiscard]]` return and you deliberately want to discard the result, 
-first think hard about whether that is really a good idea 
-(there is usually a good reason the author of the function or of the return type used `[[nodiscard]]` in the first place), 
-but if you still think it's appropriate and your code reviewer agrees, write `(void)` to turn off the warning.
+`[[nodiscard]]` 속성이 있는 함수를 호출하면서 반환 결과를 버리기를 원한다면,
+우선 그 생각이 정말 좋은 생각인지 진지하게 고민하라
+(무엇보다 함수의 반환 타입에 `[[nodiscard]]`를 작성한데는 보통 타당한 이유가 있다),
+하지만 당신이 값을 버려도 적절하다고 생각하고, 당신과 함께 코드를 리뷰한 사람들이 동의한다면 `(void)`를 써서 경고를 없애라.
 
 ##### Alternatives
 
@@ -2142,27 +2159,28 @@ Named cast의 목록:
         // ...
     }
 ```
-The example was synthesized from real-world bugs where `D` used to be derived from `B`, but someone refactored the hierarchy.
-The C-style cast is dangerous because it can do any kind of conversion, depriving us of any protection from mistakes (now or in the future).
+
+이 예시는 `D`가 `B`의 하위 타입이면서, 누군가 계층 구조를 리팩토링 했을때 발생한 실제 버그들을 종합한 것이다.
+C 스타일 타입변환이 위험한 이유는 어떤 형태로의 변환도 수행할 수 있기 때문이다. 이는 실수로부터 우리를 보호해주지 않는다 (지금도, 앞으로도). 
 
 ##### Note
 
-When converting between types with no information loss (e.g. from `float` to
-`double` or `int64` from `int32`), brace initialization may be used instead.
+정보의 손실이 없는 타입 변환의 경우 (가령 `float`에서 `double`로, 혹은 `int32`에서 `int64`로 변환하는 경우), `{}` 초기화를 대신 사용할수도 있다.
+
 ```c++
     double d {some_float};
     int64_t i {some_int32};
 ```
-This makes it clear that the type conversion was intended and also prevents
-conversions between types that might result in loss of precision. (It is a
-compilation error to try to initialize a `float` from a `double` in this fashion,
-for example.)
+
+이 코드는 타입 변환을 의도했다는 것이 분명히 드러나고 정확도를 잃을 수 있는 변환을 예방한다.
+(예를 들자면 이런 코드에서 `float`를 `double`로 초기화 하는 것은 컴파일 오류가 된다)
 
 ##### Note
 
-`reinterpret_cast` can be essential, but the essential uses (e.g., turning a machine address into pointer) are not type safe:
+`reinterpret_cast`가 필수적일 수 있다. 하지만 본질적으로 타입 안전하지는 않다 (기계 주소를 포인터로 바꾼다던가):
+
 ```c++
-    auto p = reinterpret_cast<Device_register>(0x800);  // inherently dangerous
+    auto p = reinterpret_cast<Device_register>(0x800);  // 필연적으로 위험하다
 ```
 
 ##### Enforcement
@@ -2194,7 +2212,8 @@ for example.)
 
 ##### Example
 
-Sometimes, you may be tempted to resort to `const_cast` to avoid code duplication, such as when two accessor functions that differ only in `const`-ness have similar implementations. For example:
+경우에 따라서는 코드 중복을 피하고자 `const_cast`에 의존하고 싶을수도 있다.
+이때는 두 함수가 구현은 유사하지만 오직 `const` 부분만 다를 것이다. 예를 들어:
 
 ```c++
     class Bar;
@@ -2214,7 +2233,8 @@ Sometimes, you may be tempted to resort to `const_cast` to avoid code duplicatio
     };
 ```
 
-Instead, prefer to share implementations. Normally, you can just have the non-`const` function call the `const` function. However, when there is complex logic this can lead to the following pattern that still resorts to a `const_cast`:
+대신, 구현 코드를 공유하도록 하라. 보통의 경우, 비-`const` 함수에서 `const` 함수를 호출할 수 있다.
+하지만 그 구현에 복잡한 로직이 있다면 여전히 `const_cast`를 사용하는 다음과 같은 패턴을 쓰게 될 것이다:
 
 ```c++
     class Foo {
@@ -2231,21 +2251,23 @@ Instead, prefer to share implementations. Normally, you can just have the non-`c
     };
 ```
 
-Although this pattern is safe when applied correctly, because the caller must have had a non-`const` object to begin with, it's not ideal because the safety is hard to enforce automatically as a checker rule.
+이 패턴은 정확하게 사용되었을 때는 호출자가 비-`const` 개체를 통해 호출하기 때문에 안전하지만, 안전성이 검사기의 규칙만큼 자연스럽게 강제되기는 어렵기 때문에 이상적인 코드는 아니다.
 
-Instead, prefer to put the common code in a common helper function -- and make it a template so that it deduces `const`. This doesn't use any `const_cast` at all:
+이런 패턴 대신, 공통되는 코드는 공통된 보조 함수(helper function)에 배치하라 -- 그리고 `const`를 타입 추론에서 찾아내도록 템플릿으로 만들어라. 이는 `const_cast`이 완전히 필요없게 만든다:
 
 ```c++
     class Foo {
-    public:                         // good
+    public:                 // good
               Bar& get_bar()       { return get_bar_impl(*this); }
         const Bar& get_bar() const { return get_bar_impl(*this); }
     private:
         Bar my_bar;
 
-        template<class T>           // good, deduces whether T is const or non-const
-        static auto get_bar_impl(T& t) -> decltype(t.get_bar())
-            { /* the complex logic around getting a possibly-const reference to my_bar */ }
+        template<class T>   // good, deduces whether T is const or non-const
+        static auto get_bar_impl(T& t) -> decltype(t.get_bar()){ 
+            // the complex logic around getting 
+            // a possibly-const reference to my_bar
+        }
     };
 ```
 
@@ -2260,15 +2282,15 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 예를 들면 캐싱값, 임시계산값, 선계산값 등이다.
 이런 값은 `const_cast`를 쓰는 것보다 `mutable`이나 간접적인 방법을 사용하면 더 쉽게 처리할 수 있다.
 
-Consider keeping previously computed results around for a costly operation:
+비용이 드는 처리를 거쳐서 계산한 결과를 유지하는 것을 고려해보라:
 
 ```c++
     int compute(int x); // compute a value for x; assume this to be costly
 
-    class Cache {   // some type implementing a cache for an int->int operation
+    class Cache {   // int->int 처리에서 캐시를 구현한 타입
     public:
-        pair<bool, int> find(int x) const;   // is there a value for x?
-        void set(int x, int v);             // make y the value for x
+        pair<bool, int> find(int x) const;  // x를 위한 값이 있는가?
+        void set(int x, int v);             // x를 위한 값 y를 만든다
         // ...
     private:
         // ...
@@ -2279,9 +2301,11 @@ Consider keeping previously computed results around for a costly operation:
         int get_val(int x)
         {
             auto p = cache.find(x);
-            if (p.first) return p.second;
+            if (p.first)
+                return p.second;
+
             int val = compute(x);
-            cache.set(x, val); // insert value for x
+            cache.set(x, val); // x에 값을 넣는다
             return val;
         }
         // ...
@@ -2290,8 +2314,8 @@ Consider keeping previously computed results around for a costly operation:
     };
 ```
 
-Here, `get_val()` is logically constant, so we would like to make it a `const` member.
-To do this we still need to mutate `cache`, so people sometimes resort to a `const_cast`:
+여기서 `get_val()`는 논리적으로는 상수이다. 따라서 `const`멤버로 만들 수 있을 것이다.
+이렇게 하려면 여전히 `cache`를 변경해야 한다. 일부는 그러지 않고 `const_cast`를 사용한다:
 
 ```c++
     class X {   // Suspicious solution based on casting
@@ -2299,7 +2323,8 @@ To do this we still need to mutate `cache`, so people sometimes resort to a `con
         int get_val(int x) const
         {
             auto p = cache.find(x);
-            if (p.first) return p.second;
+            if (p.first)
+                return p.second;
             int val = compute(x);
             const_cast<Cache&>(cache).set(x, val);   // ugly
             return val;
@@ -2310,8 +2335,8 @@ To do this we still need to mutate `cache`, so people sometimes resort to a `con
     };
 ```
 
-Fortunately, there is a better solution:
-State that `cache` is mutable even for a `const` object:
+다행히, 더 나은 해결책이 있다:
+`cache`가 `const` 개체여도 변경 가능하다고 표기(state)하는 것이다:
 
 ```c++
     class X {   // better solution
@@ -2319,7 +2344,9 @@ State that `cache` is mutable even for a `const` object:
         int get_val(int x) const
         {
             auto p = cache.find(x);
-            if (p.first) return p.second;
+            if (p.first)
+                return p.second;
+
             int val = compute(x);
             cache.set(x, val);
             return val;
@@ -2330,7 +2357,7 @@ State that `cache` is mutable even for a `const` object:
     };
 ```
 
-An alternative solution would to store a pointer to the `cache`:
+다른 방법은 `cache`에 대한 포인터를 보관하는 것이다:
 
 ```c++
     class X {   // OK, but slightly messier solution
@@ -2338,7 +2365,9 @@ An alternative solution would to store a pointer to the `cache`:
         int get_val(int x) const
         {
             auto p = cache->find(x);
-            if (p.first) return p.second;
+            if (p.first)
+                return p.second;
+
             int val = compute(x);
             cache->set(x, val);
             return val;
@@ -2348,17 +2377,18 @@ An alternative solution would to store a pointer to the `cache`:
         unique_ptr<Cache> cache;
     };
 ```
-That solution is the most flexible, but requires explicit construction and destruction of `*cache`
-(most likely in the constructor and destructor of `X`).
 
-In any variant, we must guard against data races on the `cache` in multi-threaded code, possibly using a `std::mutex`.
+이 해결책은 굉장히 유연하지만, `cache`로 가리키는 개체의 명시적인 생성과 소멸을 필요로 한다.
+(아마 그 코드는 `X`의 생성자와 소멸자에 위치할 것이다).
+
+멀티스레드 코드에서 `cache`에 데이터 경쟁이 발생하면 `std::mutex`를 사용해 보호해야 한다.
 
 ##### Enforcement
 
 * `const_cast`를 지적한다.
 * 이 규칙은 [타입 안정성 분석](#Pro-type-constcast)과 관련 있다
 
-### <a name="Res-range-checking"></a>ES.55: Avoid the need for range checking
+### <a name="Res-range-checking"></a>ES.55: 범위 검사가 필요없게 하라
 
 ##### Reason
 
@@ -2377,13 +2407,13 @@ In any variant, we must guard against data races on the `cache` in multi-threade
 
 명시적인 범위검사를 찾아서 적절한 대안을 제시한다.
 
-### <a name="Res-move"></a>ES.56: Write `std::move()` only when you need to explicitly move an object to another scope
+### <a name="Res-move"></a>ES.56: `std::move()`는 개체를 다른 유효범위로 명시적으로 옮겨야 할때만 사용하라
 
 ##### Reason
 
-We move, rather than copy, to avoid duplication and for improved performance.
+복제를 막고 성능을 향상시키기 위해 복사보다는 이동을 사용한다.
 
-A move typically leaves behind an empty object ([C.64](#Rc-move-semantic)), which can be surprising or even dangerous, so we try to avoid moving from lvalues (they might be accessed later).
+이동 연산은 보통 빈 개체를 남긴다 ([C.64](#Rc-move-semantic)). 이는 기대밖의 결과 혹은 위험으로 이어질 수 있다. 가능하다면 lvalue로부터 이동하는 것을 피하려 해야한다 (lvalue에 나중에 접근할 수도 있다).
 
 ##### Notes
 
@@ -2726,13 +2756,13 @@ This rule is an obvious and well-known language rule, but can be hard to follow.
 It takes good coding style, library support, and static analysis to eliminate violations without major overhead.
 This is a major part of the discussion of [C++'s resource- and type-safety model](#Stroustrup15).
 
-**See also**:
+##### See also
 
-* Use [RAII](#Rr-raii) to avoid lifetime problems.
-* Use [unique_ptr](#Rf-unique_ptr) to avoid lifetime problems.
-* Use [shared_ptr](#Rf-shared_ptr) to avoid lifetime problems.
-* Use [references](#Rf-ptr-ref) when `nullptr` isn't a possibility.
-* Use [not_null](#Rf-not_null) to catch unexpected `nullptr` early.
+* 수명주기 문제를 피하려면 [RAII](#Rr-raii)를 사용하라
+* 수명주기 문제를 피하려면 [unique_ptr](#Rf-unique_ptr)를 사용하라
+* 수명주기 문제를 피하려면 [shared_ptr](#Rf-shared_ptr)를 사용하라
+* `nullptr`가 허용되지 않는다면 [references](#Rf-ptr-ref)를 사용하라
+* 의도치 않은 `nullptr`를 일찍 잡아내기 위해 [not_null](#Rf-not_null)을 사용하라
 * Use the [bounds profile](#SS-bounds) to avoid range errors.
 
 ##### Example
@@ -2748,10 +2778,12 @@ This is a major part of the discussion of [C++'s resource- and type-safety model
             p = &y;
         } // invalidates p
 
-        *p = 42;            // BAD, p might be invalid if the branch was taken
+        *p = 42;            // BAD, p는 분기문을 거쳤다면 유효하지 않은 값을 가지고 있다
     }
 ```
+
 To resolve the problem, either extend the lifetime of the object the pointer is intended to refer to, or shorten the lifetime of the pointer (move the dereference to before the pointed-to object's lifetime ends).
+
 ```c++
     void f1()
     {
