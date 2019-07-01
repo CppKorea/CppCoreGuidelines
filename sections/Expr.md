@@ -80,9 +80,9 @@
 * [ES.102: 연산에는 부호가 있는(signed) 타입을 사용하라](#Res-signed)
 * [ES.103: Overflow가 발생하지 않게 하라](#Res-overflow)
 * [ES.104: Underflow가 발생하지 않게 하라](#Res-underflow)
-* [ES.105: 나눗셈의 제수(divisor)가 0이 되지 않게 하라](#Res-zero)
-* [ES.106: `unsigned`로 음수값을 막으려 하지 마라](#Res-nonnegative)
-* [ES.107: 배열 접근에는 `unsigned`보다는 `gsl::index`를 사용하라](#Res-subscripts)
+* [ES.105: 0으로 나누지 않도록 하라](#Res-zero)
+* [ES.106: 음수값을 막으려고 `unsigned`를 사용하지 마라](#Res-nonnegative)
+* [ES.107: 배열 접근에는 `unsigned`를 쓰지 말고 `gsl::index`를 사용하라](#Res-subscripts)
 
 ### <a name="Res-lib"></a>ES.1: 다른 라이브러리나 "직접 짠 코드" 대신 표준 라이브러리를 사용하라
 
@@ -3505,7 +3505,7 @@ Easy, just check for redundant use of `!=` and `==` in conditions.
 
 ## <a name="SS-numbers"></a>산술연산(Arithmetic)
 
-### <a name="Res-mix"></a>ES.100: Don't mix signed and unsigned arithmetic
+### <a name="Res-mix"></a>ES.100: 부호가 있는 타입과 없는 타입을 함께 연산하지 마라
 
 ##### Reason
 
@@ -3521,7 +3521,8 @@ Easy, just check for redundant use of `!=` and `==` in conditions.
     cout << x + y << '\n';  // unsigned result: 4
     cout << x * y << '\n';  // unsigned result, possibly 4294967275
 ```
-It is harder to spot the problem in more realistic examples.
+
+실제 코드에서는 문제를 찾아내기 어렵다.
 
 ##### Note
 
@@ -3532,9 +3533,9 @@ It is harder to spot the problem in more realistic examples.
 ##### Enforcement
 
 * 컴파일러가 이미 알고 있는 상황이고 경고할 것이다
-* (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
+* (너무 많은 경고를 막기 위해) 비교의 피연산자 중 하나가 `sizeof` 혹은 컨테이너의 `.size()`를 사용하고, 다른 한쪽은 `ptrdiff_t` 경우는 지적하지 마라
 
-### <a name="Res-unsigned"></a>ES.101: Use unsigned types for bit manipulation
+### <a name="Res-unsigned"></a>ES.101: 비트 조작시에는 부호가 없는(unsigned) 타입을 사용하라
 
 ##### Reason
 
@@ -3549,27 +3550,26 @@ It is harder to spot the problem in more realistic examples.
 
 ##### Note
 
-Unsigned types can also be useful for modulo arithmetic.
-However, if you want modulo arithmetic add
-comments as necessary noting the reliance on wraparound behavior, as such code
-can be surprising for many programmers.
+모듈러 연산에서 부호없는 타입은 유용하다.
+하지만, 모듈러 연산을 사용하고자 한다면 그 코드가 많은 프로그래머들을 놀라게 할 수 있기 때문에 뒤얽힌 행동에 대해 필요한 만큼 주석을 작성하라.
 
 ##### Enforcement
 
-* Just about impossible in general because of the use of unsigned subscripts in the standard library
+* 표준 라이브러리 내에서 unsigned 타입을 사용하는 것으로 인해 일반적으로 거의 불가능하다
 * ???
 
-### <a name="Res-signed"></a>ES.102: Use signed types for arithmetic
+### <a name="Res-signed"></a>ES.102: 연산에는 부호가 있는(signed) 타입을 사용하라
 
 ##### Reason
 
-대부분의 산술 연산은 부호를 고려한다;
+대부분의 산술연산(arithmetic)은 부호를 고려한다;
 모듈러 연산과 같이 특별한 경우가 아니라면 `x - y`는 `y > x`인 경우 음수값이 나오길 기대한다.
 
 ##### Example
 
-Unsigned arithmetic can yield surprising results if you are not expecting it.
-This is even more true for mixed signed and unsigned arithmetic.
+부호없는 타입을 사용한 산술연산은 기대밖의 결과를 낳는다 (그걸 의도하지 않았다면).
+부호 있는 타입과 부호 없는 타입이 섞여서 산술연산에 사용되는 코드 역시 마찬가지다.
+
 ```c++
     template<typename T, typename T2>
     T subtract(T x, T2 y)
@@ -3589,42 +3589,46 @@ This is even more true for mixed signed and unsigned arithmetic.
         cout << subtract(us, s + 2) << '\n';  // 4294967294
     }
 ```
-Here we have been very explicit about what's happening,
-but if you had seen `us - (s + 2)` or `s += 2; ...; us - s`, would you reliably have suspected that the result would print as `4294967294`?
+
+이 코드로 어떤 일이 일어나는지 분명히 알 수 있다.
+하지만 당신이 `us - (s + 2)` 혹은 `s += 2; ...; us - s`같은 코드를 봤다면, 그 결과가 `4294967294`라고 확신할 수 있었겠는가?
 
 ##### Exception
 
-Use unsigned types if you really want modulo arithmetic - add
-comments as necessary noting the reliance on overflow behavior, as such code
-is going to be surprising for many programmers.
+진정 모듈러 연산이 필요하다면 부호없는 타입을 사용하라 - 그 코드가 많은 프로그래머들을 놀라게 할 수 있기 때문에 뒤얽힌 행동에 대해 필요한 만큼 주석을 작성하라.
 
 ##### Example
 
-The standard library uses unsigned types for subscripts.
-The built-in array uses signed types for subscripts.
-This makes surprises (and bugs) inevitable.
+표준 라이브러리는 배열 원소에 접근할 때 부호없는 타입을 사용한다.
+기본적인 배열(built-in array) 타입은 부호있는 타입을 사용한다.
+이는 코드가 불가피하게 기대를 벗어나게 (그리고 버그가 생기게) 한다.
+
 ```c++
     int a[10];
-    for (int i = 0; i < 10; ++i) a[i] = i;
+    for (int i = 0; i < 10; ++i)
+        a[i] = i;
+
     vector<int> v(10);
     // compares signed to unsigned; some compilers warn, but we should not
-    for (gsl::index i = 0; i < v.size(); ++i) v[i] = i;
+    for (gsl::index i = 0; i < v.size(); ++i)
+        v[i] = i;
 
     int a2[-2];         // error: negative size
 
     // OK, but the number of ints (4294967294) is so large that we should get an exception
     vector<int> v2(-2);
 ```
- Use `gsl::index` for subscripts; [see ES.107](#Res-subscripts).
+
+배열 접근(subscript)에는 `gsl::index`를 사용하라; [ES.107를 참고하라](#Res-subscripts)
 
 ##### Enforcement
 
-* Flag mixed signed and unsigned arithmetic
-* Flag results of unsigned arithmetic assigned to or printed as signed.
-* Flag unsigned literals (e.g. `-2`) used as container subscripts.
-* (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
+* 부호 있는 타입과 없는 타입이 섞여서 산술연산에 사용되면 지적하라
+* 부호 없는 타입의 결과가 부호 있는 타입처럼 출력되거나 대입되면 지적하라
+* 부호 없는 타입으로 지정된 리터럴(예를 들어, `-2`)이 컨테이너 배열 접근에 사용되면 지적하라
+* (너무 많은 경고를 막기 위해) 비교의 피연산자 중 하나가 `sizeof` 혹은 컨테이너의 `.size()`를 사용하고, 다른 한쪽은 `ptrdiff_t` 경우는 지적하지 마라
 
-### <a name="Res-overflow"></a>ES.103: Don't overflow
+### <a name="Res-overflow"></a>ES.103: Overflow가 발생하지 않게 하라
 
 ##### Reason
 
@@ -3661,17 +3665,19 @@ This makes surprises (and bugs) inevitable.
 
 모듈러 연산(modulo arithmetic)을 사용한다면 부호없는 타입을 사용하라.
 
-**Alternative**: 어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 범위 검사를 수행하거나 부동소수점 타입을 사용하라.
+##### Alternative
+
+어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 범위 검사를 수행하거나 부동소수점 타입을 사용하라.
 
 ##### Enforcement
 
 ???
 
-### <a name="Res-underflow"></a>ES.104: Don't underflow
+### <a name="Res-underflow"></a>ES.104: Underflow가 발생하지 않게 하라
 
 ##### Reason
 
-최소값 이하로 값이 내려가면 메모리값이 망가지고 비정상적으로 작동한다.
+최소값 이하로 값이 내려가면 메모리 값이 망가지고 비정상적으로 작동한다.
 
 ##### Example, bad
 
@@ -3692,7 +3698,7 @@ This makes surprises (and bugs) inevitable.
 
 ???
 
-### <a name="Res-zero"></a>ES.105: Don't divide by zero
+### <a name="Res-zero"></a>ES.105: 0으로 나누지 않도록 하라
 
 ##### Reason
 
@@ -3724,20 +3730,21 @@ This makes surprises (and bugs) inevitable.
         return b ? a / b : quiet_NaN<double>();
     }
 ```
-**Alternative**: 어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 범위 검사를 수행하거나 부동소수점 타입을 사용하라.
+
+##### Alternative
+
+어느 정도의 오버헤드를 감수할 수 있는 대단히 중요한 프로그램에서는 범위 검사를 수행하거나 부동소수점 타입을 사용하라.
 
 ##### Enforcement
 
-* Flag division by an integral value that could be zero
+* 0이 될 수 있는 정수로 나눗셈을 할 경우 지적하라
 
-### <a name="Res-nonnegative"></a>ES.106: Don't try to avoid negative values by using `unsigned`
+### <a name="Res-nonnegative"></a>ES.106: 음수값을 막으려고 `unsigned`를 사용하지 마라
 
 ##### Reason
 
-Choosing `unsigned` implies many changes to the usual behavior of integers, including modulo arithmetic,
-can suppress warnings related to overflow,
-and opens the door for errors related to signed/unsigned mixes.
-Using `unsigned` doesn't actually eliminate the possibility of negative values.
+`unsigned`를 선택하는 것은 정수들의 동작이 달라지게 만든다. 여기에는 모듈러 연산, Overflow 경고, 부호 유무에 의한 오류의 가능성이 포함된다.
+`unsigned`를 사용하는것 자체는 음수가 생길 가능성을 원천봉쇄하지 않는다.
 
 ##### Example
 
@@ -3747,16 +3754,21 @@ Using `unsigned` doesn't actually eliminate the possibility of negative values.
     unsigned int u2 = i1;   // Valid: the value of u2 is 4294967294
     int i2 = u2;            // Valid: the value of i2 is -2
 ```
-These problems with such (perfectly legal) constructs are hard to spot in real code and are the source of many real-world errors.
-Consider:
+
+예시와 같은 (완전히 합법인) 생성 코드는 실제로는 찾아내기 어렵고 많은 오류의 원인이다.
+
+다음과 같은 코드를 고려해보라:
 ```c++
-    unsigned area(unsigned height, unsigned width) { return height*width; } // [see also](#Ri-expects)
+    unsigned area(unsigned height, unsigned width) {  // [see also](#Ri-expects)
+        return height * width;
+    }
     // ...
     int height;
     cin >> height;
     auto a = area(height, 2);   // if the input is -2 a becomes 4294967292
 ```
-Remember that `-1` when assigned to an `unsigned int` becomes the largest `unsigned int`.
+
+`-1`이 `unsigned int`에서는 최대값으로 사용된다는 것을 기억하라.
 Also, since unsigned arithmetic is modulo arithmetic the multiplication didn't overflow, it wrapped around.
 
 ##### Example
@@ -3764,26 +3776,33 @@ Also, since unsigned arithmetic is modulo arithmetic the multiplication didn't o
 ```c++
     unsigned max = 100000;    // "accidental typo", I mean to say 10'000
     unsigned short x = 100;
-    while (x < max) x += 100; // infinite loop
+    while (x < max) 
+        x += 100; // infinite loop
 ```
-Had `x` been a signed `short`, we could have warned about the undefined behavior upon overflow.
+
+`x`가 부호 있는 `short` 였다면, Overflow에 의한 미정의 행동을 컴파일러가 경고했을 것이다.
 
 ##### Alternatives
 
-* use signed integers and check for `x >= 0`
-* use a positive integer type
-* use an integer subrange type
+* 부호 있는 정수들을 사용하고 `x >= 0`를 검사한다
+* 양의 정수 타입을 사용한다
+* 정수의 부분 타입(subrange type)을 사용한다
 * `Assert(-1 < x)`
 
-For example
+예를 들자면
+
 ```c++
     struct Positive {
         int val;
-        Positive(int x) :val{x} { Assert(0 < x); }
+        Positive(int x) :val{x} {
+            Assert(0 < x);
+        }
         operator int() { return val; }
     };
 
-    int f(Positive arg) { return arg; }
+    int f(Positive arg) {
+        return arg;
+    }
 
     int r1 = f(2);
     int r2 = f(-2);  // throws
@@ -3795,33 +3814,44 @@ For example
 
 ##### Enforcement
 
-Hard: there is a lot of code using `unsigned` and we don't offer a practical positive number type.
+어려움: `unsigned`를 사용하는 코드는 엄청나게 많고, 실제로 사용 가능한 양수 타입을 제공하지 않는다.
 
-### <a name="Res-subscripts"></a>ES.107: Don't use `unsigned` for subscripts, prefer `gsl::index`
+### <a name="Res-subscripts"></a>ES.107: 배열 접근에는 `unsigned`를 쓰지 말고 `gsl::index`를 사용하라
 
 ##### Reason
 
-To avoid signed/unsigned confusion.
-To enable better optimization.
-To enable better error detection.
-To avoid the pitfalls with `auto` and `int`.
+부호 유무에 따른 혼선을 막는다.
+최적화를 돕는다.
+오류 탐지를 돕는다.
+`auto`와 `int`의 함정을 예방한다.
 
 ##### Example, bad
 
 ```c++
     vector<int> vec = /*...*/;
 
-    for (int i = 0; i < vec.size(); i += 2)                    // may not be big enough
+    // may not be big enough
+    for (int i = 0; i < vec.size(); i += 2) 
         cout << vec[i] << '\n';
-    for (unsigned i = 0; i < vec.size(); i += 2)               // risk wraparound
+
+    // risk wraparound
+    for (unsigned i = 0; i < vec.size(); i += 2)
         cout << vec[i] << '\n';
-    for (auto i = 0; i < vec.size(); i += 2)                   // may not be big enough
+    
+    // may not be big enough
+    for (auto i = 0; i < vec.size(); i += 2)
         cout << vec[i] << '\n';
-    for (vector<int>::size_type i = 0; i < vec.size(); i += 2) // verbose
+    
+    // verbose
+    for (vector<int>::size_type i = 0; i < vec.size(); i += 2)
         cout << vec[i] << '\n';
-    for (auto i = vec.size()-1; i >= 0; i -= 2)                // bug
+    
+    // bug
+    for (auto i = vec.size()-1; i >= 0; i -= 2)
         cout << vec[i] << '\n';
-    for (int i = vec.size()-1; i >= 0; i -= 2)                 // may not be big enough
+    
+    // may not be big enough
+    for (int i = vec.size()-1; i >= 0; i -= 2)
         cout << vec[i] << '\n';
 ```
 
@@ -3832,16 +3862,17 @@ To avoid the pitfalls with `auto` and `int`.
 
     for (gsl::index i = 0; i < vec.size(); i += 2)             // ok
         cout << vec[i] << '\n';
+
     for (gsl::index i = vec.size()-1; i >= 0; i -= 2)          // ok
         cout << vec[i] << '\n';
 ```
 
 ##### Note
 
-The built-in array uses signed subscripts.
-The standard-library containers use unsigned subscripts.
-Thus, no perfect and fully compatible solution is possible (unless and until the standard-library containers change to use signed subscripts someday in the future).
-Given the known problems with unsigned and signed/unsigned mixtures, better stick to (signed) integers of a sufficient size, which is guaranteed by `gsl::index`.
+기본 배열(built-in array) 타입은 부호 있는 정수를 배열 접근에 사용한다.
+표준 라이브러리의 컨테이너들은 부호 없는 정수를 사용한다.
+이로 인해 완벽하게 호환되는 해결책은 없다 (표준 라이브러리 컨테이너들이 미래에 부호 있는 정수로 배열 접근을 하지 않는 한).
+이와 관련된 문제들로 인해, 충분한 크기를 가진다고 보장하는 `gsl::index`를 쓰는 것이 더 낫다.
 
 ##### Example
 
@@ -3857,17 +3888,19 @@ Given the known problems with unsigned and signed/unsigned mixtures, better stic
 
 ##### Example
 
+```
     ??? demonstrate improved code generation and potential for error detection ???
+```
 
 ##### Alternatives
 
-Alternatives for users
+사용자를 위한 대안들
 
-* use algorithms
-* use range-for
-* use iterators/pointers
+* 표준 라이브러리의 algorithm들을 사용한다
+* 범위 기반 for 문을 사용한다
+* 반복자나 포인터를 사용한다
 
 ##### Enforcement
 
-* Very tricky as long as the standard-library containers get it wrong.
-* (To avoid noise) Do not flag on a mixed signed/unsigned comparison where one of the arguments is `sizeof` or a call to container `.size()` and the other is `ptrdiff_t`.
+* 표준 라이브러리의 컨테이너들이 바뀌지 않는 한 매우 까다롭다
+* (너무 많은 경고를 막기 위해) 비교의 피연산자 중 하나가 `sizeof` 혹은 컨테이너의 `.size()`를 사용하고, 다른 한쪽은 `ptrdiff_t` 경우는 지적하지 마라
