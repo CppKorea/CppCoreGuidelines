@@ -54,7 +54,7 @@
 * [ES.62: 서로 다른 배열에 대한 포인터를 비교하지 마라](#Res-arr2)
 * [ES.63: 복사 손실(slice)이 없도록 하라](#Res-slice)
 * [ES.64: 개체를 생성할 때는 `T{e}`표기를 사용하라](#Res-construct)
-* [ES.65: 무효화된(invalid) 포인터를 역참조하지 마라](#Res-deref)
+* [ES.65: 유효하지 않은(invalid) 포인터를 역참조하지 마라](#Res-deref)
 
 구문 규칙:
 
@@ -2770,18 +2770,17 @@ Slicing이란 개체의 일부분만을 사용해서 대입하거나 초기화 �
 
 C 스타일 `(T)e`변환과 함수형 타입변환 `T(e)`를 지적한다
 
-### <a name="Res-deref"></a>ES.65: 무효화된(invalid) 포인터를 역참조하지 마라
+### <a name="Res-deref"></a>ES.65: 유효하지 않은(invalid) 포인터를 역참조하지 마라
 
 ##### Reason
 
-Dereferencing an invalid pointer, such as `nullptr`, is undefined behavior, typically leading to immediate crashes,
-wrong results, or memory corruption.
+`nullptr`처럼 유효하지 않은 포인터를 역참조하는 것은 미정의 행동이다. 일반적으로 역참조하는 그 즉시 크래시가 발생하거나, 잘못된 결과, 혹은 메모리 파괴(corruption)가 일어난다.
 
 ##### Note
 
-This rule is an obvious and well-known language rule, but can be hard to follow.
-It takes good coding style, library support, and static analysis to eliminate violations without major overhead.
-This is a major part of the discussion of [C++'s resource- and type-safety model](#Stroustrup15).
+이 규칙은 명백하고 잘 알려진 언어 규칙이지만, 따르기 어렵다.
+큰 부담(overhead)없이 이 규칙을 준수하기 위해서는 좋은 코딩스타일, 라이브러리 지원, 그리고 정적 분석기가 필요하다.
+[C++'s resource- and type-safety model](#Stroustrup15) 논의에서의 중요 부분 중 하나다.
 
 ##### See also
 
@@ -2809,7 +2808,7 @@ This is a major part of the discussion of [C++'s resource- and type-safety model
     }
 ```
 
-To resolve the problem, either extend the lifetime of the object the pointer is intended to refer to, or shorten the lifetime of the pointer (move the dereference to before the pointed-to object's lifetime ends).
+이런 문제를 해결하기 위해, 참조되는 개체의 수명을 늘리거나, 참조하는 포인터의 수명을 줄이는 방법이 있다. (역참조하는 시점을 참조되는 개체의 수명이 끝나기 전으로 앞당긴다)
 
 ```c++
     void f1()
@@ -2825,7 +2824,8 @@ To resolve the problem, either extend the lifetime of the object the pointer is 
         *p = 42;            // OK, p points to x or y and both are still in scope
     }
 ```
-Unfortunately, most invalid pointer problems are harder to spot and harder to fix.
+
+불행하게도, 대부분의 유효하지 않은 포인터 문제는 찾아내기도, 고치기도 어렵다.
 
 ##### Example
 
@@ -2835,24 +2835,29 @@ Unfortunately, most invalid pointer problems are harder to spot and harder to fi
         int x = *p; // BAD: how do we know that p is valid?
     }
 ```
-There is a huge amount of such code.
-Most works -- after lots of testing -- but in isolation it is impossible to tell whether `p` could be the `nullptr`.
-Consequently, this is also a major source of errors.
-There are many approaches to dealing with this potential problem:
+
+이런 코드가 엄청나게 많이 있다.
+
+대부분 제대로 동작하지만 -- 수많은 테스트를 거친 후에야 -- 저 코드만 놓고 보면 `p`가 `nullptr`가 될 수 있는지에 대해 확답할 수 없다.
+결과적으로는 이 역시 오류의 주요 원인이다.
+이런 잠재적인 문제를 다루기 위해 많은 시도가 있었다:
+
 ```c++
-    void f1(int* p) // deal with nullptr
+    void f1(int* p) // nullptr를 처리해보자
     {
         if (!p) {
-            // deal with nullptr (allocate, return, throw, make p point to something, whatever
+            // nullptr인 경우 새로 할당하거나, 반환하거나, 
+            //  예외를 던지거나, 다른 무언가를 가리키게 하거나...
         }
         int x = *p;
     }
 ```
-There are two potential problems with testing for `nullptr`:
 
-* it is not always obvious what to do what to do if we find `nullptr`
-* the test can be redundant and/or relatively expensive
-* it is not obvious if the test is to protect against a violation or part of the required logic.
+`nullptr`를 검사하는데는 두가지 잠재적 문제가 있다:
+
+* 매번 `nullptr`를 찾은 후에 무엇을 해야하는지 분명한 것은 아니다
+* 테스트가 중복적이거나 상대적으로 비용이 많이 들수도 있다
+* 테스트의 목적이 잘못된 메모리 참조(violation)를 막기 위한 것인지 로직을 보호하기 위한 것인지 불분명하다
 
 ```c++
     void f2(int* p) // state that p is not supposed to be nullptr
@@ -2861,8 +2866,10 @@ There are two potential problems with testing for `nullptr`:
         int x = *p;
     }
 ```
-This would carry a cost only when the assertion checking was enabled and would give a compiler/analyzer useful information.
-This would work even better if/when C++ gets direct support for contracts:
+
+위 방법은 단정문(assertion)이 활성화될 때만 비용이 발생하고 컴파일러, 분석기에 유용한 정보를 제공할 것이다. 
+C++이 Contract를 지원하게 되면 좀 더 나은 코드가 될 것이다.
+
 ```c++
     void f3(int* p) // state that p is not supposed to be nullptr
         [[expects: p]]
@@ -2870,15 +2877,18 @@ This would work even better if/when C++ gets direct support for contracts:
         int x = *p;
     }
 ```
-Alternatively, we could use `gsl::not_null` to ensure that `p` is not the `nullptr`.
+
+다른 방법으로는, `p`가 `nullptr`가 되지 않는다는 것을 분명히 하기위해 `gsl::not_null`를 사용할수도 있다.
+
 ```c++
     void f(not_null<int*> p)
     {
         int x = *p;
     }
 ```
-These remedies take care of `nullptr` only.
-Remember that there are other ways of getting an invalid pointer.
+
+이런 방편들은 `nullptr`인 경우 만을 다룬다.
+유효하지 않은 포인터가 `nullptr`가 아닌 경우도 있다는 것을 기억하라.
 
 ##### Example
 
@@ -2895,6 +2905,7 @@ Remember that there are other ways of getting an invalid pointer.
         int x = *q; // BAD: dereferences invalid pointer
     }
 ```
+
 ##### Example
 
 ```c++
@@ -2909,12 +2920,12 @@ Remember that there are other ways of getting an invalid pointer.
 
 ##### Enforcement
 
-This rule is part of the [lifetime safety profile](#SS-lifetime)
+이 규칙은 [수명주기 안전성 분석](./Profile.md#SS-lifetime)의 일부분이다.
 
-* Flag a dereference of a pointer that points to an object that has gone out of scope
-* Flag a dereference of a pointer that may have been invalidated by assigning a `nullptr`
-* Flag a dereference of a pointer that may have been invalidated by a `delete`
-* Flag a dereference to a pointer to a container element that may have been invalidated by dereference
+* 포인터가 유효범위를 벗어난 개체를 가리키고 있다면 지적하라
+* 포인터가 `nullptr`를 대입해서 유효하지 않게 되었다면 지적하라 
+* 포인터가 `delete`에 의해서 유효하지 않게 되었을 수 있으면 지적하라
+* 포인터가 사라졌을 수 있는 컨테이너의 원소를 가리키고 있으면 지적하라
 
 ## ES.stmt: 구문(statement)
 
