@@ -50,11 +50,11 @@
 * [ES.55: 범위 검사가 필요없게 하라](#Res-range-checking)
 * [ES.56: `std::move()`는 개체를 다른 유효범위로 명시적으로 옮겨야 할때만 사용하라](#Res-move)
 * [ES.60: 자원을 관리하는 함수 외부에서 `new`와 `delete` 사용을 피하라](#Res-new)
-* [ES.61: 배열은 delete[]`, 단일 개체는 `delete`를 사용해서 해제하라](#Res-del)
-* [ES.62: Don't compare pointers into different arrays](#Res-arr2)
-* [ES.63: Don't slice](#Res-slice)
-* [ES.64: 개체 생성에는 `T{e}`을 사용하라](#Res-construct)
-* [ES.65: Don't dereference an invalid pointer](#Res-deref)
+* [ES.61: 배열은 `delete[]`, 단일 개체는 `delete`를 사용해서 해제하라](#Res-del)
+* [ES.62: 서로 다른 배열에 대한 포인터를 비교하지 마라](#Res-arr2)
+* [ES.63: 복사 손실(slice)이 없도록 하라](#Res-slice)
+* [ES.64: 개체를 생성할 때는 `T{e}`표기를 사용하라](#Res-construct)
+* [ES.65: 무효화된(invalid) 포인터를 역참조하지 마라](#Res-deref)
 
 구문 규칙:
 
@@ -2417,23 +2417,25 @@ Prefer to wrap such functions in inline `const`-correct wrappers to encapsulate 
 
 ##### Notes
 
-Moving is done implicitly when the source is an rvalue (e.g., value in a `return` treatment or a function result), so don't pointlessly complicate code in those cases by writing `move` explicitly. Instead, write short functions that return values, and both the function's return and the caller's accepting of the return will be optimized naturally.
+이동은 옮겨지는 쪽(source)이 rvalue이면 묵시적으로 일어난다 (예컨대, 함수의 결과처럼 `return`된 값), 그러니 명시적으로 `move`를 해서 코드를 복잡하게 만들 필요는 없다.
+대신, 값을 반환하는 짧은 함수를 작성하고 함수의 반환과 호출자의 반환값을 받는 부분이 자연스럽게 최적화되도록 하라.
 
-In general, following the guidelines in this document (including not making variables' scopes needlessly large, writing short functions that return values, returning local variables) help eliminate most need for explicit `std::move`.
+일반적으로, 이 문서의 가이드라인을 따르는 것(변수의 유효범위가 불필요하게 커지지 않게 하거나, 값을 반환하는 짧은 함수를 작성하는 것을 포함한다)은 대부분의 명시적인 `std::move`를 필요없도록 만든다.
 
-Explicit `move` is needed to explicitly move an object to another scope, notably to pass it to a "sink" function and in the implementations of the move operations themselves (move constructor, move assignment operator) and swap operations.
+명시적으로 `move`하는 것은 개체를 다른 유효범위로 이동시킬 때 필요하다.
+특히 그 개체를 아래 예시처럼 "sink" 함수로 넘기거나 이동 연산들(이동 생성, 이동 대입 연산자, 그리고 swap 연산)을 호출할 때 필요하다.
 
 ##### Example, bad
 
 ```c++
-    void sink(X&& x);   // sink takes ownership of x
+    void sink(X&& x);   // sink 함수가 x의 소유권을 가져간다
 
     void user()
     {
         X x;
-        // error: cannot bind an lvalue to a rvalue reference
+        // error: lvalue 참조는 rvalue 참조에 바인딩되지 않는다
         sink(x);
-        // OK: sink takes the contents of x, x must now be assumed to be empty
+        // OK: sink 가 x의 내용을 가져갔으므로, x는 비어있다고 가정한다
         sink(std::move(x));
 
         // ...
@@ -2442,19 +2444,21 @@ Explicit `move` is needed to explicitly move an object to another scope, notably
         use(x);
     }
 ```
-Usually, a `std::move()` is used as an argument to a `&&` parameter.
-And after you do that, assume the object has been moved from (see [C.64](#Rc-move-semantic)) and don't read its state again until you first set it to a new value.
+
+대부분의 경우 `std::move()`는 `&&`를 사용하는 매개변수에 실행인자를 넘길때 사용한다.
+그리고 그 뒤에는 대상 개체가 이동했다고 가정하며 ([C.64](./Class.md#Rc-move-semantic)를 함께 보라), 새로운 값을 그 개체에 쓰기 전까지는 상태를 읽어서는 안된다.
+
 ```c++
     void f() {
         string s1 = "supercalifragilisticexpialidocious";
 
-        string s2 = s1;             // ok, takes a copy
+        string s2 = s1;             // ok, 사본(copy)을 사져간다
         assert(s1 == "supercalifragilisticexpialidocious");  // ok
 
-        // bad, if you want to keep using s1's value
+        // bad, s1의 값을 보존하고자 한다면 실수한 것이다
         string s3 = move(s1);
 
-        // bad, assert will likely fail, s1 likely changed
+        // bad, s1이 변경되었기 때문에 assert는 실패할 것이다.
         assert(s1 == "supercalifragilisticexpialidocious");
     }
 ```
@@ -2462,25 +2466,25 @@ And after you do that, assume the object has been moved from (see [C.64](#Rc-mov
 ##### Example
 
 ```c++
-    void sink(unique_ptr<widget> p);  // pass ownership of p to sink()
+    void sink(unique_ptr<widget> p);  // p의 소유권을 sink()에 전달한다
 
     void f() {
         auto w = make_unique<widget>();
         // ...
         sink(std::move(w));               // ok, give to sink()
         // ...
-        sink(w);    // Error: unique_ptr is carefully designed so that you cannot copy it
+        sink(w);    // Error: unique_ptr는 복사할 수 없도록 세심하게 설계되었다
     }
 ```
 
 ##### Notes
 
-`std::move()` is a cast to `&&` in disguise; it doesn't itself move anything, but marks a named object as a candidate that can be moved from.
-The language already knows the common cases where objects can be moved from, especially when returning values from functions, so don't complicate code with redundant `std::move()`'s.
+`std::move()`는 실제로는 `&&`로 형변환하는 것이다; 단순히 이 함수를 호출하는 것 만으로는 아무것도 이동시키지 않는다. 대신 인자로 전달된 개체를 이동할수 있도록 만든다.
+C++ 언어는 함수로부터의 반환처럼 개체를 이동시킬 수 있는 일반적인 경우(common case)들에 대해 이미 알고 있기 때문에, 
+추가적으로 `std::move()`를 사용해서 코드를 복잡하게 만들 필요는 없다.
 
-Never write `std::move()` just because you've heard "it's more efficient."
-In general, don't believe claims of "efficiency" without data (???).
-In general, don't complicate your code without reason (??)
+"그냥 더 효율적이다"라고 들었기 때문에 `std::move()`를 사용해서는 절대로 안된다.
+정보가 없는 "효율성"에 대한 주장은 믿지 마라(???). 이유 없이 코드를 복잡하게 만들지 마라(??).
 
 ##### Example, bad
 
@@ -2491,16 +2495,19 @@ In general, don't complicate your code without reason (??)
         return std::move(result);       // bad; just write "return result;"
     }
 ```
-Never write `return move(local_variable);`, because the language already knows the variable is a move candidate.
-Writing `move` in this code won't help, and can actually be detrimental because on some compilers it interferes with RVO (the return value optimization) by creating an additional reference alias to the local variable.
+
+`return move(local_variable);`와 같은 코드는 절대로 작성하지 마라, 언어차원에서 이미 그 변수가 이동의 대상이 된다는 것을 알고 있다.
+코드에 `move`를 써놓는 것은 도움이 되지 않으며, 지역 변수에 대한 추가적인 참조를 만들어서 일부 컴파일러들의 반환값 최적화(RVO: Return Value Optimization)를 방해(detrimental)한다.
 
 ##### Example, bad
 
 ```c++
-    vector<int> v = std::move(make_vector());   // bad; the std::move is entirely redundant
+    // bad; move를 작성하지 않아도 이동 의미구조가 적용된다
+    vector<int> v = std::move(make_vector());
 ```
-Never write `move` on a returned value such as `x = move(f());` where `f` returns by value.
-The language already knows that a returned value is a temporary object that can be moved from.
+
+`f`가 값(by value)을 반환한다면, 절대로 `x = move(f());`처럼 반환되는 값에 `move`를 사용하지 마라.
+언어차원에서 반환 값이 임시 개체이며, 이 개체가 이동할 수 있다는 것을 이미 알고 있다.
 
 ##### Example
 
@@ -2530,7 +2537,7 @@ The language already knows that a returned value is a temporary object that can 
 * Flag when `std::forward` is applied to other than a forwarding reference. (More general case of the previous rule to cover the non-moving cases.)
 * Flag when an object is potentially moved from and the next operation is a `const` operation; there should first be an intervening non-`const` operation, ideally assignment, to first reset the object's value.
 
-### <a name="Res-new"></a>ES.60: Avoid `new` and `delete` outside resource management functions
+### <a name="Res-new"></a>ES.60: 자원을 관리하는 함수 외부에서 `new`와 `delete` 사용을 피하라
 
 ##### Reason
 
@@ -2538,7 +2545,7 @@ The language already knows that a returned value is a temporary object that can 
 
 ##### Note
 
-"No naked `new`!"로 알려져있다
+"`new`를 노출시켜서 사용하지 마라!"로 알려져있다
 
 ##### Example, bad
 
@@ -2550,15 +2557,18 @@ The language already knows that a returned value is a temporary object that can 
         delete[] p;
     }
 ```
-`...`에 `delete`가 발생하지 않게 만드는 코드가 있을 수 있다.
 
-**See also**: [R: 리소스 관리](#S-resource)
+`...`에 `delete`가 발생하지 않게 만드는 코드가 있을 수도 있다.
+
+##### See also
+
+[R: 리소스 관리](./Resource.md)
 
 ##### Enforcement
 
 그대로 노출된 `new`와 `delete`를 지적한다.
 
-### <a name="Res-del"></a>ES.61: Delete arrays using `delete[]` and non-arrays using `delete`
+### <a name="Res-del"></a>ES.61: 배열은 `delete[]`, 단일 개체는 `delete`를 사용해서 해제하라
 
 ##### Reason
 
@@ -2569,9 +2579,9 @@ C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염
 ```c++
     void f(int n)
     {
-        auto p = new X[n];   // n default constructed Xs
+        auto p = new X[n];   // n 개의 X를 생성한다
         // ...
-        delete p;   // error: just delete the object p, rather than delete the array p[]
+        delete p;   // error: p[] 배열이 아니라 p의 대상이 되는 첫번째 개체만 파괴한다, 
     }
 ```
 
@@ -2584,7 +2594,7 @@ C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염
 * `new`, `delete`가 같은 영역범위에 있다면 오류여부를 지적할 수 있다
 * `new`, `delete`가 생성자/소멸자 안에 있다면 오류여부를 지적할 수 있다
 
-### <a name="Res-arr2"></a>ES.62: Don't compare pointers into different arrays
+### <a name="Res-arr2"></a>ES.62: 서로 다른 배열에 대한 포인터를 비교하지 마라
 
 ##### Reason
 
@@ -2610,31 +2620,40 @@ C++언어가 요구하는 것이며, 리소스 해제 오류와 메모리 오염
 
 ???
 
-### <a name="Res-slice"></a>ES.63: Don't slice
+### <a name="Res-slice"></a>ES.63: 복사 손실(slice)이 없도록 하라
 
 ##### Reason
 
-Slicing -- that is, copying only part of an object using assignment or initialization -- most often leads to errors because
-the object was meant to be considered as a whole.
-In the rare cases where the slicing was deliberate the code can be surprising.
+Slicing이란 개체의 일부분만을 사용해서 대입하거나 초기화 하는 것을 의미한다 -- 대부분 개체는 모든 멤버를 가지고 있다고 생각하며 작성되었기에 이는 오류로 이어진다.
+
+드물게도 slicing을 신중하게 사용한다는 것이 놀라울수도 있다.
 
 ##### Example
 
 ```c++
-    class Shape { /* ... */ };
-    class Circle : public Shape { /* ... */ Point c; int r; };
+    class Shape {
+        /* ... */
+    };
+
+    class Circle : public Shape { 
+        /* ... */ 
+        Point c; 
+        int r;
+    };
 
     Circle c {{0, 0}, 42};
-    Shape s {c};    // copy Shape part of Circle
+    Shape s {c};    // Circle의 Shape부분을 복사한다
 ```
-The result will be meaningless because the center and radius will not be copied from `c` into `s`.
-The first defense against this is to [define the base class `Shape` not to allow this](#Rc-copy-virtual).
+
+복사한 결과는 `c`의 중심점과 반지름이 `s`로 복사되지 않았기 때문에 무의미할 것이다. 
+이 문제를 막는 방법은 [상위 클래스 `Shape`가 이런 동작을 허용하지 않도록 작성하는 것이다](./Class.md#Rc-copy-virtual).
 
 ##### Alternative
 
-If you mean to slice, define an explicit operation to do so.
-This saves readers from confusion.
-For example:
+복사 손실을 의도했다면, 그런 일을 하는 명시적인 처리(operation)를 작성하라.
+이렇게 하는것이 코드를 읽는 사람들이 혼란을 겪지 않도록 만든다.
+
+예를 들면:
 ```c++
     class Smiley : public Circle {
         public:
@@ -2643,26 +2662,27 @@ For example:
     };
 
     Smiley sm { /* ... */ };
-    Circle c1 {sm};  // ideally prevented by the definition of Circle
+    Circle c1 {sm};  // 이상적으로는 Circle의 정의에 의해 금지(prevent)되어야 한다.
     Circle c2 {sm.copy_circle()};
 ```
 
 ##### Enforcement
 
-Warn against slicing.
+복사 손실은 경고하라.
 
-### <a name="Res-construct"></a>ES.64: Use the `T{e}`notation for construction
+### <a name="Res-construct"></a>ES.64: 개체를 생성할 때는 `T{e}`표기를 사용하라
 
 ##### Reason
 
-The `T{e}` construction syntax makes it explicit that construction is desired.
-The `T{e}` construction syntax doesn't allow narrowing.
-`T{e}` is the only safe and general expression for constructing a value of type `T` from an expression `e`.
-The casts notations `T(e)` and `(T)e` are neither safe nor general.
+`T{e}` 생성 문법은 생성자 호출을 기대한다는 것을 분명하게 드러낸다.
+`T{e}` 생성 문법은 타입의 축소 변환(narrowing)을 허용하지 않는다.
+`T{e}` 는 타입 `T`의 개체를 표현식 `e`로부터 생성하는 안전하고 범용적인 유일한 방법이다.
+타입 변환을 위한 표기는 `T(e)`와 `(T)e`을 사용하고, 둘 중 그 무엇도 안전하거나 범용적이지 않다.
 
 ##### Example
 
-For built-in types, the construction notation protects against narrowing and reinterpretation
+언어의 기본(built-in) 타입들에 대해서는, 이 표기법을 사용한 생성은 축소 변환과 재해석(reinterpretation)을 예방한다.
+
 ```c++
     void use(char ch, int i, double d, char* p, long long lng)
     {
@@ -2682,16 +2702,18 @@ For built-in types, the construction notation protects against narrowing and rei
         int z4 = (int)lng;    // bad: long long->int narrowing; use a cast if you need to
     }
 ```
-The integer to/from pointer conversions are implementation defined when using the `T(e)` or `(T)e` notations, and non-portable
-between platforms with different integer and pointer sizes.
+
+정수와 포인터 사이의 변환에 `T(e)`혹은 `(T)e`표기를 사용하면 구현에따라 달라질 수 있기 때문에, 
+정수와 포인터의 크기가 다른 플랫폼에서는 쓸수 없는(non-portable) 코드가 된다
 
 ##### Note
 
-[Avoid casts](#Res-casts) (explicit type conversion) and if you must [prefer named casts](#Res-casts-named).
+[타입 변환을 피하라](#Res-casts) (명시적 타입 변환) 그리고 가능하다면 [named cast를 사용하라](#Res-casts-named).
 
 ##### Note
 
-When unambiguous, the `T` can be left out of `T{e}`.
+모호하다면, `T{e}`표기에서 `T`를 지워버리고 표현식만 남길수도 있다.
+
 ```c++
     complex<double> f(complex<double>);
 
@@ -2700,28 +2722,32 @@ When unambiguous, the `T` can be left out of `T{e}`.
 
 ##### Note
 
-The construction notation is the most general [initializer notation](#Res-list).
+개체 생성 표기법은 가장 범용적인 [초기화 표기법이다](#Res-list).
 
 ##### Exception
 
-`std::vector` and other containers were defined before we had `{}` as a notation for construction.
-Consider:
+`std::vector`와 다른 컨테이너들은 `{}`를 생성자를 위한 표기로 사용하기 전에 설계되었다.
+다음과 같은 코드를 고려해보라:
+
 ```c++
     vector<string> vs {10};                           // ten empty strings
     vector<int> vi1 {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};  // ten elements 1..10
     vector<int> vi2 {10};                             // one element with the value 10
 ```
-How do we get a `vector` of 10 default initialized `int`s?
+
+어떻게 하면 `vector`가 10개의 기본 초기화된 `int`를 가지도록 할 수 있을까?
+
 ```c++
     vector<int> v3(10); // ten elements with value 0
 ```
-The use of `()` rather than `{}` for number of elements is conventional (going back to the early 1980s), hard to change, but still
-a design error: for a container where the element type can be confused with the number of elements, we have an ambiguity that
-must be resolved.
-The conventional resolution is to interpret `{10}` as a list of one element and use `(10)` to distinguish a size.
 
-This mistake need not be repeated in new code.
-We can define a type to represent the number of elements:
+원소의 수를 생성자에 전달하기 위해 `{}`대신 `()`를 사용하는 것은 전통적인 코드를 따른 것이다 (1980년대 초반으로 거슬러 올라간다). 
+이는 바꾸기 어렵지만, 설계 오류라는 것은 여전하다: for a container where the element type can be confused with the number of elements, we have an ambiguity that must be resolved.
+전통적인 코드를 따라서 `{10}`를 해석하면 하나의 원소로 만들어진 리스트이고, `(10)`는 컨테이너의 크기를 의미한다.
+
+새로운 코드에서 이런 실수가 반복되어선 안된다.
+원소의 개수를 표현하는 타입을 정의하는 것도 가능하다:
+
 ```c++
     struct Count { int n; };
 
@@ -2737,13 +2763,14 @@ We can define a type to represent the number of elements:
     Vector<int> v2{Count{10}};
     Vector<Count> v3{Count{10}};    // yes, there is still a very minor problem
 ```
-The main problem left is to find a suitable name for `Count`.
+
+남은 문제는 `Count`에 알맞는 이름을 찾는 것이다.
 
 ##### Enforcement
 
-Flag the C-style `(T)e` and functional-style `T(e)` casts.
+C 스타일 `(T)e`변환과 함수형 타입변환 `T(e)`를 지적한다
 
-### <a name="Res-deref"></a>ES.65: Don't dereference an invalid pointer
+### <a name="Res-deref"></a>ES.65: 무효화된(invalid) 포인터를 역참조하지 마라
 
 ##### Reason
 
