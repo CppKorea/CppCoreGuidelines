@@ -1,39 +1,37 @@
 
-# <a name="S-profile"></a>Pro: 분석
+# <a name="S-profile"></a>Pro: 프로필(Profiles)
 
-Ideally, we would follow all of the guidelines.
-That would give the cleanest, most regular, least error-prone, and often the fastest code.
-Unfortunately, that is usually impossible because we have to fit our code into large code bases and use existing libraries.
-Often, such code has been written over decades and does not follow these guidelines.
-We must aim for [gradual adoption](#S-modernizing).
+이상적으로는 우리의 코드가 이 가이드라인의 모든 규칙을 따를 것이다.
+그렇게 함으로써 깔끔하고, 규칙적이면서 오류에 취약하지도 않은 코드가 될 것이다. 어쩌면 가장 빠른 코드가 될수도 있다.
+불행하게도, 그렇게 되는것은 불가능에 가까운데, 보통 우리가 작성하는 코드가 이미 존재하는 코드들에 맞추거나 이미 존재하는 라이브러리들을 사용해야 하기 때문이다.
+그런 코드가 수십년간 작성되어 왔고, 그 코드들은 이 가이드라인을 따르지 않는다.
+[점진적으로 적용](./appendix/Modernizing.md)하는 것을 목표해야 한다.
 
-Whatever strategy for gradual adoption we adopt, we need to be able to apply sets of related guidelines to address some set
-of problems first and leave the rest until later.
-A similar idea of "related guidelines" becomes important when some, but not all, guidelines are considered relevant to a code base
-or if a set of specialized guidelines is to be applied for a specialized application area.
-We call such a set of related guidelines a "profile".
-We aim for such a set of guidelines to be coherent so that they together help us reach a specific goal, such as "absence of range errors"
-or "static type safety."
-Each profile is designed to eliminate a class of errors.
-Enforcement of "random" rules in isolation is more likely to be disruptive to a code base than delivering a definite improvement.
+점진적으로 적용하기 위한 전략이 무엇이던간에, 어떤 문제들에 일련의 서로 연관된 가이드라인들을 적용할 수 있게 되고, 나머지 문제들은 나중을 위해 남겨놓을 필요가 있다.
+언제나 그런 것은 아니지만 "연관된 가이드라인들"과 같은 생각이 중요할 떄가 있다.
+가이드라인이 이미 작성된 코드(code base)와 관련있다고 여겨지거나 특별한 어플리케이션 영역에 적용되기 위한 일련의 특별한 가이드라인이 적용되면
+우리는 그런 가이드라인 묶음들을 "프로필"이라고 부른다.
+우리의 의도는 이런 가이드라인들이 일관성을 가지고 "범위 오류들을 없애는 것"이나 "정적 타입 안전성"과 같은 특정한 목적을 이루는 것을 돕는 것이다.
+각 프로필들은 오류의 한 종류(class)를 없애기 위해 설계되었다.
+개별적인 규칙을을 "아무거나" 따르는 것은 이미 존재하는 코드에 해당 규칙에서 정의하는 개선(improvement)보다 교란(disruptive)을 낳을 가능성이 크다.
 
-"프로파일"은 특정한 보장하기 위한 "결정성" "이식성" 규칙들(즉, 제한사항) 입니다.
-여기서 "결정성"은 로컬 분석이 되어야 하며, 컴파일러에 의해 구현 될수 있음(꼭 그러지 않아도 됨)을 의미합니다.
-"이식성"은 언어 규칙같이 같은 코드에 따른 그 결과가 같아야 한다는 것을 의미합니다.
+"프로필"은 결정론적(deterministic)이고 어디에서도 적용 가능(portably enforceable)하며 특정한 보증(specific guarantee)을 달성하기 위해 설계된 규칙(즉, 규정)들의 부분집합을 말한다.
+"결정론적"이라는 표현의 의미는 지역적인 분석만을 필요로 하고 컴파일러 안에서 구현할 수 있는 것(비록 그럴 필요가 없더라도)을 의미한다.
+"어디에도 적용가능"하다는 해당 규칙들이 언어의 규칙과 비슷하다는 것을 말한다. 따라서 프로그래머들은 같은 코드에 대해서 같은 해답을 제시하는 서로 다른 도구들을 사용할 수 있다.
 
-이런 프로파일을 이용하여 경고가 없도록 작성된 코드는 프로파일에 일치하는 것이라 말할 수 있습니다.
-규격에 부합하는 코드는 프로파일 상의 안전성을 지켜서 작성된 것이므로 안전하다고 판단할 수 있습니다.
-규격에 부합하는 코드는 다른 코드나, 라이브러리 또는 외부환경에 의해서 에러가 발생할 수는 있어도 그 자체에서 오류가 발생하지 않습니다.
-프로파일은 올바른 코드의 작성을 도와주는 라이브러리들을 소개해 드릴 것입니다.
+언어 프로필을 사용해 경고가 없도록 작성된 코드는 프로필에 부합하는(conform) 것으로 생각할 수 있다.
+프로필에 부합하는 코드는 작성하는 순간부터 해당 프로필이 목표하는 안전성 속성(safety property)에 대해서는 안전하다고 볼 수 있을것이다.
+프로필에서 목표하는 속성에 대한 오류가 발생했을 때, 설령 해당 오류가 다른 코드, 라이브러리 혹은 외부 환경에 의해서 프로그램에 생겨났더라도 프로필에 부합하는 코드가 그 오류의 근본 원인(root cause)이 되지는 않을 것이다. 
+프로필에서는 쉽고 정확하게 코드를 작성하도록 유도하기 위해 새로운 라이브러리 타입을 제시할수도 있다.
 
-분석 요약:
+프로필 요약:
 
 * [Pro.type: 타입 안전성](#SS-type)
-* [Pro.bounds: 범위 안전성](#SS-bounds)
+* [Pro.bounds: 경계 안전성](#SS-bounds)
 * [Pro.lifetime: 수명 안전성](#SS-lifetime)
 
-In the future, we expect to define many more profiles and add more checks to existing profiles.
-Candidates include:
+미래에는, 훨씬 더 많은 프로필을 정의하고 이미 존재하는 프로필들에 검사 방법을 추가하기를 기대한다.
+그 후보들로는 다음과 같은 것들이 있다:
 
 * narrowing arithmetic promotions/conversions (likely part of a separate safe-arithmetic profile)
 * arithmetic cast from negative floating point to unsigned integral type (ditto)
@@ -41,32 +39,34 @@ Candidates include:
 * selected unspecified behavior: Addressing portability concerns.
 * `const` violations: Mostly done by compilers already, but we can catch inappropriate casting and underuse of `const`.
 
-Enabling a profile is implementation defined; typically, it is set in the analysis tool used.
+프로필을 적용할 수 있도록 하는것은 구현에 달려있다(implementation defined); 보편적으로, 이는 사용되는 분석 도구들에 달려있다.
 
-To suppress enforcement of a profile check, place a `suppress` annotation on a language contract. For example:
+프로필 검사를 수행하지 않도록 만들고 싶다면, 언어의 Contract를 사용해서 `suppress`라고 표기하라. 예를 들어:
 
 ```c++
-    [[suppress(bounds)]] char* raw_find(char* p, int n, char x)    // find x in p[0]..p[n - 1]
+    [[suppress(bounds)]] char* raw_find(char* p, int n, char x)
+        // find x in p[0]..p[n - 1]
     {
         // ...
     }
 ```
 
-Now `raw_find()` can scramble memory to its heart's content.
-Obviously, suppression should be very rare.
+이제 `raw_find()`는 주어진 내용에 마음대로(scramble) 사용할 수 있다.
+당연히, 이런 억제(suppression)는 거의 사용되지 않아야 한다.
 
-## <a name="SS-type"></a>Pro.safety: 타입 안전성 분석
+## <a name="SS-type"></a>Pro.safety: 타입 안전성 프로필
 
-이 유형의 프로파일은 타입을 정확히 사용하며, 부주의한 타입변형을 방지하면서 코드를 작성하도록 도와드릴 것입니다.
-안전하지 않은 캐스팅과 `union`의 사용을 포함하여 타입이 잘못사용되는 것에 대한 주요 원인을 제거하는 것에 초점을 맞춰서 진행하겠습니다.
+이 프로필은 타입을 정확하게 사용하고, 부주의하게(inadvertent) 타입을 조작하지 않는 코드를 작성하는 것을 돕는다.
+그 방법으로 타입을 위배(violate)하는 궁극적인 원인을 제거하는데 집중한다. 
+원인에는 타입 변환을 사용하거나 공용체(`union`)의 사용이 포함된다.
 
-이 장의 목적인,
-타입 안전성을 정의하자면, 프로그램 상에서 변수를 원래 타입과 다르게 사용하지 않는 것이라 하겠습니다. 실제 `U` 타입으로 정의된 객체가 저장된 메모리에 `T`타입으로 읽어서 사용하지 말자는 겁니다.
-(타입 안전성 하나만 지켜서는 코드가 안전하다는 보장을 받기 힘듭니다. [범위 안전성](#SS-bounds)과 [수명 안전성](#SS-lifetime)을 함께 지켰을 때 비로서 완전히 안전성이 보장된다고 할 수 있습니다.)
+이 목적을 위해서, 타입 안전성은 임의의 변수가 그 타입에서 정의한 규칙을 준수하지 않는 방법으로 사용되지 않는 것으로 정의한다.
+타입 `T`로 접근하는 메모리 영역이 실제로는 전혀 상관없는 타입 `U`의 개체를 담고 있어서는 안된다.
+타입 안전성이 [경계 안전성](#SS-bounds), [수명 안전성](#SS-lifetime)과 같이 충족되어야 완전해지도록 의도되었다는 점에 유의하라.
 
-An implementation of this profile shall recognize the following patterns in source code as non-conforming and issue a diagnostic.
+이 프로필의 구현체는 소스코드에서 아래의 패턴에 맞지 않는 부분을 찾아내고 진단할 수 있어야 한다.
 
-Type safety profile summary:
+타입 안전성 프로필 요약:
 
 * <a name="Pro-type-avoidcasts"></a>Type.1: [Avoid casts](#Res-casts):
   * <a name="Pro-type-reinterpretcast"></a>Don't use `reinterpret_cast`; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named)
@@ -83,21 +83,22 @@ Type safety profile summary:
 
 ##### Impact
 
-With the type-safety profile you can trust that every operation is applied to a valid object.
-Exception may be thrown to indicate errors that cannot be detected statically (at compile time).
-Note that this type-safety can be complete only if we also have [Bounds safety](#SS-bounds) and [Lifetime safety](#SS-lifetime).
-Without those guarantees, a region of memory could be accessed independent of which object, objects, or parts of objects are stored in it.
+타입 안전성 프로필을 준수하면 모든 처리(operation)들이 유효한 개체에서 수행된다고 확신할 수 있다.
+오류를 알리기 위해서 발생하는 예외는 정적으로는(컴파일 시간에) 탐지해낼 수 없다.
+타입 안전성이 [경계 안전성](#SS-bounds), [수명 안전성](#SS-lifetime)과 같이 충족되어야 완전해지도록 의도되었다는 점에 유의하라.
+이를 보장할 수 없다면, 임의의 메모리 영역에 어떤 개체, 개체들, 혹은 개체의 일부가 저장되어 있는지와 상관없는 접근이 발생할 수 있다.
 
-## <a name="SS-bounds"></a>Pro.bounds: 범위 안전성 분석
+## <a name="SS-bounds"></a>Pro.bounds: 경계(bound) 안전성 프로필
 
-이 프로파일은 메모리 블록 할당 작업에 대해 코드 작성을 쉽게 해 줍니다.
-포인터 연산, 배열 인덱스 연산 등에서 발생하는 범위 위반 사항을 제거하는 것에 초점을 맞춰서 진행하겠습니다.
-이 프로파일의 주요 기능중 하나는 (하나의 객체가 아니라) 배열을 참조하는 포인터를 제한하자는 것입니다.
+이 프로필은 메모리의 할당된 블록들의 경계 내에서 동작하는 코드를 작성하는 것을 돕는다
+그 방법으로 경계를 위반하는 궁극적인 원인을 제거하는데 집중한다:
+바로 포인터를 계산하거나 배열의 인덱스를 사용하는 부분이다.
+이 프로필의 핵심적인 특징 중 하나는 포인터가 배열이 아니라 오직 하나의 개체만을 가리키도록 제한한다는 것이다. 
 
-범위-안정성이란 변수가 할당된 범위 외부에서 해당 변수를 사용하지 않는 것을 의미합니다.
-[타입 안전성](#SS-type)과 [수명 안전성](#SS-lifetime)을 함께 지켰을 때 범위 안전성도 그 의미가 있습니다.
+경계 안전성은 프로그램이 할당된 구간(range)을 벗어난 메모리에 위치한 개체를 사용하지 않는 것을 의미한다.
+경계 안전성은 타입 안전성과 수명 안전성과 같이 충족되어야 완전해지도록 의도되었다. 다른 안전성들이 경계 위반을 허용하는 안전하지 않은 처리들에 대해 다룰 것이다.
 
-Bounds safety profile summary:
+경계 안전성 프로필 요약:
 
 * <a href="Pro-bounds-arithmetic"></a>Bounds.1: Don't use pointer arithmetic. Use `span` instead: [Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
 * <a href="Pro-bounds-arrayindex"></a>Bounds.2: Only index into arrays using constant expressions: [Pass pointers to single objects (only)](#Ri-array) and [Keep pointer arithmetic simple](#Res-ptr).
@@ -106,30 +107,28 @@ Bounds safety profile summary:
 
 ##### Impact
 
-Bounds safety implies that access to an object - notably arrays - does not access beyond the object's memory allocation.
-This eliminates a large class of insidious and hard-to-find errors, including the (in)famous "buffer overflow" errors.
-This closes security loopholes as well as a prominent source of memory corruption (when writing out of bounds).
-Even an out-of-bounds access is "just a read", it can lead to invariant violations (when the accessed isn't of the assumed type)
-and "mysterious values."
+경계 안전성을 따르면 개체에 - 특히 배열에 - 접근할 때 개체에 할당된 메모리 너머에 접근하지 않게 된다.
+이는 (악명높은) "버퍼 오버플로우"를 비롯해 찾기 어려운 오류들을 소멸시킨다.
+이는 (경계를 벗어나서 값을 변경할 때 발생하는) 메모리 오염(corruption)의 유명한 원인을 비롯해 보안 약점도 함께 막는다.
+경계를 벗어난 접근이 "단순히 읽기"만 수행하더라도, (접근 대상이 의도한 타입이 아닌 경우) 불변조건을 위반하거나 "이상한 값"을 반환할 수도 있다.
 
-## <a name="SS-lifetime"></a>Pro.lifetime: 수명 안전성 분석
+## <a name="SS-lifetime"></a>Pro.lifetime: 수명 안전성 프로필
 
-Accessing through a pointer that doesn't point to anything is a major source of errors,
-and very hard to avoid in many traditional C or C++ styles of programming.
-For example, a pointer may be uninitialized, the `nullptr`, point beyond the range of an array, or to a deleted object.
+아무것도 가리키지 않는 포인터를 통해 접근하는 것은 오류의 주 원인이다.
+또한 전통적인 C 혹은 C++ 스타일의 프로그래밍은 이 문제를 피하기 매우 어렵다.
+예를 들어 포인터가 초기화되지 않았거나, `nullptr`이거나, 배열의 범위를 벗어나거나, 삭제된 개체일 수 있다.
+[현재 디자인 명세를 함께 보라](https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/Lifetime.pdf).
 
-[See the current design specification here.](https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/Lifetime.pdf)
-
-Lifetime safety profile summary:
+수명 안전성 프로필 요약:
 
 * <a href="Pro-lifetime-invalid-deref"></a>Lifetime.1: Don't dereference a possibly invalid pointer:[detect or avoid](#Res-deref).
 
 ##### Impact
 
-Once completely enforced through a combination of style rules, static analysis, and library support, this profile
+코딩 스타일 규칙, 정적 분석, 라이브러리 지원이 완전히 함께 적용되면 이 프로필은
 
-* eliminates one of the major sources of nasty errors in C++
-* eliminates a major source of potential security violations
-* improves performance by eliminating redundant "paranoia" checks
-* increases confidence in correctness of code
-* avoids undefined behavior by enforcing a key C++ language rule
+* C++의 짜증나는(nasty) 오류의 주 원인 중 하나를 없애버린다
+* 잠재적인 보안 문제의 원인을 없앤다
+* "편집증적인(paranoia)" 검사를 없애 성능을 향상시킨다
+* 코드의 정확함에 자신감을 가지게 한다
+* C++ 언어의 핵심 규칙을 따름으로써 미정의 행동이 발생하지 않게 한다.
