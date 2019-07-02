@@ -6,7 +6,7 @@
 
 소스 파일 규칙 요약:
 
-* [SF.1: SF.1: 다른 관례를 따르는 중이 아니라면 `.cpp`는 코드 파일에, `.h`는 인터페이스 파일에 사용하라](#Rs-file-suffix)
+* [SF.1: 다른 관례를 따르는 중이 아니라면 `.cpp`는 코드 파일에, `.h`는 인터페이스 파일에 사용하라](#Rs-file-suffix)
 * [SF.2: `.h` 파일에는 개체 변수(object definition) 혹은 inline이 아닌 함수의 정의가 있어서는 안된다](#Rs-inline)
 * [SF.3: `.h` 파일은 여러 소스 파일에서 사용되는 선언을 담아라](#Rs-declaration-header)
 * [SF.4: SF.4: 파일에서 무언가 선언하기 전에 `.h`를 include하라](#Rs-include-order)
@@ -16,7 +16,7 @@
 * [SF.8: 모든 `.h`파일에서 `#include` 가드(guard)를 사용하라](#Rs-guards)
 * [SF.9: 소스 파일들이 순환 의존(cyclic dependencies)하게 하지마라](#Rs-cycles)
 * [SF.10: 묵시적으로 `#include`된 이름이 필요하지 않도록 하라](#Rs-implicit)
-* [SF.11: SF.11: 헤더 파일은 독립적으로 사용할 수 있게(self-contained) 만들어라](#Rs-contained)
+* [SF.11: 헤더 파일은 독립적으로 사용할 수 있게(self-contained) 만들어라](#Rs-contained)
 * [SF.20: `namespace`는 논리적 구조를 표현할 때 사용하라](#Rs-namespace)
 * [SF.21: 헤더에서 이름없는(anonymous) 네임스페이스를 사용하지 마라](#Rs-unnamed)
 * [SF.22: 이름없는(anonymous) 네임스페이스는 내부(internal)/노출시키지 않는(non-exported) 개체에 사용하라](#Rs-unnamed2)
