@@ -15,7 +15,7 @@
 
 ## <a name="SS-readers"></a>In.target: 대상 독자
 
-모든 C++ 프로그래머. 또한 [C를 생각 중인 프로그래머](#S-cpl).
+모든 C++ 프로그래머. 또한 [C를 생각 중인 프로그래머](./CPL.md#S-cpl).
 
 ## <a name="SS-aims"></a>In.aims: 목표
 
@@ -32,9 +32,9 @@
 
 여러분의 프로그램에 가이드라인에 나온 규칙을 적용한다면, 프로그램에 어떤 영향을 줄 지 충분히 고려해야 한다.
 
-가이드라인은 "상위 집합의 하위 집합(Subset of superset)" ([Stroustrup05](#Stroustrup05)) 원리에 따라 구성되어 있다.
+가이드라인은 "상위 집합의 하위 집합(Subset of superset)" ([Stroustrup05](./Bibliography.md#Stroustrup05)) 원리에 따라 구성되어 있다.
 우리는 신뢰성, 안정성, 성능 등을 고려해 단순히 C++의 한 부분 집합을 정의하지 않는다.
-대신, 몇 가지 간단한 "확장" ([라이브러리 구성 요소](#S-gsl))을 사용하길 강력히 권고한다.
+대신, 몇 가지 간단한 "확장" ([가이드라인 지원 라이브러리](./GSL.md#S-gsl))을 사용하길 강력히 권고한다.
 이를 통해 오류가 발생하기 쉬운 C++ 기능들의 대부분을 제거할 수 있다.
 
 규칙들은 정적 타입 안정성과 리소스 안정성에 주안점을 두고 있다.
@@ -52,7 +52,7 @@
 이처럼 특화된 개발 분야에만 적용 할 수 있는 규칙들은 핵심 가이드라인의 부록에 담았다.
 어셈블리 코드와 같이 저수준의 프로그래밍 방식을 고수하기 보다는 핵심 기능을 구현하고 있는 소규모의 라이브러리를 만들고 사용하기 바란다.
 
-규칙들은 [점진적으로 적용](#S-modernizing)해 볼 수 있다.
+규칙들은 [점진적으로 적용](./appendix/Modernizing.md#S-modernizing)해 볼 수 있다.
 
 일부 규칙들은 안정성을 높이기 위해 다양한 방법들을 설명하고 있으며, 또 다른 규칙들은 문제 발생 가능성을 낮추는 방법을 설명하고 있다. 혹은 이 둘을 모두 고려해 만들어진 규칙들도 있다.
 사고를 예방하기 위한 가이드라인이 때로는 합법적인(legal) C++에 반대되기도 한다.
@@ -71,11 +71,11 @@
 즉, 규칙이 만들어진 이유를 설명하고, 만약 규칙을 따르지 않았을 때 어떤 문제가 발생할 수 있고, 그 문제를 어떻게 해결할 수 있는지를 알려주기 위해서다.
 
 이 가이드라인은 C++ 튜토리얼을 대체할 용도로 작성된 것이 아니다.
-개발자의 수준에 부합하는 튜토리얼이 필요하다면, [참고 문헌](#S-references)을 참조하기 바란다.
+개발자의 수준에 부합하는 튜토리얼이 필요하다면, [참고 문헌](./References.md#S-references)을 참조하기 바란다.
 
 이 문서는 기존의 C++ 코드를 모던 C++ 코드로 변환하는 방법에 대해서 다루고 있는 것도 아니다.
 다만, 새로운 C++ 코드에 대한 논리 정연한 생각들을 구체적으로 설명한다.
-따라서 기존 코드를 모던하게, 젊고 활기차게, 업그레이드 하고 싶다면 [모던 C++ 코드](#S-modernizing)를 참조하기 바란다.
+따라서 기존 코드를 모던하게, 젊고 활기차게, 업그레이드 하고 싶다면 [모던 C++ 코드](./appendix/Modernizing.md#S-modernizing)를 참조하기 바란다.
 중요한 것은 이 문서에서 다루고 있는 규칙들을 점진적으로 적용할 수 있다는 점이다. 엄청난 양의 코드를 단번에 바꿀 수는 없는 노릇이다.
 
 이 가이드라인이 언어의 기술 세부 사항을 완벽하게, 또는 정확하게 설명하지는 않는다.
@@ -117,12 +117,12 @@
 바라건대 모든 규칙들을 적용하는 것이 좋다고 생각한다. 그렇게 해야만 최고의 이득을 본다고 생각하기 때문이다.
 
 이는 꽤나 심각한 딜레마가 아닐 수 없는데, 우리는 이러한 딜레마의 해결책이 툴을 개발하는 것이라고 생각했다.
-각각의 규칙들은 적용 방법을 설명하고 있는 **적용** 단락을 갖고 있는데,
+각각의 규칙들은 적용 방법을 설명하고 있는 **Enforcement** 단락을 갖고 있는데,
 코드 리뷰, 정적 분석, 컴파일러, 런타임 체크 등의 방법을 나열하고 있다.
 어떤 방식이든 우리는 "기계적"이며(사람은 느리기도 하고, 쉽게 지루해 할 수 있으므로) 일관된 방법으로 개별 규칙들이 적용되기를 원했다.
 이런 이유로 런타임 체크는 다른 대안이 없을 경우에 한해서만 언급했다.
 이 같은 내용들을 여기저기에 흩어놓기 보다는 사용자가 원할 경우 쉽게 찾을 수 있도록 하고 싶었기에,
-(**적용** 단락 내에) 적절한 위치라고 생각되는 곳에 연관된 규칙들을 "프로필"이라는 이름으로 나열해 두었다.
+(**Enforcement** 단락 내에) 적절한 위치라고 생각되는 곳에 연관된 규칙들을 "프로필"이라는 이름으로 나열해 두었다.
 하나의 규칙은 여러 프로필에 속할 수 있으며, 어떤 프로필에도 속하지 않은 규칙들도 있다.
 자주 사용되는 프로필 몇 가지를 먼저 살펴보자.
 
@@ -136,9 +136,11 @@
 
 가이드라인의 규칙들을 구현한 툴에서는 명시적으로 규칙을 무시하는 다음과 같은 문법을 지원하기를 바란다:
 
+```c++
     [[gsl::suppress(tag)]]
+```
 
-여기서 "tag"는 HTML anchor의 이름으로, 가이드라인 내에서 규칙이 있는 지점을 의미한다. (가령, [C.134](#Rh-public) 규칙의 경우, Anchor 값은 "Rh-public"이다. ) 
+여기서 "tag"는 HTML anchor의 이름으로, 가이드라인 내에서 규칙이 있는 지점을 의미한다. (가령, [C.134](./Class.md#Rh-public) 규칙의 경우, Anchor 값은 "Rh-public"이다. ) 
 
 ## <a name="SS-struct"></a>In.struct: 문서의 구조
 
@@ -161,48 +163,48 @@
 일부 규칙들은 기계적으로 확인하기에 어려울 수 있으나 전문적인 프로그래머라면 손쉽게 위반 여부를 발견할 수 있다. "기계적인" 도구들이 그런 전문 프로그래머 처럼 지적할 수 있도록 발전하기를 희망한다. 또, 규칙들이 시간이 지날수록 더 정확하고 검사가 가능하도록 발전하도록 할 것이다.
 
 각 규칙들이 가능한 단순하게 유지되길 바란다. 적용 가능한 모든 대안과 특별한 예외사항까지 모두 언급하기를 바라지는 않는다.
-이러한 정보는 **대안** 단락과 [토론](#S-discussion) 절에서 찾을 수 있다.
+이러한 정보는 **대안** 단락과 [토론](./appendix/Discussion.md#S-discussion) 절에서 찾을 수 있다.
 규칙을 이해할 수 없거나 동의하지 않는다면, **논의**를 살펴보기 바란다.
 또한, 논의가 없거나 불완전하다고 생각된다면 Issue에 여러분이 염려하는 부분과 가능하다면 관련 PR에 대한 설명을 적어주기 바란다.
 
 이 문서는 언어어 대한 매뉴얼이 아니다.
 따라서 기술적인 세부 사항을 자세히 다루기보다는 기존에 작성된 코드에 대한 가이드로써의 역할을 했으면 한다.
-도움이 되는 정보의 출처는 [참고 문헌](#S-references)에서 찾을 수 있다.
+도움이 되는 정보의 출처는 [참고 문헌](./References.md#S-references)에서 찾을 수 있다.
 
 ## <a name="SS-sec"></a>In.sec: 주요 목차
 
 * [In(Introduction): 소개](#S-introduction)
-* [P(Philosophy): 철학](#S-philosophy)
-* [I(Interfaces): 인터페이스](#S-interfaces)
-* [F(Functions): 함수](#S-functions)
-* [C(Classes and class hierarchies): 클래스와 클래스 계층 구조](#S-class)
-* [Enum(Enumerations): 열거형](#S-enum)
-* [R(Resource management): 리소스 관리](#S-resource)
-* [ES(Expressions and statements): 표현식과 문장](#S-expr)
-* [Per(Performance): 성능](#S-performance)
-* [CP(Concurrency): 동시성](#S-concurrency)
-* [E(Error handling): 오류 처리](#S-errors)
-* [Con(Constants and immutability): 상수와 불변성](#S-const)
-* [T(Templates and generic programming): 템플릿과 제너릭 프로그래밍](#S-templates)
-* [CPL(C-style programming): C 스타일 프로그래밍](#S-cpl)
-* [SF(Source files): 소스 파일](#S-source)
-* [SL(The Standard library): 표준 라이브러리](#S-stdlib)
+* [P(Philosophy): 철학](./Philosophy.md)
+* [I(Interfaces): 인터페이스](./Interfaces.md)
+* [F(Functions): 함수](./Functions.md)
+* [C(Classes and class hierarchies): 클래스와 클래스 계층 구조](./Class.md)
+* [Enum(Enumerations): 열거형](./Enum.md)
+* [R(Resource management): 리소스 관리](./Resource.md)
+* [ES(Expressions and statements): 표현식과 구문](./Expr.md)
+* [Per(Performance): 성능](./Performance.md)
+* [CP(Concurrency): 동시성](./Concurrency.md)
+* [E(Error handling): 오류 처리](./Errors.md)
+* [Con(Constants and immutability): 상수와 불변성](./Const.md)
+* [T(Templates and generic programming): 템플릿과 제너릭 프로그래밍](./Templates.md)
+* [CPL(C-style programming): C 스타일 프로그래밍](./CPL.md)
+* [SF(Source files): 소스 파일](./Source.md)
+* [SL(The Standard library): 표준 라이브러리](./SL.md)
 
 참고할 만한 내용:
 
-* [A(Architectural Ideas): 구조적 아이디어](#S-A)
-* [NR(Non-Rules and myths): 규칙이 아닌 미신](#S-not)
-* [RF(References): 참고 문헌](#S-references)
-* [Pro(Profiles): 프로파일](#S-profile)
-* [GSL(Guideline support library): 가이드라인 지원 라이브러리](#S-gsl)
-* [NL(Naming and layout): 이름 명명 규칙과 레이아웃](#S-naming)
-* [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](#S-faq)
-* [부록 A: 라이브러리](#S-libraries)
-* [부록 B: 모던 C++ 스타일로 코딩하기](#S-modernizing)
-* [부록 C: 토론](#S-discussion)
-* [부록 D: 유용한 도구](#S-tools)
-* [용어 설명](#S-glossary)
-* [To-do(Unclassified proto-rules): 미분류 규칙](#S-unclassified)
+* [A(Architectural Ideas): 프로그램 구조 관련 아이디어](Architecture.md)
+* [NR(Non-Rules and myths): 규칙이 아닌 미신](./Not.md)
+* [RF(References): 참고 문헌](./References.md)
+* [Pro(Profiles): 프로파일](./Profile.md)
+* [GSL(Guideline support library): 가이드라인 지원 라이브러리](./GSL.md)
+* [NL(Naming and layout): 이름 명명 규칙과 레이아웃](./Naming.md)
+* [FAQ(Answers to frequently asked questions): 자주 묻는 질문에 대한 대답](./FAQ.md)
+* [부록 A: 라이브러리](./appendix/Libraries.md)
+* [부록 B: 모던 C++ 스타일로 코딩하기](./appendix/Modernizing.md)
+* [부록 C: 토론](./appendix/Discussion.md)
+* [부록 D: 유용한 도구](./appendix/Tools.md)
+* [용어 설명](./Glossary.md)
+* [To-do(Unclassified proto-rules): 미분류 규칙](./Unclassified.md)
 
 각 부분들은 서로 연관되어 있다.
 
