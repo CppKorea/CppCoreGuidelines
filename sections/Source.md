@@ -293,12 +293,13 @@ and M functions each containing a `using namespace X`with N lines of code in tot
 
 Flag multiple `using namespace` directives for different namespaces in a single source file.
 
-### <a name="Rs-using-directive"></a>SF.7: Don't write `using namespace` at global scope in a header file
+### <a name="Rs-using-directive"></a>SF.7: 헤더파일에서는 전체 유효범위(global scope)에 주는 `using namespace`를 작성하지 마라
 
 ##### Reason
 
-헤더 파일에 `using` 지시자를 사용하는 경우 `#include`를 사용하는 쪽에서 대체 구현을 효과적으로 구분할 수 있는 방안을 없애버린다.
-It also makes `#include`d headers order-dependent as they may have different meaning when included in different orders.
+헤더 파일에 `using` 지시자를 사용하는 경우 `#include`를 사용하는 쪽에서 다른 구현을 효과적으로 구분할 수 있는 방안을 없애버린다.
+동시에 그 헤더가 `#include`되는 순서를 신경쓰도록 만든다(order-dependent).
+이는 헤더의 순서가 바뀌면 의미가 달라지는것과 같다.
 
 ##### Example
 
@@ -321,15 +322,19 @@ It also makes `#include`d headers order-dependent as they may have different mea
 
 Flag `using namespace` at global scope in a header file.
 
-### <a name="Rs-guards"></a>SF.8: Use `#include` guards for all `.h` files
+### <a name="Rs-guards"></a>SF.8: 모든 `.h`파일에서 `#include` 가드(guard)를 사용하라
+
+> 역주:  
+> `#include` guard(보호 문구)는 어떤 헤더 파일이 여러차례 include 되었을 때 
+> redefinition이 발생하지 않도록 
+> Macro를 사용해 오직 처음 include할때만 그 내용이 활성화 되도록하는 트릭(Trick)을 말합니다
 
 ##### Reason
 
 파일이 여러 번 `#include`되는 것을 방지한다.
 
-In order to avoid include guard collisions, do not just name the guard after the filename.
-Be sure to also include a key and good differentiator, such as the name of library or component
-the header file is part of.
+가드의 이름이 충돌하는 것을 막기 위해, 단순히 파일의 이름을 따라서 가드들의 이름을 지어서는 안된다.
+가드의 이름에 헤더파일이 담당하는 라이브러리 혹은 컴포넌트의 이름과 같은 핵심과 차별성(a key and good differentiator)이 담기게 하라.
 
 ##### Example
 
@@ -337,26 +342,30 @@ the header file is part of.
     // file foobar.h:
     #ifndef LIBRARY_FOOBAR_H
     #define LIBRARY_FOOBAR_H
+
     // ... declarations ...
+
     #endif // LIBRARY_FOOBAR_H
 ```
 
 ##### Enforcement
 
-`#include`보호 문구가 없는 `.h` 파일이 있다면 표시한다
+`#include`가드가 없는 `.h` 파일이 있다면 표시한다
 
 ##### Note
 
-Some implementations offer vendor extensions like `#pragma once` as alternative to include guards.
-It is not standard and it is not portable.  It injects the hosting machine's filesystem semantics
-into your program, in addition to locking you down to a vendor.
-Our recommendation is to write in ISO C++: See [rule P.2](#Rp-Cplusplus).
+어떤 경우는 컴파일러에서 제공하는 확장(vendor extnsion)인 `#pragma once`를 대신 사용하기도 한다.
+이는 표준이 아니며 모든 컴파일러가 제공하는 것은 아니다(not portable).
+이 방법은 당신의 프로그램을 생성할 때 빌드를 수행하는 기계의 파일시스템 문맥을 사용하도록 만든다. 그 결과 해당 컴파일러/기계의 제공자(vendor)에 의존하게 된다.
 
-### <a name="Rs-cycles"></a>SF.9: Avoid cyclic dependencies among source files
+ISO C++ 를 따라서 작성할 것을 권한다: [P.2](./Philosophy.md#Rp-Cplusplus)를 읽어보라
+
+### <a name="Rs-cycles"></a>SF.9: 소스 파일들이 순환 의존(cyclic dependencies)하게 하지마라
 
 ##### Reason
+
 순환은 이해하기 어렵고, 컴파일 속도도 느려지게 한다.
-향후 언어에서 모듈 기능을 지원할 때 이를 사용하도록 변경하기 어렵게 된다.
+향후 언어에서 모듈 기능을 지원할 때 이 기능을 사용하도록 변경하기 어렵게 된다.
 
 ##### Note
 
@@ -377,15 +386,15 @@ Our recommendation is to write in ISO C++: See [rule P.2](#Rp-Cplusplus).
 
 ##### Enforcement
 
-Flag all cycles.
+순환이 있으면 지적한다.
 
-### <a name="Rs-implicit"></a>SF.10: Avoid dependencies on implicitly `#include`d names
+### <a name="Rs-implicit"></a>SF.10: 묵시적으로 `#include`된 이름이 필요하지 않도록 하라
 
 ##### Reason
 
-Avoid surprises.
-Avoid having to change `#include`s if an `#include`d header changes.
-Avoid accidentally becoming dependent on implementation details and logically separate entities included in a header.
+이상 행동(surprise)을 막는다.
+`#include`되는 파일이 바뀌었을 때 `#include`하는 코드가 바뀔 필요가 없어야 한다.
+구현 세부사항이나 해더파일에 있는 논리적으로 분리된 개체에 의존하게 되지 않도록 한다.
 
 ##### Example
 
@@ -397,19 +406,18 @@ Avoid accidentally becoming dependent on implementation details and logically se
     {
         string s;
         cin >> s;               // fine
-        getline(cin, s);        // error: getline() not defined
-        if (s == "surprise") {  // error == not defined
+        getline(cin, s);        // error: getline()이 정의되지 않았다
+        if (s == "surprise") {  // 컴파일 오류. == 연산자가 정의되지 않았다
             // ...
         }
     }
 ```
 
-`<iostream>` exposes the definition of `std::string` ("why?" makes for a fun trivia question),
-but it is not required to do so by transitively including the entire `<string>` header,
-resulting in the popular beginner question "why doesn't `getline(cin,s);` work?"
-or even an occasional "`string`s cannot be compared with `==`).
+`<iostream>`은 `std::string`의 정의를 사용할 수 있게 노출시킨다 ("어째서?"는 꽤 재미있는 질문이 될 것이다).
+하지만 `<string>`헤더를 사용해서 그 내용을 전파시키는(by transitively) 방식을 사용해야 한다고 어떤 요구사항이 존재하는 것은 아니다. 
+그 결과 많은 초심자들이 "왜 `getline(cin,s);`가 동작하지 않는거죠?"라거나, 때로는 "문자열을 `==` 연산자로 비교할수 없어요"라고 질문한다.
 
-The solution is to explicitly `#include <string>`:
+해결방법은 명시적으로 `#include <string>`를 추가하는 것이다:
 
 ```c++
     #include <iostream>
@@ -429,8 +437,8 @@ The solution is to explicitly `#include <string>`:
 
 ##### Note
 
-Some headers exist exactly to collect a set of consistent declarations from a variety of headers.
-For example:
+어떤 헤더파일들은 그저 여러 헤더들을 똑같은 형태로(일관적으로) 가져오기 위해서만 존재하기도 한다.
+예를 들어:
 
 ```c++
     // basic_std_lib.h:
@@ -443,26 +451,28 @@ For example:
     #include <vector>
 ```
 
-a user can now get that set of declarations with a single `#include`
+이렇게 하면 사용자는 한번의 `#include`로 일련의 선언들을 가져올 수 있다.
 
 ```c++
     #include "basic_std_lib.h"
 ```
 
-This rule against implicit inclusion is not meant to prevent such deliberate aggregation.
+이 규칙은 "묵시적 include가 편의를 위해 사용되기 위한 기능이 아니다"라는 규칙에 반대된다.
+
+> implicit inclusion is not meant to prevent such deliberate aggregation
 
 ##### Enforcement
 
 Enforcement would require some knowledge about what in a header is meant to be "exported" to users and what is there to enable implementation.
 No really good solution is possible until we have modules.
 
-### <a name="Rs-contained"></a>SF.11: Header files should be self-contained
+### <a name="Rs-contained"></a>SF.11: 헤더 파일은 독립적으로 사용할 수 있게(self-contained) 만들어라
 
 ##### Reason
 
-Usability, headers should be simple to use and work when included on their own.
-Headers should encapsulate the functionality they provide.
-Avoid clients of a header having to manage that header's dependencies.
+사용성, 헤더는 단순하게 사용할 수 있어야 하며 그 자신만 있어도 동작해야 한다.
+헤더는 제공하는 기능을 캡슐화해야 한다.
+헤더를 사용하는 쪽에서 헤더의 의존성을 관리하게 하지마라.
 
 ##### Example
 
@@ -479,46 +489,52 @@ Failing to follow this results in difficult to diagnose errors for clients of a 
 
 A test should verify that the header file itself compiles or that a cpp file which only includes the header file compiles.
 
-### <a name="Rs-namespace"></a>SF.20: Use `namespace`s to express logical structure
+### <a name="Rs-namespace"></a>SF.20: `namespace`는 논리적 구조를 표현할 때 사용하라
 
 ##### Reason
 
- ???
+???
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
 ???
 
-### <a name="Rs-unnamed"></a>SF.21: Don't use an unnamed (anonymous) namespace in a header
+### <a name="Rs-unnamed"></a>SF.21: 헤더에서 이름없는(anonymous) 네임스페이스를 사용하지 마라
 
 ##### Reason
 
-헤더 파일에 있는 익명 이름공간 거의 대부분이 버그이다.
+헤더 파일에 있는 익명 네임스페이스 거의 대부분이 버그이다.
 
 ##### Example
 
+```
     ???
+```
 
 ##### Enforcement
 
-* 헤더 파일에서 사용되는 익명 이름공간을 찾아내 표시한다
+* 헤더 파일에서 사용되는 익명 네임스페이스을 찾아내 표시한다
 
-### <a name="Rs-unnamed2"></a>SF.22: Use an unnamed (anonymous) namespace for all internal/nonexported entities
+### <a name="Rs-unnamed2"></a>SF.22: 이름없는(anonymous) 네임스페이스는 내부(internal)/노출시키지 않는(non-exported) 개체에 사용하라
 
 ##### Reason
 
-어떤 외부에서도 내부의 익명 이름공간에 있는 항목들에 참조할 수 없다.
-소스 파일에 정의되어 있는 모든 구현들 중 "외부에 노출되는" 항목의 정의를 뺀 나머지 모두는 익명 이름공간에 넣는다 생각하라.
+어떤 외부에서도 내부의 익명 네임스페이스에 있는 항목들에 참조할 수 없다.
+소스 파일에 정의되어 있는 모든 구현들 중 "외부에 노출되는" 항목의 정의를 뺀 나머지 모두는 익명 네임스페이스에 넣는다 생각하라.
 
 ##### Example
 
-API 클래스와 그 멤버들은 익명 이름공간에 있을 수 없지만, 구현 소스 파일에 정의된 "도우미" 클래스나 함수들의 경우 익명 이름공간 영역에 정의되어야 한다.
+API 클래스와 그 멤버들은 익명 네임스페이스에 있을 수 없지만, 구현 소스 파일에 정의된 "도우미" 클래스나 함수들의 경우 익명 네임스페이스 영역에 정의되어야 한다.
 
+```
     ???
+```
 
 ##### Enforcement
 
