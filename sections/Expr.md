@@ -2389,7 +2389,7 @@ C 스타일 타입변환이 위험한 이유는 어떤 형태로의 변환도 �
 ##### Enforcement
 
 * `const_cast`를 지적한다.
-* 이 규칙은 [타입 안정성 분석](#Pro-type-constcast)과 관련 있다
+* 이 규칙은 [타입 안정성 분석](./Profile.md#Pro-type-constcast)과 관련 있다
 
 ### <a name="Res-range-checking"></a>ES.55: 범위 검사가 필요없게 하라
 
@@ -2416,7 +2416,7 @@ C 스타일 타입변환이 위험한 이유는 어떤 형태로의 변환도 �
 
 복제를 막고 성능을 향상시키기 위해 복사보다는 이동을 사용한다.
 
-이동 연산은 보통 빈 개체를 남긴다 ([C.64](#Rc-move-semantic)). 이는 기대밖의 결과 혹은 위험으로 이어질 수 있다. 가능하다면 lvalue로부터 이동하는 것을 피하려 해야한다 (lvalue에 나중에 접근할 수도 있다).
+이동 연산은 보통 빈 개체를 남긴다 ([C.64](./Class.md#Rc-move-semantic)). 이는 기대밖의 결과 혹은 위험으로 이어질 수 있다. 가능하다면 lvalue로부터 이동하는 것을 피하려 해야한다 (lvalue에 나중에 접근할 수도 있다).
 
 ##### Notes
 
@@ -2787,7 +2787,7 @@ C 스타일 `(T)e`변환과 함수형 타입변환 `T(e)`를 지적한다
 
 이 규칙은 명백하고 잘 알려진 언어 규칙이지만, 따르기 어렵다.
 큰 부담(overhead)없이 이 규칙을 준수하기 위해서는 좋은 코딩스타일, 라이브러리 지원, 그리고 정적 분석기가 필요하다.
-[C++'s resource- and type-safety model](#Stroustrup15) 논의에서의 중요 부분 중 하나다.
+[C++'s resource- and type-safety model](./Bibliography.md#Stroustrup15) 논의에서의 중요 부분 중 하나다.
 
 ##### See also
 
@@ -2796,7 +2796,7 @@ C 스타일 `(T)e`변환과 함수형 타입변환 `T(e)`를 지적한다
 * 수명주기 문제를 피하려면 [shared_ptr](#Rf-shared_ptr)를 사용하라
 * `nullptr`가 허용되지 않는다면 [references](#Rf-ptr-ref)를 사용하라
 * 의도치 않은 `nullptr`를 일찍 잡아내기 위해 [not_null](#Rf-not_null)을 사용하라
-* Use the [bounds profile](#SS-bounds) to avoid range errors.
+* 범위 오류를 피하고 싶다면 [경계 안전성 프로필](./Profile.md#SS-bounds)을 참고하라
 
 ##### Example
 
@@ -3859,8 +3859,9 @@ C 스타일 문자열을 사용한다면 `<cstring>`의 함수들을 잘 알아�
 예시와 같은 (완전히 합법인) 생성 코드는 실제로는 찾아내기 어렵고 많은 오류의 원인이다.
 
 다음과 같은 코드를 고려해보라:
+
 ```c++
-    unsigned area(unsigned height, unsigned width) {  // [see also](#Ri-expects)
+    unsigned area(unsigned height, unsigned width) {  // see also: I.6 사전 조건을 표현하고 싶다면 `Expects()`를 사용하라
         return height * width;
     }
     // ...
