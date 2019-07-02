@@ -166,7 +166,8 @@ Not easy. ??? Look for messy loops, nested loops, long functions, absence of fun
 
 가독성이 좋아진다. 리소스 점유를 최소화할 수 있다. 값의 잘못된 사용을 피할 수 있다.
 
-**Alternative formulation**: 불필요하게 큰 스코프에 변수를 선언하지 마라
+**Alternative Formulation**:  
+불필요하게 큰 스코프에 변수를 선언하지 마라
 
 ##### Example
 

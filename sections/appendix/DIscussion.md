@@ -410,7 +410,8 @@ Resource management rule summary:
 
 Prevent leaks. Leaks can lead to performance degradation, mysterious error, system crashes, and security violations.
 
-**Alternative formulation**: Have every resource represented as an object of some class managing its lifetime.
+**Alternative Formulation**:  
+Have every resource represented as an object of some class managing its lifetime.
 
 ##### Example
 
