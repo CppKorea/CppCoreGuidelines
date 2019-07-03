@@ -175,14 +175,13 @@
 
 ##### Note
 
-There is an argument for insulating code from declarations and macros in header files by `#including` headers *after* the code we want to protect
-(as in the example labeled "bad").
+헤더파일에서 보호하고 싶은 코드 *다음에* `#include`목록이 오도록 해서 선언과 매크로로부터 코드를 분리한다는 생각에는 논쟁이 있다.
 
 하지만
 
-* that only works for one file (at one level): Use that technique in a header included with other headers and the vulnerability reappears.
+* 이 방법은 하나의 파일에(한 단계)만 통한다: Use that technique in a header included with other headers and the vulnerability reappears.
 * a namespace (an "implementation namespace") can protect against many context dependencies.
-* full protection and flexibility require modules.
+* 완전히 보호하면서 유연성을 가지려면 언어에서 모듈을 지원해야 한다
 
 ##### See also
 
