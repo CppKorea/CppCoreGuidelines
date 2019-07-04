@@ -9,7 +9,7 @@
 * [SF.1: 다른 관례를 따르는 중이 아니라면 `.cpp`는 코드 파일에, `.h`는 인터페이스 파일에 사용하라](#Rs-file-suffix)
 * [SF.2: `.h` 파일에는 개체 변수(object definition) 혹은 inline이 아닌 함수의 정의가 있어서는 안된다](#Rs-inline)
 * [SF.3: `.h` 파일은 여러 소스 파일에서 사용되는 선언을 담아라](#Rs-declaration-header)
-* [SF.4: SF.4: 파일에서 무언가 선언하기 전에 `.h`를 include하라](#Rs-include-order)
+* [SF.4: 파일에서 무언가 선언하기 전에 `.h`를 include하라](#Rs-include-order)
 * [SF.5: `.cpp`파일은 반드시 해당 인터페이스를 정의하는 `.h`를 include해야 한다](#Rs-consistency)
 * [SF.6: `using namespace`는 네임스페이스의 이름 바꾸기, `std`처럼 기본적인 라이브러리, 혹은 지역 유효범위 안에서(만) 사용하라](#Rs-using)
 * [SF.7: 헤더파일에서는 전체 유효범위(global scope)에 주는 `using namespace`를 작성하지 마라](#Rs-using-directive)
