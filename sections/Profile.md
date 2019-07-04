@@ -68,18 +68,18 @@
 
 타입 안전성 프로필 요약:
 
-* <a name="Pro-type-avoidcasts"></a>Type.1: [Avoid casts](#Res-casts):
-  * <a name="Pro-type-reinterpretcast"></a>Don't use `reinterpret_cast`; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named)
-  * <a name="Pro-type-arithmeticcast"></a>Don't use `static_cast` for arithmetic types; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](#Res-casts-named).
-  * <a name="Pro-type-identitycast"></a>Don't cast between pointer types where the source type and the target type are the same; A strict version of [Avoid casts](#Res-casts).
-  * <a name="Pro-type-implicitpointercast"></a>Don't cast between pointer types when the conversion could be implicit; A strict version of [Avoid casts](#Res-casts).
-* <a name="Pro-type-downcast"></a>Type.2: Don't use `static_cast` to downcast: [Use `dynamic_cast` instead](#Rh-dynamic_cast).
-* <a name="Pro-type-constcast"></a>Type.3: Don't use `const_cast` to cast away `const` (i.e., at all): [Don't cast away const](#Res-casts-const).
-* <a name="Pro-type-cstylecast"></a>Type.4: Don't use C-style `(T)expression` or functional `T(expression)` casts: Prefer [construction](#Res-construct) or [named casts](#Res-cast-named).
-* <a name="Pro-type-init"></a>Type.5: Don't use a variable before it has been initialized: [always initialize](#Res-always).
-* <a name="Pro-type-memberinit"></a>Type.6: Always initialize a member variable: [always initialize](#Res-always), possibly using [default constructors](#Rc-default0) or [default member initializers](#Rc-in-class-initializers).
-* <a name="Pro-type-unon"></a>Type.7: Avoid naked union: [Use `variant` instead](#Ru-naked).
-* <a name="Pro-type-varargs"></a>Type.8: Avoid varargs: [Don't use `va_arg` arguments](#F-varargs).
+* <a name="Pro-type-avoidcasts"></a>Type.1: [Avoid casts](./Expr.md#Res-casts):
+  * <a name="Pro-type-reinterpretcast"></a>Don't use `reinterpret_cast`; A strict version of [Avoid casts](#Res-casts) and [prefer named casts](./Expr.md#Res-casts-named)
+  * <a name="Pro-type-arithmeticcast"></a>Don't use `static_cast` for arithmetic types; A strict version of [Avoid casts](./Expr.md#Res-casts) and [prefer named casts](./Expr.md#Res-casts-named).
+  * <a name="Pro-type-identitycast"></a>Don't cast between pointer types where the source type and the target type are the same; A strict version of [Avoid casts](./Expr.md#Res-casts).
+  * <a name="Pro-type-implicitpointercast"></a>Don't cast between pointer types when the conversion could be implicit; A strict version of [Avoid casts](./Expr.md#Res-casts).
+* <a name="Pro-type-downcast"></a>Type.2: Don't use `static_cast` to downcast: [Use `dynamic_cast` instead](./Class.md#Rh-dynamic_cast).
+* <a name="Pro-type-constcast"></a>Type.3: Don't use `const_cast` to cast away `const` (i.e., at all): [Don't cast away const](./Expr.md#Res-casts-const).
+* <a name="Pro-type-cstylecast"></a>Type.4: Don't use C-style `(T)expression` or functional `T(expression)` casts: Prefer [construction](./Expr.md#Res-construct) or [named casts](./Expr.md#Res-cast-named).
+* <a name="Pro-type-init"></a>Type.5: Don't use a variable before it has been initialized: [always initialize](./Expr.md#Res-always).
+* <a name="Pro-type-memberinit"></a>Type.6: Always initialize a member variable: [always initialize](./Expr.md#Res-always), possibly using [default constructors](./Class.md#Rc-default0) or [default member initializers](./Class.md#Rc-in-class-initializers).
+* <a name="Pro-type-unon"></a>Type.7: Avoid naked union: [Use `variant` instead](./Class.md#Ru-naked).
+* <a name="Pro-type-varargs"></a>Type.8: Avoid varargs: [Don't use `va_arg` arguments](./Functions.md#F-varargs).
 
 ##### Impact
 
