@@ -23,7 +23,7 @@
 
 [이 가이드의 범위와 구조](#S-abstract)를 확인하거나, 읽고 싶은 부분을 클릭해 해당 내용으로 바로 이동할 수 있다.
 
-* [In: 소개](./Instruction.md)
+* [In: 소개](./Introduction.md)
 * [P: 철학](./Philosophy.md)
 * [I: 인터페이스](./Interfaces.md)
 * [F: 함수](./Functions.md)
