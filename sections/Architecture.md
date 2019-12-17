@@ -6,8 +6,8 @@
 구조적 아이디어 규칙 요약:
 
 * [A.1: 코드의 덜 안정적인 부분에서 안정적인 부분을 분리하라](#Ra-stable)
-* [A.2:잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라](#Ra-lib)
-* [A.4: There should be no cycles among libraries](#?Ra-dag)
+* [A.2: 잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라](#Ra-lib)
+* [A.4: 라이브러리 사이의 순환 참조가 없도록 하라](#?Ra-dag)
 * [???](#???)
 * [???](#???)
 * [???](#???)
@@ -17,7 +17,7 @@
 
 ### <a name="Ra-stable"></a>A.1: 코드의 덜 안정적인 부분에서 안정적인 부분을 분리하라
 
-???
+불안전한 코드를 분리하는 것은, 코드의 유닛 테스트, 인터페이스 개선, 리팩토링, 잠재적인 지원 중단에 용이하다. 
 
 ### <a name="Ra-lib"></a>A.2: 잠재적으로 재사용 가능한 부분을 라이브러리로 표현하라
 
@@ -25,23 +25,23 @@
 
 ##### Note
 
-A library is a collection of declarations and definitions maintained, documented, and shipped together.
-A library could be a set of headers (a "header only library") or a set of headers plus a set of object files.
-A library can be statically or dynamically linked into a program, or it may be `#include`d
+라이브러리는 유지되고, 문서화되며, 함께 제공되는 선언과 정의의 집합이다. 
+라이브러리는 헤더들의 집합("헤더 전용 라이브러리") 또는 헤더 집합과 오브젝트 파일 집합이 될 수 있다.
+라이브러리는 정적 또는 동적으로 프로젝트에 링크될 수 있으며, '#include' 될 수 있다.
 
-### <a name="Ra-dag"></a>A.4: There should be no cycles among libraries
+### <a name="Ra-dag"></a>A.4: 라이브러리 사이의 순환 참조가 없도록 하라
 
 ##### Reason
 
-* A cycle implies complication of the build process.
-* Cycles are hard to understand and may introduce indeterminism (unspecified behavior).
+* 순환 참조는 빌드 과정의 복잡성을 의미한다.
+* 순환 참조는 이해하기 어렵고, 미정의 동작이 발생할 수 있다.
 
 ##### Note
 
-A library can contain cyclic references in the definition of its components.
+라이브러리는 해당 구성요소의 정의에서 순환 참조를 포함할 수 있다.
+
 For example:
 
     ???
 
-However, a library should not depend on another that depends on it.
-
+하지만 라이브러리는 다른 라이브러리에 의존성을 가지면 안된다.
