@@ -85,7 +85,7 @@
 
 C++ 프로그래머는 표준 라이브러리의 기본 내용을 반드시 이해하고 올바른 곳에 사용해야 한다.
 어떤 프로그래머든 프로젝트에 기반하고 있는 핵심 라이브러리의 기본 내용을 반드시 이해하고 있어야 하며, 올바르게 사용할 줄 알아야 한다.
-이 가이드라인을 사용하는 프로그래머는 [가이드라인 지원 라이브러리](#S-gsl)을 반드시 알아야 하고 적절히 사용할 줄 알아야 한다.
+이 가이드라인을 사용하는 프로그래머는 [가이드라인 지원 라이브러리](./GSL.md#S-gsl)을 반드시 알아야 하고 적절히 사용할 줄 알아야 한다.
 
 ##### Example
 
@@ -135,7 +135,7 @@ portability will be impacted.
 ##### Note
 
 Using valid ISO C++ does not guarantee portability (let alone correctness).
-Avoid dependence on undefined behavior (e.g., [undefined order of evaluation](#Res-order))
+Avoid dependence on undefined behavior (e.g., [undefined order of evaluation](./Expr.md#Res-order))
 and be aware of constructs with implementation defined meaning (e.g., `sizeof(int)`).
 
 ##### Note
@@ -178,7 +178,7 @@ and be aware of constructs with implementation defined meaning (e.g., `sizeof(in
     for (auto& x : v) { /* modify x */ }
 ```
 
-For more details about for-statements, see [ES.71](#Res-for-range).
+For more details about for-statements, see [ES.71](./Expr.md#Res-for-range).
 Sometimes better still, use a named algorithm. This example uses the `for_each` from the Ranges TS because it directly expresses the intent:
 
 ```c++
@@ -190,8 +190,8 @@ Sometimes better still, use a named algorithm. This example uses the `for_each` 
 
 프로그래머라면 다음에 익숙해져야 한다.
 
-* [가이드라인 지원 라이브러리](#S-gsl)
-* [ISO C++ 표준 라이브러리](#S-stdlib)
+* [가이드라인 지원 라이브러리](./GSL.md#S-gsl)
+* [ISO C++ 표준 라이브러리](./SL.md#S-stdlib)
 * 현재 프로젝트에서 사용되고 있는 모든 기본 라이브러리들
 
 ##### Note
@@ -576,7 +576,7 @@ This is particularly important for long-running programs, but is an essential pi
     }
 ```
 
-[RAII](#Rr-raii)를 사용한 개선:
+[RAII](./Resource.md#Rr-raii)를 사용한 개선:
 
 ```c++
     void f(char* name)
@@ -588,7 +588,7 @@ This is particularly important for long-running programs, but is an essential pi
     }
 ```
 
-**See also**: [리소스 관리](#S-resource)
+**See also**: [리소스 관리](./Resource.md#S-resource)
 
 ##### Note
 
@@ -601,9 +601,9 @@ However, relying on abstractions that implicitly clean up can be as simple, and 
 
 ##### Note
 
-Enforcing [the lifetime safety profile](#SS-lifetime) eliminates leaks.
-When combined with resource safety provided by [RAII](#Rr-raii), it eliminates the need for "garbage collection" (by generating no garbage).
-Combine this with enforcement of [the type and bounds profiles](#SS-force) and you get complete type- and resource-safety, guaranteed by tools.
+Enforcing [the lifetime safety profile](./Profile.md#SS-lifetime) eliminates leaks.
+When combined with resource safety provided by [RAII](./Resource.md#Rr-raii), it eliminates the need for "garbage collection" (by generating no garbage).
+Combine this with enforcement of [the type and bounds profiles](./Profile.md#SS-force) and you get complete type- and resource-safety, guaranteed by tools.
 
 ##### Enforcement
 
@@ -748,7 +748,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 우리는 우리보다 전문적이고 더 많은 시간을 투자한 사람들이 설계하고 구현한 라이브러리들을 사용한다.
 마찬가지로, 우리는 사용자들(흔히 우리 자신)을 반복적으로 낮은 수준의 코드를 얻기 쉬운 환경에 버려두지 말고,
 더 전문화된 라이브러리들을 설계하고 구현해야하고 할 수 있다.
-이것은 본 지침의 기초가 되는 [subset of superset principle](Introduction.md#R0)의 변형이다.
+이것은 본 지침의 기초가 되는 [subset of superset principle](./Introduction.md#R0)의 변형이다.
 
 ##### Enforcement
 
@@ -771,7 +771,7 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 다음을 참고하라.
 
 * [정적 분석 도구들](???)
-* [동시성 도구들](#Rconc-tools)
+* [동시성 도구들](./Concurrency.md#Rconc-tools)
 * [테스팅 도구들](???)
 
 소스코드 저장소들, 빌드 도구들등과 같은 많은 다른 종류의 도구들이 있다.
@@ -800,18 +800,18 @@ Combine this with enforcement of [the type and bounds profiles](#SS-force) and y
 ```
 
 당신이 정렬 알고리즘들에 대한 전문가이거나 시간이 많이 있지 않은 이상,
-이 코드가 당신이 특정한 응용을 위해 작성한 그 어떤 것보다 더 정확하고 빠르게 동작할 것이다.
-당신이 작성한 코드를 사용하려면, 표준 라이브러리(또는 당신의 어플리케이션이 사용하는 그 어떤 기본 라이브러리들)를 사용하지 않을 이유가 필요하다.
+이 코드는 당신이 특정한 응용을 위해 작성한 그 어떤 것보다 더 정확하고 빠르게 동작할 것이다.
+당신이 직접 작성한 코드를 사용하려면, 표준 라이브러리(또는 당신의 어플리케이션이 사용하는 그 어떤 기본 라이브러리들)를 사용하지 않을 이유가 필요하다.
 
 
 ##### Note
 
 기본적으로 사용되는 것
 
-* [ISO C++ 표쥰 라이브러리](#S-stdlib)
-* [라이브러리 지원 지침들](#S-gsl)
+* [ISO C++ 표준 라이브러리](./SL.md#S-stdlib)
+* [라이브러리 지원 지침들](./GSL.md#S-gsl)
 
 ##### Note
 
-만약에 잘 설계되고, 잘 문서화되고, 잘 지원된느 라이브러리가 중요한 도메인에 없다면,
+만약에 잘 설계되고, 잘 문서화되고, 잘 지원되는 라이브러리가 중요한 도메인에 없다면,
 아마도 당신은 그것을 설계하고 구현한 뒤, 사용해야 할 것이다.
