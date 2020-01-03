@@ -10,11 +10,10 @@ repo_url: http://github.com/CppKorea/CppCoreGuidelines
 copyright: "Copyright (c) Standard C++ Foundation and its contributors"
 
 theme:
-  name: readthedocs
+  name: "ivory"
 
 docs_dir: sections
 nav:
-  - Home: ReadMe.md
   - Introduction: Introduction.md
   - References: References.md
   - Sections:

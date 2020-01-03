@@ -1,0 +1,30 @@
+#
+# Note
+#   Travis CI will update GitHub Pages
+#
+
+notifications:
+  email:
+    - luncliff@gmail.com
+
+os: linux
+dist: bionic
+
+language: python
+python:
+  - "3.7"
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - mkdocs build
+
+deploy:
+  - provider: pages
+    github_token: ${MAINTAINER_GITHUB_TOKEN}
+    local_dir: site
+    skip_cleanup: true
+    keep_history: true
+    on:
+      branch: master
