@@ -51,7 +51,7 @@
 * [FAQ: 자주 묻는 질문에 대한 대답](./FAQ.md)
 * [Appendix A: 라이브러리](./appendix/Libraries.md)
 * [Appendix B: 모던 C++ 코드](./appendix/Modernizing.md)
-* [Appendix C: 토론](./appendix/DIscussion.md)
+* [Appendix C: 토론](./appendix/Discussion.md)
 * [Appendix D: 유용한 도구들](./appendix/Tools.md)
 * [용어 해설](./Glossary.md)
 * [To-do: 미분류 규칙](./Unclassified.md)
