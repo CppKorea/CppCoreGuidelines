@@ -32,6 +32,7 @@ theme:
 
 docs_dir: sections
 nav:
+  - Overview: home.md
   - Introduction: 
     - Introduction.md
   - References: 
@@ -41,7 +42,7 @@ nav:
     - Class: Class.md
     - Concurrency: Concurrency.md
     - Const: Const.md
-    - CPL: CPL.md
+    - C-Style: CPL.md
     - Enum: Enum.md
     - Errors: Errors.md
     - Expr: Expr.md
@@ -50,14 +51,14 @@ nav:
     - GSL: GSL.md
     - Interfaces: Interfaces.md
     - Naming: Naming.md
-    - Not: Not.md
+    - Not-Rule: Not.md
     - Performance: Performance.md
     - Philosophy: Philosophy.md
     - Profile: Profile.md
     - Resource: Resource.md
-    - SL: SL.md
+    - Standard Library: SL.md
     - Source: Source.md
-    - Template: Template.md
+    - Templates: Templates.md
     - Unclassified: Unclassified.md
   - Appendix:
     # - Discussion: appendix/Discussion.md
