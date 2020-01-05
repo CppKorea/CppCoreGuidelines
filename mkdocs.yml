@@ -1,0 +1,67 @@
+
+site_name: C++ 핵심 가이드라인
+site_description: "C++ 핵심 가이드라인 한글화 프로젝트"
+site_author: C++ Korea
+site_url: https://luncliff.github.io/CoreGuidelines
+
+repo_name: CppKorea/CppCoreGuidelines
+repo_url: http://github.com/CppKorea/CppCoreGuidelines
+
+copyright: "Copyright (c) Standard C++ Foundation and its contributors"
+
+
+markdown_extensions:
+  - codehilite:
+      guess_lang: false
+
+
+theme:
+  name: "material"
+  extra:
+    search:
+      language: "en, kr"
+  font:
+    text: "Nanum Gothic"
+    code: "Nanum Gothic Coding"
+  palette:
+    primary: "Indigo"
+    accent: "blue"
+  feature:
+    tabs: true
+  logo: "images/logo.svg"
+
+docs_dir: sections
+nav:
+  - Overview: home.md
+  - Introduction: 
+    - Introduction.md
+  - References: 
+    - References.md
+  - Sections:
+    - Architecture: Architecture.md
+    - Class: Class.md
+    - Concurrency: Concurrency.md
+    - Const: Const.md
+    - C-Style: CPL.md
+    - Enum: Enum.md
+    - Errors: Errors.md
+    - Expr: Expr.md
+    - Functions: Functions.md
+    - Glossary: Glossary.md
+    - GSL: GSL.md
+    - Interfaces: Interfaces.md
+    - Naming: Naming.md
+    - Not-Rule: Not.md
+    - Performance: Performance.md
+    - Philosophy: Philosophy.md
+    - Profile: Profile.md
+    - Resource: Resource.md
+    - Standard Library: SL.md
+    - Source: Source.md
+    - Templates: Templates.md
+    - Unclassified: Unclassified.md
+  - Appendix:
+    # - Discussion: appendix/Discussion.md
+    # - Libraries: appendix/Libraries.md
+    - Modernizing: appendix/Modernizing.md
+    - Tools: appendix/Tools.md

@@ -562,11 +562,11 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 매개변수 전달(Normal):
 
-![Normal parameter passing table](../images/param-passing-normal.png)
+![Normal parameter passing table](./images/param-passing-normal.png)
 
 매개변수 전달(Advanced):
 
-![Advanced parameter passing table](../images/param-passing-advanced.png)
+![Advanced parameter passing table](./images/param-passing-advanced.png)
 
 필요한 경우에만 고급 기술을 사용하고, 주석으로 문서화하라.
 

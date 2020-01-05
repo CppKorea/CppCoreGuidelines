@@ -857,7 +857,7 @@ C++ 에서는 기본적인 의미를 가진 연산들을 제공한다.
 
 닫지 않은 소켓은 어떨까? 소멸자, 닫기, 정리 연산은 [실패하지 않는 것이 좋다](#Rc-dtor-fail).
 그럼에도 불구하고 발생한다면, 좋은 해결책을 찾기 정말 힘든 문제를 마주친 것이다.
-초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리를 거부"를 할 수 없는지 알지 못할 것이다. 이에 대해서는 [소멸자는 실패해선 안된다(토론)](./appendix/DIscussion.md#Sd-never-fail)를 참고하라.
+초심자들은 소멸자를 작성할 때 왜 소멸자가 호출되고, 예외를 던짐으로써 "처리를 거부"를 할 수 없는지 알지 못할 것이다. 이에 대해서는 [소멸자는 실패해선 안된다(토론)](./appendix/Discussion.md#Sd-never-fail)를 참고하라.
 
 문제를 악화시키는 것은, 많은 "닫기/해제" 연산들이 재시도 할 수 없도록 되어있는 것이다.
 이 문제를 풀려는 시도는 많았지만, 일반적인 해결책은 알려지지 않았다.
@@ -996,7 +996,7 @@ C++ 에서는 기본적인 의미를 가진 연산들을 제공한다.
 
 ##### Discussion
 
-[토론](./appendix/DIscussion.md#Sd-dtor)을 함께 읽어보라.
+[토론](./appendix/Discussion.md#Sd-dtor)을 함께 읽어보라.
 
 ##### Example, bad
 
@@ -1081,7 +1081,7 @@ protected virtual 소멸자를 원하지 않는 경우를 상상해볼 수 있�
 이것은 정말 현실적인 문제가 될 수 있다: 예를 들면, 닫지 않은 소켓은 어떤가?  
 소멸자를 작성하는 사람은 왜 소멸자가 호출되고 예외를 던짐으로써 "동작을 거부하는 것"을 할 수 없는지 모른다.
 
-[토론](./appendix/DIscussion.md#Sd-dtor)을 함께보라.
+[토론](./appendix/Discussion.md#Sd-dtor)을 함께보라.
 문제를 악화시키는 것은, 많은 "close/release" 연산이 재시도할 수 없게 되어있는 것이다.
 가능하다면, close/failure에 대한 실패를 근본적인 디자인 오류로 간주하고 종료시켜라.
 
@@ -1645,7 +1645,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 (단순) 멤버 초기화 리스트는 선언과 같은 순서로 진행되어야 한다.
 
 ##### See also
-[Discussion](./appendix/DIscussion.md#Sd-order)
+[Discussion](./appendix/Discussion.md#Sd-order)
 
 ### <a name="Rc-in-class-initializer"></a>C.48: 상수 초기화는 가능한 클래스 내(in-class) 멤버 초기화를 사용하라
 
@@ -1741,7 +1741,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 
 ##### Example, better still
 
-[함수에 문자열 인수를 제시하는 보다 일반적인 방법](./Stdlib.md#Rstr-view))으로,
+[함수에 문자열 인수를 제시하는 보다 일반적인 방법](./SL.md#Rstr-view))으로,
 `const char*` 대신에 'gsl::string_span' 또는 'std::string_view'(C++17)를 사용할 수 있다.
 
     class D {   // Good
@@ -1818,7 +1818,7 @@ C++11 초기화 리스트 규칙은 많은 생성자의 필요성을 제거한�
 전통적인 팩토리 함수들은 스택이나 인접 개체보다는 자유 저장소에 생성한다.
 
 ##### See also
-[Discussion](./appendix/DIscussion.md#Sd-factory)
+[Discussion](./appendix/Discussion.md#Sd-factory)
 
 ### <a name="Rc-delegating"></a>C.51: 클래스의 모든 생성자들을 위한 일반적인 동작을 표현할 때는 대리 생성자를 사용하라
 
