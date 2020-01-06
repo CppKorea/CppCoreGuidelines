@@ -2,7 +2,7 @@
 site_name: C++ 핵심 가이드라인
 site_description: "C++ 핵심 가이드라인 한글화 프로젝트"
 site_author: C++ Korea
-site_url: https://luncliff.github.io/CoreGuidelines
+site_url: http://www.cppkorea.org/CppCoreGuidelines
 
 repo_name: CppKorea/CppCoreGuidelines
 repo_url: http://github.com/CppKorea/CppCoreGuidelines
