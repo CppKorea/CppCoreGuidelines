@@ -1,4 +1,5 @@
-# ![Guideline Logo](./images/cpp_core_guidelines_logo_text.png)
+# C++ Core Guidelines
+![Guideline Logo](./images/cpp_core_guidelines_logo_text.png)
 
 > "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다."
 > -- _비야네 스트롭스트룹 (Bjarne Stroustrup)_
