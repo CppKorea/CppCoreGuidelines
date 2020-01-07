@@ -4,8 +4,8 @@
 > "C++ 안에는 밖으로 빠져나오려고 애쓰고 있는 더 작고 단순하며 안전한 언어가 있다."
 > -- _비야네 스트롭스트룹 (Bjarne Stroustrup)_
 
-* 원문: https://github.com/isocpp/CppCoreGuidelines
-* [번역 읽어보기](./sections)
+* ISO C++ 최신버전(영문): https://github.com/isocpp/CppCoreGuidelines
+* 한글: https://www.cppkorea.org/CppCoreGuidelines
 
 ## C++ 핵심 가이드라인 한글화 프로젝트
 
