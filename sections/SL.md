@@ -83,7 +83,7 @@ C++ 표준 라이브러리의 구성 요소 요약:
 * [SL.con.1: C 배열을 사용하기보다 STL의 `array`나 `vector`를 사용하라](#Rsl-arrays)
 * [SL.con.2: 다른 컨테이너를 사용할 이유가 있지 않다면 STL `vector`를 기본으로 사용하라](#Rsl-vector)
 * [SL.con.3: 경계조건에서 발생하는 에러를 피하라](#Rsl-bounds)
-*  ???
+* [SL.con.4: trivially-copyable하지 않은 객체들을 `memset`이나 `memcpy`의 인자로 사용하지 말라](#Rsl-copy)
 
 ### <a name="Rsl-arrays"></a>SL.con.1: C 배열을 사용하기보다 STL의 `array`나 `vector`를 사용하라
 
@@ -255,6 +255,54 @@ vector 를 요소의 리스트 내용으로 초기화하려면, `{}` 초기화�
 ??? insert link to a list of banned functions
 
 이러한 규칙은 [bounds profile](#SS-bounds)의 일부분이다.
+
+### <a name="Rsl-copy"></a>SL.con.4: trivially-copyable하지 않은 객체들을 `memset`이나 `memcpy`의 인자로 사용하지 말라.
+
+##### Reason
+
+그렇게 하면 가상 함수 테이블을 저장하는 `vptr` 정보를 덮어쓰게 되어서 객체의 의미를 망칠 수 있다.
+
+##### Note
+
+(w)memset, (w)memcpy, (w)memmove, (w)memcmp도 유사한 문제가 있다.
+
+##### Example
+
+```c++
+    struct base {
+        virtual void update() = 0;
+    };
+
+    struct derived : public base {
+        void update() override {}
+    };
+
+
+    void f (derived& a, derived& b) // goodbye v-tables
+    {
+        memset(&a, 0, sizeof(derived));
+        memcpy(&a, &b, sizeof(derived));
+        memcmp(&a, &b, sizeof(derived));
+    }
+```
+
+대신 적절한 디폴트 초기화, 복사, 비교 함수를 정의하라.
+
+```c++
+    void g(derived& a, derived& b)
+    {
+        a = {};    // default initialize
+        b = a;     // copy
+        if (a == b) do_something(a,b);
+    }
+```
+
+##### Enforcement
+
+* trivially copyable하지 않은 타입에 위에서 언급했던 함수들((w)memset, (w)memcpy, (w)memmove, (w)memcmp)을 사용하면 지적하라.
+
+> 역주: [trivially copyable](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)의 자세한 정보는 링크에서 확인할 수 있으며 해당 타입이 trivially copyable한 타입인지 여부는 [std::is_trivially_copyable](https://en.cppreference.com/w/cpp/types/is_trivially_copyable)로 검사할 수 있다.
+
 
 
 ## <a name="SS-string"></a>SL.str: String
