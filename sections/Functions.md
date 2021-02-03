@@ -324,27 +324,6 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 ##### Note
 
-`constexpr` 함수는 순수 함수들이며, 부수효과(side deffect)를 가지지 않는다.
-
-```c++
-    int dcount = 0;
-    constexpr int double(int v)
-    {
-        ++dcount;   // error: attempted side effect from constexpr function
-        return v + v;
-    }
-```
-
-대체적으로 좋은 특성이다.
-
-상수가 아닌 전달인자를 사용하면, `constexpr`는 예외를 던질 수도 있다. 
-부수효과를 남기면서 종료하는 것을 고려하고 있다면, `constexpr`는 완전히 순수한 함수는 아니게 된다; 그렇지 않다면 문제가 되지 않는다.
-
-??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?  
-"No" would be a nice answer that matches most practice.
-
-##### Note
-
 모든 함수를 `constexpr`로 작성하지는 마라. 대부분의 계산은 실행시간에 최적으로 수행된다.
 
 ##### Note
@@ -512,16 +491,6 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
     template<class T>
     auto square(T t) { return t * t; }
 ```
-
-##### Note
-
-`constexpr`는 순수 함수에 속한다.
-
-상수가 아닌 전달인자를 사용하면, `constexpr`는 예외를 던질 수도 있다. 
-부수효과를 남기면서 종료하는 것을 고려하고 있다면, `constexpr`는 완전히 순수한 함수는 아니게 된다; 그렇지 않다면 문제가 되지 않는다.
-
-??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?
-"No" would be a nice answer that matches most practice.
 
 ##### Enforcement
 
