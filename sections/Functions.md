@@ -324,27 +324,6 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 ##### Note
 
-`constexpr` 함수는 순수 함수들이며, 부수효과(side deffect)를 가지지 않는다.
-
-```c++
-    int dcount = 0;
-    constexpr int double(int v)
-    {
-        ++dcount;   // error: attempted side effect from constexpr function
-        return v + v;
-    }
-```
-
-대체적으로 좋은 특성이다.
-
-상수가 아닌 전달인자를 사용하면, `constexpr`는 예외를 던질 수도 있다. 
-부수효과를 남기면서 종료하는 것을 고려하고 있다면, `constexpr`는 완전히 순수한 함수는 아니게 된다; 그렇지 않다면 문제가 되지 않는다.
-
-??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?  
-"No" would be a nice answer that matches most practice.
-
-##### Note
-
 모든 함수를 `constexpr`로 작성하지는 마라. 대부분의 계산은 실행시간에 최적으로 수행된다.
 
 ##### Note
@@ -491,7 +470,7 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 ##### See also
 
 * [전달인자가 없는 경우가 허용된다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
-* [스마트 포인터 규칙 요약](#Rr-summary-smartptrs)
+* [스마트 포인터 규칙 요약](./Resource.md#Rr-summary-smartptrs)
 
 ##### Enforcement
 
@@ -512,16 +491,6 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
     template<class T>
     auto square(T t) { return t * t; }
 ```
-
-##### Note
-
-`constexpr`는 순수 함수에 속한다.
-
-상수가 아닌 전달인자를 사용하면, `constexpr`는 예외를 던질 수도 있다. 
-부수효과를 남기면서 종료하는 것을 고려하고 있다면, `constexpr`는 완전히 순수한 함수는 아니게 된다; 그렇지 않다면 문제가 되지 않는다.
-
-??? A question for the committee: can a constructor for an exception thrown by a `constexpr` function modify state?
-"No" would be a nice answer that matches most practice.
 
 ##### Enforcement
 
@@ -699,7 +668,7 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 ```
 
 `store_somewhere()`를 호출할 때 `std::move(v)`를 사용한 결과 `v`가 값을 넘겨준(moved-from) 상태로 만든다는 점에 주의하라. 
-[이는 위험할 수도 있다](#Rc-move-semantic).
+[이는 위험할 수도 있다](./Class.md#Rc-move-semantic).
 
 ##### Exception
 
@@ -981,8 +950,8 @@ C++ 17에서는 다수의 변수들을 선언과 동시에 초기화 할 수 있
 
 ##### See also
 
-* [Support library](#S-gsl)
-* [배열을 포인터 하나로 전달하지 마라](#Ri-array)
+* [Support library](./GSL.md#S-gsl)
+* [배열을 포인터 하나로 전달하지 마라](./Interfaces.md#Ri-array)
 
 ##### Enforcement
 
@@ -1082,7 +1051,7 @@ C++ 코드에서 범위를 사용하는 경우는 무척 흔하다. 보통 그�
 
 ##### See also
 
-[Support library](#S-gsl)
+[Support library](./GSL.md#S-gsl)
 
 ##### Enforcement
 
@@ -1119,7 +1088,7 @@ Consider:
 
 ##### See also
 
-[Support library](#S-gsl)
+[Support library](./GSL.md#S-gsl)
 
 ### <a name="Rf-unique_ptr"></a>F.26: 포인터가 필요한 곳에 소유권을 전달할 때는 `unique_ptr<T>`를 사용하라
 
@@ -1129,7 +1098,7 @@ Consider:
 
 ##### See also
 
-[C.50](#Rc-factory)는 팩토리 함수에서 `shared_ptr`를 반환하는 경우를 다룬다
+[C.50](./Class.md#Rc-factory)는 팩토리 함수에서 `shared_ptr`를 반환하는 경우를 다룬다
 
 ##### Example
 
@@ -1429,7 +1398,7 @@ r-value 참조는 반환한 표현식이 끝나면 유효범위에서 사라진�
 
 이런 종류의 사용은 버그의 원인이되고, 컴파일러 버그라고 잘못 보고된다. 함수를 구현할때 사용자가 이런 함정에 빠지지 않도록 해야 한다.
 
-[수명주기 안전성 분석(profile)](#SS-lifetime)에서 이런 문제를 잡아낼 것이다(완전히 구현된다면).
+[수명주기 안전성 분석(profile)](./Profile.md#SS-lifetime)에서 이런 문제를 잡아낼 것이다(완전히 구현된다면).
 
 ##### Example
 
@@ -1628,7 +1597,7 @@ Guaranteed copy elision이 적용되면 `std::move`를 반환 구문에 사용�
 
 ##### See also
 
-[가상 함수들의 기본 인자](#Rh-virtual-default-arg)
+[가상 함수들의 기본 인자](./Class.md#Rh-virtual-default-arg)
 
 ##### Enforcement
 
