@@ -17,9 +17,10 @@ markdown_extensions:
 
 theme:
   name: "material"
+  language: "kr"
   extra:
     search:
-      language: "en, kr"
+      language: "en"
   font:
     text: "Nanum Gothic"
     code: "Nanum Gothic Coding"
