@@ -4153,8 +4153,11 @@ RTTI를 직접 구현하고자 한다면, 주의하라.
 
 ##### Example
 
-```
-    ???
+```c++
+    std::string f(Base& b)
+    {
+        return dynamic_cast<Derived&>(b).to_string();
+    }
 ```
 
 ##### Enforcement
