@@ -1261,8 +1261,20 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 
 ##### Example
 
-```
-    enable_if<???>
+```c++
+    template<typename T>
+    enable_if_t<is_integral_v<T>>
+    f(T v)
+    {
+        // ...
+    }
+
+    // Equivalent to:
+    template<Integral T>
+    void f(T v)
+    {
+        // ...
+    }
 ```
 
 ##### Note
