@@ -25,7 +25,7 @@
 * [R.11: 명시적인 `new`와 `delete` 호출을 지양하라](#Rr-newdelete)
 * [R.12: 명시적인 할당의 결과는 즉시 관리 개체에 전달하라](#Rr-immediate-alloc)
 * [R.13: 하나의 표현식 구문에서 명시적 자원 할당은 최대 한번만 수행하라](#Rr-single-alloc)
-* [R.14: ??? 배열 vs. 포인터 매개변수](#Rr-ap)
+* [R.14: `[]` 매개변수 대신 `span`을 사용하라](#Rr-ap)
 * [R.15: 할당/해제가 짝을 이루도록 중복정의하라](#Rr-pair)
 
 <a name="Rr-summary-smartptrs"></a>스마트 포인터 규칙 요약:
@@ -503,7 +503,7 @@ C++ 표준뿐만 아니라 대부분의 경우 참조는 소유를 하지 않는
 
 * 표현식 내에서 여러번의 명시적 자원 할당이 있다면 경고하라(문제: 직접적인 자원 할당을 얼마나 많이 인지할 수 있을 것인가?)
 
-### <a name="Rr-ap"></a>R.14: ??? 배열 vs. 포인터 매개변수
+### <a name="Rr-ap"></a>R.14: `[]` 매개변수 대신 `span`을 사용하라
 
 > 역주:
 > * Parameter: 매개변수
@@ -511,21 +511,22 @@ C++ 표준뿐만 아니라 대부분의 경우 참조는 소유를 하지 않는
 
 ##### Reason
 
-배열은 포인터로 축약(decay)되고, 그 결과 길이를 알 수 없게 된다. 이로 인해 범위 오류가 발생할 수 있다.
+배열은 포인터로 축약(decay)되고, 그 결과 길이를 알 수 없게 된다. 이로 인해 범위 오류가 발생할 수 있다. 크기 정보를 보존하기 위해 `span`을 사용하라.
 
 ##### Example
 
-```
-    ??? what do we recommend: f(int*[]) or f(int**) ???
-```
+```c++
+    void f(int[]);          // not recommended
 
-##### Alternative
+    void f(int*);           // not recommended for multiple objects
+                            // (a pointer should point to a single object, do not subscript)
 
-길이 정보를 유지하기 위해 `span`을 사용하라
+    void f(gsl::span<int>); // good, recommended
+```
 
 ##### Enforcement
 
-매개변수에 `[]`가 사용되면 지적하라.
+`[]` 매개변수 대신 `span`을 사용하라.
 
 ### <a name="Rr-pair"></a>R.15: 할당/해제가 짝을 이루도록 중복정의하라
 
