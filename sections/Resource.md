@@ -25,7 +25,7 @@
 * [R.11: 명시적인 `new`와 `delete` 호출을 지양하라](#Rr-newdelete)
 * [R.12: 명시적인 할당의 결과는 즉시 관리 개체에 전달하라](#Rr-immediate-alloc)
 * [R.13: 하나의 표현식 구문에서 명시적 자원 할당은 최대 한번만 수행하라](#Rr-single-alloc)
-* [R.14: [] 파라미터는 피하고 span을 사용하라](#Rr-ap)
+* [R.14: `[]` 매개변수 대신 `span`을 사용하라](#Rr-ap)
 * [R.15: 할당/해제가 짝을 이루도록 중복정의하라](#Rr-pair)
 
 <a name="Rr-summary-smartptrs"></a>스마트 포인터 규칙 요약:
