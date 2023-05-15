@@ -17,6 +17,7 @@
 * [SF.9: 소스 파일들이 순환 의존(cyclic dependencies)하게 하지마라](#Rs-cycles)
 * [SF.10: 묵시적으로 `#include`된 이름이 필요하지 않도록 하라](#Rs-implicit)
 * [SF.11: 헤더 파일은 독립적으로 사용할 수 있게(self-contained) 만들어라](#Rs-contained)
+* [SF.12: `#include`에서 상대 경로를 사용하는 파일에 대해서는 따옴표(`""`)를 사용하고 그 외에는 꺽쇠(`<>`)를 선호하라](#Rs-include-files)
 * [SF.20: `namespace`는 논리적 구조를 표현할 때 사용하라](#Rs-namespace)
 * [SF.21: 헤더에서 이름없는(anonymous) 네임스페이스를 사용하지 마라](#Rs-unnamed)
 * [SF.22: 이름없는(anonymous) 네임스페이스는 내부(internal)/노출시키지 않는(non-exported) 개체에 사용하라](#Rs-unnamed2)
@@ -499,11 +500,38 @@ Module 기능을 사용할 수 있을때 까지는 좋은 해결방법이 마땅
 
 ##### Note
 
-Failing to follow this results in difficult to diagnose errors for clients of a header.
+이를 따르지 않으면 헤더 파일의 클라이언트가 진단하기 어려운 오류가 발생할 수 있다.
+
+##### Note
+
+헤더 파일은 모든 종속성을 포함해야한다. 상대 경로를 사용할때는 C++ 구현이(implementations) 의미가 다르기 때문에 주의해야한다.
 
 ##### Enforcement
 
-A test should verify that the header file itself compiles or that a cpp file which only includes the header file compiles.
+테스트는 헤더 파일 자체가 컴파일되거나 헤더 파일만 포함한 cpp파일이 컴파일되는지 확인해야한다.
+
+### <a name="Rs-include-files"></a>SF.12: `#include`에서 상대 경로를 사용하는 파일에 대해서는 따옴표(`""`)를 사용하고 그 외에는 꺽쇠(`<>`)를 선호하라
+
+##### Reason
+이 [표준](http://eel.is/c++draft/cpp.include)은 컴파일러가 꺽쇠(`<>`)나 따옴표(`""`)문법을 사용하여 두가지 형태의 `#include`를 구현하는 유연성을 제공한다. 벤더(Vendors)들은 이를 활용하여 포함 경로를 지정하기 위해 다양한 검색 알고리즘과 방법을 사용한다.
+그러나, 상대 경로에 존재하는 파일을 `#include`문(동일한 구성요소나 프로젝트에 있는)을 통해 포함하는 경우 따옴표(`""`)를 사용하고, 그 외의 경우(가능하면) 꺽쇠(`<>`)를 사용하는 것이 좋다.
+이는 파일을 포함하는 파일과 관련된 파일의 위치(locality) 또는 다른 검색 알고리즘이 필요한 경우에 대해 명확하게 알 수 있다. 헤더가 로컬 파일에서 포함되는지, 표준 라이브러리 헤더에서 포함되는지 아니면 다른 경로(예: 다른 라이브러리 또는 공통 세트)에서 헤더가 포함되는지를 빠르고 쉽게 결정할 수 있다.
+
+##### Example
+```c++
+// foo.cpp:
+#include <string>                // From the standard library, requires the <> form
+#include <some_library/common.h> // A file that is not locally relative, included from another library; use the <> form
+#include "foo.h"                 // A file locally relative to foo.cpp in the same project, use the "" form
+#include "foo_utils/utils.h"     // A file locally relative to foo.cpp in the same project, use the "" form
+#include <component_b/bar.h>     // A file in the same project located via a search path, use the <> form
+```
+##### Note 
+Failing to follow this results in difficult to diagnose errors due to picking up the wrong file by incorrectly specifying the scope when it is included. For example, in a typical case where the #include "" search algorithm might search for a file existing at a local relative path first, then using this form to refer to a file that is not locally relative could mean that if a file ever comes into existence at the local relative path (e.g. the including file is moved to a new location), it will now be found ahead of the previous include file and the set of includes will have been changed in an unexpected way.
+Library creators should put their headers in a folder and have clients include those files using the relative path #include `<some_library/common.h>`
+
+##### Enforcement
+테스트는 따옴표(`""`)구문을 사용하여 포함된 헤더가 꺽쇠(`<>`)구문을 사용하여 포함될수 있는지 확인해야 한다.
 
 ### <a name="Rs-namespace"></a>SF.20: `namespace`는 논리적 구조를 표현할 때 사용하라
 
@@ -529,8 +557,27 @@ A test should verify that the header file itself compiles or that a cpp file whi
 
 ##### Example
 
-```
-    ???
+```c++
+// file foo.h:
+namespace
+{
+    const double x = 1.234;  // bad
+
+    double foo(double y)     // bad
+    {
+        return y + x;
+    }
+}
+
+namespace Foo
+{
+    const double x = 1.234; // good
+
+    inline double foo(double y)        // good
+    {
+        return y + x;
+    }
+}
 ```
 
 ##### Enforcement
@@ -543,6 +590,25 @@ A test should verify that the header file itself compiles or that a cpp file whi
 
 어떤 외부에서도 내부의 익명 네임스페이스에 있는 항목들에 참조할 수 없다.
 소스 파일에 정의되어 있는 모든 구현들 중 "외부에 노출되는" 항목의 정의를 뺀 나머지 모두는 익명 네임스페이스에 넣는다 생각하라.
+
+##### Example; bad
+
+```c++
+static int f();
+int g();
+static bool h();
+int k();
+```
+##### Example; good
+
+```c++
+namespace {
+    int f();
+    bool h();
+}
+int g();
+int k();
+```
 
 ##### Example
 
