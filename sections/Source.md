@@ -531,7 +531,7 @@ Failing to follow this results in difficult to diagnose errors due to picking up
 Library creators should put their headers in a folder and have clients include those files using the relative path #include `<some_library/common.h>`
 
 ##### Enforcement
-테스트는 따옴표(`""`)구문을 사용하여 포함된 헤더가 꺽쇠(`<>`)구문을 사용하여 포함될수 있는지 확인해야 한다.
+테스트는 큰따옴표(`""`) 구문을 사용해 포함된 헤더가 홑화살괄호(`<>`) 구문을 사용해 포함될 수 있는지 확인해야 한다.
 
 ### <a name="Rs-namespace"></a>SF.20: `namespace`는 논리적 구조를 표현할 때 사용하라
 
