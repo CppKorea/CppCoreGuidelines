@@ -17,7 +17,7 @@
 * [SF.9: 소스 파일들이 순환 의존(cyclic dependencies)하게 하지마라](#Rs-cycles)
 * [SF.10: 묵시적으로 `#include`된 이름이 필요하지 않도록 하라](#Rs-implicit)
 * [SF.11: 헤더 파일은 독립적으로 사용할 수 있게(self-contained) 만들어라](#Rs-contained)
-* [SF.12: `#include`에서 상대 경로를 사용하는 파일에 대해서는 따옴표(`""`)를 사용하고 그 외에는 꺽쇠(`<>`)를 선호하라](#Rs-include-files)
+* [SF.12: `#include`에서 상대 경로를 사용하는 파일은 큰따옴표(`""`)를 사용하고 그 외에는 홑화살괄호(`<>`)를 사용하라](#Rs-include-files)
 * [SF.20: `namespace`는 논리적 구조를 표현할 때 사용하라](#Rs-namespace)
 * [SF.21: 헤더에서 이름없는(anonymous) 네임스페이스를 사용하지 마라](#Rs-unnamed)
 * [SF.22: 이름없는(anonymous) 네임스페이스는 내부(internal)/노출시키지 않는(non-exported) 개체에 사용하라](#Rs-unnamed2)
