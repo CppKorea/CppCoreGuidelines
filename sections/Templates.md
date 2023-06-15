@@ -301,6 +301,48 @@ STL은 이 접근법을 사용한다.
 동적인 것은 정적인 것을 돕는다: 일반적이고, 편리하며, 정적으로 결합된(bound) 인터페이스를 제공하라. 내부적으로는 동적으로 구현하라. 그렇게 함으로써 일관적인 개체를 만들어라(offer a uniform object layout).  
 
 예시로는 `std::shared_ptr`의 제거 함수(deleter) 타입 제거를 들 수 있다. (하지만 [타입 제거를 남용하지 마라](#Rt-erasure))
+```c++
+#include <memory>
+
+class Object {
+public:
+    template<typename T>
+    Object(T&& obj)
+        : concept_(std::make_shared<ConcreteCommand<T>>(std::forward<T>(obj))) {}
+
+    int get_id() const { return concept_->get_id(); }
+
+private:
+    struct Command {
+        virtual ~Command() {}
+        virtual int get_id() const = 0;
+    };
+
+    template<typename T>
+    struct ConcreteCommand final : Command {
+        ConcreteCommand(T&& obj) noexcept : object_(std::forward<T>(obj)) {}
+        int get_id() const final { return object_.get_id(); }
+
+    private:
+        T object_;
+    };
+
+    std::shared_ptr<Command> concept_;
+};
+
+class Bar {
+public:
+    int get_id() const { return 1; }
+};
+
+struct Foo {
+public:
+    int get_id() const { return 2; }
+};
+
+Object o(Bar{});
+Object o2(Foo{});
+```
 
 ##### Note
 
@@ -319,8 +361,7 @@ STL은 이 접근법을 사용한다.
 
 ## <a name="SS-concepts"></a>T.concepts: 컨셉 규칙들
 
-컨셉(Concept)은 템플릿 인자들에 대한 요구사항을 지정하기 위한 기능이다.
-컨셉은 [ISO technical specification](#Ref-conceptsTS)이지만, 현재는 GCC만 이를 지원하고 있다.  
+컨셉(Concept)은 템플릿 인자들에 대한 요구사항을 지정하기 위한 C++ 20 기능이다.
 컨셉은 제네릭 프로그래밍에서의 사고에 중요한 역할을 하며, 미래의 (표준을 비롯한) C++ 라이브러리들의 많은 작업의 기초가 될 것이다.
 
 이 항목의 규칙들은 컨셉이 지원된다고 가정한다
@@ -515,7 +556,7 @@ TC++PL 4, Palo Alto TR, Sutton
 
 하나의 클래스나 알고리즘을 문법적으로 제약하는 것은 컨셉이 의도하는 바가 아니며, 컨셉의 메커니즘을 적용했을 때의 효율을 완전히 끌어낼 수 없다.
 
-분명, 컨셉을 정의하는 것은 컨셉 구현을 사용할 수 있는 (예컨대 GCC 6.1 이후의 버전으로 컴파일 되는) 코드에 유용할 것이다.
+분명, 컨셉을 정의하는 것은 컨셉 구현을 사용할 수 있는 (예컨대 c++20 혹은 그 이상) 코드에 유용할 것이다.
 그 이외에도 컨셉을 정의하는것 자체가 유용한 설계 기술이 될 것이며 개념 차원의 오류를 잡아내거나 구현 코드의 개념을 정리하도록 도울 것이다. 
 
 ### <a name="Rt-low"></a>T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라
@@ -660,7 +701,7 @@ TC++PL 4, Palo Alto TR, Sutton
     bool operator<(const Convenient&, const Convenient&);
     // ... and the other comparison operators ...
 
-    Minimal operator+(const Convenient&, const Convenient&);
+    Convenient operator+(const Convenient&, const Convenient&);
     // .. and the other arithmetic operators ...
 
     void f(const Convenient& x, const Convenient& y)
@@ -1370,7 +1411,7 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 ##### Example, bad
 
 ```c++
-    template<typename T, typename A = std::allocator{}>
+    template<typename T, typename A = std::allocator<T>>
         // requires Regular<T> && Allocator<A>
     class List {
     public:
@@ -1406,7 +1447,7 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
         T* suc;
     };
 
-    template<typename T, typename A = std::allocator{}>
+    template<typename T, typename A = std::allocator<T>>
         // requires Regular<T> && Allocator<A>
     class List2 {
     public:
@@ -1429,10 +1470,13 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 해당 문서에 따르면:
 "The acronym SCARY describes assignments and initializations that are Seemingly erroneous (appearing Constrained by conflicting generic parameters), but Actually work with the Right implementation (unconstrained bY the conflict due to minimized dependencies."
 
+##### Note
+이는 템플릿 매개변수에 의존하지 않는 람다에도 적용된다
 ##### Enforcement
 
 * 멤버 타입이 의존하지 않는 템플릿 매개변수가 있다면 지적한다
 * 멤버 함수가 의존하지 않는 템플릿 매개변수가 있다면 지적한다
+* 람다가 의존하지 않는 템플릿 매개변수가 있다면 지적한다
 
 ### <a name="Rt-nondependent"></a>T.62: 종속적이지 않은 클래스 템플릿 멤버들은 템플릿이 아닌 상위 클래스에 배치하라
 
@@ -1615,8 +1659,6 @@ Concept가 적용 가능해지면 이런 대안은 바로 구별될 수 있을 �
 * 함수처럼 보이는 타입 변환(cast)을 지적하라
 
 ### <a name="Rt-customization"></a>T.69: 제약없는(unqualified) 비-멤버 함수 호출은 해당 부분이 변경될 수 있도록 하려는게 아니라면 템플릿 내에서 사용하지 말아라
-
-> Inside a template, don't make an unqualified nonmember function call unless you intend it to be a customization point
 
 ##### Reason
 
