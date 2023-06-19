@@ -5,16 +5,16 @@
 C++에서는 제네릭 프로그래밍을 위한 언어적 장치로 `template`을 지원하고 있다.
 
 제네릭 프로그래밍의 함수들에 사용되는 인자들은 (일련의 요구사항에 따라서) 각각의 타입과 값이 규정된다. 
-C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 검사를 사용해 코드에 나타나도록 한다.
+C++에서는 이런 요구사항을 Concepts이라는 컴파일 시간 검사를 사용해 코드에 나타나도록 한다.
 
 템플릿은 메타프로그래밍(meta-programming)에도 사용될 수 있다; 메타프로그래밍이란, 컴파일 시간에 코드를 만들어내는(compose) 프로그램을 의미한다.
 
-제네릭 프로그래밍에서 중심이 되는 생각은 "컨셉"이다; 이는 템플릿 실행인자에 대한 요구사항들을 컴파일 시간에 검사할 수 있도록 기술하는 것이다.
+제네릭 프로그래밍에서 중심이 되는 생각은 "Concepts"이다; 이는 템플릿 실행인자에 대한 요구사항들을 컴파일 시간에 검사할 수 있도록 기술하는 것이다.
 
-"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
-그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
+"Concepts"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 Concepts들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+Concepts은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 Concepts 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
 
 템플릿 사용 규칙 요약:
 
@@ -24,35 +24,35 @@ C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 �
 * [T.4: 문법 트리 조작을 표현하기 위해 템플릿을 사용하라](#Rt-expr)
 * [T.5:  제네릭 프로그래밍과 개체지향 기술을 결합해 비용이 아닌 강점을 증폭시켜라](#Rt-generic-oo)
 
-컨셉 사용 규칙 요약:
+Concepts 사용 규칙 요약:
 
-* [T.10: 모든 템플릿 인자에 컨셉을 명시하라](#Rt-concepts)
-* [T.11: 가능한 모든 경우 표준 컨셉을 사용하라](#Rt-std-concepts)
-* [T.12: 지역 변수에 `auto` 보다는 컨셉의 이름을 사용하라](#Rt-auto)
-* [T.13: 단순하거나 단일 타입을 인자로 받는 컨셉에는 약식 표기를 사용하라](#Rt-shorthand)
+* [T.10: 모든 템플릿 인자에 Concepts을 명시하라](#Rt-concepts)
+* [T.11: 가능한 모든 경우 표준 Concepts을 사용하라](#Rt-std-concepts)
+* [T.12: 지역 변수에 `auto` 보다는 Concepts의 이름을 사용하라](#Rt-auto)
+* [T.13: 단순하거나 단일 타입을 인자로 받는 Concepts에는 약식 표기를 사용하라](#Rt-shorthand)
 * ???
 
-컨셉 정의 규칙 요약:
+Concepts 정의 규칙 요약:
 
-* [T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라](#Rt-low)
-* [T.21: 컨셉에서는 연산들의 완전한 집합(complete set)을 요구하라](#Rt-complete)
-* [T.22: 컨셉에서 쓸 수 있도록 공리를 명시하라](#Rt-axiom)
-* [T.23: 정제된 컨셉(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라](#Rt-refine)
-* [T.24: 의미구조만 다른 컨셉은 Tag 클래스 혹은 Traits를 사용해 차별화하라](#Rt-tag)
+* [T.20: 유의미한 의미구조가 없는 "Concepts"을 피하라](#Rt-low)
+* [T.21: Concepts에서는 연산들의 완전한 집합(complete set)을 요구하라](#Rt-complete)
+* [T.22: Concepts에서 쓸 수 있도록 공리를 명시하라](#Rt-axiom)
+* [T.23: 정제된 Concepts(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라](#Rt-refine)
+* [T.24: 의미구조만 다른 Concepts은 Tag 클래스 혹은 Traits를 사용해 차별화하라](#Rt-tag)
 * [T.25: 제약이 서로 대비되지 않게 하라](#Rt-not)
-* [T.26: 단순한 문법보다는 사용 패턴을 고려해서 컨셉을 정의하라](#Rt-use)
+* [T.26: 단순한 문법보다는 사용 패턴을 고려해서 Concepts을 정의하라](#Rt-use)
 * ???
 
 템플릿 인터페이스 규칙 요약:
 
 * [T.40: 알고리즘에 연산(operation)을 전달할때는 함수 개체를 사용하라](#Rt-fo)
-* [T.41: 템플릿의 컨셉에서는 오직 필요한 특성(property)만 요구하라](#Rt-essential)
+* [T.41: 템플릿의 Concepts에서는 오직 필요한 특성(property)만 요구하라](#Rt-essential)
 * [T.42: 템플릿 별칭을 구현사항을 숨기거나 표기를 간단히 할 때 사용하라](#Rt-alias)
 * [T.43: 타입에 별명을 붙일때 `typedef` 보다는 `using`을 사용하라](#Rt-using)
 * [T.44: (할 수 있다면) 함수 템플릿은 클래스 템플릿의 인자 타입을 유도(deduce)할 때 사용하라](#Rt-deduce)
 * [T.46: 템플릿 인자들은 최소한 `Regular`혹은 `SemiRegular`하도록 하라](#Rt-regular)
 * [T.47: 일반적인 이름을 가지고 있으면서 쉽게 찾을 수 있고 제약이 거의 없는 템플릿은 지양하라](#Rt-visible)
-* [T.48: 컴파일러가 컨셉을 지원하지 않는다면 `enable_if`로 유사하게 작성하라](#Rt-concept-def)
+* [T.48: 컴파일러가 Concepts을 지원하지 않는다면 `enable_if`로 유사하게 작성하라](#Rt-concept-def)
 * [T.49: 가능하다면 타입 제거는 피하라](#Rt-erasure)
 
 템플릿 정의 규칙 요약:
@@ -86,7 +86,7 @@ C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 �
 메타프로그래밍 규칙 요약:
 
 * [T.120: 정말 필요한 경우에만 템플릿 메타프로그래밍을 사용하라](#Rt-metameta)
-* [T.121: 컨셉을 모방(emulate)하기 위해 템플릿 메타프로그래밍을 사용하라](#Rt-emulate)
+* [T.121: Concepts을 모방(emulate)하기 위해 템플릿 메타프로그래밍을 사용하라](#Rt-emulate)
 * [T.122: 템플릿(대부분 템플릿 별칭)은 컴파일 시간에 타입을 계산할때 사용하라](#Rt-tmp)
 * [T.123: 컴파일 시간에 값을 계산한다면 `constexpr` 함수를 사용하라](#Rt-fct)
 * [T.124: 가능한 표준 라이브러리의 TMP 기능들을 사용하라](#Rt-std-tmp)
@@ -115,7 +115,7 @@ C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 �
 
 ##### Example, bad
 
-개념적으로, 아래 요구사항은 잘못됐다. 왜냐하면 우리가 원하는 `T`는 "증가될 수 있다"거나 "추가될 수 있다"는 하위레벨 컨셉 그 이상이다:
+개념적으로, 아래 요구사항은 잘못됐다. 왜냐하면 우리가 원하는 `T`는 "증가될 수 있다"거나 "추가될 수 있다"는 하위레벨 Concepts 그 이상이다:
 
 ```c++
     template<typename T>
@@ -151,16 +151,16 @@ C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 �
     }
 ```
 
-`Arithmetic` 컨셉이 `+`와 `+=`를 모두 요구한다고 가정하면, 우리는 `sum`의 사용자가 두 연산을 지원하는 산술 타입을 제공하도록 제약한 것이다.
+`Arithmetic` Concepts이 `+`와 `+=`를 모두 요구한다고 가정하면, 우리는 `sum`의 사용자가 두 연산을 지원하는 산술 타입을 제공하도록 제약한 것이다.
 이는 연산을 구현에 필요한 만큼만 요구한 것은 아니다, 하지만 이는 알고리즘의 구현자에게 필요한 만큼의 자유를 부여하며 `Arithmetic` 타입이 알고리즘 전반에 사용될 수 있다는 것을 보증한다.
 
-더 일반적인, 재사용 가능한 코드를 위해서, `vector`와 같은 하나의 컨테이너만 사용하는 것이 아닌 `Container`또는 `Range`와 같은 더 일반적인 컨셉을 사용하는 것도 가능하다.
+더 일반적인, 재사용 가능한 코드를 위해서, `vector`와 같은 하나의 컨테이너만 사용하는 것이 아닌 `Container`또는 `Range`와 같은 더 일반적인 Concepts을 사용하는 것도 가능하다.
 
 ##### Note
 
 만약 템플릿이 하나의 알고리즘을 구현하기 위한 정확히 하나의 연산만을 요구한다면 (예컨대 `=`와 `+`를 요구하지 않고 `+=`만 요구하는 것), 유지보수를 지나치게 제약한 것이다.
 
-우리의 의도는 템플릿 인자에 대한 요구사항을 최소화하는 것이다. 하지만 구현에서 필요한 만큼만 요구하는 것은 유의미한 컨셉일 가능성이 낮다.
+우리의 의도는 템플릿 인자에 대한 요구사항을 최소화하는 것이다. 하지만 구현에서 필요한 만큼만 요구하는 것은 유의미한 Concepts일 가능성이 낮다.
 > We aim to minimize requirements on template arguments, but the absolutely minimal requirements of an implementation is rarely a meaningful concept.
 
 ##### Note
@@ -172,15 +172,15 @@ C++에서는 이런 요구사항을 컨셉(concepts)이라는 컴파일 시간 �
 
 주석처리된 `requires`는 `concepts`를 사용하는 부분이다.
 
-"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
-그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
+"Concepts"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 Concepts들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+Concepts은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 Concepts 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
 
 ##### Enforcement
 
-* 컨셉없이 특정 연산자를 바로 사용하는 것같은, 과도하게 단순한 요구사항을 가진 알고리즘이 있다면 지적한다
-* "과도하게 단순한" 컨셉 정의가 있다면 지적하지 않는다; 더 쓸만한 컨셉을 위해 만들었을지도 모른다.
+* Concepts없이 특정 연산자를 바로 사용하는 것같은, 과도하게 단순한 요구사항을 가진 알고리즘이 있다면 지적한다
+* "과도하게 단순한" Concepts 정의가 있다면 지적하지 않는다; 더 쓸만한 Concepts을 위해 만들었을지도 모른다.
 
 ### <a name="Rt-algo"></a>T.2: 여러가지 실행인자 타입들에 적용되는 알고리즘을 표현할 때 템플릿을 사용하라
 
@@ -301,6 +301,48 @@ STL은 이 접근법을 사용한다.
 동적인 것은 정적인 것을 돕는다: 일반적이고, 편리하며, 정적으로 결합된(bound) 인터페이스를 제공하라. 내부적으로는 동적으로 구현하라. 그렇게 함으로써 일관적인 개체를 만들어라(offer a uniform object layout).  
 
 예시로는 `std::shared_ptr`의 제거 함수(deleter) 타입 제거를 들 수 있다. (하지만 [타입 제거를 남용하지 마라](#Rt-erasure))
+```c++
+#include <memory>
+
+class Object {
+public:
+    template<typename T>
+    Object(T&& obj)
+        : concept_(std::make_shared<ConcreteCommand<T>>(std::forward<T>(obj))) {}
+
+    int get_id() const { return concept_->get_id(); }
+
+private:
+    struct Command {
+        virtual ~Command() {}
+        virtual int get_id() const = 0;
+    };
+
+    template<typename T>
+    struct ConcreteCommand final : Command {
+        ConcreteCommand(T&& obj) noexcept : object_(std::forward<T>(obj)) {}
+        int get_id() const final { return object_.get_id(); }
+
+    private:
+        T object_;
+    };
+
+    std::shared_ptr<Command> concept_;
+};
+
+class Bar {
+public:
+    int get_id() const { return 1; }
+};
+
+struct Foo {
+public:
+    int get_id() const { return 2; }
+};
+
+Object o(Bar{});
+Object o2(Foo{});
+```
 
 ##### Note
 
@@ -317,42 +359,41 @@ STL은 이 접근법을 사용한다.
 
 보다 구체적인 규칙들은 위의 참조링크로 확인하라.
 
-## <a name="SS-concepts"></a>T.concepts: 컨셉 규칙들
+## <a name="SS-concepts"></a>T.concepts: Concepts 규칙들
 
-컨셉(Concept)은 템플릿 인자들에 대한 요구사항을 지정하기 위한 기능이다.
-컨셉은 [ISO technical specification](#Ref-conceptsTS)이지만, 현재는 GCC만 이를 지원하고 있다.  
-컨셉은 제네릭 프로그래밍에서의 사고에 중요한 역할을 하며, 미래의 (표준을 비롯한) C++ 라이브러리들의 많은 작업의 기초가 될 것이다.
+Concepts은 템플릿 인자들에 대한 요구사항을 지정하기 위한 C++20 기능이다.
+Concepts은 제네릭 프로그래밍에서의 사고에 중요한 역할을 하며, 미래의 (표준을 비롯한) C++ 라이브러리들의 많은 작업의 기초가 될 것이다.
 
-이 항목의 규칙들은 컨셉이 지원된다고 가정한다
+이 항목의 규칙들은 Concepts이 지원된다고 가정한다
 
-컨셉 사용 규칙 요약:
+Concepts 사용 규칙 요약:
 
-* [T.10: 모든 템플릿 인자에 컨셉을 명시하라](#Rt-concepts)
-* [T.11: 가능한 모든 경우 표준 컨셉을 사용하라](#Rt-std-concepts)
-* [T.12: 지역 변수에 `auto` 보다는 컨셉의 이름을 사용하라](#Rt-auto)
-* [T.13: 단순하거나 단일 타입을 인자로 받는 컨셉에는 약식 표기를 사용하라](#Rt-shorthand)
+* [T.10: 모든 템플릿 인자에 Concepts을 명시하라](#Rt-concepts)
+* [T.11: 가능한 모든 경우 표준 Concepts을 사용하라](#Rt-std-concepts)
+* [T.12: 지역 변수에 `auto` 보다는 Concepts의 이름을 사용하라](#Rt-auto)
+* [T.13: 단순하거나 단일 타입을 인자로 받는 Concepts에는 약식 표기를 사용하라](#Rt-shorthand)
 * ???
 
-컨셉 정의 규칙 요약:
+Concepts 정의 규칙 요약:
 
-* [T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라](#Rt-low)
-* [T.21: 컨셉에서는 연산들의 완전한 집합(complete set)을 요구하라](#Rt-complete)
-* [T.22: 컨셉에서 쓸 수 있도록 공리를 명시하라](#Rt-axiom)
-* [T.23: 정제된 컨셉(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라](#Rt-refine)
-* [T.24: 의미구조만 다른 컨셉은 Tag 클래스 혹은 Traits를 사용해 차별화하라](#Rt-tag)
+* [T.20: 유의미한 의미구조가 없는 "Concepts"을 피하라](#Rt-low)
+* [T.21: Concepts에서는 연산들의 완전한 집합(complete set)을 요구하라](#Rt-complete)
+* [T.22: Concepts에서 쓸 수 있도록 공리를 명시하라](#Rt-axiom)
+* [T.23: 정제된 Concepts(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라](#Rt-refine)
+* [T.24: 의미구조만 다른 Concepts은 Tag 클래스 혹은 Traits를 사용해 차별화하라](#Rt-tag)
 * [T.25: 제약이 서로 대비되지 않게 하라](#Rt-not)
-* [T.26: 단순한 문법보다는 사용 패턴을 고려해서 컨셉을 정의하라](#Rt-use)
+* [T.26: 단순한 문법보다는 사용 패턴을 고려해서 Concepts을 정의하라](#Rt-use)
 * ???
 
-## <a name="SS-concept-use"></a>T.con-use: 컨셉 사용(Concept use)
+## <a name="SS-concept-use"></a>T.con-use: Concepts 사용(Concept use)
 
-### <a name="Rt-concepts"></a>T.10: 모든 템플릿 인자에 컨셉을 명시하라
+### <a name="Rt-concepts"></a>T.10: 모든 템플릿 인자에 Concepts을 명시하라
 
 ##### Reason
 
 정확함과 가독성.
 템플릿 인자의 가정된 의미(문법과 의미구조)는 템플릿 인터페이스의 기본이다.
-컨셉은 문서화와 템플릿용 오류 처리를 경이적으로 개선시킨다.
+Concepts은 문서화와 템플릿용 오류 처리를 경이적으로 개선시킨다.
 템플릿 인자에 적용되는 개념을 기술하는 것은 강력한 디자인 도구가 된다.
 
 ##### Example
@@ -380,10 +421,10 @@ STL은 이 접근법을 사용한다.
 
 ##### Note
 
-"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
-그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
+"Concepts"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 Concepts들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+Concepts은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 Concepts 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다:
 
 ```c++
     template<typename Iter, typename Val>
@@ -397,7 +438,7 @@ STL은 이 접근법을 사용한다.
 
 ##### Note
 
-`typename`(또는 `auto`)는 가장 제약이 작은 컨셉이다.
+`typename`(또는 `auto`)는 가장 제약이 작은 Concepts이다.
 "이 인자는 임의의 타입이다"인 경우를 제외하곤 가능한 적게 사용되어야 한다.
 
 템플릿 메타프로그래밍 코드의 한 부분으로써 우리가 표현식 트리를 조작하고, 타입 검사를 연기할때만 필요하다.
@@ -408,29 +449,29 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Enforcement
 
-컨셉을 사용하지 않은 템플릿 타입 인자가 있다면 지적한다
+Concepts을 사용하지 않은 템플릿 타입 인자가 있다면 지적한다
 
-### <a name="Rt-std-concepts"></a>T.11: 가능한 모든 경우 표준 컨셉을 사용하라
+### <a name="Rt-std-concepts"></a>T.11: 가능한 모든 경우 표준 Concepts을 사용하라
 
 ##### Reason
 
-"표준" 컨셉(GSL과 [Ranges TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)에서 제공하는)은 우리 자신만의 컨셉을 생각할 필요가 없도록 한다. 동시에 우리가 조급하게 관리하는 것보다 더 깊이 생각한 결과물이며, 상호 동작성을 개선한다.
+"표준" Concepts(GSL과 [Ranges TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)에서 제공하는)은 우리 자신만의 Concepts을 생각할 필요가 없도록 한다. 동시에 우리가 조급하게 관리하는 것보다 더 깊이 생각한 결과물이며, 상호 동작성을 개선한다.
 
 ##### Note
 
-새로운 일반화 라이브러리를 만들지 않는 한 필요한 많은 컨셉이 이미 표준 라이브러리 안에 정의되어 있다.
+새로운 일반화 라이브러리를 만들지 않는 한 필요한 많은 Concepts이 이미 표준 라이브러리 안에 정의되어 있다.
 
 ##### Example (using TS concepts)
 
 ```c++
     template<typename T>
-        // 이런 컨셉을 정의할 필요 없다: GSL에 Sortable이 정의되어 있다
+        // 이런 Concepts을 정의할 필요 없다: GSL에 Sortable이 정의되어 있다
     concept Ordered_container = Sequence<T> && Random_access<Iterator<T>> && Ordered<Value_type<T>>;
 
     void sort(Ordered_container& s);
 ```
 
-이 `Ordered_container`는 아주 타당해 보인다. 그러나 GSL(그리고 Range TS)안에 있는 `Sortable` 컨셉과 아주 비슷하다.
+이 `Ordered_container`는 아주 타당해 보인다. 그러나 GSL(그리고 Range TS)안에 있는 `Sortable` Concepts과 아주 비슷하다.
 더 좋은가? 더 올바른가? `sort`에 대한 표준 요구사항을 정확하게 반영하고 있는가?
 `Sortable`을 사용하는 것이 더 좋고 단순하다:
 
@@ -440,24 +481,24 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Note
 
-"표준" 컨셉들은 ISO 표준화 과정에서 발전하고 있다.
+"표준" Concepts들은 ISO 표준화 과정에서 발전하고 있다.
 
 ##### Note
 
-쓸만한 컨셉을 디자인하는 것은 굉장히 어려운(challenging) 일이다.
+쓸만한 Concepts을 디자인하는 것은 굉장히 어려운(challenging) 일이다.
 
 ##### Enforcement
 
 어렵다.
 
-* 제약조건이 없는 인자, 비표준 컨셉을 쓰는 템플릿, 공리(axiom)없이 'homebrew' 컨셉을 쓰는 템플릿을 찾는다
-* 컨셉 발견 툴을 개발하라. [초기 실험](http://www.stroustrup.com/sle2010_webversion.pdf) 참조
+* 제약조건이 없는 인자, 비표준 Concepts을 쓰는 템플릿, 공리(axiom)없이 'homebrew' Concepts을 쓰는 템플릿을 찾는다
+* Concepts 발견 툴을 개발하라. [초기 실험](http://www.stroustrup.com/sle2010_webversion.pdf) 참조
 
-### <a name="Rt-auto"></a>T.12: 지역 변수에 `auto` 보다는 컨셉의 이름을 사용하라
+### <a name="Rt-auto"></a>T.12: 지역 변수에 `auto` 보다는 Concepts의 이름을 사용하라
 
 ##### Reason
 
-`auto`는 가장 약한 컨셉이다. 컨셉 이름은 단순히 `auto`만 사용하는 것 보다 더 많은 의미을 전달한다.
+`auto`는 가장 약한 Concepts이다. Concepts 이름은 단순히 `auto`만 사용하는 것 보다 더 많은 의미을 전달한다.
 
 ##### Example (using TS concepts)
 
@@ -471,7 +512,7 @@ TC++PL 4, Palo Alto TR, Sutton
 
 * ???
 
-### <a name="Rt-shorthand"></a>T.13: 단순하거나 단일 타입을 인자로 받는 컨셉에는 약식 표기를 사용하라
+### <a name="Rt-shorthand"></a>T.13: 단순하거나 단일 타입을 인자로 받는 Concepts에는 약식 표기를 사용하라
 
 > 역주: 약식 표기(shorthand notation)
 
@@ -481,7 +522,7 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Example (using TS concepts)
 
-`T`는 `Sortable` 컨셉을 만족하기 위해서는:
+`T`는 `Sortable` Concepts을 만족하기 위해서는:
 
 ```c++
     template<typename T>       // Correct but verbose: "The parameter is
@@ -498,31 +539,31 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Note
 
-"컨셉(Concepts)"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
-표준 라이브러리 컨셉들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
-컨셉은 GCC 6.1이후 버전에서 사용할 수 있다.
-그에 따라, 예시들에서 컨셉 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다.
+"Concepts"은 ISO TS에 정의되어 있다: [concepts](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4553.pdf).
+표준 라이브러리 Concepts들의 초안은 다른 ISO TS에 있다: [ranges](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf)
+Concepts은 GCC 6.1이후 버전에서 사용할 수 있다.
+그에 따라, 예시들에서 Concepts 부분은 정형화된 주석으로만 표기할 것이다. 당신이 GCC 6.1이후 버전을 사용한다면, 주석을 해제할 수 있다.
 
 ##### Enforcement
 
 * `<typename T>`과 `<class T>` 표기법을 변경할 때 짧은 단어로는 쓰기가 불가능하다
-* 처음에는 `typename`을 사용하고, 그 후에 한 종류 인자 컨셉으로 제한되는 선언이 있다면 지적한다
+* 처음에는 `typename`을 사용하고, 그 후에 한 종류 인자 Concepts으로 제한되는 선언이 있다면 지적한다
 
-## <a name="SS-concepts-def"></a>T.concepts.def: 컨셉 정의(Concept definition rules) 규칙
+## <a name="SS-concepts-def"></a>T.concepts.def: Concepts 정의(Concept definition rules) 규칙
 
-좋은 컨셉을 정의하는 것은 사소한 일이 아니다.
-컨셉은 Application 범위에서 기초적인 개념을 표현하기 위한 것이다 (그렇기 때문에 "concepts"라고 이름지어졌다).
+좋은 Concepts을 정의하는 것은 사소한 일이 아니다.
+Concepts은 Application 범위에서 기초적인 개념을 표현하기 위한 것이다 (그렇기 때문에 "concepts"라고 이름지어졌다).
 
-하나의 클래스나 알고리즘을 문법적으로 제약하는 것은 컨셉이 의도하는 바가 아니며, 컨셉의 메커니즘을 적용했을 때의 효율을 완전히 끌어낼 수 없다.
+하나의 클래스나 알고리즘을 문법적으로 제약하는 것은 Concepts이 의도하는 바가 아니며, Concepts의 메커니즘을 적용했을 때의 효율을 완전히 끌어낼 수 없다.
 
-분명, 컨셉을 정의하는 것은 컨셉 구현을 사용할 수 있는 (예컨대 GCC 6.1 이후의 버전으로 컴파일 되는) 코드에 유용할 것이다.
-그 이외에도 컨셉을 정의하는것 자체가 유용한 설계 기술이 될 것이며 개념 차원의 오류를 잡아내거나 구현 코드의 개념을 정리하도록 도울 것이다. 
+분명, Concepts을 정의하는 것은 구현을 사용할 수 있는 (예를 들어, C++20 또는 그 이후) 코드에 유용할 것이다.
+그 이외에도 Concepts을 정의하는것 자체가 유용한 설계 기술이 될 것이며 개념 차원의 오류를 잡아내거나 구현 코드의 개념을 정리하도록 도울 것이다. 
 
-### <a name="Rt-low"></a>T.20: 유의미한 의미구조가 없는 "컨셉"을 피하라
+### <a name="Rt-low"></a>T.20: 유의미한 의미구조가 없는 "Concepts"을 피하라
 
 ##### Reason
 
-컨셉은 의미적인 개념, 예를 들면, "숫자", 요소들의 "범위", 그리고 "완전히 정렬된" 같은 개념을 표현하기 위한 것이다.
+Concepts은 의미적인 개념, 예를 들면, "숫자", 요소들의 "범위", 그리고 "완전히 정렬된" 같은 개념을 표현하기 위한 것이다.
 단순한 제약조건, `+`연산자를 가진다거나, `>`연산자를 가지는 것, 처럼 독자적으로 기술되어선 의미가 없다.
 유저 코드보다는 의미있는 개념을 위한 블록을 구성하는데 사용되어야 한다.
 
@@ -552,7 +593,7 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Note
 
-컨셉의 진정한 특징은 문법 제약과 달리 의미구조를 기술하는 능력이 있다는 것이다.
+Concepts의 진정한 특징은 문법 제약과 달리 의미구조를 기술하는 능력이 있다는 것이다.
 
 ##### Example (using TS concepts)
 
@@ -582,14 +623,14 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Note
 
-다수의 연산으로 정의한 컨셉은 하나의 연산으로 정의한 컨셉보다 의도치 않은 타입을 허용할 가능성이 낮다.
+다수의 연산으로 정의한 Concepts은 하나의 연산으로 정의한 Concepts보다 의도치 않은 타입을 허용할 가능성이 낮다.
 
 ##### Enforcement
 
 * 하나의 연산으로 정의한 `concepts`이 다른 `concepts`들을 정의하는 코드 이외의 코드에서 사용되면 지적하라 
 * `enable_if`가 하나의 연산으로 정의한 `concepts`처럼 사용되고 있으면 지적하라
 
-### <a name="Rt-complete"></a>T.21: 컨셉에서는 연산들의 완전한 집합을 요구하라
+### <a name="Rt-complete"></a>T.21: Concepts에서는 연산들의 완전한 집합을 요구하라
 
 > Require a complete set of operations for a concept  
 
@@ -599,7 +640,7 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Note
 
-이 규칙은 보다 일반적인 규칙인 [컨셉은 의미구조적으로 적절해야 한다](#Rt-low)에서 파생된 것이다.
+이 규칙은 보다 일반적인 규칙인 [Concepts은 의미구조적으로 적절해야 한다](#Rt-low)에서 파생된 것이다.
 
 ##### Example, bad (using TS concepts)
 
@@ -617,7 +658,7 @@ TC++PL 4, Palo Alto TR, Sutton
 
 ##### Note
 
-이 규칙은 컨셉의 지원여부와 무관하게 적용될 수 있다.
+이 규칙은 Concepts의 지원여부와 무관하게 적용될 수 있다.
 이는 비-템플릿 코드에 적용되는 일반적인 설계 규칙이다:
 
 ```c++
@@ -660,7 +701,7 @@ TC++PL 4, Palo Alto TR, Sutton
     bool operator<(const Convenient&, const Convenient&);
     // ... and the other comparison operators ...
 
-    Minimal operator+(const Convenient&, const Convenient&);
+    Convenient operator+(const Convenient&, const Convenient&);
     // .. and the other arithmetic operators ...
 
     void f(const Convenient& x, const Convenient& y)
@@ -685,14 +726,14 @@ TC++PL 4, Palo Alto TR, Sutton
   가령, `==`를 정의하지만 `!=`를 정의하지 않거나, `+`는 정의하지만 `-`를 정의하지 않는 경우이다.
   `std::string`의 연산 집합은 "완전하지 않지만", 수정하기엔 너무 늦었다.
 
-### <a name="Rt-axiom"></a>T.22: 컨셉에서 쓸 수 있도록 공리를 명시하라
+### <a name="Rt-axiom"></a>T.22: Concepts에서 쓸 수 있도록 공리를 명시하라
 
 > 역주: 공리(axiom: 증명이 없이도 자명한 것)
 
 ##### Reason
 
-의미있고 유용한 컨셉은 의미구조에 영향을 준다.
-비형식적으로든 형식적으로든 의미구조를 표현하는 것은 컨셉을 이해할 수 있게 만든다. 동시에 개념적인 오류를 잡아내도록 한다.
+의미있고 유용한 Concepts은 의미구조에 영향을 준다.
+비형식적으로든 형식적으로든 의미구조를 표현하는 것은 Concepts을 이해할 수 있게 만든다. 동시에 개념적인 오류를 잡아내도록 한다.
 
 의미구조를 기술할 수 있다는 것은 강력한 디자인 도구이다.
 
@@ -724,16 +765,16 @@ TC++PL 4, Palo Alto TR, Sutton
 ##### Note
 
 이 문맥에서 공리는 불리언 연산식이다. 그 예로 [Palo Alto TR](#S-references)를 참조하라.
-현재 C++은 공리를 지원하지 않는다. (ISO 컨셉 TS에서도) 그래서 꽤 오래동안 주석으로 대신해야만 한다.
+현재 C++은 공리를 지원하지 않는다. (ISO Concepts TS에서도) 그래서 꽤 오래동안 주석으로 대신해야만 한다.
 나중에 언어가 지원한다면 '//'를 없애면 된다.
 
 ##### Note
 
-GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ranges TS를 참조하라.
+GSL Concepts은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ranges TS를 참조하라.
 
 ##### Exception (using TS concepts)
 
-현재 개발중인 새 "컨셉" 초기버전은 의미구조를 기술하지 않고 제약조건들을 정의하려고 한다.
+현재 개발중인 새 "Concepts" 초기버전은 의미구조를 기술하지 않고 제약조건들을 정의하려고 한다.
 좋은 의미구조는 노력과 시간이 필요하다.
 불완전한 제약조건이라도 유용할 수 있다:
 
@@ -751,13 +792,13 @@ GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ra
 
 의미구조가 잘 정의되지 않은 "개념"이라도 유용할 수 있다.
 가령, 개념을 정의하는 것은 초기 실험단계에서 몇몇 사항을 검사할 수 있도록 한다.
-다만 안정화됐다고 생각해서는 안된다. 새로운 용례가 발견되면 불완전한 컨셉은 개선될 것이다.
+다만 안정화됐다고 생각해서는 안된다. 새로운 용례가 발견되면 불완전한 Concepts은 개선될 것이다.
 
 ##### Enforcement
 
-* 컨셉 정의 주석 내에 "axiom" 단어를 찾는다
+* Concepts 정의 주석 내에 "axiom" 단어를 찾는다
 
-### <a name="Rt-refine"></a>T.23: 정제된 컨셉(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라
+### <a name="Rt-refine"></a>T.23: 정제된 Concepts(refined concept)은 더 범용적인 경우에 새로운 패턴을 더해서 차별화하라
 
 ##### Reason
 
@@ -774,18 +815,18 @@ GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ra
 ```
 
 컴파일러는 요구된 연산들에 기반해서 어떤것이 필요한 연산인지 결정(determine refinement)할 수 있다. (예제에서는 `++`에 해당한다)
-이는 타입을 구현하는 측의 부담을 줄여주는데, "컨셉을 만족하도록" 특별한 선언을 작성할 필요가 없기 때문이다.
-2개의 컨셉이 요구사항이 정확하게 동일하다면 그들은 논리적 동치라고 할 수 있다 (개선된 점이 없다).
+이는 타입을 구현하는 측의 부담을 줄여주는데, "Concepts을 만족하도록" 특별한 선언을 작성할 필요가 없기 때문이다.
+2개의 Concepts이 요구사항이 정확하게 동일하다면 그들은 논리적 동치라고 할 수 있다 (개선된 점이 없다).
 
 ##### Enforcement
 
-* 다른 컨셉과 요구사항이 정확하게 일치하는 컨셉이 있다면 지적한다. 차이를 분명하게 하고 싶다면 [T.24](#Rt-tag)를 참조하라.
+* 다른 Concepts과 요구사항이 정확하게 일치하는 Concepts이 있다면 지적한다. 차이를 분명하게 하고 싶다면 [T.24](#Rt-tag)를 참조하라.
 
-### <a name="Rt-tag"></a>T.24: 의미구조만 다른 컨셉은 Tag 클래스 혹은 Traits를 사용해 차별화하라
+### <a name="Rt-tag"></a>T.24: 의미구조만 다른 Concepts은 Tag 클래스 혹은 Traits를 사용해 차별화하라
 
 ##### Reason
 
-프로그래머가 차별화하지 않는다면, 동일한 문법을 요구하지만 의미구조가 다른 두 컨셉은 모호함을 낳는다.
+프로그래머가 차별화하지 않는다면, 동일한 문법을 요구하지만 의미구조가 다른 두 Concepts은 모호함을 낳는다.
 
 ##### Example (using TS concepts)
 
@@ -800,7 +841,7 @@ GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ra
 
 라이브러리 프로그래머가 `is_contiguous`를 적절하게 정의해야 한다.
 
-컨셉으로 Tag 클래스를 감싸면 비슷한 표현이 된다:
+Concepts으로 Tag 클래스를 감싸면 비슷한 표현이 된다:
 
 ```c++
     template<typename I> concept Contiguous = is_contiguous<I>::value;
@@ -818,8 +859,8 @@ GSL 컨셉은 잘 정의된 의미구조를 가지고 있다; Palo Alto TR과 Ra
 
 ##### Enforcement
 
-* 컴파일러는 동일한 컨셉을 애매하게 사용하는 것을 지적한다
-* 동일한 컨셉을 정의한다면 지적한다
+* 컴파일러는 동일한 Concepts을 애매하게 사용하는 것을 지적한다
+* 동일한 Concepts을 정의한다면 지적한다
 
 ### <a name="Rt-not"></a>T.25: 제약이 서로 대비되지 않게 하라
 
@@ -899,7 +940,7 @@ Now the opportunities for errors multiply.
 * `C<T>`, `!C<T>`를 같이 가진 함수들이 있다면 지적한다
 * 정반대 제약조건이 있다면 모두 지적한다
 
-### <a name="Rt-use"></a>T.26: 단순한 문법보다는 사용 패턴을 고려해서 컨셉을 정의하라
+### <a name="Rt-use"></a>T.26: 단순한 문법보다는 사용 패턴을 고려해서 Concepts을 정의하라
 
 ##### Reason
 
@@ -914,7 +955,7 @@ Now the opportunities for errors multiply.
     template<typename T> concept Equality = has_equal<T> && has_not_equal<T>;
 ```
 
-표준에서 `EqualityComparable`을 지원하는게 더 낫고 쉬울 것이라는 점은 명백하다. 하지만 - 예를 들어 - 그런 컨셉을 정의해야 한다면:
+표준에서 `EqualityComparable`을 지원하는게 더 낫고 쉬울 것이라는 점은 명백하다. 하지만 - 예를 들어 - 그런 Concepts을 정의해야 한다면:
 
 ```c++
     template<typename T> concept Equality = requires(T a, T b) {
@@ -925,7 +966,7 @@ Now the opportunities for errors multiply.
     }
 ```
 
-`Equality`의 정의 안에 무의미한 컨셉인 `has_equal`와 `has_not_equal` 2개를 정의하는 것 대신에, 위와 같은 형태를 지향하라.
+`Equality`의 정의 안에 무의미한 Concepts인 `has_equal`와 `has_not_equal` 2개를 정의하는 것 대신에, 위와 같은 형태를 지향하라.
 여기서 "무의미한"이란 `has_equal`의 의미구조를 독럽적으로(in isolation) 정의할 수 없다는 것을 의미한다.
 
 ##### Enforcement
@@ -935,7 +976,7 @@ Now the opportunities for errors multiply.
 ## <a name="SS-temp-interface"></a> 템플릿 인터페이스(Template Interfaces)
 
 지난 수년동안, 템플릿을 사용한 프로그래밍은 템플릿의 인터페이스와 구현을 분명히 구분하지 않아 고통받았다.
-컨셉 이전에는, 이 구분을 위한 언어차원의 지원이 없었다. 그러나 템플릿에 대한 인터페이스는 매우 중요한 개념- 사용자와 구현자간의 계약 -이고, 마땅히 신중하게 설계되어야 한다.
+Concepts 이전에는, 이 구분을 위한 언어차원의 지원이 없었다. 그러나 템플릿에 대한 인터페이스는 매우 중요한 개념- 사용자와 구현자간의 계약 -이고, 마땅히 신중하게 설계되어야 한다.
 
 ### <a name="Rt-fo"></a>T.40: 알고리즘에 연산(operation)을 전달할때는 함수 개체를 사용하라
 
@@ -958,10 +999,10 @@ Now the opportunities for errors multiply.
     auto z = find_if(v, Greater_than<double>(7));        // function object: carries the needed data
 ```
 
-물론 저런 함수들을 `auto` 또는 컨셉을 사용해서 일반화 할 수 있다. 예를 들어:
+물론 저런 함수들을 `auto` 또는 Concepts을 사용해서 일반화 할 수 있다. 예를 들어:
 
 ```c++
-    auto y1 = find_if(v, [](Ordered x) { return x > 7; }); // Ordered 컨셉을 만족하는 타입
+    auto y1 = find_if(v, [](Ordered x) { return x > 7; }); // Ordered Concepts을 만족하는 타입
     auto z1 = find_if(v, [](auto x) { return x > 7; });    // 해당 타입이 > 연산자를 지원하기를 기대한다
 ```
 
@@ -978,7 +1019,7 @@ Now the opportunities for errors multiply.
 * 함수 템플릿 인자에 포인터가 있다면 지적한다
 * 템플릿에 함수 포인터가 인자로 전달된다면 지적한다 (false positive의 위험이 있다)
 
-### <a name="Rt-essential"></a>T.41: 템플릿의 컨셉에서는 오직 필요한 특성(property)만 요구하라
+### <a name="Rt-essential"></a>T.41: 템플릿의 Concepts에서는 오직 필요한 특성(property)만 요구하라
 
 ##### Reason
 
@@ -1021,9 +1062,9 @@ Now the opportunities for errors multiply.
 템플릿의 정의가 바뀌고 해당 템플릿의 모든 사용코드가 다시 컴파일되어야 할 것이다.
 이는 다루기 힘든 문제고, 어떤 환경에서는 현실적이지 않다.
 
-반대로, 컨셉을 사용한 검사를 보장하지 않는 구현을 사용한다면, 컴파일 시간 오류를 뒤늦게 확인하게 될 것이다.
+반대로, Concepts을 사용한 검사를 보장하지 않는 구현을 사용한다면, 컴파일 시간 오류를 뒤늦게 확인하게 될 것이다.
 
-필수적이지 않은 템플릿 실행인자들의 속성을 컨셉을 사용해 검사하지 않는 경우, 이는 실체화 시간까지 검사를 미루게 된다.
+필수적이지 않은 템플릿 실행인자들의 속성을 Concepts을 사용해 검사하지 않는 경우, 이는 실체화 시간까지 검사를 미루게 된다.
 우리는 이 방식이 그럴만한 가치가 있는 타협(worthwhile tradeoff)이라고 생각한다.
 
 지역적이지 않고, 의존적이지 않은 이름들을(`debug` 나 `cerr` 같은) 사용하는 것은 문맥 의존적인 코드를 낳고, 이는 "원인이 분명하지 않은(mysterious)" 오류들로 이어질 수 있다는 점에 주의하라.
@@ -1250,13 +1291,13 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 
 ##### Enforcement
 
-네임스페이스에서 구체적인 타입을 사용하는 템플릿이 같이 정의되어 있다면 지적한다. (컨셉이 가능해지기 전까지는 현실적으로 실행하기 어려울 수 있다)
+네임스페이스에서 구체적인 타입을 사용하는 템플릿이 같이 정의되어 있다면 지적한다. (Concepts이 가능해지기 전까지는 현실적으로 실행하기 어려울 수 있다)
 
-### <a name="Rt-concept-def"></a>T.48: 컴파일러가 컨셉을 지원하지 않는다면 `enable_if`로 유사하게 작성하라
+### <a name="Rt-concept-def"></a>T.48: 컴파일러가 Concepts을 지원하지 않는다면 `enable_if`로 유사하게 작성하라
 
 ##### Reason
 
-컨셉 지원이 없는 상황에서 최선이다.
+Concepts 지원이 없는 상황에서 최선이다.
 `enable_if`는 조건에 따라 함수를 정의하거나 여러 함수 중 하나를 선택할때 사용할 수 있다.
 
 ##### Example
@@ -1280,7 +1321,7 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 ##### Note
 
 [complementary constraints](#T.25)에 유의하라.
-컨셉 오버로딩을 `enable_if`로 꾸미는(fake) 것은 오류에 취약한 설계 기법을 쓰도록 할 수도 있다.
+Concepts 오버로딩을 `enable_if`로 꾸미는(fake) 것은 오류에 취약한 설계 기법을 쓰도록 할 수도 있다.
 
 ##### Enforcement
 
@@ -1370,7 +1411,7 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 ##### Example, bad
 
 ```c++
-    template<typename T, typename A = std::allocator{}>
+    template<typename T, typename A = std::allocator<T>>
         // requires Regular<T> && Allocator<A>
     class List {
     public:
@@ -1406,7 +1447,7 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
         T* suc;
     };
 
-    template<typename T, typename A = std::allocator{}>
+    template<typename T, typename A = std::allocator<T>>
         // requires Regular<T> && Allocator<A>
     class List2 {
     public:
@@ -1429,10 +1470,15 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 해당 문서에 따르면:
 "The acronym SCARY describes assignments and initializations that are Seemingly erroneous (appearing Constrained by conflicting generic parameters), but Actually work with the Right implementation (unconstrained bY the conflict due to minimized dependencies."
 
+##### Note
+
+템플릿 매개변수에 의존하지 않는 람다에도 적용된다.
+
 ##### Enforcement
 
-* 멤버 타입이 의존하지 않는 템플릿 매개변수가 있다면 지적한다
-* 멤버 함수가 의존하지 않는 템플릿 매개변수가 있다면 지적한다
+* 모든 템플릿 매개 변수에 의존하지 않는 멤버 타입을 표시하라.
+* 모든 템플릿 매개 변수에 의존하지 않는 멤버 함수를 표시하라.
+* 모든 템플릿 매개 변수에 의존하지 않는 람다나 변수 템플릿을 표시하라.
 
 ### <a name="Rt-nondependent"></a>T.62: 종속적이지 않은 클래스 템플릿 멤버들은 템플릿이 아닌 상위 클래스에 배치하라
 
@@ -1615,8 +1661,6 @@ Concept가 적용 가능해지면 이런 대안은 바로 구별될 수 있을 �
 * 함수처럼 보이는 타입 변환(cast)을 지적하라
 
 ### <a name="Rt-customization"></a>T.69: 제약없는(unqualified) 비-멤버 함수 호출은 해당 부분이 변경될 수 있도록 하려는게 아니라면 템플릿 내에서 사용하지 말아라
-
-> Inside a template, don't make an unqualified nonmember function call unless you intend it to be a customization point
 
 ##### Reason
 
@@ -1961,7 +2005,7 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 분석한다.
 ```
 
 
-대안으로, 컨셉을 사용하라. [언어가 지원하지 않는 컨셉을 사용하는 방법](#Rt-emulate)을 참고하라.
+대안으로, Concepts을 사용하라. [언어가 지원하지 않는 Concepts을 사용하는 방법](#Rt-emulate)을 참고하라.
 
 ##### Example
 
@@ -1977,14 +2021,14 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 분석한다.
 
 템플릿 메타프로그래밍을 전처리 매크로로 대신하고 싶다고 느낀다면 너무 나간것이다.
 
-### <a name="Rt-emulate"></a>T.121: 컨셉을 모방(emulate)하기 위해 템플릿 메타프로그래밍을 사용하라
+### <a name="Rt-emulate"></a>T.121: Concepts을 모방(emulate)하기 위해 템플릿 메타프로그래밍을 사용하라
 
 > Use template metaprogramming primarily to emulate concepts
 
 ##### Reason
 
-컨셉 개념이 널리 사용될때까지 TMP를 사용해서 에뮬레이트해야 할 것이다.
-(컨셉에 기반한 중복정의와 같이) 컨셉이 필요한 경우(usecase)들은 보통 TMP를 사용하고 있다. 
+Concepts 개념이 널리 사용될때까지 TMP를 사용해서 에뮬레이트해야 할 것이다.
+(Concepts에 기반한 중복정의와 같이) Concepts이 필요한 경우(usecase)들은 보통 TMP를 사용하고 있다. 
 
 ##### Example
 
@@ -2000,7 +2044,7 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 분석한다.
 
 ##### Note
 
-아래 코드는 컨셉을 사용하면 엄청 쉬워진다:
+아래 코드는 Concepts을 사용하면 엄청 쉬워진다:
 
 ```c++
     void advance(RandomAccessIterator p, int n) { p += n; }
@@ -2305,7 +2349,7 @@ Double dispatch, Visitor 패턴, 어떤 함수를 호출하는지 분석한다.
 
 ##### Reason
 
-클래스가 컨셉을 만족시키는지 확인해야 한다면, 일찍 검사하는 것이 사용자들의 고통을 줄여준다.
+클래스가 Concepts을 만족시키는지 확인해야 한다면, 일찍 검사하는 것이 사용자들의 고통을 줄여준다.
 
 ##### Example
 
