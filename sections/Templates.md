@@ -1471,7 +1471,9 @@ C++ 17 에서는 이 규칙처럼 템플릿 인자들을 생성자의 실행 인
 "The acronym SCARY describes assignments and initializations that are Seemingly erroneous (appearing Constrained by conflicting generic parameters), but Actually work with the Right implementation (unconstrained bY the conflict due to minimized dependencies."
 
 ##### Note
-이는 템플릿 매개변수에 의존하지 않는 람다에도 적용된다
+
+템플릿 매개변수에 의존하지 않는 람다에도 적용된다.
+
 ##### Enforcement
 
 * 멤버 타입이 의존하지 않는 템플릿 매개변수가 있다면 지적한다
