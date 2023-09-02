@@ -1,0 +1,23 @@
+name: "Test MkDocs"
+
+on: [push, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  mkdocs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          architecture: x64
+
+      - name: "Run pip install"
+        run: >
+          python3 -m pip install -r requirements.txt
+      - name: "Run MkDocs(build)"
+        run: >
+          python3 -m mkdocs build --site-dir _site
