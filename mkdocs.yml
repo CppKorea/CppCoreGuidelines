@@ -42,10 +42,8 @@ theme:
 docs_dir: sections
 nav:
   - Overview: home.md
-  - Introduction: 
-    - Introduction.md
-  - References: 
-    - References.md
+  - Introduction: Introduction.md
+  - References: References.md
   - Sections:
     - Architecture: Architecture.md
     - Class: Class.md
