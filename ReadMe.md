@@ -5,7 +5,7 @@
 > -- _비야네 스트롭스트룹 (Bjarne Stroustrup)_
 
 * ISO C++ 최신버전(영문): https://github.com/isocpp/CppCoreGuidelines
-* 한글: https://www.cppkorea.org/CppCoreGuidelines
+* 한글: http://cppkorea.github.io/CppCoreGuidelines/
 
 ## C++ 핵심 가이드라인 한글화 프로젝트
 

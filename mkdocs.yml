@@ -2,10 +2,10 @@
 site_name: C++ 핵심 가이드라인
 site_description: "C++ 핵심 가이드라인 한글화 프로젝트"
 site_author: C++ Korea
-site_url: http://www.cppkorea.org/CppCoreGuidelines
+site_url: https://cppkorea.github.io/CppCoreGuidelines/
 
 repo_name: CppKorea/CppCoreGuidelines
-repo_url: http://github.com/CppKorea/CppCoreGuidelines
+repo_url: https://github.com/CppKorea/CppCoreGuidelines
 
 copyright: "Copyright (c) Standard C++ Foundation and its contributors"
 
@@ -42,10 +42,8 @@ theme:
 docs_dir: sections
 nav:
   - Overview: home.md
-  - Introduction: 
-    - Introduction.md
-  - References: 
-    - References.md
+  - Introduction: Introduction.md
+  - References: References.md
   - Sections:
     - Architecture: Architecture.md
     - Class: Class.md
