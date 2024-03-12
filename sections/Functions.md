@@ -470,7 +470,7 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 ##### See also
 
-* [전달인자가 없는 경우가 허용된다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
+* [전달인자가 없는 경우가 허용된다면 `T&`보다는 `T*`를 선호하라](./Expr.md/#Rf-ptr-ref)
 * [스마트 포인터 규칙 요약](./Resource.md#Rr-summary-smartptrs)
 
 ##### Enforcement
@@ -544,7 +544,7 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 ##### Exception
 
-`shared_ptr` 타입을 사용한 공유 소유권을 표현하려면 F.16-21 지침을 따르기보다는 [R.34](#Rr-sharedptrparam-owner), [R.35](#Rr-sharedptrparam) 및 [R.36](#Rr-sharedptrparam-const)을 따르세요.
+`shared_ptr` 타입을 사용한 공유 소유권을 표현하려면 F.16-21 지침을 따르기보다는 [R.34](./References.md/#Rr-sharedptrparam-owner), [R.35](./References.md/#Rr-sharedptrparam) 및 [R.36](./References.md/#Rr-sharedptrparam-const)을 따르세요.
 
 ### <a name="Rf-in"></a>F.16: "입력(in)" 매개변수는 복사 비용이 적게 드는 타입의 경우 값으로 전달하고, 그 외에는 상수 참조형으로 전달하라
 
@@ -600,7 +600,7 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 
 ##### Exception
 
-`shared_ptr` 유형을 사용하여 공유 소유권을 표현하려면 함수가 전달인자를 참조하는지 여부에 따라 [R.34](#Rr-sharedptrparam-owner) 또는 [R.36](#Rr-sharedptrparam-const)을 따르세요.
+`shared_ptr` 유형을 사용하여 공유 소유권을 표현하려면 함수가 전달인자를 참조하는지 여부에 따라 [R.34](./References.md/#Rr-sharedptrparam-owner) 또는 [R.36](./References.md/#Rr-sharedptrparam-const)을 따르세요.
 
 ### <a name="Rf-inout"></a>F.17: "입출력(in-out)" 매개변수는 비상수 참조형으로 전달하라
 
@@ -687,7 +687,7 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 
 ##### Exception
 
-"will-move-from" 매개 변수가 `shared_ptr`이면 [R.34](#Rr-sharedptrparam-owner)를 따르고 `shared_ptr`을 값으로 전달한다.
+"will-move-from" 매개 변수가 `shared_ptr`이면 [R.34](./References.md/#Rr-sharedptrparam-owner)를 따르고 `shared_ptr`을 값으로 전달한다.
 
 ##### Enforcement
 
