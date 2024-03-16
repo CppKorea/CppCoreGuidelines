@@ -544,7 +544,7 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 ##### Exception
 
-`shared_ptr` 타입을 사용한 공유 소유권을 표현하려면 F.16-21 지침을 따르기보다는 [R.34](./References.md/#Rr-sharedptrparam-owner), [R.35](./References.md/#Rr-sharedptrparam) 및 [R.36](./References.md/#Rr-sharedptrparam-const)을 따르세요.
+`shared_ptr` 타입을 사용한 공유 소유권을 표현하려면 F.16-21 지침을 따르기보다는 [R.34](./References.md/#Rr-sharedptrparam-owner), [R.35](./References.md/#Rr-sharedptrparam) 및 [R.36](./References.md/#Rr-sharedptrparam-const)을 참고하라.
 
 ### <a name="Rf-in"></a>F.16: "입력(in)" 매개변수는 복사 비용이 적게 드는 타입의 경우 값으로 전달하고, 그 외에는 상수 참조형으로 전달하라
 
