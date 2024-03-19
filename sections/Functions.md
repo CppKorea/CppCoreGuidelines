@@ -600,7 +600,7 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 
 ##### Exception
 
-`shared_ptr` 유형을 사용하여 공유 소유권을 표현하려면 함수가 전달인자를 참조하는지 여부에 따라 [R.34](./References.md/#Rr-sharedptrparam-owner) 또는 [R.36](./References.md/#Rr-sharedptrparam-const)을 따르세요.
+`shared_ptr` 타입을 사용하여 공유 소유권을 표현하려면 함수가 전달인자를 참조하는지 여부에 따라 [R.34](./References.md/#Rr-sharedptrparam-owner) 또는 [R.36](./References.md/#Rr-sharedptrparam-const)를 참고하라.
 
 ### <a name="Rf-inout"></a>F.17: "입출력(in-out)" 매개변수는 비상수 참조형으로 전달하라
 
