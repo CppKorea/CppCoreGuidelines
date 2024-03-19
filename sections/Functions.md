@@ -1601,7 +1601,7 @@ Guaranteed copy elision이 적용되면 `std::move`를 반환 구문에 사용�
 
 ##### Enforcement
 
-* `const` 반환 값을 지적한다. `const`를 제거하도록 권한다.
+* `const` 값을 반환에 사용하면 지적한다. `const`를 제거하도록 권한다.
 
 ### <a name="Rf-capture-vs-overload"></a>F.50: 함수를 쓸 수 없을 때는 람다를 사용하라(지역 변수를 캡쳐하거나 지역 함수를 작성할 때)
 
