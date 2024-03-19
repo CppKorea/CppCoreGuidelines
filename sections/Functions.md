@@ -35,6 +35,7 @@
 * [F.19: "전달(forward)" 매개변수는 `TP&&`타입과 `std::forward`로만 전달하라](#Rf-forward)
 * [F.20: "출력(out)"에는 매개변수보다는 값을 반환하는 방법을 선호하라](#Rf-out)
 * [F.21: "출력"값 여러 개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
+* [F.60: "인자가 없을 경우(no argument)"를 허용한다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
 매개변수 전달 의미구조(parameter passing semantic) 규칙:
 
@@ -44,7 +45,6 @@
 * [F.25: C 스타일 문자열에는 `zstring` 혹은 `not_null<zstring>`을 사용하라](#Rf-zstring)
 * [F.26: 포인터가 필요한 곳에 소유권을 전달할 때는 `unique_ptr<T>`를 사용하라](#Rf-unique_ptr)
 * [F.27: 소유권을 공유할 때는 `shared_ptr<T>`를 사용하라](#Rf-shared_ptr)
-* [F.60: "인자가 없을 경우"를 허용한다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
 <a name="Rf-value-return"></a>값 반환 의미구조 규칙:
 
@@ -55,6 +55,7 @@
 * [F.46: `main()`는 `int`를 반환해야 한다](#Rf-main)
 * [F.47: 대입 연산자는 `T&`를 반환하라](#Rf-assignment-op)
 * [F.48: `return std::move(local)`은 사용하지 말아라](#Rf-return-move-local)
+* [F.49: `const T`는 `return`에 사용하지 말아라](#Rf-return-const)
 
 기타 함수 규칙:
 
@@ -469,7 +470,7 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 ##### See also
 
-* [전달인자가 없는 경우가 허용된다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
+* [전달인자가 없는 경우가 허용된다면 `T&`보다는 `T*`를 선호하라](./Expr.md/#Rf-ptr-ref)
 * [스마트 포인터 규칙 요약](./Resource.md#Rr-summary-smartptrs)
 
 ##### Enforcement
@@ -539,6 +540,12 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
 
 필요한 경우에만 고급 기술을 사용하고, 주석으로 문서화하라.
 
+문자열 전달은 [String](./SL.md#SS-string) 참고.
+
+##### Exception
+
+`shared_ptr` 타입을 사용한 공유 소유권을 표현하려면 F.16-21 지침을 따르기보다는 [R.34](./References.md/#Rr-sharedptrparam-owner), [R.35](./References.md/#Rr-sharedptrparam) 및 [R.36](./References.md/#Rr-sharedptrparam-const)을 참고하라.
+
 ### <a name="Rf-in"></a>F.16: "입력(in)" 매개변수는 복사 비용이 적게 드는 타입의 경우 값으로 전달하고, 그 외에는 상수 참조형으로 전달하라
 
 ##### Reason
@@ -578,39 +585,22 @@ C++14 에서는 이와 같이 작성할 수 있다. C++ 11 환경이라면, `fac
     void sink(unique_ptr<widget>);  // input only, and moves ownership of the widget
 ```
 
-아래와 같은 "난해한 기술"은 지양하라:
-
-* "효율적이라서" 인자를 `T&&`로 전달한다. `&&`로 전달함으로써 발생하는 성능 향상에 대한 루머는 잘못되었고 깨지기 쉽다(속단하지 말고 [F.18](#Rf-consume)와 [F.19](#Rf-forward)를 참고하라)
-* 대입에서 `const T&`를 반환하거나 비슷한 연산을 수행한다 ([F.47](#Rf-assignment-op) 참고)
-
-##### Example
-
-`Matrix`가 이동 연산을 지원한다고 가정하자(아마도 원소들을 `std::vector`에 보관하고 있다):
-
-```c++
-    Matrix operator+(const Matrix& a, const Matrix& b)
-    {
-        Matrix res;
-        // ... fill res with the sum ...
-        return res;
-    }
-
-    Matrix x = m1 + m2;  // move constructor
-
-    y = m3 + m3;         // move assignment
-```
+"효율적이라서" 인자를 `T&&`로 전달한다. `&&`로 전달함으로써 발생하는 성능 향상에 대한 루머는 잘못되었고 깨지기 쉽다(속단하지 말고 [F.18](#Rf-consume)와 [F.19](#Rf-forward)를 참고하라)
 
 ##### Notes
 
-반환 값 최적화는 대입에 대해서는 동작하지 않지만, 이동 대입의 경우에는 적용된다.
 참조는 언어 규칙에 의해 유효한 개체를 가리킨다고 가정하기 때문에, null 참조는 발생하지 않는다.
 optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::optional` 혹은 "값이 없음"을 의미하는 특별한 값을 사용하라.
 
 ##### Enforcement
 
-* (쉬움) (기본 사항) 인자의 크기가 `4 * sizeof(int)` 보다 크면 경고한다. `const` 참조를 전달하도록 제안한다
-* (쉬움) (기본 사항) `const` 참조로 전달되는 인자의 크기가 `3 * sizeof(int)`보다 작다면 경고한다. 값 전달을 대신 사용하도록 제안한다
-* (쉬움) (기본 사항) `const` 참조 매개변수가 `move`되면 경고한다
+* (쉬움) (기본 사항) 인자의 크기가 `2 * sizeof(void*)` 보다 크면 경고한다. 대신 `const` 참조를 전달하도록 제안한다.
+* (쉬움) (기본 사항) `const` 참조로 전달되는 인자의 크기가 `2 * sizeof(void*)` 이하면 경고한다. 대신 값을 전달하도록 제안한다.
+* (쉬움) (기본 사항) `const` 참조 매개변수가 `move`되면 경고한다.
+
+##### Exception
+
+`shared_ptr` 타입을 사용하여 공유 소유권을 표현하려면 함수가 전달인자를 참조하는지 여부에 따라 [R.34](./References.md/#Rr-sharedptrparam-owner) 또는 [R.36](./References.md/#Rr-sharedptrparam-const)를 참고하라.
 
 ### <a name="Rf-inout"></a>F.17: "입출력(in-out)" 매개변수는 비상수 참조형으로 전달하라
 
@@ -622,6 +612,18 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 
 ```c++
     void update(Record& r);  // assume that update writes to r
+```
+
+##### Note
+
+일부 사용자 정의 및 표준 라이브러리 타입은 `span<T>`나 반복자와 같이 [복사 비용이 저렴](#Rf-in)하고 값으로 전달될 수 있지만, 변경 가능한(in-out) 참조 의미론(semantics)을 가지고 있다:
+
+```c++
+    void increment_all(span<int> a)
+    {
+    for (auto&& e : a)
+        ++e;
+    }
 ```
 
 ##### Note
@@ -649,7 +651,7 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 ##### Enforcement
 
 * (중간) (기본 사항) 함수 내에서 값을 변경하지 않는 비 `const` 참조를 경고한다
-* (쉬움) (기본 사항) `const` 참조 매개변수가 `move`되면 경고한다
+* (쉬움) (기본 사항) 비 `const` 참조 매개변수가 `move`되면 경고한다
 
 ### <a name="Rf-consume"></a>F.18: "넘겨주는(will-move-from)" 매개변수는 `X&&`타입과 `std::move`로 전달하라
 
@@ -683,6 +685,10 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
     }   // p gets destroyed
 ```
 
+##### Exception
+
+"will-move-from" 매개 변수가 `shared_ptr`이면 [R.34](./References.md/#Rr-sharedptrparam-owner)를 따르고 `shared_ptr`을 값으로 전달한다.
+
 ##### Enforcement
 
 * 모든 `std::move`없이 `X&&` 매개변수를 사용하면 지적한다 (이때 `X`는 템플릿 인자가 아니다)
@@ -699,18 +705,33 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 
 ##### Example
 
-```c++
-    template <class F, class... Args>
-    inline auto invoke(F f, Args&&... args) {
-        return f(forward<Args>(args)...);
-    }
+일반적으로 모든 정적 제어 흐름 경로에서 전체 매개변수(또는 `...`을 사용하는 인자묶음(parameter pack))를 정확히 한 번 전달합니다:
 
-    ??? calls ???
+```c++
+    template<class F, class... Args>
+    inline decltype(auto) invoke(F&& f, Args&&... args)
+    {
+        return forward<F>(f)(forward<Args>(args)...);
+    }
+```
+
+##### Example
+
+때로는 모든 정적 제어 흐름 경로에서 복합 매개 변수의 각 하위 개체를 한 번씩 전달할 수 있습니다:
+
+```c++
+    template<class PairLike>
+    inline auto test(PairLike&& pairlike)
+    {
+        // ...
+        f1(some, args, and, forward<PairLike>(pairlike).first);           // forward .first
+        f2(and, forward<PairLike>(pairlike).second, in, another, call);   // forward .second
+    }
 ```
 
 ##### Enforcement
 
-* 모든 정적 경로에 대해 단 한번 `std::forward`하는 경우를 제외하고 `TP&&` 매개변수를 받는 함수를 지적한다 (`TP`는 템플릿 인자의 이름이다). 
+* 모든 정적 경로에 대해 단 한번 `std::forward`하는 경우를 제외하고 `TP&&` 매개변수를 받는 함수를 지적한다. (`TP`는 템플릿 인자의 이름이다) 또는 `std::forward`을 한 번 이상 수행하지만 정적 경로마다 정확히 한 번씩 다른 데이터 멤버로 자격을 부여한다.
 
 ### <a name="Rf-out"></a>F.20: "출력(out)"에는 매개변수보다는 값을 반환하는 방법을 선호하라
 
@@ -736,28 +757,32 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 
 (각각의 이동 비용이 크지 않은) 멤버를 많이 가진 `struct`는 전체적으로는 이동 비용이 클 수 있다.
 
-`const` 값을 반환하는 것은 추천하지 않는다. 오래된 조언들은 무의미하다: 의미도 없고 이동 의미구조를 방해한다.
-
-```c++
-    const vector<int> fct();    // bad: that "const" is more trouble than it is worth
-
-    vector<int> g(const vector<int>& vx)
-    {
-        // ...
-        fct() = vx;   // prevented by the "const"
-        // ...
-        return fct(); // expensive copy: move semantics suppressed by the "const"
-    }
-```
-
-반환 값에 `const`를 사용하는 것은 임시 변수에 대한 (굉장히 드문) 우발적 접근을 막기 위한 것이다.
-전달 인자에 `const`가 사용되면 (매우 자주 발생하는) 이동 의미구조를 막는다.
-
 ##### Exceptions
 
 * 상속 계층구조에 속한 타입처럼 값 타입이 아닌 경우, 개체를 `unique_ptr` 혹은 `shared_ptr`로 반환하라
-* 많약 값의 이동 비용이 크다면 (`array<BigPOD>` 같은 경우), 자유 저장소에 할당하고 그 핸들을 (`unique_ptr`와 같은) 반환하는 것을 고려하라. 또는 `const`가 아닌 참조(출력 매개변수)를 전달해 개체를 채워넣도록 하라
+* 많약 값의 이동 비용이 크다면 (`array<BigTrivial>` 같은 경우), 자유 저장소에 할당하고 그 핸들을 (`unique_ptr`와 같은) 반환하는 것을 고려하라. 또는 `const`가 아닌 참조(출력 매개변수)를 전달해 개체를 채워넣도록 하라
 * 최대 크기(capacity)를 가진 개체(예를 들어 `std::string`, `std::vector`)를 여러 함수 호출과정에서 재사용하고자 한다면, [입출력 매개변수로 참조를 전달하라](#Rf-out-multi).
+
+##### Example
+
+`Matrix`가 이동 연산을 지원한다고 가정하자(아마도 원소들을 `std::vector`에 보관하고 있다):
+
+```c++
+    Matrix operator+(const Matrix& a, const Matrix& b)
+    {
+        Matrix res;
+        // ... fill res with the sum ...
+        return res;
+    }
+
+    Matrix x = m1 + m2;  // move constructor
+
+    y = m3 + m3;         // move assignment
+```
+
+##### Notes
+
+반환 값 최적화는 대입에 대해서는 동작하지 않지만, 이동 대입의 경우에는 적용된다.
 
 ##### Example
 
@@ -777,15 +802,12 @@ optional 값에 대해 알고 있다면, 포인터를 사용하거나, `std::opt
 ##### Enforcement
 
 * 큰 비용 없이 반환할 수 있으면서 값을 변경하기 전에 사용하는 비 `const` 참조 매개변수를 지적하라; 이들은 "출력" 반환 값이 적절하다.
-* `const` 반환 값을 지적한다. `const`를 제거하도록 권한다
 
 ### <a name="Rf-out-multi"></a>F.21: "출력"값 여러 개를 반환할 때는 튜플이나 구조체를 선호하라
 
 ##### Reason
 
-반환 값은 그 자체로 문서가 필요하지 않고 "출력 전용"으로 사용된다.
-C++ 에서는 다수의 값을 반환할때는 `tuple`(`pair`를 포함해)를 쓴다는 것을 기억하라, 호출한 지점에서 `tie`를 사용해 받을 것이다.
-반환 값에 의미구조가 있다면 별도의 struct 타입을 사용하라. 그렇지 않다면 일반적인 코드에서는 (이름 없는) `tuple`이 유용하다.
+반환 값은 그 자체로 문서가 필요하지 않고 "출력 전용"으로 사용된다. C++ 에서는 다수의 값을 반환할때는 튜플과 유사한 유형(`struct`, `array`, `tuple` 등)를 쓴다는 것을 기억하라, 호출한 지점에서 구조화된 바인딩(structured bindings)(C++17)을 추가로 편리하게 사용할 수 있다. 반환 값에 의미구조가 있다면 별도의 `struct` 타입을 사용하라. 그렇지 않다면 일반적인 코드에서는 (이름 없는) `tuple`이 유용하다.
 
 ##### Example
 
@@ -799,38 +821,32 @@ C++ 에서는 다수의 값을 반환할때는 `tuple`(`pair`를 포함해)를 �
     }
 
     // GOOD: self-documenting
-    tuple<int, string> f(const string& input)
+    struct f_result { int status; string data; };
+
+    f_result f(const string& input)
     {
         // ...
-        return make_tuple(status, something());
+        return {status, something()};
     }
 ```
 
-사실, C++98의 표준 라이브러리에서는 `pair`가 개체 2개를 묶은 `tuple`과 같기 때문에 이 기능을 편리하게 사용하고 있었다.
-
-예를 들어, `set<string> my_set`이 주어졌다고 가정하면:
+C++98의 표준 라이브러리에서는 일부 함수에서 `pair`를 반환하는 스타일을 사용했다. 예를 들어, `set<string> my_set`이 주어졌다고 가정하면:
 
 ```c++
     // C++98
-    result = my_set.insert("Hello");
-    if (result.second) do_something_with(result.first);    // workaround
-```
-
-C++11에서는 이렇게 작성할 수 있다, 결과값들을 이미 존재하는 지역변수에 대입한다:
-
-```c++
-    Sometype iter;                                // default initialize if we haven't already
-    Someothertype success;                        // used these variables for some other purpose
-
-    tie(iter, success) = my_set.insert("Hello");   // normal return value
-    if (success) do_something_with(iter);
+    pair<set::iterator, bool> result = my_set.insert("Hello");
+    if (result.second)
+        do_something_with(result.first);    // workaround    
 ```
 
 C++ 17에서는 다수의 변수들을 선언과 동시에 초기화 할 수 있는 "structured bindings"을 지원한다:
 
 ```c++
-    if (auto [ iter, success ] = my_set.insert("Hello"); success) do_something_with(iter);
+    if (auto [ iter, success ] = my_set.insert("Hello"); success)
+        do_something_with(iter);
 ```
+
+모던 C++에서는 의미 있는 이름을 가진 `struct`가 더 일반적입니다. 예를 들어 `ranges::min_max_result`, `from_chars_result` 등을 참조.
 
 ##### Exception
 
@@ -856,16 +872,18 @@ C++ 17에서는 다수의 변수들을 선언과 동시에 초기화 할 수 있
 비교를 위해, 값을 반환하는 방법으로 해결한다면 아래와 같이 작성하게 될 것이다:
 
 ```c++
-    pair<istream&, string> get_string(istream& is);  // not recommended
+    struct get_string_result { istream& in; string s; };
+
+    get_string_result get_string(istream& in)  // not recommended
     {
         string s;
-        is >> s;
-        return {is, s};
+        in >> s;
+        return { in, move(s) };
     }
 
-    for (auto p = get_string(cin); p.first; ) {
-        // do something with p.second
-    }
+    for (auto [in, s] = get_string(cin); in; s = get_string(in).s) {
+        // do something with string
+    }    
 ```
 
 생각보다 아름답지 않고 성능에도 좋지 않다.
@@ -892,11 +910,73 @@ C++ 17에서는 다수의 변수들을 선언과 동시에 초기화 할 수 있
 
 추상화가 아닌 독립적인 존재들(independent entities)을 표현할 때는 `pair`와 `tuple`은 필요 이상으로 범용적(overly-generic)일 수 있다.
 
-다른 예로는, `tuple`대신 특정 타입과 비슷한 `variant<T, error_code>`를 사용하라. 
+다른 옵션은 `pair`와 `tuple`이 아닌 `optional<T>` 또는 `expected<T, error_code>`를 사용하는 것입니다. 적절하게 사용될 때 이러한 타입은 `pair<T, bool>` 또는 `pair<T, error_code>`보다 멤버들의 의도에 대한 더 많은 정보를 전달한다.
+
+##### Note
+
+반환할 개체가 복사 비용이 많이 드는 로컬 변수에서 초기화되는 경우 명시적인 `move`가 복사를 피하는 데 도움이 될 수 있다:
+
+```c++
+    pair<LargeObject, LargeObject> f(const string& input)
+    {
+        LargeObject large1 = g(input);
+        LargeObject large2 = h(input);
+        // ...
+        return { move(large1), move(large2) }; // no copies
+    }
+```
+
+다른 방법으로는,
+
+```c++
+    pair<LargeObject, LargeObject> f(const string& input)
+    {
+        // ...
+        return { g(input), h(input) }; // no copies, no moves
+    }
+```
+##### Note
+
+이는 [ES.56](#Res-move)의 `return move(...)` 안티 패턴과 다르다.
 
 ##### Enforcement
 
 * 출력 목적의 매개변수는 반환값으로 대체되어야 한다. 출력 매개변수는 함수(멤버함수 포함)에서 값을 변경하는 `const`가 아닌 매개변수를 의미한다.
+* 가능하다면 `pair` 또는 `tuple` 반환 유형은 `struct`로 대체되어야 한다. 변형 템플릿에서는 `tuple`을 사용할 수 밖에 없다.
+
+### <a name="Rf-ptr-ref"></a>F.60: "인자가 없을 경우(no argument)"를 허용한다면 `T&`보다는 `T*`를 선호하라
+
+##### Reason
+
+포인터(`T*`)는 `nullptr`일 수 있지만, 참조(`T&`)는 그렇지 않다.
+경우에 따라서는 "개체 없음"을 표시하기 위해 `nullptr`를 사용하는 것이 유용할 수 있다. 그렇지 않다면, 참조가 더 간단하고 좋은 코드로 이어질 것이다.
+
+##### Example
+
+```c++
+    string zstring_to_string(zstring p) // zstring is a char*; that is a C-style string
+    {
+        if (!p) return string{};    // p might be nullptr; remember to check
+        return string{p};
+    }
+
+    void print(const vector<int>& r)
+    {
+        // r refers to a vector<int>; no check needed
+    }
+```
+
+##### Note
+
+가능하기는 하지만, C++에서 `nullptr`인 개체를 생성하는 것은 정상적(valid)이지 않다(예를 들어, `T* p = nullptr; T& r = (T&)*p;`). 그런 오류는 굉장히 드물다(very uncommon).
+ 
+##### Note
+
+포인터 표기법을 선호한다면 (`.`보다는 `->` 혹은 `*`가 좋다면),  `not_null<T*>`이 `T&`처럼 사용될 수 있다.
+
+##### Enforcement
+
+???
 
 ### <a name="Rf-ptr"></a>F.22: T* 혹은 owner<T*>를 단일 개체를 지정하기 위해 사용하라
 
@@ -1158,41 +1238,6 @@ Consider:
 ##### Enforcement
 
 (실행 불가) 제대로 탐지하기엔 너무 복잡한 패턴을 띄고 있다.
-
-### <a name="Rf-ptr-ref"></a>F.60: "인자가 없을 경우"를 허용한다면 `T&`보다는 `T*`를 선호하라
-
-##### Reason
-
-포인터(`T*`)는 `nullptr`일 수 있지만, 참조(`T&`)는 그렇지 않다.
-경우에 따라서는 "개체 없음"을 표시하기 위해 `nullptr`를 사용하는 것이 유용할 수 있다. 그렇지 않다면, 참조가 더 간단하고 좋은 코드로 이어질 것이다.
-
-##### Example
-
-```c++
-    string zstring_to_string(zstring p) // zstring is a char*; that is a C-style string
-    {
-        if (!p) return string{};    // p might be nullptr; remember to check
-        return string{p};
-    }
-
-    void print(const vector<int>& r)
-    {
-        // r refers to a vector<int>; no check needed
-    }
-```
-
-##### Note
-
-
-가능하기는 하지만, C++에서 `nullptr`인 개체를 생성하는 것은 정상적(valid)이지 않다(예를 들어, `T* p = nullptr; T& r = (T&)*p;`). 그런 오류는 굉장히 드물다(very uncommon).
- 
-##### Note
-
-포인터 표기법을 선호한다면 (`.`보다는 `->` 혹은 `*`가 좋다면),  `not_null<T*>`이 `T&`처럼 사용될 수 있다.
-
-##### Enforcement
-
-???
 
 ### <a name="Rf-return-ptr"></a>F.42: 위치를 나타내는 경우에만 `T*`를 반환하라
 
@@ -1526,6 +1571,37 @@ Guaranteed copy elision이 적용되면 `std::move`를 반환 구문에 사용�
 ##### Enforcement
 
 반환 구문을 검사하는 도구에 의해서 검사되어야 한다.
+
+### <a name="Rf-return-const"></a>F.49: `const T`는 함수의 반환 타입으로 사용하지 말아라
+
+##### Reason
+
+`const` 값을 반환하는 것은 추천하지 않는다. 오래된 조언들은 무의미하다; 의미도 없고 이동 의미구조를 방해한다.
+
+##### Example
+
+```c++
+    const vector<int> fct();    // bad: that "const" is more trouble than it is worth
+
+    vector<int> g(const vector<int>& vx)
+    {
+        // ...
+        fct() = vx;   // prevented by the "const"
+        // ...
+        return fct(); // expensive copy: move semantics suppressed by the "const"
+    }
+```
+
+반환 값에 `const`를 사용하는 것은 임시 변수에 대한 (굉장히 드문) 우발적 접근을 막기 위한 것이다.
+전달 인자에 `const`가 사용되면 (매우 자주 발생하는) 이동 의미구조를 막는다.
+
+##### See also
+
+[F.20: 출력 값 "out"에 대한 일반 항목](#Rf-out)
+
+##### Enforcement
+
+* `const` 값을 반환에 사용하면 지적한다. `const`를 제거하도록 권한다.
 
 ### <a name="Rf-capture-vs-overload"></a>F.50: 함수를 쓸 수 없을 때는 람다를 사용하라(지역 변수를 캡쳐하거나 지역 함수를 작성할 때)
 
