@@ -1572,7 +1572,7 @@ Guaranteed copy elision이 적용되면 `std::move`를 반환 구문에 사용�
 
 반환 구문을 검사하는 도구에 의해서 검사되어야 한다.
 
-### <a name="Rf-return-const"></a>F.49: `return const T`는 사용하지 말아라
+### <a name="Rf-return-const"></a>F.49: `const T`는 함수의 반환 타입으로 사용하지 말아라
 
 ##### Reason
 
