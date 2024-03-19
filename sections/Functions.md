@@ -910,7 +910,7 @@ C++ 17에서는 다수의 변수들을 선언과 동시에 초기화 할 수 있
 
 추상화가 아닌 독립적인 존재들(independent entities)을 표현할 때는 `pair`와 `tuple`은 필요 이상으로 범용적(overly-generic)일 수 있다.
 
-다른 옵션은 `pair`와 `tuple`이 아닌 `optional<T>` 또는 `expected<T, error_code>`를 사용하는 것입니다. 적절하게 사용될 때 이러한 유형은 `pair<T, bool>` 또는 `pair<T, error_code>`보다 멤버들이 무엇을 의미하는지에 대한 더 많은 정보를 전달한다.
+다른 옵션은 `pair`와 `tuple`이 아닌 `optional<T>` 또는 `expected<T, error_code>`를 사용하는 것입니다. 적절하게 사용될 때 이러한 타입은 `pair<T, bool>` 또는 `pair<T, error_code>`보다 멤버들의 의도에 대한 더 많은 정보를 전달한다.
 
 ##### Note
 
