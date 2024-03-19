@@ -55,7 +55,7 @@
 * [F.46: `main()`는 `int`를 반환해야 한다](#Rf-main)
 * [F.47: 대입 연산자는 `T&`를 반환하라](#Rf-assignment-op)
 * [F.48: `return std::move(local)`은 사용하지 말아라](#Rf-return-move-local)
-* [F.49: `return const T`는 사용하지 말아라](#Rf-return-const)
+* [F.49: `const T`는 `return`에 사용하지 말아라](#Rf-return-const)
 
 기타 함수 규칙:
 
