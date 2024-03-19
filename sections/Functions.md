@@ -35,7 +35,7 @@
 * [F.19: "전달(forward)" 매개변수는 `TP&&`타입과 `std::forward`로만 전달하라](#Rf-forward)
 * [F.20: "출력(out)"에는 매개변수보다는 값을 반환하는 방법을 선호하라](#Rf-out)
 * [F.21: "출력"값 여러 개를 반환할 때는 튜플이나 구조체를 선호하라](#Rf-out-multi)
-* [F.60: "인자가 없을 경우"를 허용한다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
+* [F.60: "인자가 없을 경우(no argument)"를 허용한다면 `T&`보다는 `T*`를 선호하라](#Rf-ptr-ref)
 
 매개변수 전달 의미구조(parameter passing semantic) 규칙:
 
